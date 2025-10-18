@@ -1,32 +1,55 @@
+/* Wrapper: full page, not scrollable */
+.dashboard-wrapper {
+  width: 100%;
+  height: 100vh;           /* full viewport height */
+  padding-top: 300px;      /* pushes dashboard down */
+  box-sizing: border-box;
+  overflow: hidden;         /* wrapper itself not scrollable */
+  background-color: #f5f6fa; 
+  display: flex;            /* allows flex children alignment */
+  justify-content: flex-start;
+  align-items: flex-start;  /* content starts below padding-top */
+}
 
-/* Dashboard container */
+/* Dashboard: scrollable content */
 .dashboard {
-  display: flex;              /* horizontal layout */
-  gap: 20px;                  /* space between boxes */
+  display: flex;
+  gap: 20px;
   padding: 20px;
   background-color: #f5f6fa;
   box-sizing: border-box;
-  overflow-x: auto;           /* horizontal scroll if needed */
-  width: 100%;                /* stretch full width */
-  max-width: 100%;            /* prevent overflow beyond screen */
+
+  width: 100%;
+  /* Flexible height to fill remaining space inside wrapper */
+  max-height: calc(100vh - 300px - 10px); /* 300px padding-top + 20px top/bottom padding */
+  overflow-y: auto;        /* vertical scroll if content exceeds */
+  overflow-x: hidden;      /* no horizontal scroll */
 }
 
-/* Optional: hide scrollbar but still scrollable */
-.dashboard::-webkit-scrollbar {
-  height: 8px;
-}
-.dashboard::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
+/* Left side stretches */
+.left-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-/* Box styles */
+/* Right side stacked vertically */
+.right-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 0 0 320px;         /* fixed width */
+}
+
+/* Box styling */
 .box {
-  flex: 0 0 300px;            /* fixed width, no shrinking */
   background-color: #d3d8e0;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  flex: 1;
+  min-height: 250px; /* ensures boxes don’t shrink too much */
 }
 
 /* Box headers */
@@ -50,7 +73,7 @@
 /* Placeholder for charts */
 .box-content .placeholder {
   background-color: #e0e5ec;
-  height: 150px;
+  height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
