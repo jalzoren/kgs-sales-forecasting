@@ -1,0 +1,39 @@
+/* App.css - global styles */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;500;600&display=swap');
+
+:root{
+  --content-max: 1200px;
+  --page-padding-x: 48px;
+  --nav-height: 72px;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f7f9fc;
+  color: #222;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.page-container {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: calc(var(--nav-height) + 40px) var(--page-padding-x) 80px var(--page-padding-x);
+}
+
+h1, h2, h3 {
+  font-family: 'Merriweather', serif;
+  color: #0b2948;
+  margin: 8px 0 12px 0;
+}
+p { color: #333; line-height: 1.7; }
+
+.app-footer {
+  text-align: center;
+  color: #666;
+  padding: 36px 12px;
+  border-top: 1px solid #e6e9ee;
+  margin-top: 40px;
+}
