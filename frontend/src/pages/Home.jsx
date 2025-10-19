@@ -61,7 +61,7 @@ export default function Home() {
               </div>
             </div>
             <div className="chart-area">
-              <LineChart width={620} height={300} data={salesData}>
+              <LineChart width={970} height={440} data={salesData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
                 <XAxis dataKey="name" />
                 <YAxis />

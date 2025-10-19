@@ -1,3 +1,10 @@
+:root {
+  --accent: #001D39;
+  --accent-light: #0A4174;
+  --fg-light: #EAEFF3;
+  --notif: #EF480B;
+}
+
 .dashboard {
   display: flex;
   gap: 24px;
@@ -5,7 +12,7 @@
   max-width: 1400px;
   margin: 0 auto;
   box-sizing: border-box;
-
+margin-top: 20px;
   align-items: stretch;
 
   overflow-y: auto;
@@ -33,7 +40,7 @@
 }
 
 .box {
-  background-color: #e9edf4;
+  background-color: var(--fg-light);
   border-radius: 14px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
   padding: 20px;

@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { FaBullseye, FaBell } from "react-icons/fa";
+import { LiaUserCircle } from "react-icons/lia";
 import "../css/Navbar.css";
 
 function Navbar() {
@@ -34,6 +35,11 @@ function Navbar() {
         <div className="navbar-right">
           <button className="icon-btn">
             <FaBell />
+          </button>
+          <button className="logout-btn">
+            
+            <LiaUserCircle />
+
           </button>
         </div>
       </div>

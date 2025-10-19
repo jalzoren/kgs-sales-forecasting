@@ -1,0 +1,187 @@
+:root {
+  --accent: #001d39;
+  --accent-light: #0a4174;
+  --accent-lighter: #41a7dd;
+  --accent-lightest: #bbc8d8;
+  --fg-light: #eaeff3;
+  --notif: #ef480b;
+}
+
+.upload-data-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.upload-box {
+  background-color: var(--accent-lightest);
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 600px;
+  padding: 20px;
+  height: 201px;
+}
+
+.upload-box h3 {
+  font-weight: 600;
+  color: #222;
+  font-family: "Poppins", sans-serif;
+}
+
+.drop-zone {
+  border: 2px dashed var(--accent);
+  background-color: #fff;
+  border-radius: 8px;
+  height: 161px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.drop-zone.drag-active {
+  background-color: #e6f2ff;
+  border-color: var(--accent-light);
+}
+
+.drop-zone .icon {
+  font-size: 32px;
+  color: var(--accent-lighter);
+  margin-bottom: 4px;
+  display: inline;
+  cursor: pointer;
+}
+
+.drop-zone p {
+  font-size: 16px;
+  color: var(--accent-lighter);
+  margin: 0;
+  cursor: pointer;
+}
+
+.drop-zone .browse {
+  color: var(--accent-lighter);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.drop-zone small {
+  margin-top: 5px;
+  color: var(--accent-light);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+
+
+.table-wrapper {
+  max-width: 1000px;
+  margin: 40px auto;
+  font-family: "Poppins", sans-serif;
+  color: #001d39;
+}
+
+
+
+.table-container {
+  background: #f5f7fa;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.upload-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #c9d6e3;
+}
+
+.upload-table th,
+.upload-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid #c9d6e3;
+}
+
+.upload-table thead {
+  background-color: #e6edf5;
+  font-weight: 600;
+}
+
+.upload-table tbody tr:nth-child(even) {
+  background-color: #f9fbfd;
+}
+
+.upload-table tbody tr:hover {
+  background-color: #eef5fb;
+  transition: 0.2s;
+}
+
+.status {
+  font-weight: 600;
+}
+
+.status.success {
+  color: #1a7f37;
+}
+
+.status.failed {
+  color: #c92a2a;
+}
+
+.actions {
+  text-align: center;
+}
+
+.btn-action {
+  background: none;
+  border: none;
+  color: #0a4174;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  text-decoration: underline;
+  margin: 0 5px;
+}
+
+.btn-action.delete {
+  color: #c92a2a;
+}
+
+.btn-action:hover {
+  color: #0077cc;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.pagination button {
+  border: 1px solid #c9d6e3;
+  background: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: #001d39;
+  color: white;
+  border-color: #001d39;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
