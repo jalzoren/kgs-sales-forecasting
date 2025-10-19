@@ -20,10 +20,6 @@ function App() {
 
   const hideNavbar = ["/", "/login"].includes(path);
 
-  document.documentElement.style.setProperty(
-    "--navbar-height",
-    useSmallNavbar ? "80px" : "240px"
-  );
 
   return (
     <>
