@@ -4,30 +4,33 @@
 :root {
   --accent: #0b2948;
 }
-
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 300px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background: 
-    linear-gradient(90deg, rgba(13, 53, 99, 0.95) 0%, rgba(9, 38, 68, 0.95) 100%),
-    url("../images/pattern.png");
-  background-size: cover, 50px 50px;
+
+  background:
+    linear-gradient(180deg, #0d3563 0%, #092644 100%),  /* smooth blue gradient */
+    url("../images/pattern.png");                      /* repeating texture */
+  background-size: cover, 250px 250px;                 /* fixed pattern tile size */
   background-repeat: no-repeat, repeat;
   background-position: center, top left;
+
   color: #fff;
-  box-shadow: 0 4px 14px rgba(2, 12, 27, 0.25);
+  box-shadow: 0 6px 20px rgba(2, 12, 27, 0.35);
   z-index: 1000;
   box-sizing: border-box;
   padding: 30px 60px 0 60px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: "Merriweather", serif;
 }
-
 .navbar-top {
   display: flex;
   align-items: center;
