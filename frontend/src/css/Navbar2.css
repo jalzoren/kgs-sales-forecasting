@@ -18,7 +18,7 @@
   justify-content: flex-start;
   background: 
     linear-gradient(90deg, rgba(14, 48, 87, 0.95) 0%, rgba(9, 38, 68, 0.95) 100%),
-    url("https://www.transparenttextures.com/patterns/asfalt-dark.png");
+    url("../images/pattern.png");
 
   background-size: cover;
   background-repeat: repeat;
