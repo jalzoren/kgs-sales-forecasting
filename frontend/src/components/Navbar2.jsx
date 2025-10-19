@@ -1,7 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { FaBullseye, FaBell } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
-
 import "../css/Navbar2.css";
 
 function Navbar2() {
@@ -9,10 +8,8 @@ function Navbar2() {
     <nav className="navbar2">
       <div className="navbar2-top">
         <div className="logo">
-          <div className="logo">
-            <FaBullseye className="logo-icon" />
-            <span className="logo-text">Sales Forecasting System</span>
-          </div>
+          <FaBullseye className="logo-icon" />
+          <span className="logo-text">Sales Forecasting System</span>
         </div>
 
         <ul className="navbar2-links">
@@ -42,8 +39,6 @@ function Navbar2() {
           </button>
         </div>
       </div>
-
-      <br></br>
     </nav>
   );
 }
