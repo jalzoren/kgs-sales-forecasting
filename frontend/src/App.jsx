@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Navbar2 from "./components/Navbar2";
 
@@ -10,62 +10,33 @@ import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import "./App.css";
 
-function ProtectedRoute({ children }) {
-  const isAuthenticated = localStorage.getItem("authToken"); // check login
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
-}
-
 function App() {
   const location = useLocation();
   const path = location.pathname;
 
-  const useSmallNavbarRoutes = ["/data", "/forecast", "/reports", "/analytics"];
-  const noNavbarRoutes = ["/login"];
+  const useSmallNavbar = ["/data", "/forecast", "/reports", "/analytics"].some(route =>
+    path.startsWith(route)
+  );
 
-  const hideNavbar = noNavbarRoutes.includes(path);
-  const useSmallNavbar = useSmallNavbarRoutes.includes(path);
+  const hideNavbar = ["/", "/login"].includes(path);
+
+  document.documentElement.style.setProperty(
+    "--navbar-height",
+    useSmallNavbar ? "80px" : "240px"
+  );
 
   return (
     <>
       {!hideNavbar && (useSmallNavbar ? <Navbar2 /> : <Navbar />)}
 
-      <div className="page-container">
+      <div className={`page-container ${hideNavbar ? "no-navbar" : ""}`}>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-
-          <Route
-            path="/data"
-            element={
-              <ProtectedRoute>
-                <Data />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/forecast"
-            element={
-              <ProtectedRoute>
-                <Forecast />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/reports"
-            element={
-              <ProtectedRoute>
-                <Reports />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/analytics"
-            element={
-              <ProtectedRoute>
-                <Analytics />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/" element={<Login />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/data" element={<Data />} />
+          <Route path="/forecast" element={<Forecast />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/analytics" element={<Analytics />} />
         </Routes>
       </div>
     </>

@@ -12,10 +12,11 @@
   max-width: 1400px;
   margin: 0 auto;
   box-sizing: border-box;
-margin-top: 20px;
   align-items: stretch;
 
   overflow-y: auto;
+    margin-top: 90px;
+
 }
 
 .left-side {

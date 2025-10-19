@@ -1,31 +1,17 @@
 import React, { useState } from "react";
-import "./Login.css";
+import { useNavigate } from "react-router-dom";
+import "../css/Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-      if (res.ok) {
-        alert("Login successful!");
-      } else {
-        alert(data.message || "Invalid credentials");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
-    }
+    navigate("/home");
   };
 
   return (
@@ -65,7 +51,7 @@ const Login = () => {
             Login
           </button>
 
-          <a href="/forgot-password" className="forgot">
+          <a href="#" className="forgot">
             Forgot the password?
           </a>
         </form>

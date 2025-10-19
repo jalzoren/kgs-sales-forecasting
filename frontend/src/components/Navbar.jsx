@@ -16,7 +16,7 @@ function Navbar() {
 
         <ul className="navbar-links">
           <li>
-            <NavLink to="/">Home</NavLink>
+            <NavLink to="/home">Home</NavLink>
           </li>
           <li>
             <NavLink to="/data">Data</NavLink>
