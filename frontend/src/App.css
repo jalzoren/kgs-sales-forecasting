@@ -44,9 +44,7 @@ body {
 
 
 
-/* ------------------------------
-   HEADINGS & TEXT
------------------------------- */
+
 h1,
 h2 {
   font-family: "Merriweather", serif;
@@ -59,9 +57,7 @@ p {
   line-height: 1.7;
 }
 
-/* ------------------------------
-   FOOTER
------------------------------- */
+
 .app-footer {
   text-align: center;
   color: #666;

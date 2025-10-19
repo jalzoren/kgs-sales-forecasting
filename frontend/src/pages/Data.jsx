@@ -72,6 +72,7 @@ export default function UploadBox() {
 
   return (
     <div>
+      <h2 class="titled">Data Management</h2>
 
       <div className="upload-data-container">
         <div className="upload-box">
