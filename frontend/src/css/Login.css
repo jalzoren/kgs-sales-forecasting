@@ -1,0 +1,131 @@
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Poppins:wght@400;500;600&display=swap");
+
+:root {
+  --accent: #0b2948;
+  --bg-gradient-top: rgba(13, 53, 99, 1);
+  --bg-gradient-bottom: rgba(9, 38, 68, 1);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-wrapper {
+  width: 100%;
+  height: 100vh;
+  background-image: linear-gradient(
+      180deg,
+      var(--bg-gradient-top) 0%,
+      var(--bg-gradient-bottom) 100%
+    ),
+    url("../images/pattern.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 45px 55px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(2, 12, 27, 0.35);
+  text-align: center;
+  width: 380px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: "Merriweather", serif;
+}
+
+h2 {
+  font-weight: 600;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  padding-bottom: 12px;
+  font-size: 24px;
+}
+
+label {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  margin: 18px 0 5px;
+  font-family: "Poppins", sans-serif;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0b2948;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  margin-top: 8px;
+  color: #ddd;
+}
+
+.checkbox input {
+  margin-right: 6px;
+}
+
+.login-btn {
+  margin-top: 20px;
+  width: 100%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 11px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  font-family: "Poppins", sans-serif;
+}
+
+.login-btn:hover {
+  background: #144b7a;
+}
+
+.forgot {
+  display: block;
+  margin-top: 14px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.forgot:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .login-container {
+    width: 90%;
+    padding: 35px 25px;
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+}
