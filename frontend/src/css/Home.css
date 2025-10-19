@@ -1,83 +1,63 @@
-/* Wrapper: full page, not scrollable */
-.dashboard-wrapper {
-  width: 100%;
-  height: 100vh;           /* full viewport height */
-  padding-top: 300px;      /* pushes dashboard down */
-  box-sizing: border-box;
-  overflow: hidden;         /* wrapper itself not scrollable */
-  background-color: #f5f6fa; 
-  display: flex;            /* allows flex children alignment */
-  justify-content: flex-start;
-  align-items: flex-start;  /* content starts below padding-top */
-}
-
-/* Dashboard: scrollable content */
+/* === DASHBOARD CONTAINER === */
 .dashboard {
   display: flex;
-  gap: 20px;
+  gap: 24px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 20px;
-  background-color: #f5f6fa;
   box-sizing: border-box;
 
-  width: 100%;
-  /* Flexible height to fill remaining space inside wrapper */
-  max-height: calc(100vh - 300px - 10px); /* 300px padding-top + 20px top/bottom padding */
-  overflow-y: auto;        /* vertical scroll if content exceeds */
-  overflow-x: hidden;      /* no horizontal scroll */
+  /* Navbar offset */
+  margin-top: 190px; /* 👈 Adjust if your navbar height changes */
+
+  /* Equal column heights */
+  align-items: stretch;
+
+  /* Scrolling */
+  overflow-y: auto;
 }
 
-/* Left side stretches */
+/* === LEFT SIDE (Sales Overview) === */
 .left-side {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
-/* Right side stacked vertically */
+.sales-overview {
+  flex: 1; /* fills full height of dashboard */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* === RIGHT SIDE (Inventory + Category stacked) === */
 .right-side {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  flex: 0 0 320px;         /* fixed width */
-}
-
-/* Box styling */
-.box {
-  background-color: #d3d8e0;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  flex: 1;
-  min-height: 250px; /* ensures boxes don’t shrink too much */
-}
-
-/* Box headers */
-.box-header {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
+  flex: 0 0 340px; /* fixed width */
+  gap: 20px; /* spacing between right boxes */
 }
 
-.box-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.dropdowns select {
-  margin-left: 10px;
-  padding: 5px;
-}
-
-/* Placeholder for charts */
-.box-content .placeholder {
-  background-color: #e0e5ec;
-  height: 100px;
+/* === BOX BASE STYLE === */
+.box {
+  background-color: #e9edf4;
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+  transition: all 0.2s ease;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #555;
-  font-weight: bold;
-  border-radius: 8px;
+  flex-direction: column;
+}
+
+.box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+/* Make right-side boxes equal height */
+.right-side .box {
+  flex: 1;
 }

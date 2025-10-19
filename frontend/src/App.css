@@ -6,16 +6,19 @@
   --page-padding-x: 48px;
   --nav-height: 72px;
 }
-
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: #f7f9fc;
-  color: #222;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+:root {
+  --navbar-height: 300px; /* default height for large navbar */
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f5f6fa;
+}
+
 
 .page-container {
   max-width: var(--content-max);
