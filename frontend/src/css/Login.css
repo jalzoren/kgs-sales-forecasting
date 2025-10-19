@@ -1,96 +1,64 @@
-@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@100;300;400;700&family=Poppins:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Poppins:wght@400;500;600&display=swap");
 
 :root {
-  --accent: #001d39;
-  --accent-light: #0a4174;
-  --fg-light: #eaeff3;
-  --notif: #ef480b;
+  --accent: #0b2948;
+  --bg-gradient-top: rgba(13, 53, 99, 1);
+  --bg-gradient-bottom: rgba(9, 38, 68, 1);
 }
 
-.navbar2 {
-  position: relative;
-  top: 0;
-  left: 0;
-  width: 100%;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  height: 100vh;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  justify-content: flex-start;
+}
+
+.login-wrapper {
+  width: 100%;
+  height: 100vh;
   background-image: linear-gradient(
       180deg,
-      rgba(13, 53, 99, 1) 0%,
-      rgba(9, 38, 68, 1) 100%
+      var(--bg-gradient-top) 0%,
+      var(--bg-gradient-bottom) 100%
     ),
     url("../images/pattern.png");
-  background-size: cover, cover;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-container {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 45px 55px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(2, 12, 27, 0.35);
+  text-align: center;
+  width: 380px;
   color: #fff;
-  box-shadow: 0 4px 14px rgba(2, 12, 27, 0.25);
-  z-index: 9999; /* ensure visible above everything */
-  box-sizing: border-box;
-  padding: 25px 60px;
-  margin-bottom: 25px;
-}
-
-.navbar2-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  position: relative;
-  padding-bottom: 10px;
-}
-
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
   font-family: "Merriweather", serif;
 }
 
-/* make the Log In text white */
-.Title {
+h2 {
   font-weight: 600;
   margin-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   padding-bottom: 12px;
   font-size: 24px;
-  color: #ffffff; /* bright white */
 }
 
-.navbar2-links {
-  list-style: none;
-  display: flex;
-  gap: 50px;
-  margin: 0;
-  padding: 0;
-  align-items: center;
-  font-family: "Merriweather", sans-serif;
-  font-weight: 400;
-  margin-left: auto;
-}
-
-.navbar2-links li {
-  position: relative;
-}
-
-.navbar2-links a {
-  text-decoration: none;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  padding: 6px 0;
-  transition: color 0.2s ease;
-  display: inline-block;
-}
-
-/* equal width alignment for inputs and button */
-input[type="email"],
-input[type="password"],
-input[type="text"],
-.login-btn {
-  width: 100%;
-  box-sizing: border-box;
+label {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  margin: 18px 0 5px;
+  font-family: "Poppins", sans-serif;
 }
 
 input[type="email"],
@@ -106,7 +74,7 @@ input[type="text"] {
   color: #0b2948;
 }
 
-.navbar2-right {
+.checkbox {
   display: flex;
   align-items: center;
   font-size: 13px;
@@ -118,53 +86,46 @@ input[type="text"] {
   margin-right: 6px;
 }
 
-
 .login-btn {
   margin-top: 20px;
   width: 100%;
   background: var(--accent);
   color: white;
   border: none;
-  color: #fff;
-  font-size: 20px;
+  padding: 11px;
+  border-radius: 6px;
+  font-size: 15px;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease;
+  transition: 0.3s ease;
+  font-family: "Poppins", sans-serif;
 }
 
-.icon-btn:hover,
-.logout-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+.login-btn:hover {
+  background: #144b7a;
 }
 
-@media (max-width: 880px) {
-  .navbar2 {
-    padding: 12px 20px;
-    flex-wrap: wrap;
-    gap: 10px;
-    height: auto;
+.forgot {
+  display: block;
+  margin-top: 14px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.forgot:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 480px) {
+  .login-container {
+    width: 90%;
+    padding: 35px 25px;
   }
 
-  .navbar2-links {
-    width: 100%;
-    justify-content: center;
-    gap: 20px;
-    padding-bottom: 10px;
-    flex-wrap: wrap;
-    margin-left: 0;
-  }
-
-  .navbar2-right {
-    justify-content: center;
-    width: 100%;
-    margin: 10px 0 5px 0;
-  }
-
-  .logo-text {
-    font-size: 16px;
+  h2 {
+    font-size: 22px;
   }
 }
