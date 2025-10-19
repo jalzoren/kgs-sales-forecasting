@@ -47,20 +47,16 @@
   align-items: center;
   gap: 10px;
   font-family: "Merriweather", serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
 }
 
-.logo-icon {
-  font-size: 28px;
-  color: #fff;
-}
-
-.logo-text {
-  font-weight: 300;
-  letter-spacing: 0.2px;
-  font-size: 20px;
+/* make the Log In text white */
+.Title {
+  font-weight: 600;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  padding-bottom: 12px;
+  font-size: 24px;
+  color: #ffffff; /* bright white */
 }
 
 .navbar2-links {
@@ -88,39 +84,46 @@
   display: inline-block;
 }
 
-.navbar2-links a::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  height: 2px;
-  width: 0;
-  background: #ffffff;
-  transition: width 220ms cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-
-.navbar2-links a:hover::after,
-.navbar2-links a.active::after {
+/* equal width alignment for inputs and button */
+input[type="email"],
+input[type="password"],
+input[type="text"],
+.login-btn {
   width: 100%;
+  box-sizing: border-box;
 }
 
-.navbar2-links a:hover,
-.navbar2-links a.active {
-  color: #ffffff;
-  font-weight: 600;
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  outline: none;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0b2948;
 }
 
 .navbar2-right {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 25px;
-  margin-left: 40px;
+  font-size: 13px;
+  margin-top: 8px;
+  color: #ddd;
 }
 
-.icon-btn,
-.logout-btn {
-  background: transparent;
+.checkbox input {
+  margin-right: 6px;
+}
+
+
+.login-btn {
+  margin-top: 20px;
+  width: 100%;
+  background: var(--accent);
+  color: white;
   border: none;
   color: #fff;
   font-size: 20px;

@@ -17,7 +17,7 @@ const Login = () => {
   return (
     <div className="login-wrapper">
       <div className="login-container">
-        <h2>Log In</h2>
+        <h2 class="Title">Log In</h2>
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input
