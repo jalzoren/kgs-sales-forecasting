@@ -7,7 +7,7 @@
 
 
 .navbar2 {
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
   width: 100%;
@@ -16,17 +16,16 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
- background-image: 
-  linear-gradient(
-    180deg, 
-    rgba(13, 53, 99) 0%,  
-    rgba(9, 38, 68, 0.8) 100%
-  ),
-  url("../images/pattern.png");
+  background-image: linear-gradient(
+      180deg,
+      rgba(13, 53, 99) 0%,
+      rgba(9, 38, 68) 100%
+    ),
+    url("../images/pattern.png");
 
-background-size: cover, cover;
-background-repeat: no-repeat, no-repeat;
-background-position: center, center;
+  background-size: cover, cover;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, center;
   color: #fff;
   box-shadow: 0 4px 14px rgba(2,12,27,0.25);
   z-index: 1000;
