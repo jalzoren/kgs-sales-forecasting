@@ -4,8 +4,6 @@ import "../css/Home.css";
 
 export default function Home() {
   return (
-
-
     <div className="dashboard">
       <div className="box">
         <div className="box-header">
