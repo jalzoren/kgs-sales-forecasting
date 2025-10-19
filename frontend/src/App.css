@@ -3,11 +3,11 @@
 
 :root{
   --content-max: 1200px;
-  --page-padding-x: 48px;
-  --nav-height: 72px;
+  --page-padding-x: 30px;
+  --nav-height: 30px;
 }
 :root {
-  --navbar-height: 300px; /* default height for large navbar */
+  --navbar-height: 100px; 
 }
 
 html, body {
@@ -17,13 +17,16 @@ html, body {
   width: 100%;
   font-family: 'Poppins', sans-serif;
   background-color: #f5f6fa;
-  
 }
 
+body{
+    overflow-y: auto;
+
+}
 
 .page-container {
   margin: 0 auto;
-  padding: calc(var(--nav-height) + 30px) var(--page-padding-x) 5px var(--page-padding-x);
+  padding: calc(var(--nav-height) + 10px) var(--page-padding-x) 0px var(--page-padding-x);
 }
 
 h1, h2, h3 {
