@@ -2,7 +2,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@100;300;400;700&family=Poppins:wght@400;500;600&display=swap");
 
 :root {
-  --accent: #0b2948;
+  --accent: #001D39;
+  --accent-light: #0A4174;
+  --fg-light: #EAEFF3;
+  --notif: #EF480B;
 }
 
 
@@ -140,6 +143,25 @@
 }
 
 .icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+
+.logout-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 25px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.logout-btn:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
