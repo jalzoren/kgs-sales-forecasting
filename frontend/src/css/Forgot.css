@@ -1,0 +1,103 @@
+:root {
+  --accent: #001D39;
+  --accent-light: #0A4174;
+  --text-light: #e0e6ed;
+}
+
+
+.forgot-container {
+  background: var(--accent-light);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  width: 360px;
+  color: white;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+hr {
+  border: 0;
+  height: 1px;
+  background-color: #2b4b6a;
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  text-align: left;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  outline: none;
+}
+
+.email-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.send-code-btn {
+  background-color: #5c9bdb;
+  border: none;
+  color: #001d39;
+  font-weight: bold;
+  padding: 10px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.send-code-btn:hover {
+  background-color: #74b2f3;
+}
+
+.submit-btn {
+  width: 100%;
+  background-color: var(--accent);
+  border: none;
+  color: white;
+  font-weight: bold;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #03274e;
+}
+
+.back-login {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #cdd6e0;
+  cursor: pointer;
+}
+
+.back-login:hover {
+  text-decoration: underline;
+}
+
+.message {
+  text-align: center;
+  margin-top: 10px;
+  color: #fffacd;
+  font-size: 0.9rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
