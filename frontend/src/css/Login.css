@@ -45,12 +45,14 @@ body {
   font-family: "Merriweather", serif;
 }
 
-h2 {
+/* make the Log In text white */
+.Title {
   font-weight: 600;
   margin-bottom: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.25);
   padding-bottom: 12px;
   font-size: 24px;
+  color: #ffffff; /* bright white */
 }
 
 label {
@@ -61,10 +63,18 @@ label {
   font-family: "Poppins", sans-serif;
 }
 
+/* equal width alignment for inputs and button */
+input[type="email"],
+input[type="password"],
+input[type="text"],
+.login-btn {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 input[type="email"],
 input[type="password"],
 input[type="text"] {
-  width: 100%;
   padding: 10px;
   border: none;
   border-radius: 5px;
@@ -76,19 +86,30 @@ input[type="text"] {
 
 .checkbox {
   display: flex;
-  align-items: center;
-  font-size: 13px;
-  margin-top: 8px;
-  color: #ddd;
+  align-items: center; /* vertical alignment */
+  gap: 6px; /* spacing between checkbox and text */
+  padding-left: 2px; /* aligns left edge with inputs */
 }
 
-.checkbox input {
-  margin-right: 6px;
+.checkbox input[type="checkbox"] {
+  transform: translateY(1px); /* subtle adjust to center perfectly */
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #4a90e2; /* keep the blue color */
 }
+
+.checkbox label {
+  color: #ffffff;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
 
 .login-btn {
   margin-top: 20px;
-  width: 100%;
   background: var(--accent);
   color: white;
   border: none;
