@@ -1,4 +1,3 @@
-/* === DASHBOARD CONTAINER === */
 .dashboard {
   display: flex;
   gap: 24px;
@@ -7,18 +6,13 @@
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
+  margin-top: 190px; 
 
-  /* Navbar offset */
-  margin-top: 190px; /* 👈 Adjust if your navbar height changes */
-
-  /* Equal column heights */
   align-items: stretch;
 
-  /* Scrolling */
   overflow-y: auto;
 }
 
-/* === LEFT SIDE (Sales Overview) === */
 .left-side {
   flex: 1;
   display: flex;
@@ -26,22 +20,20 @@
 }
 
 .sales-overview {
-  flex: 1; /* fills full height of dashboard */
+  flex: 1; 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-/* === RIGHT SIDE (Inventory + Category stacked) === */
 .right-side {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  flex: 0 0 340px; /* fixed width */
-  gap: 20px; /* spacing between right boxes */
+  flex: 0 0 340px; 
+  gap: 20px;
 }
 
-/* === BOX BASE STYLE === */
 .box {
   background-color: #e9edf4;
   border-radius: 14px;
@@ -57,7 +49,6 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
 }
 
-/* Make right-side boxes equal height */
 .right-side .box {
   flex: 1;
 }
