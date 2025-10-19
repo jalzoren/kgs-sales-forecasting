@@ -1,60 +1,54 @@
-
-/* Dashboard container */
 .dashboard {
-  display: flex;              /* horizontal layout */
-  gap: 20px;                  /* space between boxes */
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 20px;
-  background-color: #f5f6fa;
   box-sizing: border-box;
-  overflow-x: auto;           /* horizontal scroll if needed */
-  width: 100%;                /* stretch full width */
-  max-width: 100%;            /* prevent overflow beyond screen */
+  margin-top: 190px; 
+
+  align-items: stretch;
+
+  overflow-y: auto;
 }
 
-/* Optional: hide scrollbar but still scrollable */
-.dashboard::-webkit-scrollbar {
-  height: 8px;
-}
-.dashboard::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
-}
-
-/* Box styles */
-.box {
-  flex: 0 0 300px;            /* fixed width, no shrinking */
-  background-color: #d3d8e0;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Box headers */
-.box-header {
+.left-side {
+  flex: 1;
   display: flex;
+  flex-direction: column;
+}
+
+.sales-overview {
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
 }
 
-.box-header h3 {
-  margin: 0;
-  font-size: 18px;
-}
-
-.dropdowns select {
-  margin-left: 10px;
-  padding: 5px;
-}
-
-/* Placeholder for charts */
-.box-content .placeholder {
-  background-color: #e0e5ec;
-  height: 150px;
+.right-side {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #555;
-  font-weight: bold;
-  border-radius: 8px;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 0 0 340px; 
+  gap: 20px;
+}
+
+.box {
+  background-color: #e9edf4;
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  padding: 20px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.right-side .box {
+  flex: 1;
 }
