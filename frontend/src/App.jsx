@@ -7,7 +7,7 @@ import Data from "./pages/Data";
 import Forecast from "./pages/Forecast";
 import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
-import "./App.css"; // new global layout styles
+import "./App.css"; 
 
 function App() {
   const location = useLocation();
@@ -15,7 +15,6 @@ function App() {
 
   const useSmallNavbar = ["/data", "/forecast", "/reports", "/analytics"].includes(path);
 
-  // Dynamically set CSS variable for navbar height
   document.documentElement.style.setProperty(
     "--navbar-height",
     useSmallNavbar ? "80px" : "300px"
