@@ -17,7 +17,7 @@ function App() {
 
   document.documentElement.style.setProperty(
     "--navbar-height",
-    useSmallNavbar ? "80px" : "300px"
+    useSmallNavbar ? "80px" : "240px"
   );
 
   return (

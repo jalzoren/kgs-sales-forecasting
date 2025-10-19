@@ -40,7 +40,6 @@ export default function Home() {
 
 
   return (  
-    <div className="dashboard-wrapper">
       <div className="dashboard">
     
         <div className="left-side">
@@ -116,7 +115,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </div>
+  
   );
 
 
