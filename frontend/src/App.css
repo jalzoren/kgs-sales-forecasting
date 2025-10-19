@@ -21,9 +21,8 @@ html, body {
 
 
 .page-container {
-  max-width: var(--content-max);
   margin: 0 auto;
-  padding: calc(var(--nav-height) + 40px) var(--page-padding-x) 80px var(--page-padding-x);
+  padding: calc(var(--nav-height) + 30px) var(--page-padding-x) 5px var(--page-padding-x);
 }
 
 h1, h2, h3 {
