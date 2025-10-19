@@ -1,5 +1,3 @@
-// Filename - app.js 
-
 // Importing modules
 const express = require('express');
 const mysql = require('mysql');
@@ -11,8 +9,8 @@ const PORT = 3000;
 const connection = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'yourpassword',
-  database: "ExpressIntegration"        
+  password: '',
+  database: "kgs"        
 });
 
 // open the MySQL connection
@@ -28,4 +26,9 @@ connection.connect(error => {
         console.log("Database connection is Ready and "
             + "Server is Listening on Port ", PORT);
     })
+});
+
+// Simple test route
+app.get('/', (req, res) => {
+  res.send('Sales Forecasting System - Database Connected!');
 });
