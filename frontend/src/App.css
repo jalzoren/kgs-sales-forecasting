@@ -48,11 +48,10 @@ body {
    HEADINGS & TEXT
 ------------------------------ */
 h1,
-h2,
-h3 {
+h2 {
   font-family: "Merriweather", serif;
   color: var(--accent);
-  margin: 8px 0 12px 0;
+  margin: 0px 0 12px 0;
 }
 
 p {

@@ -7,12 +7,13 @@
   --fg-light: #EAEFF3;
   --notif: #EF480B;
 }
-
 .navbar2 {
   position: relative;
   top: 0;
   left: 0;
   width: 100%;
+  height: 100px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,15 +24,16 @@
       rgba(9, 38, 68) 100%
     ),
     url("../images/pattern.png");
+
   background-size: cover, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
   color: #fff;
-  box-shadow: 0 4px 14px rgba(2,12,27,0.25);
-  z-index: 10;
+  box-shadow: 0 6px 20px rgba(2, 12, 27, 0.35);
+  z-index: 1000;
   box-sizing: border-box;
-  padding: 25px 60px;
-  margin-bottom: 25px; /* ✅ creates space below navbar */
+  padding: 30px 60px 0 60px;
+  font-family: "Merriweather", serif;
 }
 
 .navbar2-top {

@@ -75,7 +75,7 @@ export default function UploadBox() {
 
       <div className="upload-data-container">
         <div className="upload-box">
-          <h3>Upload New Data</h3>
+          <h3 class="title">Upload New Data</h3>
 
           <div
             className={`drop-zone ${isDragging ? "drag-active" : ""}`}
