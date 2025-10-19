@@ -5,13 +5,12 @@
   --notif: #EF480B;
 }
 
-
 .dashboard {
   display: flex;
   gap: 24px;
   width: 100%;
   max-width: 1400px;
-  margin: 20px auto;
+  margin: 0 auto;
   box-sizing: border-box;
   align-items: stretch;
 
