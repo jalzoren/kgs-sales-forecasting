@@ -82,6 +82,7 @@ export default function Home() {
               <a href="#" className="view-all">View All ↗</a>
             </div>
             <div className="inventory-alerts">
+
               {inventoryData.map((item, index) => (
                 <div key={index} className="inventory-item">
                   <span>{item.name}</span>
@@ -94,6 +95,7 @@ export default function Home() {
                   <span className="value">{item.value}</span>
                 </div>
               ))}
+              
             </div>
           </div>
 

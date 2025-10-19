@@ -5,7 +5,6 @@
   --accent: #0b2948;
 }
 
-
 .navbar {
   position: fixed;
   top: 0;
@@ -18,7 +17,7 @@
   justify-content: flex-start;
   background: 
     linear-gradient(90deg, rgba(13, 53, 99, 0.95) 0%, rgba(9, 38, 68, 0.95) 100%),
-    url("https://www.transparenttextures.com/patterns/gplay.png");
+    url("../images/pattern.png");
   background-size: cover, 50px 50px;
   background-repeat: no-repeat, repeat;
   background-position: center, top left;
@@ -52,8 +51,6 @@
     rgba(255, 255, 255)
   );
 }
-
-
 
 
 .logo {
