@@ -1,5 +1,4 @@
-/* Navbar.css - imported by Navbar.jsx */
-@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@100;300;400;700&family=Poppins:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Poppins:wght@400;500;600&display=swap");
 
 :root {
   --accent: #001D39;
@@ -7,95 +6,60 @@
   --fg-light: #EAEFF3;
   --notif: #EF480B;
 }
-body{
+
+body {
   margin: 0;
   padding: 0;
   font-family: "Poppins", sans-serif;
 }
+
 .navbar {
-  position: relative;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 255px;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  background-image: linear-gradient(
-      180deg,
-      rgba(13, 53, 99) 0%,
-      rgba(9, 38, 68) 100%
-    ),
-    url("../images/pattern.png");
-
-  background-size: cover, cover;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, center;
+  background-image: linear-gradient(180deg, #0d3563 0%, #092644 100%), url("../images/pattern.png");
+  background-size: cover;
+  background-repeat: no-repeat;
   color: #fff;
   box-shadow: 0 6px 20px rgba(2, 12, 27, 0.35);
-  z-index: 1000;
   box-sizing: border-box;
-  padding: 30px 60px 0 60px;
+  padding: 30px 60px 25px;
   font-family: "Merriweather", serif;
+  position: relative; /* Navbar scrolls with the page */
 }
+
+/* --- Top Section --- */
 .navbar-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
   position: relative;
-  padding-bottom: 10px;
-}
-
-.navbar-top::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -10px;
-  width: 100%;
-  height: 0.5px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255),
-    rgba(255, 255, 255),
-    rgba(255, 255, 255)
-  );
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 .logo {
   display: flex;
   align-items: center;
   gap: 10px;
-  white-space: nowrap;
-  font-family: "Merriweather", serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
 }
 
 .logo-icon {
-  font-size: 28px;
+  font-size: 26px;
   color: #fff;
 }
 
 .logo-text {
-  font-weight: 200;
-  letter-spacing: 0.2px;
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
+/* --- Links --- */
 .navbar-links {
   list-style: none;
   display: flex;
-  gap: 50px;
+  gap: 40px;
   margin: 0;
   padding: 0;
-  align-items: center;
-  font-family: "Merriweather", sans-serif;
-  font-weight: 400;
-  margin-left: auto;
 }
 
 .navbar-links li {
@@ -105,95 +69,74 @@ body{
 .navbar-links a {
   text-decoration: none;
   color: rgba(255, 255, 255, 0.9);
-  font-size: 16px;
-  padding: 6px 0;
-  transition: color 0.2s ease;
-  display: inline-block;
+  font-weight: 400;
+  transition: 0.2s;
+  font-size: 15px;
+  position: relative;
 }
 
 .navbar-links a::after {
   content: "";
   position: absolute;
   left: 0;
-  bottom: -1px;
+  bottom: -2px;
+  width: 0;
   height: 2px;
-  background: #ffffff;
-  transition: width 220ms cubic-bezier(0.2, 0.9, 0.3, 1);
-  font-weight: 600;
+  background: #fff;
+  transition: width 0.25s ease;
 }
 
 .navbar-links a:hover::after,
 .navbar-links a.active::after {
   width: 100%;
-  font-weight: 600;
 }
 
 .navbar-links a:hover,
 .navbar-links a.active {
-  width: 100%;
-
-  color: #ffffff;
-  font-weight: 600;
+  color: #fff;
+  font-weight: 500;
 }
 
+/* --- Right Icons --- */
 .navbar-right {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 25px;
-  margin-left: 40px;
+  gap: 18px;
 }
 
-.icon-btn {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 20px;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease;
-}
-
-.icon-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
+.icon-btn,
 .logout-btn {
   background: transparent;
   border: none;
   color: #fff;
-  font-size: 25px;
+  font-size: 22px;
   cursor: pointer;
-  padding: 8px;
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease;
+  transition: background 0.25s ease;
+  padding: 6px;
 }
 
+.icon-btn:hover,
 .logout-btn:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* --- Stats Section --- */
 .navbar-stats {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-evenly;
   align-items: center;
-  width: 80%;
-  margin: 10px auto;
-  background: rgba(255, 255, 255, 0.111);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  color: var(--fg-light);
-  font-family: "Poppins", sans-serif;
-  height: 120px;
-
+  margin-top: 22px;
+  padding: 20px 0;
+  width: 85%;
+  margin-inline: auto;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+  height: 110px;
+  /* Optional: To reduce navbar height, change to height: 90px; and margin-top: 15px; */
+  /* Then update --navbar-height in App.css to 220px */
 }
 
 .stat-item {
@@ -204,72 +147,63 @@ body{
 .stat-item h4 {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255);
-  margin-bottom: 6px;
-  padding-top: 0;
+  margin-bottom: 4px;
 }
 
 .stat-item .value {
   font-size: 22px;
   font-weight: 700;
   margin: 4px 0;
-  color: rgba(255, 255, 255);
 }
 
 .stat-item span {
   font-size: 12px;
-  color: rgba(255, 255, 255);
+  opacity: 0.9;
 }
 
-.stat-item .green {
+.green {
   color: #00ff7f;
 }
-
-.stat-item .red {
+.red {
   color: #ff4d4d;
 }
 
 .divider {
   width: 1px;
-  height: 50px;
-  background: rgba(255, 255, 255, 0.2);
+  height: 45px;
+  background: rgba(255, 255, 255, 0.3);
 }
 
+/* --- Responsive --- */
 @media (max-width: 900px) {
+  .navbar {
+    padding: 20px;
+  }
+
+  .navbar-top {
+    flex-direction: column;
+    gap: 10px;
+    border: none;
+  }
+
+  .navbar-links {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .navbar-right {
+    justify-content: center;
+  }
+
   .navbar-stats {
     flex-direction: column;
+    height: auto;
+    padding: 15px;
     gap: 12px;
   }
 
   .divider {
     display: none;
-  }
-}
-
-@media (max-width: 880px) {
-  .navbar {
-    padding: 12px 20px;
-    flex-wrap: wrap;
-    gap: 10px;
-    height: auto;
-  }
-
-  .navbar-links {
-    width: 100%;
-    justify-content: center;
-    gap: 20px;
-    padding-bottom: 10px;
-    flex-wrap: wrap;
-    margin-left: 0;
-  }
-
-  .navbar-right {
-    justify-content: center;
-    width: 100%;
-    margin: 10px 0 5px 0;
-  }
-
-  .logo-text {
-    font-size: 16px;
   }
 }
