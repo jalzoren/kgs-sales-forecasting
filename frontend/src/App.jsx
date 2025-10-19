@@ -8,27 +8,22 @@ import Forecast from "./pages/Forecast";
 import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
-
 import "./App.css";
 
 function App() {
   const location = useLocation();
   const path = location.pathname;
 
-  // ✅ Show Navbar2 only for specific routes
-  const showNavbar2 = ["/data", "/forecast", "/reports", "/analytics"].some(
-    (route) => path.startsWith(route)
+  const useSmallNavbar = ["/data", "/forecast", "/reports", "/analytics"].some(route =>
+    path.startsWith(route)
   );
 
-  // ✅ Hide navbar for login and root
-  const hideNavbar = path === "/" || path === "/login";
+  const hideNavbar = ["/", "/login"].includes(path);
 
-  console.log("PATH:", path, "showNavbar2:", showNavbar2, "hideNavbar:", hideNavbar);
 
   return (
     <>
-      {/* ✅ Conditional Navbar rendering */}
-      {!hideNavbar && (showNavbar2 ? <Navbar2 /> : <Navbar />)}
+      {!hideNavbar && (useSmallNavbar ? <Navbar2 /> : <Navbar />)}
 
       <div className={`page-container ${hideNavbar ? "no-navbar" : ""}`}>
         <Routes>

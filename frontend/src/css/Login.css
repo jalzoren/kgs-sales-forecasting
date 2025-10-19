@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 
-=======
->>>>>>> main
 @import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Poppins:wght@400;500;600&display=swap");
 
 :root {
@@ -10,9 +7,6 @@
   --bg-gradient-bottom: rgba(9, 38, 68, 1);
 }
 
-<<<<<<< HEAD
-
-=======
 body {
   margin: 0;
   padding: 0;
@@ -22,7 +16,6 @@ body {
   justify-content: center;
   align-items: center;
 }
->>>>>>> main
 
 .login-wrapper {
   width: 100%;
@@ -39,7 +32,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-<<<<<<< HEAD
 }
 
 .login-container {
@@ -70,38 +62,6 @@ label {
   font-family: "Poppins", sans-serif;
 }
 
-=======
-}
-
-.login-container {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 45px 55px;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(2, 12, 27, 0.35);
-  text-align: center;
-  width: 380px;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  font-family: "Merriweather", serif;
-}
-
-h2 {
-  font-weight: 600;
-  margin-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-  padding-bottom: 12px;
-  font-size: 24px;
-}
-
-label {
-  display: block;
-  text-align: left;
-  font-size: 14px;
-  margin: 18px 0 5px;
-  font-family: "Poppins", sans-serif;
-}
-
->>>>>>> main
 input[type="email"],
 input[type="password"],
 input[type="text"] {
