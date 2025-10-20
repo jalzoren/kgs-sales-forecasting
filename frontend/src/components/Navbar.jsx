@@ -22,7 +22,6 @@ function Navbar() {
   const [notifications] = useState(notificationsData);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleLogout = () => {
     Swal.fire({
@@ -66,7 +65,6 @@ function Navbar() {
           <div className="notification-wrapper">
             <button className="icon-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
               <FaBell />
-              {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
             </button>
 
             {dropdownOpen && (

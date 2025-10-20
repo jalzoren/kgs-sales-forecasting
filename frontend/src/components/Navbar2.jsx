@@ -6,22 +6,16 @@ import { useState } from "react";
 
 import "../css/Navbar2.css";
 
-// Example notifications data
-const notificationsData = [
+const sampleNotifications = [
   { message: "Inventory Alert: Item X low stock", time: "2h ago", read: false },
   { message: "Sales forecast updated", time: "5h ago", read: false },
   { message: "New report available", time: "1d ago", read: true },
   { message: "Forecast accuracy variance: 7%", time: "2d ago", read: true },
-  { message: "Predicted sales updated", time: "3d ago", read: true },
-  { message: "Inventory Alert: Item Y low stock", time: "4d ago", read: false },
 ];
 
 function Navbar2() {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState(notificationsData);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleLogout = () => {
     Swal.fire({
@@ -71,12 +65,11 @@ function Navbar2() {
           <div className="notification-wrapper">
             <button className="icon-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
               <FaBell />
-              {unreadCount > 0 && <span className="badge">{unreadCount}</span>}
             </button>
 
             {dropdownOpen && (
               <div className="notifications-dropdown">
-                {notifications.slice(0, 5).map((n, i) => (
+                {sampleNotifications.map((n, i) => (
                   <div key={i} className={`notification-item ${n.read ? "" : "unread"}`}>
                     <p>{n.message}</p>
                     <span>{n.time}</span>
