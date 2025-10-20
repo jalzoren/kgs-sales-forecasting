@@ -39,7 +39,7 @@ h2 {
 hr {
   border: 0;
   height: 1px;
-  background-color: #2b4b6a;
+  background-color: #ffffff;
   margin-bottom: 20px;
 }
 
@@ -113,8 +113,23 @@ input {
   font-size: 0.9rem;
 }
 
+.title{
+  color:#fffacd;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+
+.checkbox-row label{
+  margin: 0;
+  font-weight: normal;
+}
+
 .checkbox-row {
   display: flex;
   align-items: center;
+  margin-top: 5px;
   gap: 5px;
 }
