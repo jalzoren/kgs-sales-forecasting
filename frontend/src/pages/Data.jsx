@@ -111,7 +111,6 @@ export default function UploadBox() {
         {/* Toolbar */}
         <div className="table-toolbar">
           <div className="search-box">
-            <FiSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search"

@@ -112,18 +112,16 @@ select {
   align-items: center;
   border-radius: 6px;
   color: var(--accent);
+
 }
 
-.search-box .search-icon {
-  position: absolute;
-  left: 10px;
-  color: var(--accent-lighter);
-  font-size: 18px;
-}
+
 
 .search-box input {
-  padding-left: 38px !important;
   width: 250px;
+  margin: 0px;
+    color: var(--accent);
+
 }
 
 /* ------------------------------
