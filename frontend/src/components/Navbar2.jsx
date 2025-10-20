@@ -36,7 +36,7 @@ function Navbar2() {
           icon: "success",
           title: "Logged out successfully!",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 500,
           timerProgressBar: true,
         }).then(() => {
           navigate("/");
