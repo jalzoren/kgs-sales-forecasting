@@ -14,6 +14,7 @@ const Login = () => {
     navigate("/home");
   };
 
+
   return (
     <div className="login-wrapper">
       <div className="login-container">
@@ -51,7 +52,7 @@ const Login = () => {
             Login
           </button>
 
-          <a href="#" className="forgot">
+          <a href="/forgot" className="forgot">
             Forgot the password?
           </a>
         </form>
