@@ -40,14 +40,12 @@ export default function Forecast() {
 
   return (
     <div>
-
       <h2 class="titled">Forecast Page</h2>
 
       <div className="table-wrapper">
         {/* Toolbar */}
         <div className="table-toolbar">
           <div className="search-box">
-            <FiSearch className="search-icon" />
             <input
               type="text"
               placeholder="Search"
@@ -122,7 +120,7 @@ export default function Forecast() {
           </table>
         </div>
 
-           <div className="table-container">
+        <div className="table-container">
           <table className="upload-table">
             <thead>
               <tr>
@@ -172,9 +170,7 @@ export default function Forecast() {
           <button>68</button>
           <button>Next →</button>
         </div>
-        </div>
       </div>
-
-
+    </div>
   );
 }
