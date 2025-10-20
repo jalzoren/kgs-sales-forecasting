@@ -47,7 +47,8 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="forgot-container">
+    <div className="forgot-bg">
+      <div className="forgot-container">
       {step === 1 && (
         <div className="forgot-form">
           <h2>Forgot Password</h2>
@@ -136,7 +137,8 @@ const ForgotPassword = () => {
         </form>
       )}
     </div>
+    </div>
   );
 };
 
-export default ForgotPassword;
+export default Forgot;

@@ -10,12 +10,15 @@
 
 
 .forgot-container {
-  background: var(--accent-light);
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-  width: 360px;
-  color: white;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 45px 55px;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(2, 12, 27, 0.35);
+  text-align: center;
+  width: 380px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-family: "Merriweather", serif;
 }
 
 h2 {
