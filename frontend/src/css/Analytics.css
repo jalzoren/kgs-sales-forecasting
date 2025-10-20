@@ -108,7 +108,7 @@
 
 .metrics-charts {
   display: flex;
-  gap: 40px;
+  gap: 20px;
 }
 
 .circle-progress {

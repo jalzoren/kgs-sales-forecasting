@@ -81,6 +81,62 @@ export default function Analytics() {
             </div>
           ))}
         </div>
+
+        <div className="metrics-charts">
+          {[1, 2, 3].map((_, index) => (
+            <div className="circle-progress" key={index}>
+              <svg viewBox="0 0 36 36" className="circular-chart">
+                <path
+                  className="circle-bg"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  className="circle"
+                  strokeDasharray="96, 100"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <text x="18" y="20.35" className="percentage">
+                  96.25%
+                </text>
+              </svg>
+              <p className="metric-label">
+                {index === 2 ? "Forecast Accuracy" : ""}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="metrics-charts">
+          {[1, 2, 3].map((_, index) => (
+            <div className="circle-progress" key={index}>
+              <svg viewBox="0 0 36 36" className="circular-chart">
+                <path
+                  className="circle-bg"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path
+                  className="circle"
+                  strokeDasharray="96, 100"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <text x="18" y="20.35" className="percentage">
+                  96.25%
+                </text>
+              </svg>
+              <p className="metric-label">
+                {index === 2 ? "Forecast Accuracy" : ""}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       <div className="chart-section">
