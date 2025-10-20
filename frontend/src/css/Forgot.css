@@ -1,23 +1,13 @@
 :root {
-  --accent: #001D39;
-  --accent-light: #0A4174;
-  --text-light: #e0e6ed;
-  --bg-gradient-top: rgba(13, 53, 99, 1);
-  --bg-gradient-bottom: rgba(9, 38, 68, 1);
+  --accent: #001d39;
+  --accent-light: #0a4174;
+  --accent-lighter: #41a7dd;
+  --accent-lightest: #bbc8d8;
+  --fg-light: #eaeff3;
+  --notif: #ef480b;
 }
 
-.forgot-bg {
-  width: 100%;
-  height: 100vh;
-  background: linear-gradient(
-    180deg,
-    var(--bg-gradient-top) 0%,
-    var(--bg-gradient-bottom) 100%
-  );
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
 
 .forgot-container {
   background: rgba(255, 255, 255, 0.08);

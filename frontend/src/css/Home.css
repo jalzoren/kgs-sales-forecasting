@@ -1,9 +1,12 @@
 :root {
-  --accent: #001D39;
-  --accent-light: #0A4174;
-  --fg-light: #EAEFF3;
-  --notif: #EF480B;
+  --accent: #001d39;
+  --accent-light: #0a4174;
+  --accent-lighter: #41a7dd;
+  --accent-lightest: #bbc8d8;
+  --fg-light: #eaeff3;
+  --notif: #ef480b;
 }
+
 
 .dashboard {
   display: flex;
@@ -36,6 +39,10 @@
   justify-content: space-between;
   flex: 0 0 340px; 
   gap: 20px;
+}
+
+h4{
+  margin: 0;
 }
 
 .box {
