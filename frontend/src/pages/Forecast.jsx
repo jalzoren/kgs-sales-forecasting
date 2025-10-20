@@ -1,80 +1,63 @@
 import React, { useState } from "react";
 import "../css/Forecast.css";
-import { FiUploadCloud, FiSearch } from "react-icons/fi";
+
 export default function Forecast() {
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Active Uploads");
-  const [sortMethod, setSortMethod] = useState("Manual");
+  const [sortStatus, setSortStatus] = useState("All");
   const [sortOrder, setSortOrder] = useState("Newest First");
 
-  const uploads = [
+  const forecasts = [
     {
-      date: "o",
-      from: "Manually",
-      fileName: "day20_10_6-12_2025.csv",
-      records: 5,
-      status: "Failed",
+      date: "October 1, 2025 | 12:00 AM",
+      horizon: "Next 30 days",
+      scope: "All Products",
+      status: "Completed",
+      accuracy: "5.25%",
     },
     {
-      date: "o",
-      from: "Manually",
-      fileName: "week2_10_6-12_2025.csv",
-      records: 1500,
-      status: "0",
+      date: "October 13, 2025 | 12:00 AM",
+      horizon: "Next Week",
+      scope: "All Products",
+      status: "Completed",
+      accuracy: "98.25%",
     },
     {
-      date: "o",
-      from: "Manually",
-      fileName: "week_9-10_29-5_2025.csv",
-      records: 0,
-      status: "0",
+      date: "October 13, 2025 | 12:00 AM",
+      horizon: "Next 30 days",
+      scope: "All Products",
+      status: "Completed",
+      accuracy: "98.25%",
     },
     {
-      date: "o",
-      from: "Manually",
-      fileName: "pos_data.xlsx",
-      records: 0,
-      status: "0",
+      date: "October 13, 2025 | 12:00 AM",
+      horizon: "Next 90 days",
+      scope: "All Products",
+      status: "Completed",
+      accuracy: "98.25%",
     },
   ];
 
   return (
     <div>
-      <h2 class="titled">Forecast Page</h2>
+      <h2 className="titled">Forecast History</h2>
 
       <div className="table-wrapper">
         {/* Toolbar */}
         <div className="table-toolbar">
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option>Active Uploads</option>
-            <option>Completed</option>
-            <option>Failed</option>
+          <select value={sortStatus} onChange={(e) => setSortStatus(e.target.value)}>
+            <option>Sort By Status: All</option>
+            <option>Sort By Status: Completed</option>
+            <option>Sort By Status: Failed</option>
           </select>
 
-          <select
-            value={sortMethod}
-            onChange={(e) => setSortMethod(e.target.value)}
-          >
-            <option>Sort By Upload: Manual</option>
-            <option>Sort By Upload: Auto</option>
-          </select>
-
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
             <option>Sort By: Newest First</option>
             <option>Sort By: Oldest First</option>
           </select>
@@ -85,73 +68,30 @@ export default function Forecast() {
           <table className="upload-table">
             <thead>
               <tr>
-                <th>Upload Date</th>
-                <th>Uploaded From</th>
-                <th>File Name</th>
-                <th>Records</th>
+                <th>Date</th>
+                <th>Horizon</th>
+                <th>Scope</th>
                 <th>Status</th>
+                <th>Accuracy</th>
                 <th>Actions</th>
               </tr>
             </thead>
-
             <tbody>
-              {uploads.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.date}</td>
-                  <td>{item.from}</td>
-                  <td>{item.fileName}</td>
-                  <td>{item.records.toLocaleString()}</td>
+              {forecasts.map((f, idx) => (
+                <tr key={idx}>
+                  <td>{f.date}</td>
+                  <td>{f.horizon}</td>
+                  <td>{f.scope}</td>
                   <td>
-                    <span
-                      className={`status ${
-                        item.status === "Success" ? "success" : "failed"
-                      }`}
-                    >
-                      {item.status}
+                    <span className={`status ${f.status === "Completed" ? "success" : "failed"}`}>
+                      {f.status}
                     </span>
                   </td>
+                  <td>{f.accuracy}</td>
                   <td className="actions">
                     <button className="btn-action">[View]</button> |
-                    <button className="btn-action delete">[Delete]</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="table-container">
-          <table className="upload-table">
-            <thead>
-              <tr>
-                <th>Upload Date</th>
-                <th>Uploaded From</th>
-                <th>File Name</th>
-                <th>Records</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {uploads.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.date}</td>
-                  <td>{item.from}</td>
-                  <td>{item.fileName}</td>
-                  <td>{item.records.toLocaleString()}</td>
-                  <td>
-                    <span
-                      className={`status ${
-                        item.status === "Success" ? "success" : "failed"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="actions">
-                    <button className="btn-action">[View]</button> |
-                    <button className="btn-action delete">[Delete]</button>
+                    <button className="btn-action">[Download]</button> |
+                    <button className="btn-action">[Reforecast]</button>
                   </td>
                 </tr>
               ))}

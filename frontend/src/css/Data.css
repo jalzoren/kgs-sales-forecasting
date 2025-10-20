@@ -15,8 +15,10 @@
 }
 
 hr{
-  color: #001d39;
-  opacity: 0.2;
+  background-color: var(--accent);
+  margin: 0%;
+  opacity: 0.3;
+
 }
 
 .upload-data-container {
