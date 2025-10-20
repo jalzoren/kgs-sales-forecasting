@@ -64,7 +64,6 @@ input[type="text"],
 input[type="email"],
 input[type="password"],
 input[type="text"] {
-  padding: 10px;
   border: none;
   border-radius: 5px;
   outline: none;
@@ -79,7 +78,7 @@ input[type="text"] {
   align-items: center;
   justify-content: flex-start;
   gap: 6px;
-  margin-top: 10px;
+  margin-bottom: -20px;
 }
 
 .checkbox input[type="checkbox"] {
@@ -94,7 +93,7 @@ input[type="text"] {
   font-size: 14px;
   cursor: pointer;
   line-height: 1;
-  margin-bottom: 16px;
+  margin-bottom: 30px;
 }
 
 .login-btn {
