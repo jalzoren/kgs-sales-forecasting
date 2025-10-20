@@ -1,17 +1,42 @@
 import { NavLink } from "react-router-dom";
 import { FaBullseye, FaBell } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
+import Swal from "sweetalert2";
+import { useNavigate } from "react-router-dom";
+
 import "../css/Navbar.css";
 
 function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You will be logged out!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#0A4174",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, log out!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          "Logged Out!",
+          "You have been successfully logged out.",
+          "success"
+        ).then(() => {
+          navigate("/");
+        });
+      }
+    });
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-top">
         <div className="logo">
-          <div className="logo">
-            <FaBullseye className="logo-icon" />
-            <span className="logo-text">Sales Forecasting System</span>
-          </div>
+          <FaBullseye className="logo-icon" />
+          <span className="logo-text">Sales Forecasting System</span>
         </div>
 
         <ul className="navbar-links">
@@ -36,15 +61,13 @@ function Navbar() {
           <button className="icon-btn">
             <FaBell />
           </button>
-          <button className="logout-btn">
-            
+          <button className="logout-btn" onClick={handleLogout}>
             <LiaUserCircle />
-
           </button>
         </div>
       </div>
 
-      <br></br>
+      <br />
 
       <div className="navbar-stats">
         <div className="stat-item">

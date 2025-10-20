@@ -7,6 +7,9 @@
   --notif: #ef480b;
 }
 
+body{
+  overflow-x: hidden;
+}
 /* Layout */
 .analytics-container {
   width: 100%;
@@ -150,7 +153,7 @@
 }
 
 .metric-label {
-  margin-top: 5px;
+  margin: 0px;
   font-size: 14px;
   color: var(--accent-light);
   font-weight: 500;
@@ -162,4 +165,5 @@
   border-radius: 10px;
   padding: 20px;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  width: 920px;
 }
