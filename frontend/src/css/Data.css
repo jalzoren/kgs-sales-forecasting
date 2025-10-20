@@ -7,10 +7,16 @@
   --notif: #ef480b;
 }
 
- .titled {
+.titled{
   font-family: "Merriweather", serif;
   color: var(--accent);
-  margin: 20px ;
+ 
+  margin: 0;
+}
+
+hr{
+  color: #001d39;
+  opacity: 0.2;
 }
 
 .upload-data-container {
@@ -26,7 +32,7 @@
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   width: 600px;
-  padding: 20px;
+  padding: 15px;
   height: 201px;
 }
 
@@ -34,7 +40,7 @@
   font-weight: 600;
   color: #222;
   font-family: "Poppins", sans-serif;
-  margin: 05px
+  margin: 0px
 }
 
 .drop-zone {
@@ -51,6 +57,20 @@
   align-items: center;
 }
 
+.drop-text{
+  background-color: #fff;
+  height: 161px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0px;
+}
+
+
 .drop-zone.drag-active {
   background-color: #e6f2ff;
   border-color: var(--accent-light);
@@ -62,6 +82,9 @@
   margin-bottom: 4px;
   display: inline;
   cursor: pointer;
+  align-items: center;
+    justify-content: center;
+
 }
 
 .drop-zone p {
