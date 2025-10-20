@@ -7,6 +7,9 @@
   --notif: #ef480b;
 }
 
+body{
+  overflow-x: hidden;
+}
 /* Layout */
 .analytics-container {
   width: 100%;
