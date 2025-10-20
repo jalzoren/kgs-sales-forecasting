@@ -124,15 +124,35 @@ select {
 
 }
 
-/* ------------------------------
-   TABLE TOOLBAR
------------------------------- */
 .table-toolbar {
   display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-  color: var(--accent);
-  margin-bottom: 16px;
+  justify-content: space-evenly;
+  
 }
+
+.table-toolbar input {
+  padding: 10px 10px;
+  border: 1px solid #c9d6e3;
+  border-radius: 4px;
+  
+}
+
+.table-toolbar select {
+  padding: 10px 10px;
+  border: 1px solid #c9d6e3;
+  border-radius: 4px;
+  width: 240px;
+}
+
+.upload-table th, .upload-table td {
+  font-size: 14px;
+  padding: 8px 12px;
+}
+
+.actions button {
+  margin: 0 3px;
+}
+
