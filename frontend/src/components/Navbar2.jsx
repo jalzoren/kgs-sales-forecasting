@@ -1,14 +1,11 @@
-import { NavLink, useNavigate} from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaBullseye, FaBell } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
 
 import "../css/Navbar2.css";
-import Swal from "sweetalert2"; 
-
- 
+import Swal from "sweetalert2";
 
 function Navbar2() {
-
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -62,9 +59,9 @@ function Navbar2() {
           <button className="icon-btn">
             <FaBell />
           </button>
-           <button className="logout-btn" onClick={handleLogout}>
-      <LiaUserCircle />
-    </button>
+          <button className="logout-btn" onClick={handleLogout}>
+            <LiaUserCircle />
+          </button>
         </div>
       </div>
     </nav>
