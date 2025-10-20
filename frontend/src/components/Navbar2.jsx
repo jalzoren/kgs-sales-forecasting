@@ -1,8 +1,7 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaBullseye, FaBell } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 import "../css/Navbar2.css";
@@ -19,7 +18,7 @@ const notificationsData = [
 
 function Navbar2() {
   const navigate = useNavigate();
-  const [notifications] = useState(notificationsData);
+  const [notifications, setNotifications] = useState(notificationsData);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -33,13 +32,19 @@ function Navbar2() {
       confirmButtonColor: "#0A4174",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, log out!",
+      toast: true,
+      position: "top",
     }).then((result) => {
       if (result.isConfirmed) {
-        Swal.fire(
-          "Logged Out!",
-          "You have been successfully logged out.",
-          "success"
-        ).then(() => {
+        Swal.fire({
+          toast: true,
+          position: "top",
+          icon: "success",
+          title: "Logged out successfully!",
+          showConfirmButton: false,
+          timer: 2000,
+          timerProgressBar: true,
+        }).then(() => {
           navigate("/");
         });
       }
@@ -47,14 +52,14 @@ function Navbar2() {
   };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-top">
+    <nav className="navbar2">
+      <div className="navbar2-top">
         <div className="logo">
           <FaBullseye className="logo-icon" />
           <span className="logo-text">Sales Forecasting System</span>
         </div>
 
-        <ul className="navbar-links">
+        <ul className="navbar2-links">
           <li><NavLink to="/home">Home</NavLink></li>
           <li><NavLink to="/data">Data</NavLink></li>
           <li><NavLink to="/forecast">Forecast</NavLink></li>
@@ -62,7 +67,7 @@ function Navbar2() {
           <li><NavLink to="/analytics">Analytics</NavLink></li>
         </ul>
 
-        <div className="navbar-right">
+        <div className="navbar2-right">
           <div className="notification-wrapper">
             <button className="icon-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
               <FaBell />
@@ -84,34 +89,6 @@ function Navbar2() {
           <button className="logout-btn" onClick={handleLogout}>
             <LiaUserCircle />
           </button>
-        </div>
-      </div>
-
-      <br />
-
-      <div className="navbar-stats">
-        <div className="stat-item">
-          <h4>Predicted Sales</h4>
-          <p className="value">0</p>
-          <span>next 7 days</span>
-        </div>
-        <div className="divider"></div>
-        <div className="stat-item">
-          <h4>Actual Sales</h4>
-          <p className="value">0</p>
-          <span>previous 7 days</span>
-        </div>
-        <div className="divider"></div>
-        <div className="stat-item">
-          <h4>Forecast Accuracy</h4>
-          <p className="value green">0</p>
-          <span>variance: 7%</span>
-        </div>
-        <div className="divider"></div>
-        <div className="stat-item">
-          <h4>Inventory Alerts</h4>
-          <p className="value red">0</p>
-          <span>items need action</span>
         </div>
       </div>
     </nav>
