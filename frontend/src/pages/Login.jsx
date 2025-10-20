@@ -1,24 +1,58 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2"; // ✅ Import SweetAlert2
 import "../css/Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/home");
-  };
 
+    try {
+      const response = await fetch("http://localhost:5000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          text: "Welcome back!",
+          confirmButtonColor: "#001D39",
+        }).then(() => {
+          navigate("/home");
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: data.message || "Invalid email or password",
+          confirmButtonColor: "#001D39",
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Connection Error",
+        text: "Cannot connect to the server. Please try again.",
+        confirmButtonColor: "#001D39",
+      });
+    }
+  };
 
   return (
     <div className="login-wrapper">
       <div className="login-container">
-        <h2 class="Title">Log In</h2>
+        <h2 className="Title">Log In</h2>
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input
