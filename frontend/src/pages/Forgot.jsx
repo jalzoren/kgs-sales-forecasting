@@ -13,45 +13,94 @@ export default function Forgot() {
 
   // Handle sending OTP code
   const handleSendCode = async () => {
-    if (!email) {
-      setMessage("Please enter your email.");
-      return;
+  if (!email) {
+    Swal.fire("Warning", "Please enter your email.", "warning");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:5000/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+      setIsCodeSent(true);
+      Swal.fire("Success", data.message, "success");
+    } else {
+      Swal.fire("Error", data.message, "error");
     }
-    // Later you’ll integrate this with backend API
-    setIsCodeSent(true);
-    setMessage("Code sent to your email (simulated).");
-  };
+  } catch (error) {
+    Swal.fire("Error", "Failed to connect to the server.", "error");
+  }
+};
 
-  // Handle verifying code
-  const handleVerifyCode = async (e) => {
-    e.preventDefault();
+// Handle verifying code
+const handleVerifyCode = async (e) => {
+  e.preventDefault();
+  if (!code) {
+    Swal.fire("Warning", "Please enter the code.", "warning");
+    return;
+  }
 
-    if (!code) {
-      setMessage("Please enter the code sent to your email.");
-      return;
+  try {
+    const response = await fetch("http://localhost:5000/verify-code", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+      setStep(2);
+      Swal.fire("Success", data.message, "success");
+    } else {
+      Swal.fire("Error", data.message, "error");
     }
-
-    // Simulated verification
-    setStep(2);
-    setMessage("Code verified! You can now reset your password.");
-  };
+  } catch (error) {
+    Swal.fire("Error", "Connection failed.", "error");
+  }
+};
 
   // Handle resetting password
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
+const handleResetPassword = async (e) => {
+  e.preventDefault();
 
-    if (!newPassword || !confirmPassword) {
-      setMessage("Please fill out both fields.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setMessage("Passwords do not match.");
-      return;
-    }
+  if (!newPassword || !confirmPassword) {
+    Swal.fire("Warning", "Please fill out both fields.", "warning");
+    return;
+  }
+  if (newPassword !== confirmPassword) {
+    Swal.fire("Error", "Passwords do not match.", "error");
+    return;
+  }
 
-    // Later you’ll call backend API here
-    setMessage("✅ Password reset successfully!");
-  };
+  try {
+    const response = await fetch("http://localhost:5000/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, newPassword }),
+    });
+    const data = await response.json();
+
+    if (response.ok) {
+      Swal.fire({
+        icon: "success",
+        title: "Password Reset Successful",
+        text: data.message,
+        confirmButtonColor: "#001D39",
+      }).then(() => {
+        window.location.href = "/"; // Back to login
+      });
+    } else {
+      Swal.fire("Error", data.message, "error");
+    }
+  } catch (error) {
+    Swal.fire("Error", "Failed to connect to the server.", "error");
+  }
+};
 
   return (
     <div className="forgot-bg">
