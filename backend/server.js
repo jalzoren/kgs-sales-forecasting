@@ -54,6 +54,9 @@ app.post("/login", (req, res) => {
 
     const user = results[0];
 
+    console.log("🔍 Plain:", password);
+    console.log("🔍 Hash from DB:", user.password);
+
     // ✅ Compare hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)

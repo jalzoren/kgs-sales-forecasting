@@ -95,7 +95,9 @@ export default function Forgot() {
               </>
             )}
 
-            <p className="back-login">Back to LogIn</p>
+            <a href="/" className="back-login">
+              Back to Login
+            </a>
             {message && <p className="message">{message}</p>}
           </form>
         )}
