@@ -60,7 +60,7 @@ export default function Forgot() {
         {/* STEP 1: Email + Code */}
         {step === 1 && (
           <form className="forgot-form" onSubmit={handleVerifyCode}>
-            <h2>Forgot Password</h2>
+            <h2 className="title" >Forgot Password</h2>
             <hr />
             <label>Email</label>
             <div className="email-group">
@@ -103,7 +103,7 @@ export default function Forgot() {
         {/* STEP 2: Reset Password */}
         {step === 2 && (
           <form className="forgot-form" onSubmit={handleResetPassword}>
-            <h2>Forgot Password</h2>
+            <h2 className="title" >Forgot Password</h2>
             <hr />
             <label>New Password</label>
             <input

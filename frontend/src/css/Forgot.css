@@ -39,7 +39,7 @@ h2 {
 hr {
   border: 0;
   height: 1px;
-  background-color: #2b4b6a;
+  background-color: #ffffff;
   margin-bottom: 20px;
 }
 
@@ -52,10 +52,9 @@ label {
 
 input {
   width: 100%;
-  padding: 10px;
+  padding: 15px;
   border: none;
   border-radius: 5px;
-  margin-bottom: 15px;
   outline: none;
 }
 
@@ -70,8 +69,8 @@ input {
   border: none;
   color: #001d39;
   font-weight: bold;
-  padding: 10px 12px;
   border-radius: 5px;
+  padding: 5px 10px;
   cursor: pointer;
 }
 
@@ -87,6 +86,7 @@ input {
   font-weight: bold;
   padding: 10px;
   border-radius: 5px;
+  margin-top: 15px;
   cursor: pointer;
 }
 
@@ -113,8 +113,23 @@ input {
   font-size: 0.9rem;
 }
 
+.title{
+  color:#fffacd;
+}
+
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+
+.checkbox-row label{
+  margin: 0;
+  font-weight: normal;
+}
+
 .checkbox-row {
   display: flex;
   align-items: center;
+  margin-top: 5px;
   gap: 5px;
 }
