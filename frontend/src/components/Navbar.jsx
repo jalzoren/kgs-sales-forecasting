@@ -7,7 +7,6 @@ import { useState } from "react";
 
 import "../css/Navbar.css";
 
-// Example notifications data
 const notificationsData = [
   { message: "Inventory Alert: Item X low stock", time: "2h ago", read: false },
   { message: "Sales forecast updated", time: "5h ago", read: false },
@@ -23,27 +22,33 @@ function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
 
-  const handleLogout = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You will be logged out!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#0A4174",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, log out!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(
-          "Logged Out!",
-          "You have been successfully logged out.",
-          "success"
-        ).then(() => {
-          navigate("/");
-        });
-      }
-    });
-  };
+ const handleLogout = () => {
+     Swal.fire({
+       title: "Are you sure?",
+       text: "You will be logged out!",
+       icon: "warning",
+       showCancelButton: true,
+       confirmButtonColor: "#0A4174",
+       cancelButtonColor: "#d33",
+       confirmButtonText: "Yes, log out!",
+       toast: true,
+       position: "top",
+     }).then((result) => {
+       if (result.isConfirmed) {
+         Swal.fire({
+           toast: true,
+           position: "top",
+           icon: "success",
+           title: "Logged out successfully!",
+           showConfirmButton: false,
+           timer: 500,
+           timerProgressBar: true,
+         }).then(() => {
+           navigate("/");
+         });
+       }
+     });
+   };
 
   return (
     <nav className="navbar">
