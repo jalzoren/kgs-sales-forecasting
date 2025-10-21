@@ -4,7 +4,7 @@ import { LiaUserCircle } from "react-icons/lia";
 import Swal from "sweetalert2";
 import { useState } from "react";
 
-import "../css/Navbar2.css";
+import "../components/components-css/Navbar2.css";
 
 const sampleNotifications = [
   { message: "Inventory Alert: Item X low stock", time: "2h ago", read: false },

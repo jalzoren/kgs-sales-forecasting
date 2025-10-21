@@ -1,6 +1,5 @@
 import React from "react";
 import "../css/Home.css";
- 
 
 
 import {
@@ -40,7 +39,7 @@ export default function Home() {
 
 
   return (  
-  
+    <div>
     
       <div className="dashboard">
     
@@ -116,8 +115,10 @@ export default function Home() {
             </div>
           </div>
         </div>
+
       </div>
-  
+      <br/><br/>
+  </div>
   );
 
 
