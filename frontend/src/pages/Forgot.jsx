@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Swal from "sweetalert2"; // ✅ Import SweetAlert2
 import "../css/Forgot.css";
 
 export default function Forgot() {
@@ -19,7 +20,7 @@ export default function Forgot() {
   }
 
   try {
-    const response = await fetch("http://localhost:5000/forgot-password", {
+    const response = await fetch("http://localhost:5000/forgot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
