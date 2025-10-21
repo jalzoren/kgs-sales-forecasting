@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2025 at 01:38 PM
+-- Generation Time: Oct 21, 2025 at 12:26 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -45,6 +45,7 @@ CREATE TABLE `user` (
   `userId` int(11) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `role` varchar(50) NOT NULL,
   `resetCode` varchar(11) DEFAULT NULL,
   `codeExpiry` timestamp(6) NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -53,8 +54,8 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`userId`, `email`, `password`, `resetCode`, `codeExpiry`) VALUES
-(1, 'bitancor_jeremiah@plpasig.edu.ph', '$2b$10$sMx7emoKrnYzwzR5s7f4oekPjSD0M.II.5P0rEftJjjhtpd5s8rZq', NULL, NULL);
+INSERT INTO `user` (`userId`, `email`, `password`, `role`, `resetCode`, `codeExpiry`) VALUES
+(1, 'bitancor1234amora@gmail.com', '$2b$10$TzaHgOfdYstjsdbInuNHUeeHi8DCPnO9ZT9ozau43CXmzRKHMLn66', 'admin', NULL, NULL);
 
 --
 -- Indexes for dumped tables
