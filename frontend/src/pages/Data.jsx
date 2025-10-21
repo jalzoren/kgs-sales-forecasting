@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "../css/Data.css";
 import { FiUploadCloud } from "react-icons/fi";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Manila"); // 🇵🇭 Philippine timezone
 
 export default function UploadBox() {
   const [isDragging, setIsDragging] = useState(false);
@@ -9,13 +16,15 @@ export default function UploadBox() {
   const [statusFilter, setStatusFilter] = useState("Active Uploads");
   const [sortMethod, setSortMethod] = useState("Manual");
   const [sortOrder, setSortOrder] = useState("Newest First");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
-useEffect(() => {
-  fetch("http://localhost:5000/api/data")
-    .then((res) => res.json())
-    .then((data) => setUploads(data))
-    .catch((err) => console.error("Error fetching data:", err));
-}, []);
+  useEffect(() => {
+    fetch("http://localhost:5000/api/data")
+      .then((res) => res.json())
+      .then((data) => setUploads(data))
+      .catch((err) => console.error("Error fetching data:", err));
+  }, []);
 
   // 📤 Handle file upload
   const handleFileChange = async (e) => {
@@ -31,11 +40,12 @@ useEffect(() => {
         body: formData,
       });
       const result = await res.json();
-      console.log(result);
       alert("✅ File uploaded successfully!");
+      console.log(result);
       // Refresh uploads
       const updated = await fetch("http://localhost:5000/api/data").then((r) => r.json());
       setUploads(updated);
+      setCurrentPage(1); // reset to first page
     } catch (err) {
       console.error(err);
       alert("❌ Upload failed.");
@@ -53,7 +63,7 @@ useEffect(() => {
     }
   };
 
-  // Drag events
+  // 🖱 Drag events
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -79,10 +89,30 @@ useEffect(() => {
     }
   };
 
+  // 🔍 Filter + Search logic
+  const filteredUploads = uploads.filter((item) => {
+    const matchesSearch = item.fileName.toLowerCase().includes(search.toLowerCase());
+    const matchesStatus =
+      statusFilter === "Active Uploads"
+        ? item.status !== "Completed" && item.status !== "Failed"
+        : item.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  // 🔢 Pagination logic
+  const totalPages = Math.ceil(filteredUploads.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = filteredUploads.slice(startIndex, startIndex + itemsPerPage);
+
+  const goToPage = (page) => {
+    if (page >= 1 && page <= totalPages) setCurrentPage(page);
+  };
+
   return (
     <div>
       <h2 className="titled">Data Management</h2>
 
+      {/* Upload Section */}
       <div className="upload-data-container">
         <div className="upload-box">
           <h3 className="title">Upload New Data</h3>
@@ -117,7 +147,9 @@ useEffect(() => {
       <br />
       <hr />
 
+      {/* Table Section */}
       <div className="table-wrapper">
+        {/* Toolbar */}
         <div className="table-toolbar">
           <div className="search-box">
             <input
@@ -145,6 +177,7 @@ useEffect(() => {
           </select>
         </div>
 
+        {/* Table */}
         <div className="table-container">
           <table className="upload-table">
             <thead>
@@ -158,44 +191,73 @@ useEffect(() => {
             </thead>
 
             <tbody>
-              {uploads.map((item, index) => (
-                <tr key={index}>
-                  <td>{item.uploadDate || "—"}</td>
-                  <td>{item.fileName}</td>
-                  <td>{item.records?.toLocaleString() || 0}</td>
-                  <td>
-                    <span
-                      className={`status ${
-                        item.status === "Success" ? "success" : "failed"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
-                  <td className="actions">
-                    <button className="btn-action">[View]</button> |
-                    <button
-                      className="btn-action delete"
-                      onClick={() => handleDelete(item.salesID)}
-                    >
-                      [Delete]
-                    </button>
+              {currentData.length > 0 ? (
+                currentData.map((item, index) => (
+                  <tr key={index}>
+                    <td>
+                      {item.uploadDate
+                        ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A")
+                        : "—"}
+                    </td>
+                    <td>{item.fileName}</td>
+                    <td>{item.records?.toLocaleString() || 0}</td>
+                    <td>
+                      <span
+                        className={`status ${
+                          item.status === "Success"
+                            ? "success"
+                            : item.status === "Failed"
+                            ? "failed"
+                            : "pending"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
+                    <td className="actions">
+                      <button className="btn-action">[View]</button> |
+                      <button
+                        className="btn-action delete"
+                        onClick={() => handleDelete(item.salesID)}
+                      >
+                        [Delete]
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: "center", padding: "1rem" }}>
+                    No data available
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
 
+        {/* Pagination */}
         <div className="pagination">
-          <button disabled>← Previous</button>
-          <button className="active">1</button>
-          <button>2</button>
-          <button>3</button>
-          <span>...</span>
-          <button>67</button>
-          <button>68</button>
-          <button>Next →</button>
+          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+            ← Previous
+          </button>
+
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => goToPage(i + 1)}
+              className={currentPage === i + 1 ? "active" : ""}
+            >
+              {i + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages || totalPages === 0}
+          >
+            Next →
+          </button>
         </div>
       </div>
     </div>
