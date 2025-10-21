@@ -5,7 +5,6 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const db = require("../config/db.js");
-
 const app = express();
 const PORT = 5000;
 
