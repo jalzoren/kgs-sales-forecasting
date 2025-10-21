@@ -21,7 +21,31 @@ class AuthController {
       if (!isMatch)
         return res.status(401).json({ message: "Invalid password" });
 
+      // Store user info in session
+      req.session.user = {
+        id: user.userId,
+        email: user.email,
+      };
+
       res.json({ message: "Login successful", userId: user.userId });
+    });
+  }
+
+    // CHECK SESSION
+  checkSession(req, res) {
+    if (req.session.user) {
+      res.json({ loggedIn: true, user: req.session.user });
+    } else {
+      res.json({ loggedIn: false });
+    }
+  }
+
+  // LOGOUT
+  logout(req, res) {
+    req.session.destroy((err) => {
+      if (err) return res.status(500).json({ message: "Logout failed" });
+      res.clearCookie("connect.sid");
+      res.json({ message: "Logged out successfully" });
     });
   }
 
