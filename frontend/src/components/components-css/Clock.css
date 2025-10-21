@@ -1,0 +1,15 @@
+.clock-container {
+  display: inline;
+  align-items: right;
+  justify-content: right;
+  font-size: 1rem; 
+  padding: 1px 16px;
+  border-radius: 1px;
+  gap: 0.5rem;
+  margin-left: 470px;
+}
+
+.divider1{
+    margin: 0 8px;
+    background-color: none;
+}

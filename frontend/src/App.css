@@ -19,7 +19,7 @@
 }
 
 
-html,
+
 body {
   margin: 0;
   padding: 0;
@@ -27,7 +27,7 @@ body {
   font-family: "Poppins", sans-serif;
   background-color: var(--fg-light);
   color: var(--text-color);
-  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 

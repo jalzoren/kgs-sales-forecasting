@@ -1,0 +1,151 @@
+:root {
+  --accent: #001d39;
+  --accent-light: #0a4174;
+  --accent-lighter: #41a7dd;
+  --accent-lightest: #bbc8d8;
+  --fg-light: #eaeff3;
+  --notif: #ef480b;
+}
+body {
+
+  color: var(--accent);
+  overflow-y: scroll;
+}
+ .titled {
+  font-family: "Merriweather", serif;
+  color: var(--accent);
+  margin: 20px ;
+}
+
+
+
+.table-wrapper {
+  max-width: 1000px;
+  margin: 40px auto;
+  font-family: "Poppins", sans-serif;
+  color: #001d39;
+}
+
+.analytics-container {
+  width: 100%;
+  padding: 30px;
+  background: var(--fg-lighter);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+/* Header (Tabs + Filters) */
+.analytics-header {
+  width: 100%;
+  max-width: 1100px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: var(--accent-lightest) solid 1px ;
+  padding-bottom: 20px;
+}
+
+
+
+.table-container {
+  background: #f5f7fa;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.upload-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background-color: #fff;
+  border: 1px solid #c9d6e3;
+}
+
+.upload-table th,
+.upload-table td {
+  padding: 10px 14px;
+  text-align: left;
+  border: 1px solid #c9d6e3;
+}
+
+.upload-table thead {
+  background-color: #e6edf5;
+  font-weight: 600;
+}
+
+.upload-table tbody tr:nth-child(even) {
+  background-color: #f9fbfd;
+}
+
+.upload-table tbody tr:hover {
+  background-color: #eef5fb;
+  transition: 0.2s;
+}
+
+.status {
+  font-weight: 600;
+}
+
+.status.success {
+  color: #1a7f37;
+}
+
+.status.failed {
+  color: #c92a2a;
+}
+
+.actions {
+  text-align: center;
+}
+
+.btn-action {
+  background: none;
+  border: none;
+  color: #0a4174;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 13px;
+  text-decoration: underline;
+  margin: 0 5px;
+}
+
+.btn-action.delete {
+  color: #c92a2a;
+}
+
+.btn-action:hover {
+  color: #0077cc;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.pagination button {
+  border: 1px solid #c9d6e3;
+  background: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.pagination button.active {
+  background: #001d39;
+  color: white;
+  border-color: #001d39;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+ 

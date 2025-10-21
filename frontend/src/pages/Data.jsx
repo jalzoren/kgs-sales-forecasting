@@ -1,82 +1,91 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "../css/Data.css";
-import { FiUploadCloud, FiSearch } from "react-icons/fi";
+import { FiUploadCloud } from "react-icons/fi";
 
 export default function UploadBox() {
   const [isDragging, setIsDragging] = useState(false);
-
-  const handleDragEnter = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsDragging(false);
-    const files = e.dataTransfer.files;
-    console.log("Dropped files:", files);
-  };
-
-  const handleFileChange = (e) => {
-    console.log("Selected files:", e.target.files);
-  };
-
+  const [uploads, setUploads] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Active Uploads");
   const [sortMethod, setSortMethod] = useState("Manual");
   const [sortOrder, setSortOrder] = useState("Newest First");
 
-  const uploads = [
-    {
-      date: "o",
-      from: "Manually",
-      fileName: "day20_10_6-12_2025.csv",
-      records: 5,
-      status: "Failed",
-    },
-    {
-      date: "o",
-      from: "Manually",
-      fileName: "week2_10_6-12_2025.csv",
-      records: 1500,
-      status: "0",
-    },
-    {
-      date: "o",
-      from: "Manually",
-      fileName: "week_9-10_29-5_2025.csv",
-      records: 0,
-      status: "0",
-    },
-    {
-      date: "o",
-      from: "Manually",
-      fileName: "pos_data.xlsx",
-      records: 0,
-      status: "0",
-    },
-  ];
+useEffect(() => {
+  fetch("http://localhost:5000/api/data")
+    .then((res) => res.json())
+    .then((data) => setUploads(data))
+    .catch((err) => console.error("Error fetching data:", err));
+}, []);
+
+  // 📤 Handle file upload
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("http://localhost:5000/api/data/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await res.json();
+      console.log(result);
+      alert("✅ File uploaded successfully!");
+      // Refresh uploads
+      const updated = await fetch("http://localhost:5000/api/data").then((r) => r.json());
+      setUploads(updated);
+    } catch (err) {
+      console.error(err);
+      alert("❌ Upload failed.");
+    }
+  };
+
+  // 🗑 Delete upload
+  const handleDelete = async (id) => {
+    if (!window.confirm("Delete this upload?")) return;
+    try {
+      await fetch(`http://localhost:5000/api/data/${id}`, { method: "DELETE" });
+      setUploads((prev) => prev.filter((u) => u.salesID !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Drag events
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const fakeEvent = { target: { files } };
+      handleFileChange(fakeEvent);
+    }
+  };
 
   return (
     <div>
-      <h2 class="titled">Data Management</h2>
+      <h2 className="titled">Data Management</h2>
 
       <div className="upload-data-container">
         <div className="upload-box">
-          <h3 class="title">Upload New Data</h3>
+          <h3 className="title">Upload New Data</h3>
 
           <div
             className={`drop-zone ${isDragging ? "drag-active" : ""}`}
@@ -95,7 +104,7 @@ export default function UploadBox() {
             <label htmlFor="fileUpload" className="drop-text">
               <div className="icon">
                 <FiUploadCloud />
-              </div>{" "}
+              </div>
               <p>
                 Drag and Drop Files or <span className="browse">Browse</span>
               </p>
@@ -104,11 +113,11 @@ export default function UploadBox() {
           </div>
         </div>
       </div>
+
       <br />
       <hr />
 
       <div className="table-wrapper">
-        {/* Toolbar */}
         <div className="table-toolbar">
           <div className="search-box">
             <input
@@ -119,39 +128,28 @@ export default function UploadBox() {
             />
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option>Active Uploads</option>
             <option>Completed</option>
             <option>Failed</option>
           </select>
 
-          <select
-            value={sortMethod}
-            onChange={(e) => setSortMethod(e.target.value)}
-          >
+          <select value={sortMethod} onChange={(e) => setSortMethod(e.target.value)}>
             <option>Sort By Upload: Manual</option>
             <option>Sort By Upload: Auto</option>
           </select>
 
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
             <option>Sort By: Newest First</option>
             <option>Sort By: Oldest First</option>
           </select>
         </div>
 
-        {/* Table */}
         <div className="table-container">
           <table className="upload-table">
             <thead>
               <tr>
                 <th>Upload Date</th>
-                <th>Uploaded From</th>
                 <th>File Name</th>
                 <th>Records</th>
                 <th>Status</th>
@@ -162,10 +160,9 @@ export default function UploadBox() {
             <tbody>
               {uploads.map((item, index) => (
                 <tr key={index}>
-                  <td>{item.date}</td>
-                  <td>{item.from}</td>
+                  <td>{item.uploadDate || "—"}</td>
                   <td>{item.fileName}</td>
-                  <td>{item.records.toLocaleString()}</td>
+                  <td>{item.records?.toLocaleString() || 0}</td>
                   <td>
                     <span
                       className={`status ${
@@ -177,7 +174,12 @@ export default function UploadBox() {
                   </td>
                   <td className="actions">
                     <button className="btn-action">[View]</button> |
-                    <button className="btn-action delete">[Delete]</button>
+                    <button
+                      className="btn-action delete"
+                      onClick={() => handleDelete(item.salesID)}
+                    >
+                      [Delete]
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -185,7 +187,6 @@ export default function UploadBox() {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="pagination">
           <button disabled>← Previous</button>
           <button className="active">1</button>
@@ -196,9 +197,7 @@ export default function UploadBox() {
           <button>68</button>
           <button>Next →</button>
         </div>
-        </div>
       </div>
-
-
+    </div>
   );
 }
