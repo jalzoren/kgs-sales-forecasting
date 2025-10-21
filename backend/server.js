@@ -2,6 +2,7 @@
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
+const dataRoutes = require("./routes/dataRoutes"); 
 const sessionConfig = require("./config/sessionConfig");
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(sessionConfig);
 
 // Routes
 app.use("/", authRoutes);
+app.use("/", dataRoutes);
 
 // Default route
 app.get("/", (req, res) => {
