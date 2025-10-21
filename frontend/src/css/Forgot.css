@@ -95,15 +95,18 @@ input {
 }
 
 .back-login {
-  margin-top: 10px;
-  font-size: 0.9rem;
-  text-align: center;
-  color: #cdd6e0;
+  display: block;
+  margin-top: 14px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: 0.2s;
   cursor: pointer;
 }
 
 .back-login:hover {
   text-decoration: underline;
+  color: #fff;
 }
 
 .message {

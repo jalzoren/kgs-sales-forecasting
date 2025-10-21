@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 20, 2025 at 09:54 AM
+-- Generation Time: Oct 20, 2025 at 01:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -50,6 +50,13 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`userId`, `email`, `password`, `resetCode`, `codeExpiry`) VALUES
+(1, 'bitancor_jeremiah@plpasig.edu.ph', '$2b$10$sMx7emoKrnYzwzR5s7f4oekPjSD0M.II.5P0rEftJjjhtpd5s8rZq', NULL, NULL);
+
+--
 -- Indexes for dumped tables
 --
 
@@ -79,7 +86,7 @@ ALTER TABLE `salesdata`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

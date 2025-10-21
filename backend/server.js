@@ -1,34 +1,24 @@
-// Importing modules
-const express = require('express');
-const mysql = require('mysql');
+// server.js
+const express = require("express");
+const cors = require("cors");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
-const PORT = 3306;
+const PORT = 5000;
 
-// Create a connection to the database
-const connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: "kgs"        
+// Middleware
+app.use(cors());
+app.use(express.json());
+
+// Routes
+app.use("/", authRoutes);
+
+// Default route
+app.get("/", (req, res) => {
+  res.send("Sales Forecasting System - Backend Running 🚀");
 });
 
-// open the MySQL connection
-connection.connect(error => {
-    if (error){
-        console.log("A error has been occurred "
-            + "while connecting to database.");        
-        throw error;
-    }
-    
-    //If Everything goes correct, Then start Express Server
-    app.listen(PORT, ()=>{
-        console.log("Database connection is Ready and "
-            + "Server is Listening on Port ", PORT);
-    })
-});
-
-// Simple test route
-app.get('/', (req, res) => {
-  res.send('Sales Forecasting System - Database Connected!');
+// Start server
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
