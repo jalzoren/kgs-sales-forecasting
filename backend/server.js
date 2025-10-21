@@ -2,13 +2,16 @@
 const express = require("express");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
+const session = require("./config/sessionConfig");
 
 const app = express();
 const PORT = 5000;
 
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(session);
 
 // Routes
 app.use("/", authRoutes);
