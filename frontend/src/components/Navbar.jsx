@@ -7,7 +7,6 @@ import { useState } from "react";
 
 import "../css/Navbar.css";
 
-// Example notifications data
 const notificationsData = [
   { message: "Inventory Alert: Item X low stock", time: "2h ago", read: false },
   { message: "Sales forecast updated", time: "5h ago", read: false },

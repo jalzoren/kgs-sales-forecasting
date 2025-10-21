@@ -8,7 +8,6 @@
   --page-padding-x: 20px;
   --navbar-height: 80px;
 
-  /* Color palette */
   --accent: #001d39;
   --accent-light: #0a4174;
   --accent-lighter: #41a7dd;
@@ -18,6 +17,7 @@
   --border-color: #cfd6e1;
   --text-color: #001d39;
 }
+
 
 html,
 body {
