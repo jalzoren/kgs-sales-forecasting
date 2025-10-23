@@ -15,3 +15,7 @@ frontend/.env.local
 # OS
 .DS_Store
 Thumbs.db
+
+# Security
+node_modules/
+.env

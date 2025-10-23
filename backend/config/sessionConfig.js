@@ -1,8 +1,9 @@
 // config/sessionConfig.js
+require("dotenv").config();
 const session = require("express-session");
 
 const sessionConfig = session({
-  secret: "superSecretKey123!", // 🔒 Change this to a long, random string
+  secret: process.env.SESSION_SECRET, // 🔒 Change this to a long, random string
   resave: false,
   saveUninitialized: true,
   cookie: {
