@@ -4,6 +4,7 @@ const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
 const db = require("../config/db.js");
+const {requireAuth} = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ✅ GET all uploads
-router.get("/api/data", (req, res) => {
+router.get("/api/data", requireAuth, (req, res) => {
   const sql = "SELECT * FROM salesdata ORDER BY uploadDate DESC";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ error: err });
@@ -30,7 +31,7 @@ router.get("/api/data", (req, res) => {
 });
 
 // 📤 POST upload new file
-router.post("/api/data/upload", upload.single("file"), (req, res) => {
+router.post("/api/data/upload", requireAuth, upload.single("file"), (req, res) => {
   const file = req.file;
   if (!file) return res.status(400).json({ message: "No file uploaded" });
 
@@ -46,7 +47,7 @@ router.post("/api/data/upload", upload.single("file"), (req, res) => {
 });
 
 // ❌ DELETE upload record
-router.delete("/api/data/:id", (req, res) => {
+router.delete("/api/data/:id", requireAuth, (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM salesdata WHERE salesID = ?";
   db.query(sql, [id], (err, result) => {

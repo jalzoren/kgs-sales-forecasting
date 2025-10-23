@@ -9,6 +9,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila"); // 🇵🇭 Philippine timezone
 
+
 export default function UploadBox() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState([]);
@@ -19,12 +20,33 @@ export default function UploadBox() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/data")
-      .then((res) => res.json())
-      .then((data) => setUploads(data))
-      .catch((err) => console.error("Error fetching data:", err));
-  }, []);
+useEffect(() => {
+  fetch("http://localhost:5000/api/data", {
+    credentials: 'include'
+  })
+    .then((res) => {
+      if (res.status === 401) {
+        // Redirect to login if not authenticated
+        window.location.href = '/';
+        return [];
+      }
+      if (!res.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      return res.json();
+    })
+    .then((data) => {
+      if (Array.isArray(data)) {
+        setUploads(data);
+      } else {
+        setUploads([]);
+      }
+    })
+    .catch((err) => {
+      console.error("Error fetching data:", err);
+      setUploads([]);
+    });
+}, []);
 
   // 📤 Handle file upload
   const handleFileChange = async (e) => {
@@ -37,13 +59,25 @@ export default function UploadBox() {
     try {
       const res = await fetch("http://localhost:5000/api/data/upload", {
         method: "POST",
+        credentials: 'include',
         body: formData,
       });
       const result = await res.json();
       alert("✅ File uploaded successfully!");
       console.log(result);
       // Refresh uploads
-      const updated = await fetch("http://localhost:5000/api/data").then((r) => r.json());
+      const updated = await fetch("http://localhost:5000/api/data", {
+        credentials: 'include'
+      }).then(async (r) => {
+        if (r.status === 401) {
+          window.location.href = '/';
+          return [];
+        }
+        if (!r.ok) {
+          throw new Error('Failed to fetch');
+        }
+        return r.json();
+      });
       setUploads(updated);
       setCurrentPage(1); // reset to first page
     } catch (err) {
@@ -56,7 +90,7 @@ export default function UploadBox() {
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this upload?")) return;
     try {
-      await fetch(`http://localhost:5000/api/data/${id}`, { method: "DELETE" });
+      await fetch(`http://localhost:5000/api/data/${id}`, { method: "DELETE", credentials: 'include' });
       setUploads((prev) => prev.filter((u) => u.salesID !== id));
     } catch (err) {
       console.error(err);
@@ -90,14 +124,16 @@ export default function UploadBox() {
   };
 
   // 🔍 Filter + Search logic
-  const filteredUploads = uploads.filter((item) => {
-    const matchesSearch = item.fileName.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus =
-      statusFilter === "Active Uploads"
-        ? item.status !== "Completed" && item.status !== "Failed"
-        : item.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
+  const filteredUploads = Array.isArray(uploads) 
+    ? uploads.filter((item) => {
+      const matchesSearch = item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
+      const matchesStatus =
+        statusFilter === "Active Uploads"
+          ? item.status !== "Completed" && item.status !== "Failed"
+          : item.status === statusFilter;
+      return matchesSearch && matchesStatus;
+    })
+  : [];
 
   // 🔢 Pagination logic
   const totalPages = Math.ceil(filteredUploads.length / itemsPerPage);

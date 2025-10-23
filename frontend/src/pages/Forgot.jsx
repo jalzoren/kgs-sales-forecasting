@@ -12,6 +12,7 @@ export default function Forgot() {
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
 
+
   // Handle sending OTP code
   const handleSendCode = async () => {
   if (!email) {
@@ -23,6 +24,7 @@ export default function Forgot() {
     const response = await fetch("http://localhost:5000/forgot", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: 'include',
       body: JSON.stringify({ email }),
     });
     const data = await response.json();
