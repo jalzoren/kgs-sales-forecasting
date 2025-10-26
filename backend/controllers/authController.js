@@ -5,6 +5,7 @@ const db = require("../config/db");
 const mailService = require("../services/mailService");
 
 class AuthController {
+  // REGISTER
   async register(req, res) {
     const { firstName, lastName, email, password, confirmPassword } = req.body;
     const passwordRegex =
