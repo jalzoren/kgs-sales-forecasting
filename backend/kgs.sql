@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2025 at 02:36 PM
+-- Generation Time: Oct 26, 2025 at 04:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -57,7 +57,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`userId`, `firstName`, `lastName`, `email`, `password`, `resetCode`, `codeExpiry`, `createdAt`) VALUES
-(3, 'Jerimiah', 'Bitancor', 'bitancor1234amora@gmail.com', '$2b$10$rg28hXSWc4yxkz5vUkE0pelanp24PE.6xwSY6Od0TVMaPi4Oc7FCy', NULL, NULL, '2025-10-26 13:12:40');
+(3, 'Jerimiah', 'Bitancor', 'bitancor1234amora@gmail.com', '$2b$10$rg28hXSWc4yxkz5vUkE0pelanp24PE.6xwSY6Od0TVMaPi4Oc7FCy', NULL, NULL, '2025-10-26 13:12:40'),
+(4, 'Laurence', 'Flavier', 'dumpblj@gmail.com', '$2b$10$D5z5gKunguWG32xB82VT.uxGnYPR4ni7s.g5E..OoYqnZBG7pifnq', NULL, NULL, '2025-10-26 15:27:47');
 
 --
 -- Indexes for dumped tables
@@ -90,7 +91,7 @@ ALTER TABLE `salesdata`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

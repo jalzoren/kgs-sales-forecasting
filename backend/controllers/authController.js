@@ -26,12 +26,13 @@ class AuthController {
       });
     }
 
+    /*
     // Add this check after other validations
     if (!acceptTerms || !acceptPrivacy) {
       return res.status(400).json({
         message: "You must accept Terms & Conditions and Privacy Policy",
       });
-    }
+    }*/
 
     try {
       // Check if email already exists
