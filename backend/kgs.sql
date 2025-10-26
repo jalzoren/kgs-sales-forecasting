@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2025 at 11:37 AM
+-- Generation Time: Oct 26, 2025 at 02:36 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -43,19 +43,21 @@ CREATE TABLE `salesdata` (
 
 CREATE TABLE `user` (
   `userId` int(11) NOT NULL,
+  `firstName` varchar(100) NOT NULL,
+  `lastName` varchar(100) NOT NULL,
   `email` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `role` varchar(50) NOT NULL,
   `resetCode` varchar(11) DEFAULT NULL,
-  `codeExpiry` timestamp(6) NULL DEFAULT NULL
+  `codeExpiry` timestamp(6) NULL DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`userId`, `email`, `password`, `role`, `resetCode`, `codeExpiry`) VALUES
-(1, 'bitancor1234amora@gmail.com', '$2b$10$OOEx0MoSIAbE9xla492UvO7eSHEJ/24A565wf7Mvo7D2N2A6V7YcO', 'admin', NULL, NULL);
+INSERT INTO `user` (`userId`, `firstName`, `lastName`, `email`, `password`, `resetCode`, `codeExpiry`, `createdAt`) VALUES
+(3, 'Jerimiah', 'Bitancor', 'bitancor1234amora@gmail.com', '$2b$10$rg28hXSWc4yxkz5vUkE0pelanp24PE.6xwSY6Od0TVMaPi4Oc7FCy', NULL, NULL, '2025-10-26 13:12:40');
 
 --
 -- Indexes for dumped tables
@@ -71,7 +73,8 @@ ALTER TABLE `salesdata`
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`userId`);
+  ADD PRIMARY KEY (`userId`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -87,7 +90,7 @@ ALTER TABLE `salesdata`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
