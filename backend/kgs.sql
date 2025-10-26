@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 23, 2025 at 04:31 PM
+-- Generation Time: Oct 26, 2025 at 11:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -55,7 +55,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`userId`, `email`, `password`, `role`, `resetCode`, `codeExpiry`) VALUES
-(1, 'bitancor1234amora@gmail.com', '$2b$10$TzaHgOfdYstjsdbInuNHUeeHi8DCPnO9ZT9ozau43CXmzRKHMLn66', 'admin', NULL, NULL);
+(1, 'bitancor1234amora@gmail.com', '$2b$10$OOEx0MoSIAbE9xla492UvO7eSHEJ/24A565wf7Mvo7D2N2A6V7YcO', 'admin', NULL, NULL);
 
 --
 -- Indexes for dumped tables
