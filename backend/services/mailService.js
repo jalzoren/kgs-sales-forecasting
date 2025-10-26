@@ -32,7 +32,7 @@ class MailService {
                 <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:4px;padding:15px;text-align:center;font-size:24px;font-weight:bold;margin:20px 0;color:#007bff;">
                   ${code}
                 </div>
-                <p>This code is valid for <strong>30 seconds</strong>. Do not share it with anyone.</p>
+                <p>This code is valid for <strong>2 minutes</strong>. Do not share it with anyone.</p>
               </div>
               <div style="background:#e9ecef;color:#6c757d;padding:15px;font-size:12px;text-align:center;border-top:1px solid #dee2e6;">
                 &copy; ${new Date().getFullYear()} Sales Forecasting. All rights reserved.

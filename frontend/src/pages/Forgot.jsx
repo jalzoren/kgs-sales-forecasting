@@ -13,12 +13,22 @@ export default function Forgot() {
   const [message, setMessage] = useState("");
 
 
-  // Handle sending OTP code
-  const handleSendCode = async () => {
+// Handle sending OTP code
+const handleSendCode = async () => {
   if (!email) {
     Swal.fire("Warning", "Please enter your email.", "warning");
     return;
   }
+
+  // Show loading alert
+  Swal.fire({
+    title: 'Sending Code...',
+    text: 'Please wait while we send the OTP to your email',
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    }
+  });
 
   try {
     const response = await fetch("http://localhost:5000/forgot", {
@@ -29,6 +39,9 @@ export default function Forgot() {
     });
     const data = await response.json();
 
+    // Close loading alert
+    Swal.close();
+
     if (response.ok) {
       setIsCodeSent(true);
       Swal.fire("Success", data.message, "success");
@@ -36,6 +49,8 @@ export default function Forgot() {
       Swal.fire("Error", data.message, "error");
     }
   } catch (error) {
+    // Close loading alert on error
+    Swal.close();
     Swal.fire("Error", "Failed to connect to the server.", "error");
   }
 };
