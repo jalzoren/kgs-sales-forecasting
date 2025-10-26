@@ -27,12 +27,12 @@ class MailService {
                 <h2>Password Reset Request</h2>
               </div>
               <div style="padding:30px;color:#333;">
-                <p>Hello,</p>
-                <p>Use the following OTP code to reset your password:</p>
+                <p>Dear Customer,</p>
+                <p>You recently requested a password reset for your account. To proceed, please use the following One-Time Password (OTP) code:</p>
                 <div style="background:#f8f9fa;border:1px solid #e9ecef;border-radius:4px;padding:15px;text-align:center;font-size:24px;font-weight:bold;margin:20px 0;color:#007bff;">
                   ${code}
                 </div>
-                <p>This code is valid for <strong>2 minutes</strong>. Do not share it with anyone.</p>
+                <p>This code is only valid for <strong>2 minutes</strong>. For security, please do not share this code with anyone. If you did not request this reset, you can safely ignore this email.</p>
               </div>
               <div style="background:#e9ecef;color:#6c757d;padding:15px;font-size:12px;text-align:center;border-top:1px solid #dee2e6;">
                 &copy; ${new Date().getFullYear()} Sales Forecasting. All rights reserved.

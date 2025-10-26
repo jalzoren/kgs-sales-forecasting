@@ -108,7 +108,7 @@ input[type="text"] {
   background: #144b7a;
 }
 
-.forgot {
+.forgot, .register {
   display: block;
   margin-top: 14px;
   font-size: 13px;
@@ -117,7 +117,8 @@ input[type="text"] {
   transition: 0.2s;
 }
 
-.forgot:hover {
+.forgot:hover,
+.register:hover {
   text-decoration: underline;
   color: #fff;
 }

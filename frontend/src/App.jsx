@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Navbar2 from "./components/Navbar2";
 
@@ -9,6 +9,7 @@ import Reports from "./pages/Reports";
 import Analytics from "./pages/Analytics";
 import Login from "./pages/Login";
 import Forgot from "./pages/Forgot";  
+import Register from "./pages/Register";  
 
 
 import "./App.css";
@@ -21,7 +22,7 @@ function App() {
     (route) => path.startsWith(route)
   );
 
-  const hideNavbar = path === "/" || path === "/login" || path === "/forgot";
+  const hideNavbar = path === "/" || path === "/login" || path === "/forgot" || path === "/register";
 
   console.log("PATH:", path, "showNavbar2:", showNavbar2, "hideNavbar:", hideNavbar);
 
@@ -32,6 +33,8 @@ function App() {
       <div className={`page-container ${hideNavbar ? "no-navbar" : ""}`}>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/forgot" element={<Forgot />} />
           <Route path="/home" element={<Home />} />
           <Route path="/data" element={<Data />} />

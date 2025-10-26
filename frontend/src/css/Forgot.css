@@ -136,3 +136,85 @@ input[type="checkbox"] {
   margin-top: 5px;
   gap: 5px;
 }
+
+/* ✅ Add to existing Forgot.css */
+
+/* SweetAlert Centering */
+.swal-centered .swal2-title,
+.swal-centered .swal2-html-container {
+  text-align: center !important;
+}
+
+/* Password Validation Styles */
+.password-criteria {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 15px;
+  margin: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.password-criteria h4 {
+  margin: 0 0 10px 0;
+  font-size: 12px;
+  color: #ffffff;
+  font-family: "Poppins", sans-serif;
+}
+
+.password-criteria ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.password-criteria li {
+  font-size: 10px;
+  margin: 5px 0;
+  font-family: "Poppins", sans-serif;
+  transition: color 0.3s ease;
+}
+
+.criteria-valid {
+  color: #52c41a;
+}
+
+.criteria-invalid {
+  color: #ff4d4f;
+}
+
+/* Input Validation States */
+.input-valid {
+  border: 2px solid #52c41a !important;
+  background: rgb(209, 255, 188) !important;
+}
+
+.input-invalid {
+  border: 2px solid #ff4d4f !important;
+  background: rgb(252, 171, 171) !important;
+}
+
+/* Password Match Indicator */
+.password-match {
+  margin: 5px 0 15px 0;
+  font-size: 12px;
+  font-family: "Poppins", sans-serif;
+}
+
+.match-valid {
+  color: #52c41a;
+}
+
+.match-invalid {
+  color: #ff4d4f;
+}
+
+/* Disabled Button State */
+.submit-btn:disabled {
+  background: #94a3b8 !important;
+  cursor: not-allowed !important;
+  opacity: 0.7 !important;
+}
+
+.submit-btn:disabled:hover {
+  background: #94a3b8 !important;
+}

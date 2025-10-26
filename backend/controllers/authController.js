@@ -5,6 +5,90 @@ const db = require("../config/db");
 const mailService = require("../services/mailService");
 
 class AuthController {
+  async register(req, res) {
+    const { firstName, lastName, email, password, confirmPassword } = req.body;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+
+    // Validation
+    if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character",
+      });
+    }
+
+    // Add this check after other validations
+    if (!acceptTerms || !acceptPrivacy) {
+      return res.status(400).json({
+        message: "You must accept Terms & Conditions and Privacy Policy",
+      });
+    }
+
+    try {
+      // Check if email already exists
+      db.query(
+        "SELECT * FROM user WHERE email = ?",
+        [email],
+        async (err, results) => {
+          if (err) return res.status(500).json({ message: "Database error" });
+
+          if (results.length > 0) {
+            return res
+              .status(409)
+              .json({ message: "Email already registered" });
+          }
+
+          // Hash password
+          const hashedPassword = await bcrypt.hash(password, 10);
+
+          // Insert new user
+          const insertQuery = `
+        INSERT INTO user (firstName, lastName, email, password) 
+        VALUES (?, ?, ?, ?)
+      `;
+
+          db.query(
+            insertQuery,
+            [firstName, lastName, email, hashedPassword],
+            (err, result) => {
+              if (err) {
+                console.error("Registration error:", err);
+                return res
+                  .status(500)
+                  .json({ message: "Failed to create account" });
+              }
+
+              // Auto-login after registration
+              req.session.user = {
+                id: result.insertId,
+                email: email,
+                firstName: firstName,
+                lastName: lastName,
+              };
+
+              res.json({
+                message: "Account created successfully!",
+                user: req.session.user,
+              });
+            }
+          );
+        }
+      );
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Server error during registration" });
+    }
+  }
+
   // LOGIN
   async login(req, res) {
     const { email, password } = req.body;
@@ -87,7 +171,8 @@ class AuthController {
         req.session.user = {
           id: user.userId,
           email: user.email,
-          role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName,
         };
 
         res.json({ message: "Login successful", user: req.session.user });
@@ -171,6 +256,16 @@ class AuthController {
     const { email, newPassword } = req.body;
     if (!email || !newPassword)
       return res.status(400).json({ message: "Missing data" });
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character",
+      });
+    }
 
     try {
       const hashed = await bcrypt.hash(newPassword, 10);

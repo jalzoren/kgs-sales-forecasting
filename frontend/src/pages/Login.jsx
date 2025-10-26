@@ -166,6 +166,9 @@ const Login = () => {
           <a href="/forgot" className="forgot">
             Forgot the password?
           </a>
+          <a href="/register" className="register">
+            Don't have an account? Register here.
+          </a>
         </form>
       </div>
     </div>
