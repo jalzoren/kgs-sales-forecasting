@@ -7,8 +7,7 @@ import timezone from "dayjs/plugin/timezone";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia/Manila"); // 🇵🇭 Philippine timezone
-
+dayjs.tz.setDefault("Asia/Manila"); 
 
 export default function UploadBox() {
   const [isDragging, setIsDragging] = useState(false);
