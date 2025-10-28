@@ -4,6 +4,7 @@ import { FiUploadCloud } from "react-icons/fi";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import Swal from "sweetalert2"; 
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -19,33 +20,22 @@ export default function UploadBox() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-useEffect(() => {
-  fetch("http://localhost:5000/api/data", {
-    credentials: 'include'
-  })
-    .then((res) => {
-      if (res.status === 401) {
-        // Redirect to login if not authenticated
-        window.location.href = '/';
-        return [];
-      }
-      if (!res.ok) {
-        throw new Error('Failed to fetch data');
-      }
-      return res.json();
-    })
-    .then((data) => {
-      if (Array.isArray(data)) {
-        setUploads(data);
-      } else {
+  useEffect(() => {
+    fetch("http://localhost:5000/api/data", { credentials: "include" })
+      .then((res) => {
+        if (res.status === 401) {
+          window.location.href = "/";
+          return [];
+        }
+        if (!res.ok) throw new Error("Failed to fetch data");
+        return res.json();
+      })
+      .then((data) => Array.isArray(data) && setUploads(data))
+      .catch((err) => {
+        console.error("Error fetching data:", err);
         setUploads([]);
-      }
-    })
-    .catch((err) => {
-      console.error("Error fetching data:", err);
-      setUploads([]);
-    });
-}, []);
+      });
+  }, []);
 
   // 📤 Handle file upload
   const handleFileChange = async (e) => {
@@ -55,48 +45,99 @@ useEffect(() => {
     const formData = new FormData();
     formData.append("file", file);
 
+    Swal.fire({
+      title: "Uploading...",
+      text: "Please wait while your file is being uploaded.",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     try {
       const res = await fetch("http://localhost:5000/api/data/upload", {
         method: "POST",
-        credentials: 'include',
+        credentials: "include",
         body: formData,
       });
       const result = await res.json();
-      alert("✅ File uploaded successfully!");
-      console.log(result);
-      // Refresh uploads
-      const updated = await fetch("http://localhost:5000/api/data", {
-        credentials: 'include'
-      }).then(async (r) => {
-        if (r.status === 401) {
-          window.location.href = '/';
-          return [];
-        }
-        if (!r.ok) {
-          throw new Error('Failed to fetch');
-        }
-        return r.json();
-      });
-      setUploads(updated);
-      setCurrentPage(1); // reset to first page
+
+      if (res.ok) {
+        Swal.fire({
+          icon: "success",
+          title: "Upload Successful!",
+          text: result.message,
+          confirmButtonColor: "#3085d6",
+        });
+
+        // Refresh uploads
+        const updated = await fetch("http://localhost:5000/api/data", {
+          credentials: "include",
+        }).then((r) => (r.ok ? r.json() : []));
+        setUploads(updated);
+        setCurrentPage(1);
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Upload Failed",
+          text: result.message || "Something went wrong.",
+        });
+      }
     } catch (err) {
-      console.error(err);
-      alert("❌ Upload failed.");
+      Swal.fire({
+        icon: "error",
+        title: "Upload Error",
+        text: err.message,
+      });
     }
   };
 
   // 🗑 Delete upload
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this upload?")) return;
+    const confirmDelete = await Swal.fire({
+      title: "Are you sure?",
+      text: "This upload will be permanently deleted.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+    });
+
+    if (!confirmDelete.isConfirmed) return;
+
     try {
-      await fetch(`http://localhost:5000/api/data/${id}`, { method: "DELETE", credentials: 'include' });
-      setUploads((prev) => prev.filter((u) => u.salesID !== id));
+      const res = await fetch(`http://localhost:5000/api/data/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+        setUploads((prev) => prev.filter((u) => u.salesID !== id));
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: result.message,
+          confirmButtonColor: "#3085d6",
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: result.message || "Unable to delete file.",
+        });
+      }
     } catch (err) {
-      console.error(err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: err.message,
+      });
     }
   };
 
-  // 🖱 Drag events
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -121,6 +162,7 @@ useEffect(() => {
       handleFileChange(fakeEvent);
     }
   };
+
 
   // 🔍 Filter + Search logic
   const filteredUploads = Array.isArray(uploads) 
