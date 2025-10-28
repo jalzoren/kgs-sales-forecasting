@@ -7,20 +7,20 @@ const { requireAuth } = require("../middleware/authMiddleware.js");
 
 const router = express.Router();
 
-// 📂 Ensure uploads folder exists
+// ensure uploads folder exists
 const uploadDir = path.join(__dirname, "../uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// ⚙️ Multer configuration
+// multer config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => cb(null, file.originalname),
 });
 const upload = multer({ storage });
 
-// ✅ Fetch all uploaded data
+// fetch
 router.get("/api/data", requireAuth, (req, res) => {
   const sql = "SELECT * FROM salesdata ORDER BY uploadDate DESC";
   db.query(sql, (err, results) => {
@@ -29,7 +29,7 @@ router.get("/api/data", requireAuth, (req, res) => {
   });
 });
 
-// 📤 Upload new file
+// Upload csv
 router.post("/api/data/upload", requireAuth, upload.single("file"), (req, res) => {
   if (!req.file) {
     return res.status(400).json({ message: "No file uploaded" });
@@ -43,7 +43,7 @@ router.post("/api/data/upload", requireAuth, upload.single("file"), (req, res) =
   });
 });
 
-// ❌ Delete a file record
+// Delete
 router.delete("/api/data/:id", requireAuth, (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM salesdata WHERE salesID = ?";
