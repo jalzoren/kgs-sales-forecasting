@@ -13,6 +13,8 @@ const sampleNotifications = [
   { message: "Forecast accuracy variance: 7%", time: "2d ago", read: true },
 ];
 
+
+
 function Navbar2() {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
