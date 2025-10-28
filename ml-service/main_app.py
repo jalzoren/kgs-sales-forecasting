@@ -1,17 +1,12 @@
+# simple_app.py
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
-# Allow frontend (React/Vite) to talk to backend
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # or ["http://localhost:5173"] for safety
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+@app.get("/")
+def read_root():
+    return ("Hello, this is your FastAPI output!")
 
-@app.get("/api/hello")
-def get_message():
-    return {"message": "Hello from FastAPI!"}
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("simple_app:app", host="127.0.0.1", port=8000, reload=True)

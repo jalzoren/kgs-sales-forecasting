@@ -10,19 +10,13 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import axios from "axios";
-import { useEffect, useState } from "react";
+
 
 
 
 export default function Analytics() {
 
-    const [message, setMessage] = useState("Loading...");
-
-  useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/hello")
-      .then((response) => setMessage(response.data.message))
-  }, []);
+  
   
   const data = [
     { date: "Mon", actual: 1000, forecasted: 1200, future: 1500 },
@@ -58,12 +52,9 @@ export default function Analytics() {
 
 
   return (
+  
+      
     <div>
-      <h2 className="titled">Analytics Page</h2>
-
-       <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>{message}</h1>
-    </div>
       <div className="analytics-container">
         {/* Tabs */}
         <div className="analytics-header">
