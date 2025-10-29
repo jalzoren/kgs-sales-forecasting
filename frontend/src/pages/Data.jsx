@@ -31,7 +31,7 @@ export default function UploadBox() {
         return;
       }
       const data = await res.json();
-      console.log("📥 Fetched data:", data); // Debug log
+      console.log("📥 Fetched data:", data);
       if (Array.isArray(data)) setUploads(data);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -43,10 +43,28 @@ export default function UploadBox() {
     fetchUploads();
   }, []);
 
-  // 📤 Handle file upload - WORKING VERSION
+  // 📤 Handle file upload with validation
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // ✅ Validate file type
+    const allowedTypes = [
+      "text/csv",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ];
+    const allowedExtensions = ["csv", "xlsx"];
+    const fileExtension = file.name.split(".").pop().toLowerCase();
+
+    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid File Type",
+        text: `The file "${file.name}" is not supported. Only CSV and XLSX files are allowed.`,
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
 
     const formData = new FormData();
     formData.append("file", file);
@@ -67,7 +85,6 @@ export default function UploadBox() {
       const result = await res.json();
 
       if (res.ok) {
-        // Wait for backend processing
         setTimeout(() => {
           Swal.fire({
             icon: "success",
@@ -75,7 +92,7 @@ export default function UploadBox() {
             text: result.message,
             confirmButtonColor: "#3085d6",
           });
-          fetchUploads(); // Refresh data
+          fetchUploads();
           setCurrentPage(1);
         }, 3000);
       } else {
@@ -140,6 +157,7 @@ export default function UploadBox() {
     }
   };
 
+  // 🖱️ Drag and Drop Handlers
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -158,27 +176,41 @@ export default function UploadBox() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
+      const file = files[0];
+      const allowedExtensions = ["csv", "xlsx"];
+      const fileExtension = file.name.split(".").pop().toLowerCase();
+
+      if (!allowedExtensions.includes(fileExtension)) {
+        Swal.fire({
+          icon: "error",
+          title: "Invalid File Type",
+          text: `The file "${file.name}" is not supported. Only CSV and XLSX files are allowed.`,
+          confirmButtonColor: "#d33",
+        });
+        return;
+      }
+
       const fakeEvent = { target: { files } };
       handleFileChange(fakeEvent);
     }
   };
 
-
   // 🔍 Filter + Search logic
-  const filteredUploads = Array.isArray(uploads) 
+  const filteredUploads = Array.isArray(uploads)
     ? uploads.filter((item) => {
-      const matchesSearch = item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
-      const matchesStatus =
-        statusFilter === "All"
-          ? true
-          : statusFilter === "Active Uploads"
-          ? item.status !== "Completed" && item.status !== "Failed"
-          : item.status === statusFilter;
-      return matchesSearch && matchesStatus;
-    })
-  : [];
+        const matchesSearch = item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
+        const matchesStatus =
+          statusFilter === "All"
+            ? true
+            : statusFilter === "Active Uploads"
+            ? item.status !== "Completed" && item.status !== "Failed"
+            : item.status === statusFilter;
+        return matchesSearch && matchesStatus;
+      })
+    : [];
 
   // 🔢 Pagination logic
   const totalPages = Math.ceil(filteredUploads.length / itemsPerPage);
@@ -230,7 +262,6 @@ export default function UploadBox() {
 
       {/* Table Section */}
       <div className="table-wrapper">
-        {/* Toolbar */}
         <div className="table-toolbar">
           <div className="search-box">
             <input
@@ -273,7 +304,7 @@ export default function UploadBox() {
             </thead>
 
             <tbody>
-                {currentData.length > 0 ? (
+              {currentData.length > 0 ? (
                 currentData.map((item) => (
                   <tr key={item.salesID}>
                     <td>
@@ -284,18 +315,18 @@ export default function UploadBox() {
                     <td>{item.fileName}</td>
                     <td>{item.records?.toLocaleString() || 0}</td>
                     <td>
-                    <span
-                      className={`status ${
-                        item.status === "Completed"  // ← Changed from "Success" to "Completed"
-                          ? "success"
-                          : item.status === "Failed"
-                          ? "failed"
-                          : "pending"  // This covers "Processing" status
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </td>
+                      <span
+                        className={`status ${
+                          item.status === "Completed"
+                            ? "success"
+                            : item.status === "Failed"
+                            ? "failed"
+                            : "pending"
+                        }`}
+                      >
+                        {item.status}
+                      </span>
+                    </td>
                     <td className="actions">
                       <button className="btn-action">[View]</button> |
                       <button
