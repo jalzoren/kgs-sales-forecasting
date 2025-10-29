@@ -4,40 +4,46 @@ import { FiUploadCloud } from "react-icons/fi";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia/Manila"); 
+dayjs.tz.setDefault("Asia/Manila");
 
 export default function UploadBox() {
   const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState([]);
   const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("Active Uploads");
+  const [statusFilter, setStatusFilter] = useState("All");
   const [sortMethod, setSortMethod] = useState("Manual");
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  useEffect(() => {
-    fetch("http://localhost:5000/api/data", { credentials: "include" })
-      .then((res) => {
-        if (res.status === 401) {
-          window.location.href = "/";
-          return [];
-        }
-        if (!res.ok) throw new Error("Failed to fetch data");
-        return res.json();
-      })
-      .then((data) => Array.isArray(data) && setUploads(data))
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-        setUploads([]);
+  // 🔄 Fetch existing uploads
+  const fetchUploads = async () => {
+    try {
+      const res = await fetch("http://localhost:5000/api/data", {
+        credentials: "include",
       });
+      if (res.status === 401) {
+        window.location.href = "/";
+        return;
+      }
+      const data = await res.json();
+      console.log("📥 Fetched data:", data); // Debug log
+      if (Array.isArray(data)) setUploads(data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setUploads([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchUploads();
   }, []);
 
-  // 📤 Handle file upload
+  // 📤 Handle file upload - WORKING VERSION
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -49,9 +55,7 @@ export default function UploadBox() {
       title: "Uploading...",
       text: "Please wait while your file is being uploaded.",
       allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
+      didOpen: () => Swal.showLoading(),
     });
 
     try {
@@ -63,19 +67,17 @@ export default function UploadBox() {
       const result = await res.json();
 
       if (res.ok) {
-        Swal.fire({
-          icon: "success",
-          title: "Upload Successful!",
-          text: result.message,
-          confirmButtonColor: "#3085d6",
-        });
-
-        // Refresh uploads
-        const updated = await fetch("http://localhost:5000/api/data", {
-          credentials: "include",
-        }).then((r) => (r.ok ? r.json() : []));
-        setUploads(updated);
-        setCurrentPage(1);
+        // Wait for backend processing
+        setTimeout(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Upload Successful!",
+            text: result.message,
+            confirmButtonColor: "#3085d6",
+          });
+          fetchUploads(); // Refresh data
+          setCurrentPage(1);
+        }, 3000);
       } else {
         Swal.fire({
           icon: "error",
@@ -169,7 +171,9 @@ export default function UploadBox() {
     ? uploads.filter((item) => {
       const matchesSearch = item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
       const matchesStatus =
-        statusFilter === "Active Uploads"
+        statusFilter === "All"
+          ? true
+          : statusFilter === "Active Uploads"
           ? item.status !== "Completed" && item.status !== "Failed"
           : item.status === statusFilter;
       return matchesSearch && matchesStatus;
@@ -238,6 +242,7 @@ export default function UploadBox() {
           </div>
 
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option>All</option>
             <option>Active Uploads</option>
             <option>Completed</option>
             <option>Failed</option>
@@ -268,9 +273,9 @@ export default function UploadBox() {
             </thead>
 
             <tbody>
-              {currentData.length > 0 ? (
-                currentData.map((item, index) => (
-                  <tr key={index}>
+                {currentData.length > 0 ? (
+                currentData.map((item) => (
+                  <tr key={item.salesID}>
                     <td>
                       {item.uploadDate
                         ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A")
@@ -279,18 +284,18 @@ export default function UploadBox() {
                     <td>{item.fileName}</td>
                     <td>{item.records?.toLocaleString() || 0}</td>
                     <td>
-                      <span
-                        className={`status ${
-                          item.status === "Success"
-                            ? "success"
-                            : item.status === "Failed"
-                            ? "failed"
-                            : "pending"
-                        }`}
-                      >
-                        {item.status}
-                      </span>
-                    </td>
+                    <span
+                      className={`status ${
+                        item.status === "Completed"  // ← Changed from "Success" to "Completed"
+                          ? "success"
+                          : item.status === "Failed"
+                          ? "failed"
+                          : "pending"  // This covers "Processing" status
+                      }`}
+                    >
+                      {item.status}
+                    </span>
+                  </td>
                     <td className="actions">
                       <button className="btn-action">[View]</button> |
                       <button
