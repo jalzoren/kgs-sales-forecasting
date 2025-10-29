@@ -18,17 +18,19 @@ function App() {
   const location = useLocation();
   const path = location.pathname;
 
-  const hideNavbarPaths = ["/", "/login", "/register", "/forgot"];
-  const showNavbar2Paths = ["/welcome"];
-
-  const hideNavbar = hideNavbarPaths.includes(path);
-  const showNavbar2 = showNavbar2Paths.includes(path);
+  const noNavbarPaths = ["/", "/login", "/register", "/forgot"];
+  const navbar2Paths = ["/welcome", "/data", "/forecast", "/reports", "/analytics"];
+  const navbarPaths = ["/home"];
 
   return (
     <>
-      {!hideNavbar && (showNavbar2 ? <Navbar2 /> : <Navbar />)}
+      {noNavbarPaths.includes(path) ? null : navbar2Paths.includes(path) ? (
+        <Navbar2 />
+      ) : navbarPaths.includes(path) ? (
+        <Navbar />
+      ) : null}
 
-      <div className={`page-container ${hideNavbar ? "no-navbar" : ""}`}>
+      <div className={`page-container ${noNavbarPaths.includes(path) ? "no-navbar" : ""}`}>
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
