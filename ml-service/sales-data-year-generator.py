@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 import random
 import os
 
-# ================== CONFIGURATION ==================
+# ==== CONFIGURATION ===
 CONFIG = {
     "year": 2024,
     "min_quantity": 1,
@@ -44,14 +44,14 @@ CONFIG = {
     "holiday_discount_chance_major": 0.25,
 }
 
-# ================== LOAD PRODUCT LIST ==================
+# === LOAD PRODUCT LIST ===
 base_dir = os.path.dirname(os.path.abspath(__file__))
 file_path = os.path.join(base_dir, "Final Products List.xlsx")
 products = pd.read_excel(file_path, sheet_name="Sheet1")
 products.columns = ["Product_Name", "Unit_Price", "Category"]
 products["Product_ID"] = [f"P{i:04d}" for i in range(1, len(products) + 1)]
 
-# ================== LOAD HOLIDAYS ==================
+# === LOAD HOLIDAYS === 
 holidays_path = os.path.join(base_dir, "Holidays.xlsx")
 holidays_df = pd.read_excel(holidays_path)
 holidays_df.columns = [col.strip().title() for col in holidays_df.columns]
@@ -66,7 +66,7 @@ regular_holidays = set(holidays_df.loc[holidays_df["Type"].str.lower() == "regul
 
 # print(f" Loaded {len(major_holidays)} major and {len(regular_holidays)} regular holidays.")
 
-# ================== GENERATION FUNCTION ==================
+# === GENERATION FUNCTION ===
 def generate_sales_data(config):
     year = config["year"]
     start_date = datetime(year, 1, 1)
@@ -137,7 +137,6 @@ def generate_sales_data(config):
     return pd.DataFrame(records)
 
 
-# ================== RUN ==================
 if __name__ == "__main__":
     os.makedirs(CONFIG["output_dir"], exist_ok=True)
     print(f"Generating sales data for {CONFIG['year']}...")
