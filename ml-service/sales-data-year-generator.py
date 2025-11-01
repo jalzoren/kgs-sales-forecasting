@@ -6,11 +6,11 @@ import os
 
 # ==== CONFIGURATION ===
 CONFIG = {
-    "year": 2024,
+    "year": 2022,
     "min_quantity": 1,
     "max_quantity": 10,
     "min_tx_per_day": 200,
-    "max_tx_per_day": 700,
+    "max_tx_per_day": 600,
     "min_items_per_tx": 1,
     "max_items_per_tx": 10,
     "open_hour": 8,
@@ -142,14 +142,14 @@ if __name__ == "__main__":
     print(f"Generating sales data for {CONFIG['year']}...")
 
     df = generate_sales_data(CONFIG)
-    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_Final_{CONFIG['year']}.xlsx")
-    '''
+    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_csv_{CONFIG['year']}.csv")
+    
     # Save as CSV
     df.to_csv(output_file, index=False)
     '''
     # Save as Excel
     with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name="Sales_Data")
-
+    '''
     print(f"\n✅ Completed: {output_file}")
     print(f"🧾 Total records: {len(df):,}")
