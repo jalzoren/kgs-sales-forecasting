@@ -6,11 +6,11 @@ import os
 
 # ==== CONFIGURATION ===
 CONFIG = {
-    "year": 2022,
+    "year": 2024,
     "min_quantity": 1,
     "max_quantity": 10,
     "min_tx_per_day": 200,
-    "max_tx_per_day": 600,
+    "max_tx_per_day": 680,
     "min_items_per_tx": 1,
     "max_items_per_tx": 10,
     "open_hour": 8,
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     print(f"Generating sales data for {CONFIG['year']}...")
 
     df = generate_sales_data(CONFIG)
-    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_csv_{CONFIG['year']}.csv")
+    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_{CONFIG['year']}.csv")
     
     # Save as CSV
     df.to_csv(output_file, index=False)

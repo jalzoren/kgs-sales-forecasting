@@ -1,3 +1,4 @@
+//frontend/src/pages/Data.jsx
 import React, { useState, useEffect } from "react";
 import "../css/Data.css";
 import { FiUploadCloud } from "react-icons/fi";

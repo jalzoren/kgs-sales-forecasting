@@ -26,7 +26,9 @@ class SalesFileValidator {
     const headerLine = fs.readFileSync(filePath, "utf8").split("\n")[0];
     const headers = headerLine
       .split(",")
-      .map((h) => h.trim().replace(/^"|"$/g, "").toLowerCase().replace(/\s+/g, "_"));
+      .map((h) =>
+        h.trim().replace(/^"|"$/g, "").toLowerCase().replace(/\s+/g, "_")
+      );
 
     if (!this.validateHeaders(headers)) {
       console.error("❌ CSV Header Validation Failed!");
@@ -36,6 +38,7 @@ class SalesFileValidator {
     }
 
     console.log("✅ CSV headers validated successfully:", headers);
+    return headers; // ✅ Make it iterable
   }
 }
 

@@ -10,8 +10,14 @@ class DataController {
     console.log("📤 Received upload request...");
     const startTime = Date.now();
 
-    if (!req.file)
-      return res.status(400).json({ message: "No file uploaded" });
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+
+    const userId = req.session.user?.id; // ✅ Get logged-in user's ID
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not logged in" });
+    }
 
     const originalFile = req.file;
     let filePath = originalFile.path;
@@ -19,6 +25,7 @@ class DataController {
 
     console.log(`📦 File uploaded: ${fileName}`);
     console.log(`📍 Path: ${filePath}`);
+    console.log(`👤 Uploaded by User ID: ${userId}`);
 
     try {
       // STEP 1️⃣: Detect & Convert if Excel
@@ -31,11 +38,15 @@ class DataController {
           throw new Error("Conversion failed — cannot process Excel file");
         }
 
-        console.log("✅ Conversion successful, using converted CSV for next steps");
         filePath = convertedPath; // continue with CSV version
         fileName = path.basename(convertedPath);
+        console.log(
+          "✅ Conversion successful, using converted CSV for next steps"
+        );
       } else if (!fileName.endsWith(".csv")) {
-        throw new Error("Unsupported file type. Please upload CSV or XLSX only.");
+        throw new Error(
+          "Unsupported file type. Please upload CSV or XLSX only."
+        );
       }
 
       // STEP 2️⃣: Validate file headers
@@ -44,14 +55,35 @@ class DataController {
       // STEP 3️⃣: Count rows
       const rowCount = await PythonService.countRows(filePath);
 
-      // STEP 4️⃣: Save record in DB
-      const insertSql =
-        "INSERT INTO salesdata (fileName, records, status) VALUES (?, ?, ?)";
-      await db.query(insertSql, [fileName, rowCount, "Completed"]);
+      // STEP 4️⃣: Check if this user already uploaded the same file
+      const checkSql = `
+  SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?
+`;
+
+      const existing = await new Promise((resolve, reject) => {
+        db.query(checkSql, [userId, fileName], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
+      });
+
+      if (existing.length > 0) {
+        throw new Error(
+          `A file named "${fileName}" already exists for your account.`
+        );
+      }
+
+      // Now safely insert the new record
+      const insertSql = `
+  INSERT INTO salesdata (userId, fileName, records, status)
+  VALUES (?, ?, ?, ?)
+`;
+      await db.query(insertSql, [userId, fileName, rowCount, "Completed"]);
 
       // STEP 5️⃣: Move final file to salesData folder (if converted)
       const finalSalesDir = path.join(__dirname, "../files/salesData");
-      if (!fs.existsSync(finalSalesDir)) fs.mkdirSync(finalSalesDir, { recursive: true });
+      if (!fs.existsSync(finalSalesDir))
+        fs.mkdirSync(finalSalesDir, { recursive: true });
       const finalFilePath = path.join(finalSalesDir, path.basename(filePath));
 
       if (filePath !== finalFilePath) {
@@ -79,13 +111,24 @@ class DataController {
 
   async getUploads(req, res) {
     console.log("📡 Fetching uploaded data records...");
-    const sql = "SELECT * FROM salesdata ORDER BY uploadDate DESC";
-    db.query(sql, (err, results) => {
+    const userId = req.session.user?.id;
+
+    if (!userId) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not logged in" });
+    }
+
+    const sql =
+      "SELECT * FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC";
+    db.query(sql, [userId], (err, results) => {
       if (err) {
         console.error("❌ Database fetch error:", err);
         return res.status(500).json({ message: "Database error", error: err });
       }
-      console.log(`✅ Fetched ${results.length} upload records`);
+      console.log(
+        `✅ Fetched ${results.length} upload records for user ${userId}`
+      );
       res.json(results);
     });
   }
