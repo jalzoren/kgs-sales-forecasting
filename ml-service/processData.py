@@ -72,7 +72,7 @@ def preprocess_sales_data(file_path: str, output_path: str):
             agg.groupby("Product_ID")["Total_Sales"]
             .transform(lambda x: x.rolling(window, min_periods=1).mean())
         )
-
+        
     # --- Step 5: Trend Index ---
     print("Calculating trend index...")
     def rolling_trend(x):
