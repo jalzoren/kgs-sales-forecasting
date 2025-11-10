@@ -14,7 +14,14 @@ def preprocess_sales_data(file_path: str, output_path: str):
 
     print(f"Reading sales data from: {file_path}")
     if file_path.endswith(".csv"):
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(
+            file_path,
+            encoding="utf-8",
+            on_bad_lines="skip",     # ✅ skip broken rows
+            sep=",",                 # ✅ ensure comma-separated
+            quotechar='"',           # ✅ handle quoted text properly
+            engine="python"          # ✅ more lenient than C engine
+        )
     else:
         df = pd.read_excel(file_path)
 
@@ -99,32 +106,34 @@ def preprocess_sales_data(file_path: str, output_path: str):
     return output_path
 
 
-def process_latest_upload():
+def process_latest_upload(user_id=None):
     """
-    Automatically find and process the most recently uploaded sales file.
+    Process the latest uploaded sales file for a specific user.
     """
-    print("Scanning uploads directory for latest file...")
+    base_path = UPLOAD_DIR if user_id is None else os.path.join(UPLOAD_DIR, f"user_{user_id}")
+    
+    if not os.path.exists(base_path):
+        print(f"No directory for user {user_id}")
+        return None
+
     files = [
-        f for f in os.listdir(UPLOAD_DIR)
+        f for f in os.listdir(base_path)
         if f.endswith((".xlsx", ".csv")) and not f.endswith("_processed.xlsx")
     ]
     if not files:
-        print("No sales files found in uploads folder.")
+        print(f"No sales files found for user {user_id}.")
         return None
 
-    # Find most recent file
-    latest_file = max(files, key=lambda f: os.path.getctime(os.path.join(UPLOAD_DIR, f)))
-    input_path = os.path.join(UPLOAD_DIR, latest_file)
+    latest_file = max(files, key=lambda f: os.path.getctime(os.path.join(base_path, f)))
+    input_path = os.path.join(base_path, latest_file)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # Save cleaned file to cleanData folder
-    if not os.path.exists(CLEAN_DIR):
-        os.makedirs(CLEAN_DIR)
-    output_path = os.path.join(CLEAN_DIR, f"{latest_file.split('.')[0]}_processed_{timestamp}.xlsx")
+    output_path = os.path.join(
+        "../backend/files/cleanData",
+        f"user_{user_id}_{latest_file.split('.')[0]}_processed_{timestamp}.xlsx"
+    )
 
-
-    print(f"Found latest file: {latest_file}")
-    print("Starting preprocessing...")
+    print(f"Processing latest file for user {user_id}: {latest_file}")
     preprocess_sales_data(input_path, output_path)
     print("Processing complete.")
 
@@ -132,4 +141,6 @@ def process_latest_upload():
 
 
 if __name__ == "__main__":
-    process_latest_upload()
+    import sys
+    user_id = sys.argv[1] if len(sys.argv) > 1 else None
+    process_latest_upload(user_id)

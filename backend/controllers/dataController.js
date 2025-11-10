@@ -81,9 +81,10 @@ class DataController {
       await db.query(insertSql, [userId, fileName, rowCount, "Completed"]);
 
       // STEP 5️⃣: Move final file to salesData folder (if converted)
-      const finalSalesDir = path.join(__dirname, "../files/salesData");
+      const finalSalesDir = path.join( __dirname, "../files/salesData", `user_${userId}`);
       if (!fs.existsSync(finalSalesDir))
         fs.mkdirSync(finalSalesDir, { recursive: true });
+
       const finalFilePath = path.join(finalSalesDir, path.basename(filePath));
 
       if (filePath !== finalFilePath) {
@@ -102,7 +103,10 @@ class DataController {
       });
 
       // STEP 6️⃣: Launch preprocessing asynchronously
-      await PythonService.preprocessData();
+      PythonService.preprocessData(userId)
+        .then(() => console.log(`✅ Preprocessing completed for user ${userId}`))
+        .catch((err) => console.error(`⚠️ Python preprocessing error: ${err.message}`));
+
     } catch (err) {
       console.error("❌ Upload failed:", err.message);
       return res.status(400).json({ message: err.message });

@@ -1,5 +1,5 @@
 // services/pythonService.js
-const { spawn, exec } = require("child_process");
+const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
@@ -43,12 +43,24 @@ class PythonService {
     return count;
   }
 
-  async preprocessData() {
-    console.log("🚀 Launching Python preprocessing...");
-    exec("python ../ml-service/processData.py", (error, stdout, stderr) => {
-      if (error) console.error(`❌ Python error: ${error.message}`);
-      if (stderr) console.error(`⚠️ Python stderr: ${stderr}`);
-      console.log(`✅ Python stdout:\n${stdout}`);
+  async preprocessData(userId) {
+    console.log(`🚀 Launching Python preprocessing for User ID: ${userId}...`);
+    const processScript = path.join(__dirname, "../../ml-service/processData.py");
+
+    return new Promise((resolve, reject) => {
+      const python = spawn("python", [processScript, userId.toString()]);
+
+      python.stdout.on("data", (data) => console.log("Python:", data.toString()));
+      python.stderr.on("data", (data) => console.error("🐍 Python Error:", data.toString()));
+
+      python.on("close", (code) => {
+        if (code === 0) {
+          console.log(`✅ Python preprocessing finished for User ID: ${userId}`);
+          resolve();
+        } else {
+          reject(new Error(`Python script exited with code ${code}`));
+        }
+      });
     });
   }
 }
