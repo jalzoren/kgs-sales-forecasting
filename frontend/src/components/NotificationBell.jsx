@@ -5,7 +5,7 @@ import { useNotifications } from "./Notifications";
 import "../components/components-css/NotificationBell.css";
 
 export default function NotificationBell() {
-  const { notifications, markAsRead, unreadCount } = useNotifications();
+  const { notifications, markAsRead, unreadCount, removeNotification } = useNotifications(); // fixed typo
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
 
@@ -28,7 +28,7 @@ export default function NotificationBell() {
       case "info":
         return <FaInfoCircle className="notif-icon info" />;
       case "processing":
-        return <FaCog className="notif-icon processing" />;
+        return <FaCog className="notif-icon processing spin" />; // spin animation
       default:
         return <FaInfoCircle className="notif-icon info" />;
     }
@@ -45,7 +45,7 @@ export default function NotificationBell() {
         <div className="notifications-dropdown">
           {notifications.length === 0 ? (
             <div className="notification-item empty">
-              <p style={{ color: "#000" }}>No notifications</p>
+              <p>No notifications</p>
             </div>
           ) : (
             notifications.map((n) => (
@@ -57,20 +57,20 @@ export default function NotificationBell() {
                 {/* Left icon + text */}
                 <div className="notif-content">
                   <div className="notif-icon-wrapper">{getIcon(n.type)}</div>
-                  <div className="notif-text" style={{ color: "#000" }}>
+                  <div className="notif-text">
                     <div className="notif-title">{n.title}</div>
                     <div className="notif-message">{n.message}</div>
                   </div>
                 </div>
 
                 {/* Time + close */}
-                <div className="notif-meta" style={{ color: "#000" }}>
+                <div className="notif-meta">
                   <div className="notif-time">{n.time}</div>
                   <IoClose
                     className="close-icon"
                     onClick={(e) => {
-                      e.stopPropagation();
-                      markAsRead(n.id);
+                      e.stopPropagation(); // prevent marking as read
+                      removeNotification(n.id); // delete the notification
                     }}
                   />
                 </div>
