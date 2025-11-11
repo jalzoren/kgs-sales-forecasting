@@ -291,16 +291,16 @@ body{
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Notification item */
 .notification-item {
   display: flex;
   align-items: flex-start;
   gap: 10px;
   padding: 14px 16px;
   border-bottom: 1px solid #f0f0f0;
-  background-color: #fff;
+  background-image: linear-gradient(to right, #012E72,#FFFFFF);
   transition: background 0.2s, transform 0.2s;
   border-left: 4px solid transparent;
+  margin: 20px;
 }
 
 .notification-item:hover {

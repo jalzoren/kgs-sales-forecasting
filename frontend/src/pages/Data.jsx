@@ -10,7 +10,8 @@ import { useNotifications } from "../components/Notifications";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia/Manila");
+dayjs.tz.setDefault("Asia
+  /Manila");
 
 export default function UploadBox() {
   const { showInfo, showSuccess, showError, showWarning } = useNotifications();

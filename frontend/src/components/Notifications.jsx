@@ -1,4 +1,3 @@
-// frontend/src/components/Notifications.jsx
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 const NotificationContext = createContext();
@@ -122,6 +121,9 @@ export const NotificationProvider = ({ children }) => {
     <NotificationContext.Provider value={value}>
       {children}
     </NotificationContext.Provider>
+
+
+
   );
 };
 
