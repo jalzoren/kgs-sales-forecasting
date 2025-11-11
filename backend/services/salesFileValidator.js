@@ -8,6 +8,7 @@ class SalesFileValidator {
       "product_id",
       "product_name",
       "quantity",
+      "discount",
       "unit_price",
       "discount",
       "total_amount",
