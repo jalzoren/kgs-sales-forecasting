@@ -139,6 +139,27 @@ class PythonService {
       });
     });
   }
+
+  async trainModel(userId) {
+    console.log(`🧠 Starting model training for User ID: ${userId}...`);
+    const trainScript = path.join(__dirname, "../../ml-service/trainModel.py");
+
+    return new Promise((resolve, reject) => {
+      const python = spawn(pythonPath, [trainScript, userId.toString()]);
+
+      python.stdout.on("data", (data) => console.log("🧩 Python Train:", data.toString()));
+      python.stderr.on("data", (data) => console.error("🐍 Python Train Error:", data.toString()));
+
+      python.on("close", (code) => {
+        if (code === 0) {
+          console.log(`✅ Model training completed successfully for User ID: ${userId}`);
+          resolve();
+        } else {
+          reject(new Error(`Training script exited with code ${code}`));
+        }
+      });
+    });
+  }
 }
 
 module.exports = new PythonService();
