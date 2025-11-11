@@ -1,4 +1,4 @@
-//frontend/src/pages/Data.jsx
+// frontend/src/pages/Data.jsx
 import React, { useState, useEffect } from "react";
 import "../css/Data.css";
 import { FiUploadCloud } from "react-icons/fi";
@@ -10,11 +10,10 @@ import { useNotifications } from "../components/Notifications";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault("Asia
-  /Manila");
+dayjs.tz.setDefault("Asia/Manila");
 
 export default function UploadBox() {
-  const { showInfo, showSuccess, showError, showWarning } = useNotifications();
+  const { showInfo, showSuccess, showError } = useNotifications();
   const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState([]);
   const [search, setSearch] = useState("");
@@ -23,6 +22,7 @@ export default function UploadBox() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  // Fetch uploads from backend
   const fetchUploads = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/data", {
@@ -33,7 +33,6 @@ export default function UploadBox() {
         return;
       }
       const data = await res.json();
-      console.log("📥 Fetched data:", data);
       if (Array.isArray(data)) setUploads(data);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -45,21 +44,14 @@ export default function UploadBox() {
     fetchUploads();
   }, []);
 
+  // Handle file upload
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const allowedTypes = [
-      "text/csv",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    ];
     const allowedExtensions = ["csv", "xlsx"];
     const fileExtension = file.name.split(".").pop().toLowerCase();
-
-    if (
-      !allowedTypes.includes(file.type) &&
-      !allowedExtensions.includes(fileExtension)
-    ) {
+    if (!allowedExtensions.includes(fileExtension)) {
       Swal.fire({
         icon: "error",
         title: "Invalid File Type",
@@ -72,9 +64,7 @@ export default function UploadBox() {
     const formData = new FormData();
     formData.append("file", file);
 
-    // Show info notification when processing starts
     showInfo("Processing sales data...");
-
     Swal.fire({
       title: "Uploading...",
       text: "Please wait while your file is being uploaded.",
@@ -98,13 +88,11 @@ export default function UploadBox() {
             text: result.message,
             confirmButtonColor: "#3085d6",
           });
-          // Show success notification when processing completes
           showSuccess(`Sales data processed successfully: ${file.name}`);
           fetchUploads();
           setCurrentPage(1);
-        }, 3000);
+        }, 1000);
       } else {
-        // Show error notification
         showError(`Upload failed: ${result.message || "Something went wrong."}`);
         Swal.fire({
           icon: "error",
@@ -113,7 +101,6 @@ export default function UploadBox() {
         });
       }
     } catch (err) {
-      // Show error notification
       showError(`Upload error: ${err.message}`);
       Swal.fire({
         icon: "error",
@@ -123,6 +110,7 @@ export default function UploadBox() {
     }
   };
 
+  // Delete an upload
   const handleDelete = async (id) => {
     const confirmDelete = await Swal.fire({
       title: "Are you sure?",
@@ -170,6 +158,7 @@ export default function UploadBox() {
     }
   };
 
+  // Drag & Drop handlers
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -194,7 +183,6 @@ export default function UploadBox() {
       const file = files[0];
       const allowedExtensions = ["csv", "xlsx"];
       const fileExtension = file.name.split(".").pop().toLowerCase();
-
       if (!allowedExtensions.includes(fileExtension)) {
         Swal.fire({
           icon: "error",
@@ -205,31 +193,25 @@ export default function UploadBox() {
         return;
       }
 
-      const fakeEvent = { target: { files } };
-      handleFileChange(fakeEvent);
+      handleFileChange({ target: { files } });
     }
   };
 
-  const filteredUploads = Array.isArray(uploads)
-    ? uploads.filter((item) => {
-        const matchesSearch =
-          item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
-        const matchesStatus =
-          statusFilter === "All"
-            ? true
-            : statusFilter === "Active Uploads"
-            ? item.status !== "Completed" && item.status !== "Failed"
-            : item.status === statusFilter;
-        return matchesSearch && matchesStatus;
-      })
-    : [];
+  // Filtered & paginated uploads
+  const filteredUploads = uploads.filter((item) => {
+    const matchesSearch = item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
+    const matchesStatus =
+      statusFilter === "All"
+        ? true
+        : statusFilter === "Active Uploads"
+        ? item.status !== "Completed" && item.status !== "Failed"
+        : item.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const totalPages = Math.ceil(filteredUploads.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = filteredUploads.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  const currentData = filteredUploads.slice(startIndex, startIndex + itemsPerPage);
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
@@ -239,10 +221,10 @@ export default function UploadBox() {
     <div>
       <h2 className="titled">Data Management</h2>
 
+      {/* Upload Box */}
       <div className="upload-data-container">
         <div className="upload-box">
           <h3 className="title">Upload New Data</h3>
-
           <div
             className={`drop-zone ${isDragging ? "drag-active" : ""}`}
             onDragEnter={handleDragEnter}
@@ -270,9 +252,9 @@ export default function UploadBox() {
         </div>
       </div>
 
-      <br />
       <hr />
 
+      {/* Table */}
       <div className="table-wrapper">
         <div className="table-toolbar">
           <div className="search-box">
@@ -287,20 +269,14 @@ export default function UploadBox() {
             </button>
           </div>
 
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
             <option>All</option>
             <option>Active Uploads</option>
             <option>Completed</option>
             <option>Failed</option>
           </select>
 
-          <select
-            value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-          >
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
             <option>Sort By: Newest First</option>
             <option>Sort By: Oldest First</option>
           </select>
@@ -317,18 +293,11 @@ export default function UploadBox() {
                 <th>Actions</th>
               </tr>
             </thead>
-
             <tbody>
               {currentData.length > 0 ? (
                 currentData.map((item) => (
                   <tr key={item.salesID}>
-                    <td>
-                      {item.uploadDate
-                        ? dayjs(item.uploadDate)
-                            .tz()
-                            .format("MMMM D, YYYY • h:mm A")
-                        : "—"}
-                    </td>
+                    <td>{item.uploadDate ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A") : "—"}</td>
                     <td>{item.fileName}</td>
                     <td>{item.records?.toLocaleString() || 0}</td>
                     <td>
@@ -344,14 +313,8 @@ export default function UploadBox() {
                         {item.status}
                       </span>
                     </td>
-                    <td
-                      className="actions"
-                      style={{ textAlign: "center", verticalAlign: "middle" }}
-                    >
-                      <button
-                        className="btn-delete"
-                        onClick={() => handleDelete(item.salesID)}
-                      >
+                    <td className="actions">
+                      <button className="btn-delete" onClick={() => handleDelete(item.salesID)}>
                         Delete
                       </button>
                     </td>
@@ -359,14 +322,7 @@ export default function UploadBox() {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="5"
-                    style={{
-                      textAlign: "center",
-                      verticalAlign: "middle",
-                      padding: "1rem",
-                    }}
-                  >
+                  <td colSpan="5" style={{ textAlign: "center", padding: "1rem" }}>
                     No data available
                   </td>
                 </tr>
@@ -375,11 +331,9 @@ export default function UploadBox() {
           </table>
         </div>
 
+        {/* Pagination */}
         <div className="pagination">
-          <button
-            onClick={() => goToPage(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
+          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
             ← Previous
           </button>
 
@@ -393,10 +347,7 @@ export default function UploadBox() {
             </button>
           ))}
 
-          <button
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalPages || totalPages === 0}
-          >
+          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages || totalPages === 0}>
             Next →
           </button>
         </div>

@@ -10,7 +10,7 @@ export const useNotifications = () => {
   return context;
 };
 
-// Helper function to format time
+// Format relative time
 const formatTime = (date) => {
   const now = new Date();
   const diff = now - date;
@@ -26,106 +26,133 @@ const formatTime = (date) => {
 };
 
 export const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState([]);
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem("notifications");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  // Add a new notification
+  const [history, setHistory] = useState(() => {
+    const saved = localStorage.getItem("notificationHistory");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const saveState = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+
   const addNotification = useCallback((type, message) => {
     const newNotif = {
-      id: Date.now() + Math.random(), // Unique ID
-      type, // 'success', 'info', 'warning', 'error'
+      id: Date.now() + Math.random(),
+      type, // success, info, warning, error, processing
       message,
-      time: formatTime(new Date()),
       timestamp: new Date(),
+      time: formatTime(new Date()),
       read: false,
     };
-    setNotifications((prev) => [newNotif, ...prev]);
-    
-    // Auto-update time display every minute
+    setNotifications((prev) => {
+      const updated = [newNotif, ...prev];
+      saveState("notifications", updated);
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = [newNotif, ...prev];
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
     return newNotif.id;
   }, []);
 
-  // Convenience methods for each notification type
-  const showSuccess = useCallback((message) => {
-    return addNotification("success", message);
-  }, [addNotification]);
+  const showSuccess = useCallback((msg) => addNotification("success", msg), [addNotification]);
+  const showInfo = useCallback((msg) => addNotification("info", msg), [addNotification]);
+  const showWarning = useCallback((msg) => addNotification("warning", msg), [addNotification]);
+  const showError = useCallback((msg) => addNotification("error", msg), [addNotification]);
+  const showProcessing = useCallback((msg) => addNotification("processing", msg), [addNotification]);
 
-  const showInfo = useCallback((message) => {
-    return addNotification("info", message);
-  }, [addNotification]);
-
-  const showWarning = useCallback((message) => {
-    return addNotification("warning", message);
-  }, [addNotification]);
-
-  const showError = useCallback((message) => {
-    return addNotification("error", message);
-  }, [addNotification]);
-
-  // Mark notification as read
   const markAsRead = useCallback((id) => {
-    setNotifications((prev) =>
-      prev.map((notif) =>
-        notif.id === id ? { ...notif, read: true } : notif
-      )
-    );
+    setNotifications((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      saveState("notifications", updated);
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
   }, []);
 
-  // Mark all as read
   const markAllAsRead = useCallback(() => {
-    setNotifications((prev) =>
-      prev.map((notif) => ({ ...notif, read: true }))
-    );
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, read: true }));
+      saveState("notifications", updated);
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = prev.map((n) => ({ ...n, read: true }));
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
   }, []);
 
-  // Remove a notification
   const removeNotification = useCallback((id) => {
-    setNotifications((prev) => prev.filter((notif) => notif.id !== id));
+    setNotifications((prev) => {
+      const updated = prev.filter((n) => n.id !== id);
+      saveState("notifications", updated);
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = prev.filter((n) => n.id !== id);
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
   }, []);
 
-  // Clear all notifications
   const clearAll = useCallback(() => {
     setNotifications([]);
+    setHistory([]);
+    localStorage.removeItem("notifications");
+    localStorage.removeItem("notificationHistory");
   }, []);
 
-  // Update time display for all notifications
   const updateNotificationTimes = useCallback(() => {
-    setNotifications((prev) =>
-      prev.map((notif) => ({
-        ...notif,
-        time: formatTime(notif.timestamp),
-      }))
-    );
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, time: formatTime(n.timestamp) }));
+      saveState("notifications", updated);
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = prev.map((n) => ({ ...n, time: formatTime(n.timestamp) }));
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
   }, []);
 
-  // Auto-update times every minute
   useEffect(() => {
     const interval = setInterval(updateNotificationTimes, 60000);
     return () => clearInterval(interval);
   }, [updateNotificationTimes]);
 
-  const value = {
-    notifications,
-    addNotification,
-    showSuccess,
-    showInfo,
-    showWarning,
-    showError,
-    markAsRead,
-    markAllAsRead,
-    removeNotification,
-    clearAll,
-    unreadCount: notifications.filter((n) => !n.read).length,
-  };
-
   return (
-    <NotificationContext.Provider value={value}>
+    <NotificationContext.Provider
+      value={{
+        notifications,
+        history,
+        addNotification,
+        showSuccess,
+        showInfo,
+        showWarning,
+        showError,
+        showProcessing,
+        markAsRead,
+        markAllAsRead,
+        removeNotification,
+        clearAll,
+        unreadCount: notifications.filter((n) => !n.read).length,
+      }}
+    >
       {children}
     </NotificationContext.Provider>
-
-
-
   );
 };
 
 export default NotificationProvider;
-

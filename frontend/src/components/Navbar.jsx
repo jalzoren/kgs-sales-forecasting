@@ -1,18 +1,13 @@
-// frontend/src/components/Navbar.jsx
-import { NavLink } from "react-router-dom";
-import { FaBullseye, FaBell } from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaBullseye } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import Clock from "./Clock";
-import { useNotifications } from "./Notifications";
+import NotificationBell from "./NotificationBell";
 import "../components/components-css/Navbar.css";
 
 function Navbar() {
   const navigate = useNavigate();
-  const { notifications, markAsRead } = useNotifications();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     Swal.fire({
@@ -35,9 +30,7 @@ function Navbar() {
           showConfirmButton: false,
           timer: 500,
           timerProgressBar: true,
-        }).then(() => {
-          navigate("/");
-        });
+        }).then(() => navigate("/"));
       }
     });
   };
@@ -51,54 +44,15 @@ function Navbar() {
         </div>
 
         <ul className="navbar-links">
-          <li>
-            <NavLink to="/home">Home</NavLink>
-          </li>
-          <li>
-            <NavLink to="/data">Data</NavLink>
-          </li>
-          <li>
-            <NavLink to="/forecast">Forecast</NavLink>
-          </li>
-          <li>
-            <NavLink to="/reports">Reports</NavLink>
-          </li>
-          <li>
-            <NavLink to="/analytics">Analytics</NavLink>
-          </li>
+          <li><NavLink to="/home">Home</NavLink></li>
+          <li><NavLink to="/data">Data</NavLink></li>
+          <li><NavLink to="/forecast">Forecast</NavLink></li>
+          <li><NavLink to="/reports">Reports</NavLink></li>
+          <li><NavLink to="/analytics">Analytics</NavLink></li>
         </ul>
 
         <div className="navbar-right">
-          <div className="notification-wrapper">
-            <button
-              className="icon-btn"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-              <FaBell />
-            </button>
-
-            {dropdownOpen && (
-              <div className="notifications-dropdown">
-                {notifications.length === 0 ? (
-                  <div className="notification-item">
-                    <p>No notifications</p>
-                  </div>
-                ) : (
-                  notifications.slice(0, 5).map((n) => (
-                    <div
-                      key={n.id}
-                      className={`notification-item ${n.read ? "" : "unread"} ${n.type}`}
-                      onClick={() => markAsRead(n.id)}
-                    >
-                      <p>{n.message}</p>
-                      <span>{n.time}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-
+          <NotificationBell />
           <button className="logout-btn" onClick={handleLogout}>
             <LiaUserCircle />
           </button>
