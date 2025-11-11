@@ -16,7 +16,6 @@ export default function UploadBox() {
   const [uploads, setUploads] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [sortMethod, setSortMethod] = useState("Manual");
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
@@ -269,6 +268,9 @@ export default function UploadBox() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <button className="btn-search" onClick={() => setCurrentPage(1)}>
+              Search
+            </button>
           </div>
 
           <select
@@ -279,14 +281,6 @@ export default function UploadBox() {
             <option>Active Uploads</option>
             <option>Completed</option>
             <option>Failed</option>
-          </select>
-
-          <select
-            value={sortMethod}
-            onChange={(e) => setSortMethod(e.target.value)}
-          >
-            <option>Sort By Upload: Manual</option>
-            <option>Sort By Upload: Auto</option>
           </select>
 
           <select
@@ -314,11 +308,13 @@ export default function UploadBox() {
               {currentData.length > 0 ? (
                 currentData.map((item) => (
                   <tr key={item.salesID}>
-                    <td>{item.uploadDate
-                      ? dayjs(item.uploadDate)
-                          .tz()
-                          .format("MMMM D, YYYY • h:mm A")
-                      : "—"}</td>
+                    <td>
+                      {item.uploadDate
+                        ? dayjs(item.uploadDate)
+                            .tz()
+                            .format("MMMM D, YYYY • h:mm A")
+                        : "—"}
+                    </td>
                     <td>{item.fileName}</td>
                     <td>{item.records?.toLocaleString() || 0}</td>
                     <td>
@@ -334,7 +330,10 @@ export default function UploadBox() {
                         {item.status}
                       </span>
                     </td>
-                    <td className="actions" style={{ textAlign: "center", verticalAlign: "middle" }}>
+                    <td
+                      className="actions"
+                      style={{ textAlign: "center", verticalAlign: "middle" }}
+                    >
                       <button
                         className="btn-delete"
                         onClick={() => handleDelete(item.salesID)}
@@ -346,7 +345,14 @@ export default function UploadBox() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: "center", verticalAlign: "middle", padding: "1rem" }}>
+                  <td
+                    colSpan="5"
+                    style={{
+                      textAlign: "center",
+                      verticalAlign: "middle",
+                      padding: "1rem",
+                    }}
+                  >
                     No data available
                   </td>
                 </tr>
