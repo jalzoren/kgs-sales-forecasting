@@ -13,7 +13,7 @@ dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
 
 export default function UploadBox() {
-  const { showInfo, showSuccess, showError } = useNotifications();
+  const { showInfo, showSuccess, showError, showProgress, updateNotification, removeNotification } = useNotifications();
   const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState([]);
   const [search, setSearch] = useState("");
@@ -63,7 +63,8 @@ export default function UploadBox() {
     const formData = new FormData();
     formData.append("file", file);
 
-    showInfo("Processing sales data...");
+    // 1) Show uploading info
+    const uploadingId = showInfo("Uploading sales data...");
     Swal.fire({
       title: "Uploading...",
       text: "Please wait while your file is being uploaded.",
@@ -80,18 +81,65 @@ export default function UploadBox() {
       const result = await res.json();
 
       if (res.ok) {
-        setTimeout(() => {
-          Swal.fire({
-            icon: "success",
-            title: "Upload Successful!",
-            text: result.message,
-            confirmButtonColor: "#3085d6",
-          });
-          showSuccess(`Sales data processed successfully: ${file.name}`);
-          fetchUploads();
-          setCurrentPage(1);
-        }, 1000);
+        // Close loader and switch to notifications-only UX
+        Swal.close();
+
+        // 2) Remove 'Uploading...' and show 'Uploaded successfully'
+        removeNotification(uploadingId);
+        showSuccess(`Sales data uploaded successfully: ${file.name}`);
+
+        // 3) Start preprocessing progress polling
+        let progressNotifId = null;
+        const poll = async () => {
+          try {
+            const statusRes = await fetch("http://localhost:5000/api/data/preprocess-status", {
+              credentials: "include",
+            });
+            if (!statusRes.ok) return;
+            const status = await statusRes.json(); // { state, progress, message }
+
+            if (status.state === "running") {
+              if (!progressNotifId) {
+                progressNotifId = showProgress("Preprocessing sales data...", status.progress || 0);
+              } else {
+                updateNotification(progressNotifId, {
+                  message: status.message || "Preprocessing sales data...",
+                  progress: typeof status.progress === "number" ? status.progress : undefined,
+                });
+              }
+            } else if (status.state === "done") {
+              if (!progressNotifId) {
+                progressNotifId = showProgress("Preprocessing complete.", 100);
+              }
+              updateNotification(progressNotifId, {
+                type: "success",
+                message: "Done preprocessing sales data.",
+                progress: undefined,
+              });
+              clearInterval(pollInterval);
+            } else if (status.state === "error") {
+              showError(`Preprocessing error: ${status.message || "Unknown error"}`);
+              if (progressNotifId) {
+                updateNotification(progressNotifId, {
+                  type: "error",
+                  message: "Preprocessing failed.",
+                  progress: undefined,
+                });
+              }
+              clearInterval(pollInterval);
+            }
+          } catch (e) {
+            // ignore transient polling errors
+          }
+        };
+        const pollInterval = setInterval(poll, 1500);
+        poll(); // fire immediately
+
+        fetchUploads();
+        setCurrentPage(1);
       } else {
+        Swal.close();
+        removeNotification(uploadingId);
         showError(`Upload failed: ${result.message || "Something went wrong."}`);
         Swal.fire({
           icon: "error",
@@ -100,6 +148,8 @@ export default function UploadBox() {
         });
       }
     } catch (err) {
+      Swal.close();
+      removeNotification(uploadingId);
       showError(`Upload error: ${err.message}`);
       Swal.fire({
         icon: "error",

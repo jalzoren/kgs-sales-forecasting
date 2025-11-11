@@ -69,6 +69,44 @@ export const NotificationProvider = ({ children }) => {
   const showError = useCallback((msg) => addNotification("error", msg), [addNotification]);
   const showProcessing = useCallback((msg) => addNotification("processing", msg), [addNotification]);
 
+  // Progress notification
+  const showProgress = useCallback((message, initialProgress = 0) => {
+    const id = Date.now() + Math.random();
+    const notif = {
+      id,
+      type: "processing",
+      message,
+      timestamp: new Date(),
+      time: formatTime(new Date()),
+      read: false,
+      progress: initialProgress,
+    };
+    setNotifications((prev) => {
+      const updated = [notif, ...prev];
+      saveState("notifications", updated);
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = [notif, ...prev];
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
+    return id;
+  }, []);
+
+  const updateNotification = useCallback((id, updates) => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => (n.id === id ? { ...n, ...updates } : n));
+      saveState("notifications", updated);
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = prev.map((n) => (n.id === id ? { ...n, ...updates } : n));
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
+  }, []);
+
   const markAsRead = useCallback((id) => {
     setNotifications((prev) => {
       const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
@@ -143,6 +181,8 @@ export const NotificationProvider = ({ children }) => {
         showInfo,
         showWarning,
         showError,
+        showProgress,
+        updateNotification,
         showProcessing,
         markAsRead,
         markAllAsRead,

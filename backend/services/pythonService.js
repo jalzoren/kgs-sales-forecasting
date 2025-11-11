@@ -4,6 +4,9 @@ const path = require("path");
 const fs = require("fs");
 
 class PythonService {
+  constructor() {
+    this.preprocessStatusByUserId = new Map();
+  }
   runScript(scriptPath, args = []) {
     return new Promise((resolve, reject) => {
       const python = spawn("python", [scriptPath, ...args]);
@@ -48,20 +51,101 @@ class PythonService {
     const processScript = path.join(__dirname, "../../ml-service/processData.py");
 
     return new Promise((resolve, reject) => {
+      // init status
+      this.preprocessStatusByUserId.set(String(userId), {
+        state: "running",
+        progress: 0,
+        message: "Starting preprocessing...",
+        updatedAt: Date.now(),
+      });
+
       const python = spawn("python", [processScript, userId.toString()]);
 
-      python.stdout.on("data", (data) => console.log("Python:", data.toString()));
-      python.stderr.on("data", (data) => console.error("🐍 Python Error:", data.toString()));
+      python.stdout.on("data", (data) => {
+        const text = data.toString();
+        console.log("Python:", text);
+        const status = this.preprocessStatusByUserId.get(String(userId)) || {};
+        let progress = status.progress || 0;
+        let message = status.message || "";
+
+        if (text.includes("Reading sales data")) {
+          progress = Math.max(progress, 10);
+          message = "Reading sales data...";
+        } else if (text.includes("Cleaning raw data")) {
+          progress = Math.max(progress, 20);
+          message = "Cleaning raw data...";
+        } else if (text.includes("Aggregating daily sales data")) {
+          progress = Math.max(progress, 40);
+          message = "Aggregating daily sales data...";
+        } else if (text.includes("Generating features")) {
+          progress = Math.max(progress, 55);
+          message = "Generating features...";
+        } else if (text.includes("Computing rolling & lag features")) {
+          progress = Math.max(progress, 70);
+          message = "Computing rolling and lag features...";
+        } else if (text.includes("Calculating trend index")) {
+          progress = Math.max(progress, 85);
+          message = "Calculating trend index...";
+        } else if (text.includes("Normalizing sales values")) {
+          progress = Math.max(progress, 92);
+          message = "Normalizing sales values...";
+        } else if (text.includes("Processed data saved")) {
+          progress = 100;
+          message = "Preprocessing complete.";
+        }
+
+        this.preprocessStatusByUserId.set(String(userId), {
+          state: progress >= 100 ? "done" : "running",
+          progress,
+          message,
+          updatedAt: Date.now(),
+        });
+      });
+
+      python.stderr.on("data", (data) => {
+        const text = data.toString();
+        console.error("🐍 Python Error:", text);
+        this.preprocessStatusByUserId.set(String(userId), {
+          state: "error",
+          progress: this.preprocessStatusByUserId.get(String(userId))?.progress || 0,
+          message: text,
+          updatedAt: Date.now(),
+        });
+      });
 
       python.on("close", (code) => {
         if (code === 0) {
           console.log(`✅ Python preprocessing finished for User ID: ${userId}`);
+          const status = this.preprocessStatusByUserId.get(String(userId)) || {};
+          this.preprocessStatusByUserId.set(String(userId), {
+            state: "done",
+            progress: 100,
+            message: status.message || "Preprocessing complete.",
+            updatedAt: Date.now(),
+          });
           resolve();
         } else {
+          this.preprocessStatusByUserId.set(String(userId), {
+            state: "error",
+            progress: this.preprocessStatusByUserId.get(String(userId))?.progress || 0,
+            message: `Python script exited with code ${code}`,
+            updatedAt: Date.now(),
+          });
           reject(new Error(`Python script exited with code ${code}`));
         }
       });
     });
+  }
+
+  getPreprocessStatus(userId) {
+    return (
+      this.preprocessStatusByUserId.get(String(userId)) || {
+        state: "idle",
+        progress: 0,
+        message: "Idle",
+        updatedAt: Date.now(),
+      }
+    );
   }
 }
 
