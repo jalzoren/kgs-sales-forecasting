@@ -9,7 +9,10 @@ class PythonService {
   }
   runScript(scriptPath, args = []) {
     return new Promise((resolve, reject) => {
-      const python = spawn("python", [scriptPath, ...args]);
+      const pythonPath = "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe";
+      console.log(`🐍 Using Python at: ${pythonPath}`);
+
+      const python = spawn(pythonPath, [scriptPath, ...args]);
       let output = "";
       let errorMsg = "";
 
@@ -59,7 +62,7 @@ class PythonService {
         updatedAt: Date.now(),
       });
 
-      const python = spawn("python", [processScript, userId.toString()]);
+      const python = spawn(pythonPath, [processScript, userId.toString()]);
 
       python.stdout.on("data", (data) => {
         const text = data.toString();
@@ -135,17 +138,6 @@ class PythonService {
         }
       });
     });
-  }
-
-  getPreprocessStatus(userId) {
-    return (
-      this.preprocessStatusByUserId.get(String(userId)) || {
-        state: "idle",
-        progress: 0,
-        message: "Idle",
-        updatedAt: Date.now(),
-      }
-    );
   }
 }
 
