@@ -6,37 +6,13 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import Clock from "./Clock";
+import { useNotifications } from "./Notifications";
 import "../components/components-css/Navbar.css";
-
-const initialNotifications = [
-  // Example
-  { type: "info", message: "Processing sales data...", time: "Just now", read: false },
-];
 
 function Navbar() {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState(initialNotifications);
+  const { notifications, markAsRead } = useNotifications();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  // Add a new notification
-  const addNotification = (type, message) => {
-    const newNotif = {
-      type,
-      message,
-      time: "Just now",
-      read: false,
-    };
-    setNotifications(prev => [newNotif, ...prev]);
-  };
-
-  // Mark as read (optional)
-  const markAsRead = (index) => {
-    setNotifications(prev => {
-      const copy = [...prev];
-      copy[index].read = true;
-      return copy;
-    });
-  };
 
   const handleLogout = () => {
     Swal.fire({
@@ -103,15 +79,22 @@ function Navbar() {
 
             {dropdownOpen && (
               <div className="notifications-dropdown">
-                {notifications.slice(0, 5).map((n, i) => (
-                  <div
-                    key={i}
-                    className={`notification-item ${n.read ? "" : "unread"} ${n.type}`}
-                  >
-                    <p>{n.message}</p>
-                    <span>{n.time}</span>
+                {notifications.length === 0 ? (
+                  <div className="notification-item">
+                    <p>No notifications</p>
                   </div>
-                ))}
+                ) : (
+                  notifications.slice(0, 5).map((n) => (
+                    <div
+                      key={n.id}
+                      className={`notification-item ${n.read ? "" : "unread"} ${n.type}`}
+                      onClick={() => markAsRead(n.id)}
+                    >
+                      <p>{n.message}</p>
+                      <span>{n.time}</span>
+                    </div>
+                  ))
+                )}
               </div>
             )}
           </div>

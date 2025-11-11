@@ -6,12 +6,14 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Swal from "sweetalert2";
+import { useNotifications } from "../components/Notifications";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
 
 export default function UploadBox() {
+  const { showInfo, showSuccess, showError, showWarning } = useNotifications();
   const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState([]);
   const [search, setSearch] = useState("");
@@ -70,6 +72,9 @@ export default function UploadBox() {
     const formData = new FormData();
     formData.append("file", file);
 
+    // Show info notification when processing starts
+    showInfo("Processing sales data...");
+
     Swal.fire({
       title: "Uploading...",
       text: "Please wait while your file is being uploaded.",
@@ -93,10 +98,14 @@ export default function UploadBox() {
             text: result.message,
             confirmButtonColor: "#3085d6",
           });
+          // Show success notification when processing completes
+          showSuccess(`Sales data processed successfully: ${file.name}`);
           fetchUploads();
           setCurrentPage(1);
         }, 3000);
       } else {
+        // Show error notification
+        showError(`Upload failed: ${result.message || "Something went wrong."}`);
         Swal.fire({
           icon: "error",
           title: "Upload Failed",
@@ -104,6 +113,8 @@ export default function UploadBox() {
         });
       }
     } catch (err) {
+      // Show error notification
+      showError(`Upload error: ${err.message}`);
       Swal.fire({
         icon: "error",
         title: "Upload Error",
@@ -136,6 +147,7 @@ export default function UploadBox() {
 
       if (res.ok) {
         setUploads((prev) => prev.filter((u) => u.salesID !== id));
+        showSuccess("Sales data file deleted successfully");
         Swal.fire({
           icon: "success",
           title: "Deleted!",
@@ -143,6 +155,7 @@ export default function UploadBox() {
           confirmButtonColor: "#3085d6",
         });
       } else {
+        showError(`Delete failed: ${result.message || "Unable to delete file."}`);
         Swal.fire({
           icon: "error",
           title: "Delete Failed",

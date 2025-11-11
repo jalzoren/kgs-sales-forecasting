@@ -1,6 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Navbar2 from "./components/Navbar2";
+import { NotificationProvider } from "./components/Notifications";
 
 import Home from "./pages/Home";
 import Data from "./pages/Data";
@@ -23,7 +24,7 @@ function App() {
   const navbarPaths = ["/home"];
 
   return (
-    <>
+    <NotificationProvider>
       {noNavbarPaths.includes(path) ? null : navbar2Paths.includes(path) ? (
         <Navbar2 />
       ) : navbarPaths.includes(path) ? (
@@ -44,7 +45,7 @@ function App() {
           <Route path="/analytics" element={<Analytics />} />
         </Routes>
       </div>
-    </>
+    </NotificationProvider>
   );
 }
 

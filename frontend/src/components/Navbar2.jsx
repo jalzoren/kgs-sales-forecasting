@@ -4,20 +4,13 @@ import { FaBullseye, FaBell } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
 import Swal from "sweetalert2";
 import { useState } from "react";
+import { useNotifications } from "./Notifications";
 
 import "../components/components-css/Navbar2.css";
 
-const sampleNotifications = [
-  { message: "Inventory Alert: Item X low stock", time: "2h ago", read: false },
-  { message: "Sales forecast updated", time: "5h ago", read: false },
-  { message: "New report available", time: "1d ago", read: true },
-  { message: "Forecast accuracy variance: 7%", time: "2d ago", read: true },
-];
-
-
-
 function Navbar2() {
   const navigate = useNavigate();
+  const { notifications, markAsRead } = useNotifications();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = () => {
@@ -72,12 +65,22 @@ function Navbar2() {
 
             {dropdownOpen && (
               <div className="notifications-dropdown">
-                {sampleNotifications.map((n, i) => (
-                  <div key={i} className={`notification-item ${n.read ? "" : "unread"}`}>
-                    <p>{n.message}</p>
-                    <span>{n.time}</span>
+                {notifications.length === 0 ? (
+                  <div className="notification-item">
+                    <p>No notifications</p>
                   </div>
-                ))}
+                ) : (
+                  notifications.slice(0, 5).map((n) => (
+                    <div
+                      key={n.id}
+                      className={`notification-item ${n.read ? "" : "unread"} ${n.type}`}
+                      onClick={() => markAsRead(n.id)}
+                    >
+                      <p>{n.message}</p>
+                      <span>{n.time}</span>
+                    </div>
+                  ))
+                )}
               </div>
             )}
           </div>

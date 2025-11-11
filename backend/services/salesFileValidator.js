@@ -9,6 +9,7 @@ class SalesFileValidator {
       "product_name",
       "quantity",
       "unit_price",
+      "discount",
       "total_amount",
     ];
   }
