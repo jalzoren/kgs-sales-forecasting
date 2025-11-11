@@ -94,11 +94,11 @@
 /* Type-specific styles */
 .notification-item.success {
   border-left: 4px solid green;
-  background: linear-gradient(to right, rgba(86, 151, 28, 0.6), #ffffff);
+  background: linear-gradient(to right, rgba(86, 151, 28, 0.60), #ffffff);
 }
 .notification-item.info {
   border-left: 4px solid rgba(1, 46, 114, 1);
-  background: linear-gradient(to right, rgba(1, 46, 114, 0.6), #ffffff);
+  background: linear-gradient(to right, rgba(1, 46, 114, 0.60), #ffffff);
 }
 .notification-item.warning {
   border-left: 4px solid orange;
@@ -106,11 +106,11 @@
 }
 .notification-item.error {
   border-left: 4px solid red;
-  background: #fdecea;
+  background: linear-gradient(to right, rgb(239, 72, 11, 0.60), #ffffff);
 }
 .notification-item.processing {
-  border-left: 4px solid purple;
-  background: #f3e8fd;
+  border-left: 4px solid rgba(1, 46, 114, 1);
+  background: linear-gradient(to right, rgba(1, 46, 114, 0.60), #ffffff);
 }
 .notif-content {
   display: flex;
