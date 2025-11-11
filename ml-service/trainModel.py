@@ -14,7 +14,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
 # ========================
-# CONFIGURATION
+# CONFIGURATION HUEUHEU
 # ========================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CLEAN_DIR = os.path.join(BASE_DIR, "../backend/files/cleanData")
