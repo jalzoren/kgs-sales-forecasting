@@ -27,14 +27,32 @@ const formatTime = (date) => {
 };
 
 export const NotificationProvider = ({ children }) => {
+  const reviveItems = (raw) => {
+    try {
+      const parsed = JSON.parse(raw || "[]");
+      return Array.isArray(parsed)
+        ? parsed.map((n) => {
+            const ts = n.timestamp ? new Date(n.timestamp) : new Date();
+            return {
+              ...n,
+              timestamp: ts,
+              time: formatTime(ts),
+            };
+          })
+        : [];
+    } catch {
+      return [];
+    }
+  };
+
   const [notifications, setNotifications] = useState(() => {
     const saved = localStorage.getItem("notifications");
-    return saved ? JSON.parse(saved) : [];
+    return reviveItems(saved);
   });
 
   const [history, setHistory] = useState(() => {
     const saved = localStorage.getItem("notificationHistory");
-    return saved ? JSON.parse(saved) : [];
+    return reviveItems(saved);
   });
 
   const saveState = (key, value) => {
@@ -155,12 +173,18 @@ export const NotificationProvider = ({ children }) => {
 
   const updateNotificationTimes = useCallback(() => {
     setNotifications((prev) => {
-      const updated = prev.map((n) => ({ ...n, time: formatTime(n.timestamp) }));
+      const updated = prev.map((n) => {
+        const ts = n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
+        return { ...n, timestamp: ts, time: formatTime(ts) };
+      });
       saveState("notifications", updated);
       return updated;
     });
     setHistory((prev) => {
-      const updatedHistory = prev.map((n) => ({ ...n, time: formatTime(n.timestamp) }));
+      const updatedHistory = prev.map((n) => {
+        const ts = n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
+        return { ...n, timestamp: ts, time: formatTime(ts) };
+      });
       saveState("notificationHistory", updatedHistory);
       return updatedHistory;
     });
