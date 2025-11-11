@@ -7,23 +7,21 @@
   --notif: #ef480b;
 }
 
-.titled{
+/* Titles */
+.titled {
   font-family: "Merriweather", serif;
   color: var(--accent);
- 
   margin: 0;
 }
 
-hr{
+hr {
   background-color: var(--accent);
-  margin: 0%;
+  margin: 0;
   opacity: 0.3;
-
 }
 
+/* Upload Section */
 .upload-data-container {
-
-
   display: flex;
   justify-content: center;
   margin-top: 30px;
@@ -42,9 +40,10 @@ hr{
   font-weight: 600;
   color: #222;
   font-family: "Poppins", sans-serif;
-  margin: 0px
+  margin: 0;
 }
 
+/* Drop Zone */
 .drop-zone {
   border: 2px dashed var(--accent);
   background-color: #fff;
@@ -59,7 +58,7 @@ hr{
   align-items: center;
 }
 
-.drop-text{
+.drop-text {
   background-color: #fff;
   height: 161px;
   text-align: center;
@@ -69,9 +68,8 @@ hr{
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 0px;
+  margin: 0;
 }
-
 
 .drop-zone.drag-active {
   background-color: #e6f2ff;
@@ -82,11 +80,10 @@ hr{
   font-size: 32px;
   color: var(--accent-lighter);
   margin-bottom: 4px;
-  display: inline;
-  cursor: pointer;
+  display: inline-flex;
   align-items: center;
-    justify-content: center;
-
+  justify-content: center;
+  cursor: pointer;
 }
 
 .drop-zone p {
@@ -109,16 +106,13 @@ hr{
   cursor: pointer;
 }
 
-
-
+/* Table Section */
 .table-wrapper {
   max-width: 1000px;
   margin: 40px auto;
   font-family: "Poppins", sans-serif;
-  color: #001d39;
+  color: var(--accent);
 }
-
-
 
 .table-container {
   background: #f5f7fa;
@@ -132,12 +126,14 @@ hr{
   font-size: 14px;
   background-color: #fff;
   border: 1px solid #c9d6e3;
+  text-align: center;
 }
 
 .upload-table th,
 .upload-table td {
   padding: 10px 14px;
-  text-align: left;
+  text-align: center;
+  vertical-align: middle;
   border: 1px solid #c9d6e3;
 }
 
@@ -155,6 +151,7 @@ hr{
   transition: 0.2s;
 }
 
+/* Status Indicators */
 .status {
   font-weight: 600;
 }
@@ -167,6 +164,7 @@ hr{
   color: #c92a2a;
 }
 
+/* Table Actions */
 .actions {
   text-align: center;
 }
@@ -174,12 +172,13 @@ hr{
 .btn-action {
   background: none;
   border: none;
-  color: #0a4174;
+  color: var(--accent-light);
   cursor: pointer;
   font-weight: 500;
   font-size: 13px;
   text-decoration: underline;
   margin: 0 5px;
+  transition: color 0.2s ease;
 }
 
 .btn-action.delete {
@@ -188,6 +187,22 @@ hr{
 
 .btn-action:hover {
   color: #0077cc;
+}
+
+/* Delete Button (standalone red style) */
+.btn-delete {
+  background-color: #e53935;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.btn-delete:hover {
+  background-color: #c62828;
 }
 
 /* Pagination */
@@ -202,20 +217,20 @@ hr{
 
 .pagination button {
   border: 1px solid #c9d6e3;
-  background: white;
+  background: #fff;
   border-radius: 4px;
   padding: 4px 8px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .pagination button.active {
-  background: #001d39;
-  color: white;
-  border-color: #001d39;
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
 }
 
 .pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
