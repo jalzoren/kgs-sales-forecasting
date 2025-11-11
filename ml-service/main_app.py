@@ -1,4 +1,4 @@
-# simple_app.py
+# ml-service/main_app.py
 from fastapi import FastAPI # pyright: ignore[reportMissingImports]
 
 app = FastAPI()

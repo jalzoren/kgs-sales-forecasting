@@ -81,7 +81,11 @@ class DataController {
       await db.query(insertSql, [userId, fileName, rowCount, "Completed"]);
 
       // STEP 5️⃣: Move final file to salesData folder (if converted)
-      const finalSalesDir = path.join( __dirname, "../files/salesData", `user_${userId}`);
+      const finalSalesDir = path.join(
+        __dirname,
+        "../files/salesData",
+        `user_${userId}`
+      );
       if (!fs.existsSync(finalSalesDir))
         fs.mkdirSync(finalSalesDir, { recursive: true });
 
@@ -104,9 +108,27 @@ class DataController {
 
       // STEP 6️⃣: Launch preprocessing asynchronously
       PythonService.preprocessData(userId)
-        .then(() => console.log(`✅ Preprocessing completed for user ${userId}`))
-        .catch((err) => console.error(`⚠️ Python preprocessing error: ${err.message}`));
+        .then(async () => {
+          console.log(`✅ Preprocessing completed for user ${userId}`);
 
+          // STEP 7️⃣: Trigger training pipeline automatically
+          console.log(`🚀 Starting model training for user ${userId}...`);
+          try {
+            await PythonService.trainModel(userId);
+            console.log(
+              `🎯 Model training completed successfully for user ${userId}!`
+            );
+          } catch (trainErr) {
+            console.error(
+              `⚠️ Training failed for user ${userId}:`,
+              trainErr.message
+            );
+          }
+        })
+        .catch((err) =>
+          console.error(`⚠️ Python preprocessing error: ${err.message}`)
+        );
+        
     } catch (err) {
       console.error("❌ Upload failed:", err.message);
       return res.status(400).json({ message: err.message });
