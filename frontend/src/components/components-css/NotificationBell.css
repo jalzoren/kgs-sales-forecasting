@@ -231,3 +231,23 @@ display: flex;
    from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
    }
+
+   /* Slide out when removing */
+.notification-item {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.notification-item.slide-out {
+  transform: translateX(100%);
+  opacity: 0;
+}
+
+/* Spin icon for processing */
+.spin { 
+  animation: spin 1s linear infinite; 
+} 
+
+@keyframes spin {
+   from { transform: rotate(0deg); }
+   to { transform: rotate(360deg); }
+}

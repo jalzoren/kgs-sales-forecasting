@@ -5,10 +5,12 @@ import { useNotifications } from "./Notifications";
 import "../components/components-css/NotificationBell.css";
 
 export default function NotificationBell() {
-  const { notifications, markAsRead, unreadCount, removeNotification } = useNotifications(); // fixed typo
+  const { notifications, markAsRead, unreadCount, removeNotification } = useNotifications();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
+  const [removingIds, setRemovingIds] = useState([]);
 
+  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -19,21 +21,27 @@ export default function NotificationBell() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Icon based on type
   const getIcon = (type) => {
-  switch (type) {
-    case "success":
-      return <FaCheckCircle className="notif-icon success" />;
-    case "warning":
-      return <FaExclamationTriangle className="notif-icon warning" />;
-    case "info":
-      return <FaInfoCircle className="notif-icon info" />;
-    case "processing":
-      return <FaCog className="notif-icon processing spin" />; // <--- add spin class here
-    default:
-      return <FaInfoCircle className="notif-icon info" />;
-  }
-};
+    switch (type) {
+      case "success":
+        return <FaCheckCircle className="notif-icon success" />;
+      case "warning":
+        return <FaExclamationTriangle className="notif-icon warning" />;
+      case "info":
+        return <FaInfoCircle className="notif-icon info" />;
+      case "processing":
+        return <FaCog className="notif-icon processing spin" />; // spinning icon
+      default:
+        return <FaInfoCircle className="notif-icon info" />;
+    }
+  };
 
+  // Handle remove with slide animation
+  const handleRemove = (id) => {
+    setRemovingIds((prev) => [...prev, id]); // trigger CSS animation
+    setTimeout(() => removeNotification(id), 300); // remove after animation
+  };
 
   return (
     <div className="notification-wrapper" ref={dropdownRef}>
@@ -52,7 +60,7 @@ export default function NotificationBell() {
             notifications.map((n) => (
               <div
                 key={n.id}
-                className={`notification-item ${n.read ? "read" : "unread"} ${n.type}`}
+                className={`notification-item ${n.read ? "read" : "unread"} ${n.type} ${removingIds.includes(n.id) ? "slide-out" : ""}`}
                 onClick={() => markAsRead(n.id)}
               >
                 {/* Left icon + text */}
@@ -70,8 +78,8 @@ export default function NotificationBell() {
                   <IoClose
                     className="close-icon"
                     onClick={(e) => {
-                      e.stopPropagation(); // prevent marking as read
-                      removeNotification(n.id); // delete the notification
+                      e.stopPropagation();
+                      handleRemove(n.id);
                     }}
                   />
                 </div>
