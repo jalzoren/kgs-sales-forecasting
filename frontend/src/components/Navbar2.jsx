@@ -1,24 +1,13 @@
 // frontend/src/components/Navbar2.jsx
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaBullseye, FaBell } from "react-icons/fa";
+import { FaBullseye } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
 import Swal from "sweetalert2";
-import { useState } from "react";
-
+import NotificationBell from "./NotificationBell"; 
 import "../components/components-css/Navbar2.css";
-
-const sampleNotifications = [
-  { message: "Inventory Alert: Item X low stock", time: "2h ago", read: false },
-  { message: "Sales forecast updated", time: "5h ago", read: false },
-  { message: "New report available", time: "1d ago", read: true },
-  { message: "Forecast accuracy variance: 7%", time: "2d ago", read: true },
-];
-
-
 
 function Navbar2() {
   const navigate = useNavigate();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     Swal.fire({
@@ -51,11 +40,13 @@ function Navbar2() {
   return (
     <nav className="navbar2">
       <div className="navbar2-top">
+        {/* Logo */}
         <div className="logo">
           <FaBullseye className="logo-icon" />
           <span className="logo-text">Sales Forecasting System</span>
         </div>
 
+        {/* Navigation Links */}
         <ul className="navbar2-links">
           <li><NavLink to="/home">Home</NavLink></li>
           <li><NavLink to="/data">Data</NavLink></li>
@@ -65,22 +56,7 @@ function Navbar2() {
         </ul>
 
         <div className="navbar2-right">
-          <div className="notification-wrapper">
-            <button className="icon-btn" onClick={() => setDropdownOpen(!dropdownOpen)}>
-              <FaBell />
-            </button>
-
-            {dropdownOpen && (
-              <div className="notifications-dropdown">
-                {sampleNotifications.map((n, i) => (
-                  <div key={i} className={`notification-item ${n.read ? "" : "unread"}`}>
-                    <p>{n.message}</p>
-                    <span>{n.time}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <NotificationBell /> 
 
           <button className="logout-btn" onClick={handleLogout}>
             <LiaUserCircle />

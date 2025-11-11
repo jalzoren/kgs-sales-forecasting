@@ -10,6 +10,7 @@ class SalesFileValidator {
       "quantity",
       "discount",
       "unit_price",
+      "discount",
       "total_amount",
     ];
   }

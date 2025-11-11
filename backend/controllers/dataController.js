@@ -162,15 +162,81 @@ class DataController {
   async deleteUpload(req, res) {
     const { id } = req.params;
     console.log(`🗑️ Deleting upload record ID: ${id}`);
-    const sql = "DELETE FROM salesdata WHERE salesID = ?";
-    db.query(sql, [id], (err) => {
-      if (err) {
-        console.error("❌ Deletion error:", err);
-        return res.status(500).json({ message: "Deletion failed", error: err });
+    try {
+      // Fetch record to get userId and fileName
+      const [record] = await new Promise((resolve, reject) => {
+        db.query("SELECT userId, fileName FROM salesdata WHERE salesID = ?", [id], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
+      });
+
+      if (!record) {
+        return res.status(404).json({ message: "Record not found" });
       }
-      console.log("✅ Record deleted successfully!");
-      res.json({ message: "Upload deleted successfully" });
-    });
+
+      const userId = record.userId;
+      const fileName = record.fileName;
+
+      // Delete database record
+      await new Promise((resolve, reject) => {
+        db.query("DELETE FROM salesdata WHERE salesID = ?", [id], (err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+
+      // Delete files from filesystem
+      const salesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
+      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${userId}`);
+
+      // salesData file
+      const salesFilePath = path.join(salesDir, fileName);
+      try {
+        if (fs.existsSync(salesFilePath)) fs.unlinkSync(salesFilePath);
+      } catch (e) {
+        console.warn("⚠️ Could not delete salesData file:", salesFilePath, e.message);
+      }
+
+      // cleanData files that start with base name + '_processed_'
+      const base = fileName.split(".")[0];
+      try {
+        if (fs.existsSync(cleanDir)) {
+          const files = fs.readdirSync(cleanDir);
+          files
+            .filter((f) => f.startsWith(`${base}_processed_`))
+            .forEach((f) => {
+              try {
+                fs.unlinkSync(path.join(cleanDir, f));
+              } catch (e) {
+                console.warn("⚠️ Could not delete cleanData file:", f, e.message);
+              }
+            });
+        }
+      } catch (e) {
+        console.warn("⚠️ Error while deleting cleanData files:", e.message);
+      }
+
+      console.log("✅ Record and files deleted successfully!");
+      res.json({ message: "Upload and related files deleted successfully" });
+    } catch (err) {
+      console.error("❌ Deletion error:", err);
+      return res.status(500).json({ message: "Deletion failed", error: err });
+    }
+  }
+
+  async getPreprocessStatus(req, res) {
+    try {
+      const userId = req.session.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized: User not logged in" });
+      }
+      const status = PythonService.getPreprocessStatus(userId);
+      return res.json(status);
+    } catch (err) {
+      console.error("❌ Status error:", err);
+      return res.status(500).json({ message: "Failed to get status" });
+    }
   }
 }
 

@@ -1,4 +1,4 @@
-//frontend/src/pages/Data.jsx
+// frontend/src/pages/Data.jsx
 import React, { useState, useEffect } from "react";
 import "../css/Data.css";
 import { FiUploadCloud } from "react-icons/fi";
@@ -6,22 +6,22 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Swal from "sweetalert2";
+import { useNotifications } from "../components/Notifications";
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
 
 export default function UploadBox() {
+  const { showInfo, showSuccess, showError, showProgress, updateNotification, removeNotification } = useNotifications();
   const [isDragging, setIsDragging] = useState(false);
   const [uploads, setUploads] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
-  const [sortMethod, setSortMethod] = useState("Manual");
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // 🔄 Fetch existing uploads
   const fetchUploads = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/data", {
@@ -32,7 +32,6 @@ export default function UploadBox() {
         return;
       }
       const data = await res.json();
-      console.log("📥 Fetched data:", data);
       if (Array.isArray(data)) setUploads(data);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -44,20 +43,14 @@ export default function UploadBox() {
     fetchUploads();
   }, []);
 
-  // 📤 Handle file upload with validation
+  // Handle file upload
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // ✅ Validate file type
-    const allowedTypes = [
-      "text/csv",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    ];
     const allowedExtensions = ["csv", "xlsx"];
     const fileExtension = file.name.split(".").pop().toLowerCase();
-
-    if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+    if (!allowedExtensions.includes(fileExtension)) {
       Swal.fire({
         icon: "error",
         title: "Invalid File Type",
@@ -70,6 +63,8 @@ export default function UploadBox() {
     const formData = new FormData();
     formData.append("file", file);
 
+    // 1) Show uploading info
+    const uploadingId = showInfo("Uploading sales data...");
     Swal.fire({
       title: "Uploading...",
       text: "Please wait while your file is being uploaded.",
@@ -86,17 +81,66 @@ export default function UploadBox() {
       const result = await res.json();
 
       if (res.ok) {
-        setTimeout(() => {
-          Swal.fire({
-            icon: "success",
-            title: "Upload Successful!",
-            text: result.message,
-            confirmButtonColor: "#3085d6",
-          });
-          fetchUploads();
-          setCurrentPage(1);
-        }, 3000);
+        // Close loader and switch to notifications-only UX
+        Swal.close();
+
+        // 2) Remove 'Uploading...' and show 'Uploaded successfully'
+        removeNotification(uploadingId);
+        showSuccess(`Sales data uploaded successfully: ${file.name}`);
+
+        // 3) Start preprocessing progress polling
+        let progressNotifId = null;
+        const poll = async () => {
+          try {
+            const statusRes = await fetch("http://localhost:5000/api/data/preprocess-status", {
+              credentials: "include",
+            });
+            if (!statusRes.ok) return;
+            const status = await statusRes.json(); // { state, progress, message }
+
+            if (status.state === "running") {
+              if (!progressNotifId) {
+                progressNotifId = showProgress("Preprocessing sales data...", status.progress || 0);
+              } else {
+                updateNotification(progressNotifId, {
+                  message: status.message || "Preprocessing sales data...",
+                  progress: typeof status.progress === "number" ? status.progress : undefined,
+                });
+              }
+            } else if (status.state === "done") {
+              if (!progressNotifId) {
+                progressNotifId = showProgress("Preprocessing complete.", 100);
+              }
+              updateNotification(progressNotifId, {
+                type: "success",
+                message: "Done preprocessing sales data.",
+                progress: undefined,
+              });
+              clearInterval(pollInterval);
+            } else if (status.state === "error") {
+              showError(`Preprocessing error: ${status.message || "Unknown error"}`);
+              if (progressNotifId) {
+                updateNotification(progressNotifId, {
+                  type: "error",
+                  message: "Preprocessing failed.",
+                  progress: undefined,
+                });
+              }
+              clearInterval(pollInterval);
+            }
+          } catch (e) {
+            // ignore transient polling errors
+          }
+        };
+        const pollInterval = setInterval(poll, 1500);
+        poll(); // fire immediately
+
+        fetchUploads();
+        setCurrentPage(1);
       } else {
+        Swal.close();
+        removeNotification(uploadingId);
+        showError(`Upload failed: ${result.message || "Something went wrong."}`);
         Swal.fire({
           icon: "error",
           title: "Upload Failed",
@@ -104,6 +148,9 @@ export default function UploadBox() {
         });
       }
     } catch (err) {
+      Swal.close();
+      removeNotification(uploadingId);
+      showError(`Upload error: ${err.message}`);
       Swal.fire({
         icon: "error",
         title: "Upload Error",
@@ -112,7 +159,7 @@ export default function UploadBox() {
     }
   };
 
-  // 🗑 Delete upload
+  // Delete an upload
   const handleDelete = async (id) => {
     const confirmDelete = await Swal.fire({
       title: "Are you sure?",
@@ -136,6 +183,7 @@ export default function UploadBox() {
 
       if (res.ok) {
         setUploads((prev) => prev.filter((u) => u.salesID !== id));
+        showSuccess("Sales data file deleted successfully");
         Swal.fire({
           icon: "success",
           title: "Deleted!",
@@ -143,6 +191,7 @@ export default function UploadBox() {
           confirmButtonColor: "#3085d6",
         });
       } else {
+        showError(`Delete failed: ${result.message || "Unable to delete file."}`);
         Swal.fire({
           icon: "error",
           title: "Delete Failed",
@@ -158,7 +207,7 @@ export default function UploadBox() {
     }
   };
 
-  // 🖱️ Drag and Drop Handlers
+  // Drag & Drop handlers
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -183,7 +232,6 @@ export default function UploadBox() {
       const file = files[0];
       const allowedExtensions = ["csv", "xlsx"];
       const fileExtension = file.name.split(".").pop().toLowerCase();
-
       if (!allowedExtensions.includes(fileExtension)) {
         Swal.fire({
           icon: "error",
@@ -194,26 +242,22 @@ export default function UploadBox() {
         return;
       }
 
-      const fakeEvent = { target: { files } };
-      handleFileChange(fakeEvent);
+      handleFileChange({ target: { files } });
     }
   };
 
-  // 🔍 Filter + Search logic
-  const filteredUploads = Array.isArray(uploads)
-    ? uploads.filter((item) => {
-        const matchesSearch = item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
-        const matchesStatus =
-          statusFilter === "All"
-            ? true
-            : statusFilter === "Active Uploads"
-            ? item.status !== "Completed" && item.status !== "Failed"
-            : item.status === statusFilter;
-        return matchesSearch && matchesStatus;
-      })
-    : [];
+  // Filtered & paginated uploads
+  const filteredUploads = uploads.filter((item) => {
+    const matchesSearch = item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
+    const matchesStatus =
+      statusFilter === "All"
+        ? true
+        : statusFilter === "Active Uploads"
+        ? item.status !== "Completed" && item.status !== "Failed"
+        : item.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
-  // 🔢 Pagination logic
   const totalPages = Math.ceil(filteredUploads.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = filteredUploads.slice(startIndex, startIndex + itemsPerPage);
@@ -226,11 +270,10 @@ export default function UploadBox() {
     <div>
       <h2 className="titled">Data Management</h2>
 
-      {/* Upload Section */}
+      {/* Upload Box */}
       <div className="upload-data-container">
         <div className="upload-box">
           <h3 className="title">Upload New Data</h3>
-
           <div
             className={`drop-zone ${isDragging ? "drag-active" : ""}`}
             onDragEnter={handleDragEnter}
@@ -258,10 +301,9 @@ export default function UploadBox() {
         </div>
       </div>
 
-      <br />
       <hr />
 
-      {/* Table Section */}
+      {/* Table */}
       <div className="table-wrapper">
         <div className="table-toolbar">
           <div className="search-box">
@@ -271,6 +313,9 @@ export default function UploadBox() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <button className="btn-search" onClick={() => setCurrentPage(1)}>
+              Search
+            </button>
           </div>
 
           <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
@@ -280,18 +325,12 @@ export default function UploadBox() {
             <option>Failed</option>
           </select>
 
-          <select value={sortMethod} onChange={(e) => setSortMethod(e.target.value)}>
-            <option>Sort By Upload: Manual</option>
-            <option>Sort By Upload: Auto</option>
-          </select>
-
           <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
             <option>Sort By: Newest First</option>
             <option>Sort By: Oldest First</option>
           </select>
         </div>
 
-        {/* Table */}
         <div className="table-container">
           <table className="upload-table">
             <thead>
@@ -303,16 +342,11 @@ export default function UploadBox() {
                 <th>Actions</th>
               </tr>
             </thead>
-
             <tbody>
               {currentData.length > 0 ? (
                 currentData.map((item) => (
                   <tr key={item.salesID}>
-                    <td>
-                      {item.uploadDate
-                        ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A")
-                        : "—"}
-                    </td>
+                    <td>{item.uploadDate ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A") : "—"}</td>
                     <td>{item.fileName}</td>
                     <td>{item.records?.toLocaleString() || 0}</td>
                     <td>
@@ -329,12 +363,8 @@ export default function UploadBox() {
                       </span>
                     </td>
                     <td className="actions">
-                      <button className="btn-action">[View]</button> |
-                      <button
-                        className="btn-action delete"
-                        onClick={() => handleDelete(item.salesID)}
-                      >
-                        [Delete]
+                      <button className="btn-delete" onClick={() => handleDelete(item.salesID)}>
+                        Delete
                       </button>
                     </td>
                   </tr>
@@ -366,10 +396,7 @@ export default function UploadBox() {
             </button>
           ))}
 
-          <button
-            onClick={() => goToPage(currentPage + 1)}
-            disabled={currentPage === totalPages || totalPages === 0}
-          >
+          <button onClick={() => goToPage(currentPage + 1)} disabled={currentPage === totalPages || totalPages === 0}>
             Next →
           </button>
         </div>

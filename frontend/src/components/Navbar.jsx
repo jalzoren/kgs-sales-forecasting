@@ -1,42 +1,13 @@
-// frontend/src/components/Navbar.jsx
-import { NavLink } from "react-router-dom";
-import { FaBullseye, FaBell } from "react-icons/fa";
+import { NavLink, useNavigate } from "react-router-dom";
+import { FaBullseye } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
 import Swal from "sweetalert2";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import Clock from "./Clock";
+import NotificationBell from "./NotificationBell";
 import "../components/components-css/Navbar.css";
-
-const initialNotifications = [
-  // Example
-  { type: "info", message: "Processing sales data...", time: "Just now", read: false },
-];
 
 function Navbar() {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState(initialNotifications);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-
-  // Add a new notification
-  const addNotification = (type, message) => {
-    const newNotif = {
-      type,
-      message,
-      time: "Just now",
-      read: false,
-    };
-    setNotifications(prev => [newNotif, ...prev]);
-  };
-
-  // Mark as read (optional)
-  const markAsRead = (index) => {
-    setNotifications(prev => {
-      const copy = [...prev];
-      copy[index].read = true;
-      return copy;
-    });
-  };
 
   const handleLogout = () => {
     Swal.fire({
@@ -59,9 +30,7 @@ function Navbar() {
           showConfirmButton: false,
           timer: 500,
           timerProgressBar: true,
-        }).then(() => {
-          navigate("/");
-        });
+        }).then(() => navigate("/"));
       }
     });
   };
@@ -75,47 +44,15 @@ function Navbar() {
         </div>
 
         <ul className="navbar-links">
-          <li>
-            <NavLink to="/home">Home</NavLink>
-          </li>
-          <li>
-            <NavLink to="/data">Data</NavLink>
-          </li>
-          <li>
-            <NavLink to="/forecast">Forecast</NavLink>
-          </li>
-          <li>
-            <NavLink to="/reports">Reports</NavLink>
-          </li>
-          <li>
-            <NavLink to="/analytics">Analytics</NavLink>
-          </li>
+          <li><NavLink to="/home">Home</NavLink></li>
+          <li><NavLink to="/data">Data</NavLink></li>
+          <li><NavLink to="/forecast">Forecast</NavLink></li>
+          <li><NavLink to="/reports">Reports</NavLink></li>
+          <li><NavLink to="/analytics">Analytics</NavLink></li>
         </ul>
 
         <div className="navbar-right">
-          <div className="notification-wrapper">
-            <button
-              className="icon-btn"
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-            >
-              <FaBell />
-            </button>
-
-            {dropdownOpen && (
-              <div className="notifications-dropdown">
-                {notifications.slice(0, 5).map((n, i) => (
-                  <div
-                    key={i}
-                    className={`notification-item ${n.read ? "" : "unread"} ${n.type}`}
-                  >
-                    <p>{n.message}</p>
-                    <span>{n.time}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
+          <NotificationBell />
           <button className="logout-btn" onClick={handleLogout}>
             <LiaUserCircle />
           </button>

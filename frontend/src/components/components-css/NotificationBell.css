@@ -1,0 +1,233 @@
+.notification-wrapper {
+  position: relative;
+  display: inline-block;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Ensure all notification text is black */
+.notification-item,
+.notification-item .notif-text,
+.notification-item .notif-title,
+.notification-item .notif-message,
+.notification-item .notif-meta,
+.notification-item .notif-time {
+  color: #000 !important;
+}
+
+.notif-icon-wrapper .notif-icon,
+.close-icon {
+  color: #000 !important;
+  fill: #000 !important;
+  stroke: #000 !important;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  font-size: 1.5rem;
+}
+
+.notif-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: red;
+  color: white;
+  font-size: 0.75rem;
+  border-radius: 50%;
+  padding: 2px 5px;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  width: 400px;
+  max-height: 450px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 999;
+  padding: 0.5rem;
+  overflow-x: hidden;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+    color: #000;
+
+}
+
+.notification-item {
+  padding: 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #000;
+  font-family: "Poppins", sans-serif;
+  transition: background 0.2s;
+  min-height: 100px;
+  margin: 20px;
+  color: #000;
+}
+
+.notification-item.unread {
+  
+  font-weight: bold;
+  background: #f0f8ff;
+}
+
+.notification-item.read {
+  opacity: 0.7;
+}
+
+.notification-item.success {
+  border-left: 4px solid green;
+  background: linear-gradient(to right, rgba(86, 151, 28, 0.6) 0%, #ffffff 100%);
+}
+
+.notification-item.info {
+  border-left: 4px solid  rgba(1, 46, 114);
+  background: linear-gradient(to right, rgba(1, 46, 114, 0.6) 0%, #ffffff 100%);
+}
+
+.notification-item.warning {
+  border-left: 4px solid orange;
+  background: #fff4e5;
+}
+
+.notification-item.error {
+  border-left: 4px solid red;
+  background: #fdecea;
+}
+
+.notification-item.processing {
+  border-left: 4px solid purple;
+  background: #f3e8fd;
+}
+
+/* Notification content layout */
+.notif-content {
+display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+
+.notif-icon-wrapper {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.notif-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.notif-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.notif-message {
+  font-size: 13px;
+  color: #555;
+}
+
+.notif-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 10px;
+  font-size: 11px;
+  color: #999;
+}
+
+.close-icon {
+  cursor: pointer;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+/* Scrollbar styling */
+.notifications-dropdown::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 8px;
+}
+
+.notifications-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.notifications-dropdown::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+
+.notifications-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Mark all as read button */
+.mark-all-read {
+  margin-bottom: 0.5rem;
+  background: #0a4174;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+/* --- FIXED PROGRESS BAR --- */
+.notif-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+  overflow: hidden;
+}
+
+.progress {
+  width: 100%;
+  height: 6px;
+  background: #eee;
+  border-radius: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #0A4174;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+}
+
+/* Allow notification height to expand if progress bar is visible */
+.notification-item {
+  min-height: 80px;
+  height: auto;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+
+.spin { 
+  animation: spin 1s linear infinite; 
+} 
+
+@keyframes spin {
+   from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+   }
