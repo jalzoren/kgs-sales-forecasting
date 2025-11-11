@@ -20,19 +20,20 @@ export default function NotificationBell() {
   }, []);
 
   const getIcon = (type) => {
-    switch (type) {
-      case "success":
-        return <FaCheckCircle className="notif-icon success" />;
-      case "warning":
-        return <FaExclamationTriangle className="notif-icon warning" />;
-      case "info":
-        return <FaInfoCircle className="notif-icon info" />;
-      case "processing":
-        return <FaCog className="notif-icon processing" />;
-      default:
-        return <FaInfoCircle className="notif-icon info" />;
-    }
-  };
+  switch (type) {
+    case "success":
+      return <FaCheckCircle className="notif-icon success" />;
+    case "warning":
+      return <FaExclamationTriangle className="notif-icon warning" />;
+    case "info":
+      return <FaInfoCircle className="notif-icon info" />;
+    case "processing":
+      return <FaCog className="notif-icon processing spin" />; // <--- add spin class here
+    default:
+      return <FaInfoCircle className="notif-icon info" />;
+  }
+};
+
 
   return (
     <div className="notification-wrapper" ref={dropdownRef}>
