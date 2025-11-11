@@ -5,14 +5,15 @@ const fs = require("fs");
 
 class PythonService {
   constructor() {
+    this.pythonPath = "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe"; // ✅ central path
     this.preprocessStatusByUserId = new Map();
   }
+
   runScript(scriptPath, args = []) {
     return new Promise((resolve, reject) => {
-      const pythonPath = "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe";
-      console.log(`🐍 Using Python at: ${pythonPath}`);
+      console.log(`🐍 Using Python at: ${this.pythonPath}`);
 
-      const python = spawn(pythonPath, [scriptPath, ...args]);
+      const python = spawn(this.pythonPath, [scriptPath, ...args]);
       let output = "";
       let errorMsg = "";
 
@@ -54,7 +55,6 @@ class PythonService {
     const processScript = path.join(__dirname, "../../ml-service/processData.py");
 
     return new Promise((resolve, reject) => {
-      // init status
       this.preprocessStatusByUserId.set(String(userId), {
         state: "running",
         progress: 0,
@@ -62,11 +62,13 @@ class PythonService {
         updatedAt: Date.now(),
       });
 
-      const python = spawn(pythonPath, [processScript, userId.toString()]);
+      // ✅ FIXED: now uses `this.pythonPath`
+      const python = spawn(this.pythonPath, [processScript, userId.toString()]);
 
       python.stdout.on("data", (data) => {
         const text = data.toString();
         console.log("Python:", text);
+
         const status = this.preprocessStatusByUserId.get(String(userId)) || {};
         let progress = status.progress || 0;
         let message = status.message || "";
@@ -144,8 +146,9 @@ class PythonService {
     console.log(`🧠 Starting model training for User ID: ${userId}...`);
     const trainScript = path.join(__dirname, "../../ml-service/trainModel.py");
 
+    // ✅ FIXED: now uses `this.pythonPath`
     return new Promise((resolve, reject) => {
-      const python = spawn(pythonPath, [trainScript, userId.toString()]);
+      const python = spawn(this.pythonPath, [trainScript, userId.toString()]);
 
       python.stdout.on("data", (data) => console.log("🧩 Python Train:", data.toString()));
       python.stderr.on("data", (data) => console.error("🐍 Python Train Error:", data.toString()));
@@ -159,6 +162,15 @@ class PythonService {
         }
       });
     });
+  }
+
+  // ✅ Added missing method
+  getPreprocessStatus(userId) {
+    return this.preprocessStatusByUserId.get(String(userId)) || {
+      state: "idle",
+      progress: 0,
+      message: "No preprocessing started yet.",
+    };
   }
 }
 

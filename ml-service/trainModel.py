@@ -16,9 +16,9 @@ from sklearn.metrics import mean_squared_error
 # ========================
 # CONFIGURATION
 # ========================
-CLEAN_DIR = "../backend/files/cleanData"
-MODEL_DIR = "./models"
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+CLEAN_DIR = os.path.join(BASE_DIR, "../backend/files/cleanData")
+MODEL_DIR = os.path.join(BASE_DIR, "models")
 
 # ========================
 # DATA LOADER
@@ -26,7 +26,7 @@ MODEL_DIR = "./models"
 class DataLoader:
     def __init__(self, user_id: str):
         self.user_id = user_id
-        self.clean_path = os.path.join(CLEAN_DIR, f"user_{user_id}")
+        self.clean_path = os.path.abspath(os.path.join(CLEAN_DIR, f"user_{user_id}"))
         if not os.path.exists(self.clean_path):
             raise FileNotFoundError(f"No cleaned data found for user {user_id}")
 
