@@ -56,9 +56,8 @@ function Navbar2() {
           <li><NavLink to="/analytics">Analytics</NavLink></li>
         </ul>
 
-        {/* Right Side: Notification Bell + Logout */}
         <div className="navbar2-right">
-          <NotificationBell /> {/* ✅ Use NotificationBell component */}
+          <NotificationBell /> 
 
           <button className="logout-btn" onClick={handleLogout}>
             <LiaUserCircle />
