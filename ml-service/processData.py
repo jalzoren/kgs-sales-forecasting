@@ -7,6 +7,15 @@ from datetime import datetime
 UPLOAD_DIR = "../backend/files/salesData"   # where uploaded files go
 CLEAN_DIR = "../backend/files/cleanData"    # where processed files will be saved
 
+def ensure_user_folder(base_dir: str, user_id: str) -> str:
+    """
+    Ensure user-specific directory exists under base_dir.
+    """
+    user_dir = os.path.join(base_dir, f"user_{user_id}")
+    os.makedirs(user_dir, exist_ok=True)
+    return user_dir
+
+
 def preprocess_sales_data(file_path: str, output_path: str):
     """
     Cleans and preprocesses transactional sales data for LSTM + XGBoost forecasting.
@@ -100,7 +109,8 @@ def preprocess_sales_data(file_path: str, output_path: str):
         .transform(lambda x: (x - x.min()) / (x.max() - x.min() + 1e-9))
     )
 
-    # Save processed file
+    # ✅ Save to user-specific clean directory
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
     agg.to_excel(output_path, index=False)
     print(f"Processed data saved to: {output_path}")
     return output_path
@@ -111,7 +121,6 @@ def process_latest_upload(user_id=None):
     Process the latest uploaded sales file for a specific user.
     """
     base_path = UPLOAD_DIR if user_id is None else os.path.join(UPLOAD_DIR, f"user_{user_id}")
-    
     if not os.path.exists(base_path):
         print(f"No directory for user {user_id}")
         return None
@@ -128,15 +137,17 @@ def process_latest_upload(user_id=None):
     input_path = os.path.join(base_path, latest_file)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
+    # ✅ Ensure user clean folder exists
+    user_clean_dir = ensure_user_folder(CLEAN_DIR, user_id or "general")
+
     output_path = os.path.join(
-        "../backend/files/cleanData",
-        f"user_{user_id}_{latest_file.split('.')[0]}_processed_{timestamp}.xlsx"
+        user_clean_dir,
+        f"{latest_file.split('.')[0]}_processed_{timestamp}.xlsx"
     )
 
     print(f"Processing latest file for user {user_id}: {latest_file}")
     preprocess_sales_data(input_path, output_path)
     print("Processing complete.")
-
     return output_path
 
 

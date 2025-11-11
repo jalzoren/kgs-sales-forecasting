@@ -1,3 +1,4 @@
+// frontend/src/components/Navbar.jsx
 import { NavLink } from "react-router-dom";
 import { FaBullseye, FaBell } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
@@ -7,19 +8,35 @@ import { useState } from "react";
 import Clock from "./Clock";
 import "../components/components-css/Navbar.css";
 
-const notificationsData = [
-  { message: "Inventory Alert: Item X low stock", time: "2h ago", read: false },
-  { message: "Sales forecast updated", time: "5h ago", read: false },
-  { message: "New report available", time: "1d ago", read: true },
-  { message: "Forecast accuracy variance: 7%", time: "2d ago", read: true },
-  { message: "Predicted sales updated", time: "3d ago", read: true },
-  { message: "Inventory Alert: Item Y low stock", time: "4d ago", read: false },
+const initialNotifications = [
+  // Example
+  { type: "info", message: "Processing sales data...", time: "Just now", read: false },
 ];
 
 function Navbar() {
   const navigate = useNavigate();
-  const [notifications] = useState(notificationsData);
+  const [notifications, setNotifications] = useState(initialNotifications);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // Add a new notification
+  const addNotification = (type, message) => {
+    const newNotif = {
+      type,
+      message,
+      time: "Just now",
+      read: false,
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+  };
+
+  // Mark as read (optional)
+  const markAsRead = (index) => {
+    setNotifications(prev => {
+      const copy = [...prev];
+      copy[index].read = true;
+      return copy;
+    });
+  };
 
   const handleLogout = () => {
     Swal.fire({
@@ -89,7 +106,7 @@ function Navbar() {
                 {notifications.slice(0, 5).map((n, i) => (
                   <div
                     key={i}
-                    className={`notification-item ${n.read ? "" : "unread"}`}
+                    className={`notification-item ${n.read ? "" : "unread"} ${n.type}`}
                   >
                     <p>{n.message}</p>
                     <span>{n.time}</span>

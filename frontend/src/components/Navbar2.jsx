@@ -1,3 +1,4 @@
+// frontend/src/components/Navbar2.jsx
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaBullseye, FaBell } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";

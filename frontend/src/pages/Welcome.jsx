@@ -27,7 +27,7 @@ export default function Welcome() {
         <br />
         <div className="how-it-works">
           <h4 className="text-h4">How it works </h4>
-         <a
+        <a
   className="how"
   href="#"
   onClick={(e) => {
