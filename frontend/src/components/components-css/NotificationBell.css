@@ -1,6 +1,24 @@
 .notification-wrapper {
   position: relative;
   display: inline-block;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Ensure all notification text is black */
+.notification-item,
+.notification-item .notif-text,
+.notification-item .notif-title,
+.notification-item .notif-message,
+.notification-item .notif-meta,
+.notification-item .notif-time {
+  color: #000 !important;
+}
+
+.notif-icon-wrapper .notif-icon,
+.close-icon {
+  color: #000 !important;
+  fill: #000 !important;
+  stroke: #000 !important;
 }
 
 .icon-btn {
@@ -26,7 +44,7 @@
   position: absolute;
   top: 2.5rem;
   right: 0;
-  width: 500px;
+  width: 400px;
   max-height: 450px;
   overflow-y: auto;
   background: white;
@@ -41,51 +59,28 @@
 .notifications-list {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  overflow-y: scroll;
+  gap: 0.5rem;
+    color: #000;
+
 }
 
 .notification-item {
   padding: 0.5rem;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20PX;
-  height: 90px;
   color: #000;
-  font-family: "Poppins";
-}
-
-/* width */
-::-webkit-scrollbar {
-  width: 10px;
-    border-radius: 8px;
-
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: #f1f1f1; 
-    border-radius: 8px;
-
-}
- 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888; 
-  border-radius: 8px;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555; 
-    border-radius: 8px;
-
+  font-family: "Poppins", sans-serif;
+  transition: background 0.2s;
+  min-height: 100px;
+  margin: 20px;
+  color: #000;
 }
 
 .notification-item.unread {
+  
   font-weight: bold;
   background: #f0f8ff;
 }
@@ -96,16 +91,13 @@
 
 .notification-item.success {
   border-left: 4px solid green;
-  border: 1px solid #000;
-  border-radius: 10px;
-        background-image: linear-gradient(to right,rgb(86, 151, 28, .60) 0%, #FFFFFF 100%);
+  background: linear-gradient(to right, rgba(86, 151, 28, 0.6) 0%, #ffffff 100%);
 }
 
 .notification-item.info {
-  border-left: 4px solid #3498db;
- border: 1px solid #000;
-  border-radius: 10px;
-        background-image: linear-gradient(to right,rgb(1, 46, 114, .60) 0%, #FFFFFF 100%);}
+  border-left: 4px solid  rgba(1, 46, 114);
+  background: linear-gradient(to right, rgba(1, 46, 114, 0.6) 0%, #ffffff 100%);
+}
 
 .notification-item.warning {
   border-left: 4px solid orange;
@@ -122,6 +114,70 @@
   background: #f3e8fd;
 }
 
+/* Notification content layout */
+.notif-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.notif-icon-wrapper {
+  margin-right: 10px;
+  font-size: 20px;
+}
+
+.notif-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.notif-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.notif-message {
+  font-size: 13px;
+  color: #555;
+}
+
+.notif-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-left: 10px;
+  font-size: 11px;
+  color: #999;
+}
+
+.close-icon {
+  cursor: pointer;
+  margin-top: 4px;
+  font-size: 16px;
+}
+
+/* Scrollbar styling */
+.notifications-dropdown::-webkit-scrollbar {
+  width: 10px;
+  border-radius: 8px;
+}
+
+.notifications-dropdown::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 8px;
+}
+
+.notifications-dropdown::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 8px;
+}
+
+.notifications-dropdown::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Mark all as read button */
 .mark-all-read {
   margin-bottom: 0.5rem;
   background: #0a4174;
@@ -131,7 +187,6 @@
   border-radius: 5px;
   cursor: pointer;
 }
-
 /* --- FIXED PROGRESS BAR --- */
 .notif-content {
   display: flex;

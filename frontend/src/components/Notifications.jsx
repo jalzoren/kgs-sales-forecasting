@@ -10,7 +10,6 @@ export const useNotifications = () => {
   return context;
 };
 
-
 // Format relative time
 const formatTime = (date) => {
   const now = new Date();
@@ -59,10 +58,19 @@ export const NotificationProvider = ({ children }) => {
     localStorage.setItem(key, JSON.stringify(value));
   };
 
-  const addNotification = useCallback((type, message) => {
+  const typeToTitle = {
+    success: "Success",
+    info: "Info",
+    warning: "Warning",
+    error: "Error",
+    processing: "Processing",
+  };
+
+  const addNotification = useCallback((type, message, title) => {
     const newNotif = {
       id: Date.now() + Math.random(),
-      type, // success, info, warning, error, processing
+      type,
+      title: title || typeToTitle[type] || "Notification",
       message,
       timestamp: new Date(),
       time: formatTime(new Date()),
@@ -81,18 +89,19 @@ export const NotificationProvider = ({ children }) => {
     return newNotif.id;
   }, []);
 
-  const showSuccess = useCallback((msg) => addNotification("success", msg), [addNotification]);
-  const showInfo = useCallback((msg) => addNotification("info", msg), [addNotification]);
-  const showWarning = useCallback((msg) => addNotification("warning", msg), [addNotification]);
-  const showError = useCallback((msg) => addNotification("error", msg), [addNotification]);
-  const showProcessing = useCallback((msg) => addNotification("processing", msg), [addNotification]);
+  const showSuccess = useCallback((msg, title) => addNotification("success", msg, title), [addNotification]);
+  const showInfo = useCallback((msg, title) => addNotification("info", msg, title), [addNotification]);
+  const showWarning = useCallback((msg, title) => addNotification("warning", msg, title), [addNotification]);
+  const showError = useCallback((msg, title) => addNotification("error", msg, title), [addNotification]);
+  const showProcessing = useCallback((msg, title) => addNotification("processing", msg, title), [addNotification]);
 
   // Progress notification
-  const showProgress = useCallback((message, initialProgress = 0) => {
+  const showProgress = useCallback((message, initialProgress = 0, title) => {
     const id = Date.now() + Math.random();
     const notif = {
       id,
       type: "processing",
+      title: title || typeToTitle.processing,
       message,
       timestamp: new Date(),
       time: formatTime(new Date()),
