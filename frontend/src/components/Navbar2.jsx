@@ -3,8 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { FaBullseye } from "react-icons/fa";
 import { LiaUserCircle } from "react-icons/lia";
 import Swal from "sweetalert2";
-import NotificationBell from "./NotificationBell"; // ✅ import the component
-
+import NotificationBell from "./NotificationBell"; 
 import "../components/components-css/Navbar2.css";
 
 function Navbar2() {
