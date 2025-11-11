@@ -73,8 +73,9 @@
 
 .notification-item.info {
   border-left: 4px solid #3498db;
-  background: #eaf4fc;
-}
+ border: 1px solid #000;
+  border-radius: 10px;
+        background-image: linear-gradient(to right,rgb(1, 46, 114, .60) 0%, #FFFFFF 100%);}
 
 .notification-item.warning {
   border-left: 4px solid orange;

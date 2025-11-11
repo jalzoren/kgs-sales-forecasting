@@ -22,7 +22,6 @@ export default function UploadBox() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  // Fetch uploads from backend
   const fetchUploads = async () => {
     try {
       const res = await fetch("http://localhost:5000/api/data", {

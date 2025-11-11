@@ -11,6 +11,7 @@ import { useNotifications } from "./Notifications";
 import "../components/components-css/NotificationBell.css";
 
 export default function NotificationBell() {
+  
   const { history, markAsRead, unreadCount, markAllAsRead } = useNotifications();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef();
