@@ -116,9 +116,9 @@
 
 /* Notification content layout */
 .notif-content {
-  display: flex;
-  align-items: center;
-  flex: 1;
+display: flex;
+    flex-direction: row;
+    align-items: flex-start;
 }
 
 .notif-icon-wrapper {
