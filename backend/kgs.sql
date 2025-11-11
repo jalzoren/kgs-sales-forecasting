@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2025 at 04:40 PM
+-- Generation Time: Nov 11, 2025 at 06:49 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,11 +29,21 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `salesdata` (
   `salesID` int(11) NOT NULL,
+  `userId` int(11) NOT NULL,
   `uploadDate` datetime(6) DEFAULT current_timestamp(6),
   `fileName` varchar(255) NOT NULL,
   `records` int(11) NOT NULL,
   `status` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `salesdata`
+--
+
+INSERT INTO `salesdata` (`salesID`, `userId`, `uploadDate`, `fileName`, `records`, `status`) VALUES
+(54, 3, '2025-11-11 13:17:14.034311', 'Sales_Data_2022.csv', 816600, 'Completed'),
+(55, 3, '2025-11-11 13:21:18.715884', 'Sales_Data_2023.csv', 876953, 'Completed'),
+(56, 4, '2025-11-11 13:34:17.607548', 'Sales_Data_2024.csv', 877007, 'Completed');
 
 -- --------------------------------------------------------
 
@@ -85,13 +95,23 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `salesdata`
 --
 ALTER TABLE `salesdata`
-  MODIFY `salesID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `salesID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
   MODIFY `userId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `salesdata`
+--
+ALTER TABLE `salesdata`
+  ADD CONSTRAINT `userId` FOREIGN KEY (`userId`) REFERENCES `user` (`userId`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
