@@ -11,7 +11,6 @@ export const useNotifications = () => {
 };
 
 
-
 // Format relative time
 const formatTime = (date) => {
   const now = new Date();
