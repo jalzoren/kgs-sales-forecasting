@@ -417,7 +417,7 @@ export default function UploadBox() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Pagination  AA*/}
         <div className="pagination">
           <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
             ← Previous
