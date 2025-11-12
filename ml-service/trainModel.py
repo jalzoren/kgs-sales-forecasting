@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 
+from tensorflow.keras import Input
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from tensorflow.keras.callbacks import EarlyStopping
@@ -33,16 +34,20 @@ class DataLoader:
     def get_latest_file(self):
         files = [
             f for f in os.listdir(self.clean_path)
-            if f.endswith("_processed.xlsx")
+            if "_processed" in f and f.endswith(".xlsx")
         ]
         if not files:
             raise FileNotFoundError(f"No processed files found in {self.clean_path}")
         latest = max(files, key=lambda f: os.path.getctime(os.path.join(self.clean_path, f)))
+
+        print(f"Found processed files: {files}")
+        print(f"Using latest file: {latest}")
+
         return os.path.join(self.clean_path, latest)
 
     def load_data(self):
         file_path = self.get_latest_file()
-        print(f"📂 Loading data from: {file_path}")
+        print(f"Loading data from: {file_path}")
         df = pd.read_excel(file_path)
         df = df.sort_values("Date")
         return df
@@ -64,7 +69,7 @@ class LSTMTrainer:
         return np.array(X), np.array(y)
 
     def train(self, sales_series):
-        print("🧠 Training LSTM model...")
+        print("Training LSTM model...")
         data = sales_series.values.reshape(-1, 1)
         X, y = self.create_sequences(data)
 
@@ -81,11 +86,11 @@ class LSTMTrainer:
         es = EarlyStopping(patience=5, restore_best_weights=True)
 
         model.fit(X_train, y_train, validation_data=(X_test, y_test),
-                  epochs=30, batch_size=32, verbose=1, callbacks=[es])
+                epochs=30, batch_size=32, verbose=1, callbacks=[es])
 
         y_pred = model.predict(X_test)
         rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-        print(f"✅ LSTM RMSE: {rmse:.4f}")
+        print(f"LSTM RMSE: {rmse:.4f}")
 
         self.model = model
         return model
@@ -95,14 +100,21 @@ class LSTMTrainer:
         Feed the full series through the trained LSTM and extract its hidden states
         as temporal context features.
         """
-        print("🔍 Extracting LSTM temporal context features...")
+        print("Extracting LSTM temporal context features...")
         data = sales_series.values.reshape(-1, 1)
         X, _ = self.create_sequences(data)
+        print(f"Extracting features from {len(X)} sequences using lookback={self.lookback}")
 
+        # Use a new Input tensor to match LSTM input shape
+        input_layer = Input(shape=(X.shape[1], 1))
         lstm_layer = self.model.layers[0]
-        feature_extractor = Model(inputs=self.model.input, outputs=lstm_layer.output)
-        features = feature_extractor.predict(X)
-        # Pad to match original length
+        
+        # Rebuild a temporary model for feature extraction
+        feature_extractor = Model(inputs=input_layer, outputs=lstm_layer(input_layer))
+
+        features = feature_extractor.predict(X, verbose=1)
+        
+        # Pad features to align with original series length
         padded_features = np.vstack([np.zeros((self.lookback, features.shape[1])), features])
         return padded_features
 
@@ -112,7 +124,7 @@ class LSTMTrainer:
 # ========================
 class XGBoostTrainer:
     def train(self, X, y):
-        print("🌳 Training XGBoost model...")
+        print("Training XGBoost model...")
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
         model = xgb.XGBRegressor(
@@ -127,7 +139,7 @@ class XGBoostTrainer:
         model.fit(X_train, y_train)
         preds = model.predict(X_test)
         rmse = np.sqrt(mean_squared_error(y_test, preds))
-        print(f"✅ XGBoost RMSE: {rmse:.4f}")
+        print(f"XGBoost RMSE: {rmse:.4f}")
         return model
 
 
@@ -145,7 +157,7 @@ class SalesForecasterPipeline:
         df = self.data_loader.load_data()
 
         # === Prepare features ===
-        print("📊 Preparing features...")
+        print("Preparing features...")
         sales_series = df["Total_Sales"]
 
         # 1️⃣ Train LSTM and extract features
@@ -180,8 +192,8 @@ class SalesForecasterPipeline:
         lstm_model.save(lstm_path)
         xgb_model.save_model(xgb_path)
 
-        print(f"💾 Models saved:\n - {lstm_path}\n - {xgb_path}")
-        print("🎯 Training pipeline completed successfully!")
+        print(f"Models saved:\n - {lstm_path}\n - {xgb_path}")
+        print("Training pipeline completed successfully!")
 
 
 # ========================
