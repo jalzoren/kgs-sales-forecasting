@@ -18,6 +18,30 @@ h3 {
   margin-bottom: 5px;
 }
 
+.how-it-works-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: underline;
+  color: #001d39;
+  cursor: pointer;
+}
+
+.how-it-works-link h4 {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 18px;
+}
+
+.info-icon {
+  font-size: 22px;
+  color: #001d39;
+}
+
+
 .welcome{
   font-family: "Merriweather", sans-serif;
   color: var(--accent-light);
