@@ -51,7 +51,7 @@ export default function NotificationBell() {
     setTimeout(() => removeNotification(id), 300);
   };
 
-  // ✅ Group notifications by day (does NOT mutate timestamps)
+  // Group notifications by day
   const groupByDay = (notifs) => {
     const groups = {};
     const today = new Date();
@@ -109,51 +109,40 @@ export default function NotificationBell() {
             Object.keys(groupedNotifications).map((dayLabel) => (
               <div key={dayLabel}>
                 <h4 className="notif-day">{dayLabel}</h4>
-                {groupedNotifications[dayLabel].map((n) => {
-                  const ts = n.timestamp instanceof Date
-                    ? n.timestamp
-                    : new Date(n.timestamp);
-
-                  return (
-                    <div
-                      key={n.id}
-                      className={`notification-item ${n.read ? "read" : "unread"} ${n.type} ${
-                        removingIds.includes(n.id) ? "slide-out" : ""
-                      }`}
-                      onClick={() => markAsRead(n.id)}
-                    >
-                      {/* Left: Icon + Title + Message */}
-                      <div className="notif-content">
-                        <div className="title-head">
-                          <div className="notif-header">
-                            <div className="notif-icon-wrapper">
-                              {getIcon(n.type)}
-                            </div>
-                            <div className="notif-title">{n.title}</div>
+                {groupedNotifications[dayLabel].map((n) => (
+                  <div
+                    key={n.id}
+                    className={`notification-item ${n.read ? "read" : "unread"} ${n.type} ${
+                      removingIds.includes(n.id) ? "slide-out" : ""
+                    }`}
+                    onClick={() => markAsRead(n.id)}
+                  >
+                    {/* Left: Icon + Title + Message */}
+                    <div className="notif-content">
+                      <div className="title-head">
+                        <div className="notif-header">
+                          <div className="notif-icon-wrapper">
+                            {getIcon(n.type)}
                           </div>
+                          <div className="notif-title">{n.title}</div>
                         </div>
-                        <div className="notif-message">{n.message}</div>
                       </div>
-
-                      {/* Right: Time + Close */}
-                      <div className="notif-meta">
-                        <div className="notif-time">
-                          {ts.toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
-                        </div>
-                        <IoClose
-                          className="close-icon"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleRemove(n.id);
-                          }}
-                        />
-                      </div>
+                      <div className="notif-message">{n.message}</div>
                     </div>
-                  );
-                })}
+
+                    {/* Right: Time + Close */}
+                    <div className="notif-meta">
+                      <div className="notif-time">{n.time}</div>
+                      <IoClose
+                        className="close-icon"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemove(n.id);
+                        }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
             ))
           )}
