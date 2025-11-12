@@ -350,7 +350,6 @@ export default function UploadBox() {
               className="btn-custom-swal"
               onClick={handleInfoClick}
               style={{}}
-              title="User Manual"
             >
               <FaInfoCircle />
             </i>
