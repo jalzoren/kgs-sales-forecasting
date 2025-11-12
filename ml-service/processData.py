@@ -7,6 +7,10 @@ from datetime import datetime
 UPLOAD_DIR = "../backend/files/salesData"   # where uploaded files go
 CLEAN_DIR = "../backend/files/cleanData"    # where processed files will be saved
 
+
+# ==========================================
+# UTILITIES
+# ==========================================
 def ensure_user_folder(base_dir: str, user_id: str) -> str:
     """
     Ensure user-specific directory exists under base_dir.
@@ -16,20 +20,22 @@ def ensure_user_folder(base_dir: str, user_id: str) -> str:
     return user_dir
 
 
+# ==========================================
+# MAIN PREPROCESS FUNCTION
+# ==========================================
 def preprocess_sales_data(file_path: str, output_path: str):
     """
     Cleans and preprocesses transactional sales data for LSTM + XGBoost forecasting.
     """
-
     print(f"Reading sales data from: {file_path}")
     if file_path.endswith(".csv"):
         df = pd.read_csv(
             file_path,
             encoding="utf-8",
-            on_bad_lines="skip",     # ✅ skip broken rows
-            sep=",",                 # ✅ ensure comma-separated
-            quotechar='"',           # ✅ handle quoted text properly
-            engine="python"          # ✅ more lenient than C engine
+            on_bad_lines="skip",
+            sep=",",
+            quotechar='"',
+            engine="python"
         )
     else:
         df = pd.read_excel(file_path)
@@ -40,11 +46,9 @@ def preprocess_sales_data(file_path: str, output_path: str):
     df = df.drop_duplicates()
     df = df.dropna(subset=["Date", "Product_ID", "Product_Name", "Total_Amount", "Quantity"])
 
-    # Convert date/time columns to datetime format
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
     df = df.dropna(subset=["Date"])
 
-    # Fix invalid or negative values
     numeric_cols = ["Quantity", "Unit_Price", "Discount", "Total_Amount"]
     for col in numeric_cols:
         df[col] = pd.to_numeric(df[col], errors="coerce")
@@ -78,17 +82,15 @@ def preprocess_sales_data(file_path: str, output_path: str):
     print("Computing rolling & lag features...")
     agg = agg.sort_values(["Product_ID", "Date"]).reset_index(drop=True)
 
-    # Lag features (previous day, week, month)
     for lag in [1, 7, 30]:
         agg[f"Sales_Lag_{lag}"] = agg.groupby("Product_ID")["Total_Sales"].shift(lag)
 
-    # Rolling averages (trend smoothers)
     for window in [7, 30]:
         agg[f"Rolling_{window}d_Sales"] = (
             agg.groupby("Product_ID")["Total_Sales"]
             .transform(lambda x: x.rolling(window, min_periods=1).mean())
         )
-        
+
     # --- Step 5: Trend Index ---
     print("Calculating trend index...")
     def rolling_trend(x):
@@ -109,13 +111,69 @@ def preprocess_sales_data(file_path: str, output_path: str):
         .transform(lambda x: (x - x.min()) / (x.max() - x.min() + 1e-9))
     )
 
-    # ✅ Save to user-specific clean directory
+    #  Save processed file
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     agg.to_excel(output_path, index=False)
     print(f"Processed data saved to: {output_path}")
     return output_path
 
 
+# ==========================================
+# POST-PROCESS VALIDATION & MERGING
+# ==========================================
+def validate_data_span(user_id):
+    """
+    Validates that the combined processed data covers at least 3 years.
+    """
+    user_clean_dir = ensure_user_folder(CLEAN_DIR, user_id)
+    files = [f for f in os.listdir(user_clean_dir) if f.endswith("_processed.xlsx")]
+    if not files:
+        raise FileNotFoundError(f"No processed files found for user {user_id}.")
+
+    all_data = []
+    for file in files:
+        df = pd.read_excel(os.path.join(user_clean_dir, file))
+        all_data.append(df)
+
+    merged = pd.concat(all_data, ignore_index=True)
+    merged["Date"] = pd.to_datetime(merged["Date"], errors="coerce")
+    merged = merged.dropna(subset=["Date"])
+
+    min_date = merged["Date"].min()
+    max_date = merged["Date"].max()
+    span_years = (max_date - min_date).days / 365
+
+    print(f" Data covers from {min_date.date()} to {max_date.date()} (~{span_years:.2f} years)")
+
+    if span_years < 3:
+        raise ValueError(
+            f" Insufficient historical data: only {span_years:.2f} years detected. "
+            "Please upload at least 3 years of consistent sales data before training."
+        )
+
+    print(" Data span validated — 3 years or more of historical data available.")
+    return merged
+
+
+def merge_multi_year_data(user_id):
+    """
+    Merge all processed files into one dataset after validating 3-year span.
+    """
+    print(f" Merging multi-year processed files for user {user_id}...")
+    validated_df = validate_data_span(user_id)
+
+    merged_dir = ensure_user_folder(CLEAN_DIR, user_id)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    merged_path = os.path.join(merged_dir, f"merged_3yr_sales_{timestamp}.xlsx")
+
+    validated_df.to_excel(merged_path, index=False)
+    print(f" Multi-year merged dataset saved to: {merged_path}")
+    return merged_path
+
+
+# ==========================================
+# MAIN PROCESS WRAPPER
+# ==========================================
 def process_latest_upload(user_id=None):
     """
     Process the latest uploaded sales file for a specific user.
@@ -137,9 +195,7 @@ def process_latest_upload(user_id=None):
     input_path = os.path.join(base_path, latest_file)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    # ✅ Ensure user clean folder exists
     user_clean_dir = ensure_user_folder(CLEAN_DIR, user_id or "general")
-
     output_path = os.path.join(
         user_clean_dir,
         f"{latest_file.split('.')[0]}_processed_{timestamp}.xlsx"
@@ -148,6 +204,19 @@ def process_latest_upload(user_id=None):
     print(f"Processing latest file for user {user_id}: {latest_file}")
     preprocess_sales_data(input_path, output_path)
     print("Processing complete.")
+
+    # ✅ After processing, check for multi-year merging
+    processed_files = [f for f in os.listdir(user_clean_dir) if f.endswith("_processed.xlsx")]
+    if len(processed_files) < 3:
+        print(f" User {user_id} currently has only {len(processed_files)} processed file(s).")
+        print(" Training blocked — please upload at least 3 years of sales data.")
+    else:
+        print(f" Detected {len(processed_files)} processed files — validating data span...")
+        try:
+            merge_multi_year_data(user_id)
+        except ValueError as e:
+            print(str(e))
+
     return output_path
 
 
