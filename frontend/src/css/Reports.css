@@ -131,15 +131,14 @@ select {
   width: 100%;
   background-color: #fff;
   font-size: 14px;
-  border-collapse: collapse; /* remove double borders */
+  border-collapse: collapse; 
 }
 
 .rp-upload-table th,
 .rp-upload-table td {
   padding: 10px 14px;
   text-align: center;
-  border: 1px solid #c9d6e3; /* single border only */
-  border-radius: 6px; /* optional, but works better if removed for collapse */
+  border: 1px solid #c9d6e3;
 }
 
 
