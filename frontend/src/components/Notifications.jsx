@@ -10,7 +10,7 @@ export const useNotifications = () => {
   return context;
 };
 
-// Format relative time
+// Format relative time (1m ago, etc.)
 const formatTime = (date) => {
   const now = new Date();
   const diff = now - date;
@@ -24,8 +24,6 @@ const formatTime = (date) => {
   if (hours < 24) return `${hours}h ago`;
   return `${days}d ago`;
 };
-
-
 
 export const NotificationProvider = ({ children }) => {
   const reviveItems = (raw) => {
@@ -95,9 +93,46 @@ export const NotificationProvider = ({ children }) => {
   const showInfo = useCallback((msg, title) => addNotification("info", msg, title), [addNotification]);
   const showWarning = useCallback((msg, title) => addNotification("warning", msg, title), [addNotification]);
   const showError = useCallback((msg, title) => addNotification("error", msg, title), [addNotification]);
-  const showProcessing = useCallback((msg, title) => addNotification("processing", msg, title), [addNotification]);
 
-  // Progress notification
+  // 🌀 Show processing notification that auto-completes after delay
+  const showProcessing = useCallback((msg, title, duration = 5000) => {
+    const id = Date.now() + Math.random();
+    const notif = {
+      id,
+      type: "processing",
+      title: title || typeToTitle.processing,
+      message: msg,
+      timestamp: new Date(),
+      time: formatTime(new Date()),
+      read: false,
+      progress: 0,
+    };
+
+    // Add it to notifications
+    setNotifications((prev) => {
+      const updated = [notif, ...prev];
+      localStorage.setItem("notifications", JSON.stringify(updated));
+      return updated;
+    });
+    setHistory((prev) => {
+      const updatedHistory = [notif, ...prev];
+      localStorage.setItem("notificationHistory", JSON.stringify(updatedHistory));
+      return updatedHistory;
+    });
+
+    // ✅ Auto-complete after duration (default 5 seconds)
+    setTimeout(() => {
+      updateNotification(id, {
+        type: "success",
+        message: "Done Processed",
+        time: formatTime(new Date()),
+      });
+    }, duration);
+
+    return id;
+  }, []);
+
+  // Progress-based processing notification
   const showProgress = useCallback((message, initialProgress = 0, title) => {
     const id = Date.now() + Math.random();
     const notif = {
@@ -123,6 +158,7 @@ export const NotificationProvider = ({ children }) => {
     return id;
   }, []);
 
+  // 🔁 Update notification content
   const updateNotification = useCallback((id, updates) => {
     setNotifications((prev) => {
       const updated = prev.map((n) => (n.id === id ? { ...n, ...updates } : n));
@@ -182,6 +218,7 @@ export const NotificationProvider = ({ children }) => {
     localStorage.removeItem("notificationHistory");
   }, []);
 
+  // 🕒 Keep relative time updated
   const updateNotificationTimes = useCallback(() => {
     setNotifications((prev) => {
       const updated = prev.map((n) => {
@@ -205,6 +242,28 @@ export const NotificationProvider = ({ children }) => {
     const interval = setInterval(updateNotificationTimes, 60000);
     return () => clearInterval(interval);
   }, [updateNotificationTimes]);
+
+  // ✅ Auto-convert processing notifications with progress=100 → Done Processed
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setNotifications((prev) => {
+        const updated = prev.map((n) => {
+          if (n.type === "processing" && n.progress >= 100) {
+            return {
+              ...n,
+              type: "success",
+              message: "Done Processed",
+              time: formatTime(new Date()),
+            };
+          }
+          return n;
+        });
+        saveState("notifications", updated);
+        return updated;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <NotificationContext.Provider

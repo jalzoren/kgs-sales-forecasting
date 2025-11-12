@@ -6,18 +6,17 @@
   --fg-light: #eaeff3;
   --notif: #ef480b;
 }
-body {
 
+body {
   color: var(--accent);
   overflow-y: scroll;
 }
- .titled {
+
+.titled {
   font-family: "Merriweather", serif;
   color: var(--accent);
-  margin: 20px ;
+  margin: 20px;
 }
-
-
 
 .table-wrapper {
   max-width: 1000px;
@@ -26,7 +25,51 @@ body {
   color: #001d39;
 }
 
+.table-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  gap: 10px;
+}
 
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-box input {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #c9d6e3;
+  outline: none;
+  font-size: 14px;
+}
+
+.btn-search {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-search:hover {
+  background-color: var(--accent-light);
+}
+
+select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #c9d6e3;
+  background-color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
 
 .table-container {
   background: #f5f7fa;
@@ -75,27 +118,55 @@ body {
   color: #c92a2a;
 }
 
+/* ====== ACTION BUTTONS INSIDE TABLE ====== */
 .actions {
-  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.btn-action {
-  background: none;
+/* Standard filled button style */
+.btn-view, .btn-download, .btn-reforecast {
   border: none;
-  color: #0a4174;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 400;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 13px;
-  text-decoration: underline;
-  margin: 0 5px;
+  color: #fff; /* text color white */
+  text-decoration: none; /* no underline */
+  transition: all 0.2s ease;
+  min-width: 80px;
+  list-style: none;
+  text-decoration: none;
 }
 
-.btn-action.delete {
-  color: #c92a2a;
+
+/* Individual button colors */
+.btn-view {
+  background-color: #41a7dd; /* blue */
 }
 
-.btn-action:hover {
-  color: #0077cc;
+.btn-download {
+  background-color: #1a7f37; /* green */
+}
+
+.btn-reforecast {
+  background-color: #c97c00; /* orange */
+}
+
+/* Hover effects: slightly darker */
+.btn-view:hover {
+  background-color: #0a4174;
+}
+
+.btn-download:hover {
+  background-color: #145c2e;
+}
+
+.btn-reforecast:hover {
+  background-color: #974f00;
 }
 
 /* Pagination */
@@ -126,5 +197,3 @@ body {
   opacity: 0.5;
   cursor: not-allowed;
 }
-
- 

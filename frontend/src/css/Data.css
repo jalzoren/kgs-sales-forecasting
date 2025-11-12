@@ -20,6 +20,63 @@ hr {
   opacity: 0.3;
 }
 
+.upload-header{
+  justify-content: space-between;
+  display: flex;
+}
+.btn-custom-swal {
+  position: relative; 
+  display: inline-block; 
+  color: var(--accent);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 20px;
+}
+
+.btn-custom-swal:hover {
+  color: #0a4174;
+}
+
+.btn-custom-swal::after {
+  content: "User Manual"; 
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff;
+  color: var(--accent);
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+    border: 1px solid var(--accent);
+
+}
+
+.btn-custom-swal::before {
+  content: '';
+  position: absolute;
+  bottom: 115%; 
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #ffffff transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.btn-custom-swal:hover::after,
+.btn-custom-swal:hover::before {
+  opacity: 1;
+}
+
 /* Upload Section */
 .upload-data-container {
   display: flex;
