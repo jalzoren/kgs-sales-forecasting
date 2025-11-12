@@ -75,7 +75,7 @@ h3 {
 .how-it-works-link::before {
   content: '';
   position: absolute;
-  bottom: 115%; 
+  bottom: 90%; 
   left: 50%;
   transform: translateX(-50%);
   border-width: 5px;

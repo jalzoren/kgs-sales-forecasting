@@ -62,12 +62,12 @@ hr {
 .btn-custom-swal::before {
   content: '';
   position: absolute;
-  bottom: 115%; 
+  bottom: 90%; 
   left: 50%;
   transform: translateX(-50%);
   border-width: 5px;
   border-style: solid;
-  border-color: #ffffff transparent transparent transparent;
+  border-color: #001d39 transparent transparent transparent;
   opacity: 0;
   transition: opacity 0.2s ease;
 }
