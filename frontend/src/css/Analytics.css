@@ -1,167 +1,139 @@
 :root {
-  --accent: #001d39;
-  --accent-light: #0a4174;
-  --accent-lighter: #41a7dd;
-  --accent-lightest: #bbc8d8;
-  --fg-light: #eaeff3;
-  --notif: #ef480b;
+  --analytics-accent: #001d39;
+  --analytics-accent-light: #0a4174;
+  --analytics-accent-lighter: #41a7dd;
+  --analytics-accent-lightest: #bbc8d8;
+  --analytics-fg-light: #f5f7fa;
 }
 
-
-/* Layout */
-.analytics-container {
-  width: 100%;
-  padding: 30px;
-  background: var(--fg-lighter);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 25px;
+.analytics-page-container {
+  font-family: "Poppins", sans-serif;
+  color: var(--analytics-accent);
 }
 
-/* Header (Tabs + Filters) */
-.analytics-header {
-  width: 100%;
-  max-width: 1100px;
+.analytics-title {
+  font-family: "Merriweather", serif;
+  font-size: 21px;
+  margin: 20px;
+}
+
+/* Tabs */
+.analytics-tab-buttons {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: var(--accent-lightest) solid 1px ;
+  gap: 12px;
+  border-bottom: 1px solid #c9d6e3;
+  margin: 20px;
   padding-bottom: 20px;
 }
 
-.tab-buttons {
-  display: flex;
-  gap: 10px;
+.analytics-tab {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #c9d6e3;
+  background-color: #f5f7fa;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
 }
 
-.tab {
-  background: white;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  color: var(--accent);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: all 0.2s ease;
-}
-
-.tab:hover {
-  background: var(--accent-lightest);
-}
-
-.tab.active {
-  background: var(--accent-light);
+.analytics-tab.active {
+  background-color: var(--analytics-accent);
   color: white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border-color: var(--analytics-accent);
 }
 
-/* Wrapper aligns everything to the right */
-.filter-wrapper {
+/* Toolbar / Filters */
+.analytics-toolbar {
   display: flex;
   justify-content: flex-end;
-  margin-top: 10px;
-  width: 950px;
-
+  margin-bottom: 20px;
+  margin: 20px;
 }
 
-/* Filters layout */
-.filters {
+.analytics-filters {
   display: flex;
   gap: 10px;
-  align-items: center;
 }
 
-/* Dropdown styling */
-.filters select {
-  padding: 8px 12px;
-  border: 1.5px solid var(--accent-light);
+.analytics-filters select {
+  padding: 10px 14px;
   border-radius: 6px;
+  border: 1px solid #c9d6e3;
   background-color: #fff;
-  color: var(--accent);
-  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.filters select:hover {
-  border-color: var(--accent-lighter);
-  background-color: var(--fg-light);
+  font-size: 14px;
 }
 
 /* Metrics Box */
-.metrics-box {
+.analytics-metrics-box {
   background: white;
-  border: 1px solid var(--accent-lightest);
-  border-radius: 12px;
+  border-radius: 10px;
+  padding: 20px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  width: 900px;
-  padding: 20px 30px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  margin-bottom: 20px;
+  margin: 20px;
 }
 
-.metrics-info p {
-  margin: 5px 0;
-  color: var(--accent);
+.analytics-metrics-info p {
+  margin: 6px 0;
 }
 
-.metrics-charts {
+.analytics-metrics-charts {
   display: flex;
   gap: 20px;
 }
 
-.circle-progress {
+/* Circular charts */
+.analytics-circle-progress {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.circular-chart {
+.analytics-circular-chart {
   max-width: 90px;
   max-height: 90px;
 }
 
-.circle-bg {
+.analytics-circle-bg {
   fill: none;
   stroke: #eee;
   stroke-width: 3.8;
 }
 
-.circle {
+.analytics-circle {
   fill: none;
   stroke-width: 3.8;
   stroke-linecap: round;
-  stroke: var(--accent-lighter);
+  stroke: var(--analytics-accent-lighter);
   animation: progress 1s ease-out forwards;
 }
 
 @keyframes progress {
-  0% {
-    stroke-dasharray: 0 100;
-  }
+  0% { stroke-dasharray: 0 100; }
 }
 
-.percentage {
-  fill: var(--accent);
+.analytics-percentage {
+  fill: var(--analytics-accent);
   font-size: 0.5em;
   text-anchor: middle;
   font-weight: 600;
 }
 
-.metric-label {
-  margin: 0px;
+.analytics-metric-label {
   font-size: 14px;
-  color: var(--accent-light);
+  color: var(--analytics-accent-light);
   font-weight: 500;
+  margin-top: 4px;
 }
 
 /* Chart Section */
-.chart-section {
+.analytics-chart-section {
   background: white;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  width: 920px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  margin: 20px;
 }
