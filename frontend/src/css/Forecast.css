@@ -92,6 +92,13 @@ select {
   border: 1px solid #c9d6e3;
 }
 
+
+.upload-table th,
+.upload-table td {
+  text-align: center;
+  justify-content: center;
+}
+
 .upload-table thead {
   background-color: #e6edf5;
   font-weight: 600;
