@@ -1,151 +1,270 @@
 :root {
-  --accent: #001d39;
-  --accent-light: #0a4174;
-  --accent-lighter: #41a7dd;
-  --accent-lightest: #bbc8d8;
-  --fg-light: #eaeff3;
-  --notif: #ef480b;
+  --rp-accent: #001d39;
+  --rp-accent-light: #0a4174;
+  --rp-accent-lighter: #41a7dd;
+  --rp-accent-lightest: #bbc8d8;
+  --rp-fg-light: #f5f7fa;
 }
-body {
 
-  color: var(--accent);
+body {
+  font-family: "Poppins", sans-serif;
+  color: var(--rp-accent);
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
   overflow-y: scroll;
 }
- .titled {
+
+.rp-titled {
   font-family: "Merriweather", serif;
-  color: var(--accent);
-  margin: 20px ;
+  text-align: center;
+  margin: 20px 0;
+  font-size: 21px;
 }
 
-
-
-.table-wrapper {
-  max-width: 1000px;
-  margin: 40px auto;
-  font-family: "Poppins", sans-serif;
-  color: #001d39;
-}
-
-.analytics-container {
-  width: 100%;
-  padding: 30px;
-  background: var(--fg-lighter);
+/* Tabs */
+.rp-tab-buttons-container {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 25px;
+  justify-content: start; /* center tabs */
+  gap: 12px;
+  margin: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #c9d6e3;
 }
 
-/* Header (Tabs + Filters) */
-.analytics-header {
-  width: 100%;
-  max-width: 1100px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: var(--accent-lightest) solid 1px ;
-  padding-bottom: 20px;
-}
-
-
-
-.table-container {
-  background: #f5f7fa;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.upload-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  background-color: #fff;
-  border: 1px solid #c9d6e3;
-}
-
-.upload-table th,
-.upload-table td {
+.rp-tab {
   padding: 10px 14px;
-  text-align: left;
+  border-radius: 6px;
   border: 1px solid #c9d6e3;
+  background-color: #f5f7fa;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: 0.2s;
 }
 
-.upload-table thead {
+.rp-tab.active {
+  background-color: var(--rp-accent);
+  color: white;
+  border-color: var(--rp-accent);
+}
+
+/* Toolbar */
+.rp-table-toolbar {
+ display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px;
+    flex-direction: column-reverse;
+}
+
+select {
+  padding: 10px 14px;             /* same as input */
+  border-radius: 6px;            /* same as input */
+  border: 1px solid #c9d6e3;    /* same as input */
+  background-color: #fff;
+  font-size: 14px;               /* same as input */
+  cursor: pointer;
+  outline: none;                 /* remove default outline */
+  appearance: none;              /* removes default arrow in some browsers */
+}
+
+
+/* Search box */
+.rp-search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: 300px;
+}
+
+.rp-search-box input {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 6px;
+  outline: none;
+  font-size: 14px;
+}
+
+.rp-btn-search {
+  background-color: var(--rp-accent);
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.rp-btn-search:hover {
+  background-color: var(--rp-accent-light);
+}
+
+/* Filters */
+.rp-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rp-filters select {
+  border-radius: 6px;
+  border: 1px solid #c9d6e3;
+  background-color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+/* Table container with spacing */
+.rp-table-container {
+  overflow-x: auto;
+  padding: 20px;
+  margin: 20px;
+}/* Table style */
+.rp-upload-table {
+  width: 100%;
+  background-color: #fff;
+  font-size: 14px;
+  border-collapse: collapse; /* remove double borders */
+}
+
+.rp-upload-table th,
+.rp-upload-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid #c9d6e3; /* single border only */
+  border-radius: 6px; /* optional, but works better if removed for collapse */
+}
+
+
+.rp-upload-table thead {
   background-color: #e6edf5;
   font-weight: 600;
 }
 
-.upload-table tbody tr:nth-child(even) {
+.rp-upload-table tbody tr:nth-child(even) {
   background-color: #f9fbfd;
 }
 
-.upload-table tbody tr:hover {
+.rp-upload-table tbody tr:hover {
   background-color: #eef5fb;
   transition: 0.2s;
 }
 
-.status {
+/* Status */
+.rp-status {
   font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
-.status.success {
+.rp-status.success {
+  background-color: #d4f1dc;
   color: #1a7f37;
 }
 
-.status.failed {
+.rp-status.failed {
+  background-color: #f8d6d6;
   color: #c92a2a;
 }
 
-.actions {
-  text-align: center;
+/* Action buttons */
+.rp-actions {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
 }
 
-.btn-action {
-  background: none;
+.rp-btn-view,
+.rp-btn-download,
+.rp-btn-reforecast {
+  padding: 6px 12px;
+  border-radius: 6px;
   border: none;
-  color: #0a4174;
+  color: white;
   cursor: pointer;
-  font-weight: 500;
-  font-size: 13px;
-  text-decoration: underline;
-  margin: 0 5px;
+  font-size: 14px;
+  transition: 0.2s;
+  min-width: 80px;
 }
 
-.btn-action.delete {
-  color: #c92a2a;
+.rp-btn-view {
+  background-color: #41a7dd;
 }
 
-.btn-action:hover {
-  color: #0077cc;
+.rp-btn-view:hover {
+  background-color: #0a4174;
+}
+
+.rp-btn-download {
+  background-color: #1a7f37;
+}
+
+.rp-btn-download:hover {
+  background-color: #145c2e;
+}
+
+.rp-btn-reforecast {
+  background-color: #c90000;
+}
+
+.rp-btn-reforecast:hover {
+  background-color: #970000;
 }
 
 /* Pagination */
-.pagination {
+.rp-pagination {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 6px;
-  margin-top: 15px;
-  font-size: 14px;
+  margin-top: 20px;
 }
 
-.pagination button {
+.rp-pagination button {
+  padding: 4px 10px;
   border: 1px solid #c9d6e3;
-  background: white;
   border-radius: 4px;
-  padding: 4px 8px;
+  background-color: #fff;
   cursor: pointer;
+  font-size: 14px;
+    padding: 10px 14px;
+
 }
 
-.pagination button.active {
-  background: #001d39;
+.rp-pagination button.active {
+  background-color: var(--rp-accent);
   color: white;
-  border-color: #001d39;
+  border-color: var(--rp-accent);
 }
 
-.pagination button:disabled {
+.rp-pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
- 
+/* Responsive toolbar */
+@media (max-width: 600px) {
+  .rp-table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rp-search-box,
+  .rp-filters {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .rp-filters select {
+    flex: 1;
+  }
+}

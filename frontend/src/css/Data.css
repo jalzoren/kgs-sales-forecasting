@@ -292,12 +292,12 @@ hr {
   cursor: not-allowed;
 }
 .table-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: row-reverse;
 }
 
 /* Equal width for all controls */
