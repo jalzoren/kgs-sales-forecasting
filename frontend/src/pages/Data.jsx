@@ -105,20 +105,28 @@ export default function UploadBox() {
         let progressNotifId = null;
         const poll = async () => {
           try {
-            const statusRes = await fetch("http://localhost:5000/api/data/preprocess-status", {
-              credentials: "include",
-            });
+            const statusRes = await fetch(
+              "http://localhost:5000/api/data/preprocess-status",
+              {
+                credentials: "include",
+              }
+            );
             if (!statusRes.ok) return;
             const status = await statusRes.json(); // { state, progress, message }
 
             if (status.state === "running") {
               if (!progressNotifId) {
-                progressNotifId = showProgress("Preprocessing sales data...", status.progress || 0);
+                progressNotifId = showProgress(
+                  "Preprocessing sales data...",
+                  status.progress || 0
+                );
               } else {
                 updateNotification(progressNotifId, {
                   message: status.message || "Preprocessing sales data...",
                   progress:
-                    typeof status.progress === "number" ? status.progress : undefined,
+                    typeof status.progress === "number"
+                      ? status.progress
+                      : undefined,
                 });
               }
             } else if (status.state === "done") {
@@ -132,7 +140,9 @@ export default function UploadBox() {
               });
               clearInterval(pollInterval);
             } else if (status.state === "error") {
-              showError(`Preprocessing error: ${status.message || "Unknown error"}`);
+              showError(
+                `Preprocessing error: ${status.message || "Unknown error"}`
+              );
               if (progressNotifId) {
                 updateNotification(progressNotifId, {
                   type: "error",
@@ -154,7 +164,9 @@ export default function UploadBox() {
       } else {
         Swal.close();
         removeNotification(uploadingId);
-        showError(`Upload failed: ${result.message || "Something went wrong."}`);
+        showError(
+          `Upload failed: ${result.message || "Something went wrong."}`
+        );
         Swal.fire({
           icon: "error",
           title: "Upload Failed",
@@ -205,7 +217,9 @@ export default function UploadBox() {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        showError(`Delete failed: ${result.message || "Unable to delete file."}`);
+        showError(
+          `Delete failed: ${result.message || "Unable to delete file."}`
+        );
         Swal.fire({
           icon: "error",
           title: "Delete Failed",
@@ -282,13 +296,16 @@ export default function UploadBox() {
 
   const totalPages = Math.ceil(sortedUploads.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = sortedUploads.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = sortedUploads.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
- const handleInfoClick = () => {
+  const handleInfoClick = () => {
     Swal.fire({
       title: "User Manual",
       html: `
@@ -326,17 +343,19 @@ export default function UploadBox() {
       {/* Upload Box */}
       <div className="upload-data-container">
         <div className="upload-box">
-          <div className="upload-header">  <h3 className="title">Upload New Data</h3>
-        <i className="btn-custom-swal"
-        onClick={handleInfoClick}
-        style={{
-        
-        }}
-        title="Upload Info"
-      >
-        <FaInfoCircle />
-      </i></div>
-        
+          <div className="upload-header">
+            {" "}
+            <h3 className="title">Upload New Data</h3>
+            <i
+              className="btn-custom-swal"
+              onClick={handleInfoClick}
+              style={{}}
+              title="User Manual"
+            >
+              <FaInfoCircle />
+            </i>
+          </div>
+
           <div
             className={`drop-zone ${isDragging ? "drag-active" : ""}`}
             onDragEnter={handleDragEnter}
@@ -455,7 +474,10 @@ export default function UploadBox() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" style={{ textAlign: "center", padding: "1rem" }}>
+                  <td
+                    colSpan="5"
+                    style={{ textAlign: "center", padding: "1rem" }}
+                  >
                     No data available
                   </td>
                 </tr>
@@ -466,7 +488,10 @@ export default function UploadBox() {
 
         {/* Pagination  AA*/}
         <div className="pagination">
-          <button onClick={() => goToPage(currentPage - 1)} disabled={currentPage === 1}>
+          <button
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
             ← Previous
           </button>
 
