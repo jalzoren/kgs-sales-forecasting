@@ -20,6 +20,23 @@ hr {
   opacity: 0.3;
 }
 
+.upload-header{
+  justify-content: space-between;
+  display: flex;
+}
+
+.btn-custom-swal {
+  color: var(--accent);
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 20px;
+}
+
+.btn-custom-swal:hover {
+  color: #0a4174;
+}
 /* Upload Section */
 .upload-data-container {
   display: flex;

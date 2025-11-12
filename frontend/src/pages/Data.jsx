@@ -7,7 +7,13 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Swal from "sweetalert2";
 import { useNotifications } from "../components/Notifications";
-
+import {
+  FaBell,
+  FaCog,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaInfoCircle,
+} from "react-icons/fa";
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
@@ -282,6 +288,37 @@ export default function UploadBox() {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
+ const handleInfoClick = () => {
+    Swal.fire({
+      title: "User Manual",
+      html: `
+        <div style=" max-height: 250px; overflow-y: auto; text-align: left; padding: 0 10px;">
+          <h4>Uploading Files</h4>
+          <ol style="padding-left: 20px;">
+            <li>As much as possible, CSV files should be uploaded.</li>
+            <li>Note: Excel files may take longer to upload.</li>
+            <li>Sales data must contain required columns such as:
+              <ul>
+                <li>date</li>
+                <li>product_id</li>
+                <li>product_name</li>
+                <li>quantity</li>
+                <li>discount</li>
+                <li>unit_price</li>
+                <li>total_amount</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      `,
+      icon: "info",
+      confirmButtonText: "Got it!",
+      confirmButtonColor: "#41a7dd",
+      background: "#f5f7fa",
+      color: "#001d39",
+      width: "400px",
+    });
+  };
   return (
     <div>
       <h2 className="titled">Data Management</h2>
@@ -289,7 +326,17 @@ export default function UploadBox() {
       {/* Upload Box */}
       <div className="upload-data-container">
         <div className="upload-box">
-          <h3 className="title">Upload New Data</h3>
+          <div className="upload-header">  <h3 className="title">Upload New Data</h3>
+        <i className="btn-custom-swal"
+        onClick={handleInfoClick}
+        style={{
+        
+        }}
+        title="Upload Info"
+      >
+        <FaInfoCircle />
+      </i></div>
+        
           <div
             className={`drop-zone ${isDragging ? "drag-active" : ""}`}
             onDragEnter={handleDragEnter}
