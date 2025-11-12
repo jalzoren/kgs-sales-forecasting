@@ -23,9 +23,10 @@ h3 {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  text-decoration: underline;
   color: #001d39;
   cursor: pointer;
+    text-decoration: none;
+
 }
 
 .how-it-works-link h4 {
@@ -34,6 +35,61 @@ h3 {
   align-items: center;
   gap: 6px;
   font-size: 18px;
+  list-style: none;
+  text-decoration: none;
+}
+
+
+.how-it-works-link {
+  position: relative; /* important for tooltip positioning */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: underline;
+  color: #001d39;
+  cursor: pointer;
+}
+
+/* Tooltip text */
+.how-it-works-link::after {
+  content: "User Manual"; 
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffffff;
+  color: var(--accent);
+  padding: 5px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+  border: 1px solid var(--accent);
+  font-style: italic;
+}
+
+/* Tooltip arrow */
+.how-it-works-link::before {
+  content: '';
+  position: absolute;
+  bottom: 115%; 
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #001d39 transparent transparent transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 100;
+}
+
+/* Show tooltip on hover */
+.how-it-works-link:hover::after,
+.how-it-works-link:hover::before {
+  opacity: 1;
 }
 
 .info-icon {
@@ -65,7 +121,7 @@ h3 {
   
 }
 
-.text-h4 {
+.how-it-works-link {
   margin: 0;
 }
 
