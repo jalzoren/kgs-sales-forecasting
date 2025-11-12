@@ -312,7 +312,7 @@ export default function UploadBox() {
         </div>
       `,
       icon: "info",
-      confirmButtonText: "Got it!",
+      confirmButtonText: "Understood!",
       confirmButtonColor: "#41a7dd",
       background: "#f5f7fa",
       color: "#001d39",
