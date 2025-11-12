@@ -122,13 +122,13 @@ def preprocess_sales_data(file_path: str, output_path: str):
 # POST-PROCESS VALIDATION & MERGING
 # ==========================================
 def validate_data_span(user_id):
-    """
-    Validates that the combined processed data covers at least 3 years.
-    """
     user_clean_dir = ensure_user_folder(CLEAN_DIR, user_id)
-    files = [f for f in os.listdir(user_clean_dir) if f.endswith("_processed.xlsx")]
-    if not files:
-        raise FileNotFoundError(f"No processed files found for user {user_id}.")
+    files = [f for f in os.listdir(user_clean_dir) if "_processed_" in f and f.endswith(".xlsx")]
+    if len(files) < 3:
+        raise ValueError(
+            f" Only {len(files)} processed file(s) found. "
+            f"At least 3 years of sales data are required before training."
+        )
 
     all_data = []
     for file in files:
@@ -144,21 +144,17 @@ def validate_data_span(user_id):
     span_years = (max_date - min_date).days / 365
 
     print(f" Data covers from {min_date.date()} to {max_date.date()} (~{span_years:.2f} years)")
-
     if span_years < 3:
         raise ValueError(
             f" Insufficient historical data: only {span_years:.2f} years detected. "
             "Please upload at least 3 years of consistent sales data before training."
         )
 
-    print(" Data span validated — 3 years or more of historical data available.")
+    print("Data span validated — 3 years or more available.")
     return merged
 
 
 def merge_multi_year_data(user_id):
-    """
-    Merge all processed files into one dataset after validating 3-year span.
-    """
     print(f" Merging multi-year processed files for user {user_id}...")
     validated_df = validate_data_span(user_id)
 
@@ -175,18 +171,12 @@ def merge_multi_year_data(user_id):
 # MAIN PROCESS WRAPPER
 # ==========================================
 def process_latest_upload(user_id=None):
-    """
-    Process the latest uploaded sales file for a specific user.
-    """
     base_path = UPLOAD_DIR if user_id is None else os.path.join(UPLOAD_DIR, f"user_{user_id}")
     if not os.path.exists(base_path):
         print(f"No directory for user {user_id}")
         return None
 
-    files = [
-        f for f in os.listdir(base_path)
-        if f.endswith((".xlsx", ".csv")) and not f.endswith("_processed.xlsx")
-    ]
+    files = [f for f in os.listdir(base_path) if f.endswith((".xlsx", ".csv"))]
     if not files:
         print(f"No sales files found for user {user_id}.")
         return None
@@ -197,25 +187,23 @@ def process_latest_upload(user_id=None):
 
     user_clean_dir = ensure_user_folder(CLEAN_DIR, user_id or "general")
     output_path = os.path.join(
-        user_clean_dir,
-        f"{latest_file.split('.')[0]}_processed_{timestamp}.xlsx"
+        user_clean_dir, f"{latest_file.split('.')[0]}_processed_{timestamp}.xlsx"
     )
 
     print(f"Processing latest file for user {user_id}: {latest_file}")
     preprocess_sales_data(input_path, output_path)
-    print("Processing complete.")
+    print("File processed successfully.")
 
-    # ✅ After processing, check for multi-year merging
-    processed_files = [f for f in os.listdir(user_clean_dir) if f.endswith("_processed.xlsx")]
-    if len(processed_files) < 3:
-        print(f" User {user_id} currently has only {len(processed_files)} processed file(s).")
-        print(" Training blocked — please upload at least 3 years of sales data.")
-    else:
-        print(f" Detected {len(processed_files)} processed files — validating data span...")
+    processed_files = [f for f in os.listdir(user_clean_dir) if "_processed_" in f and f.endswith(".xlsx")]
+    if len(processed_files) >= 3:
+        print(f"Detected {len(processed_files)} processed files — validating data span...")
         try:
             merge_multi_year_data(user_id)
         except ValueError as e:
             print(str(e))
+    else:
+        print(f"User {user_id} currently has {len(processed_files)} processed file(s).")
+        print("Training blocked — upload at least 3 years of sales data.")
 
     return output_path
 

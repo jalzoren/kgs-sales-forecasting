@@ -51,13 +51,6 @@ class DataLoader:
             print(f" Found merged 3-year dataset: {latest_merged}")
             return os.path.join(self.clean_path, latest_merged)
 
-        # ⚠️ Fallback if no merged file
-        if not processed_files:
-            raise FileNotFoundError(f"No processed sales data available in {self.clean_path}")
-        latest = max(processed_files, key=lambda f: os.path.getctime(os.path.join(self.clean_path, f)))
-        print(f" No merged 3-year file found, using latest processed file: {latest}")
-        return os.path.join(self.clean_path, latest)
-
     def load_data(self):
         file_path = self.get_merged_or_latest_file()
         print(f" Loading dataset: {file_path}")

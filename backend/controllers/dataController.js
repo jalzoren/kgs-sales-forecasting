@@ -111,7 +111,41 @@ class DataController {
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
 
-          // STEP 7️⃣: Trigger training pipeline automatically
+          // 🧩 Before training, verify data span and merged dataset
+          const cleanDir = path.resolve(
+            __dirname,
+            "../files/cleanData",
+            `user_${userId}`
+          );
+          const processedFiles = fs
+            .readdirSync(cleanDir)
+            .filter((f) => f.includes("_processed") && f.endsWith(".xlsx")); // ✅ Fixed filter
+          const mergedFiles = fs
+            .readdirSync(cleanDir)
+            .filter(
+              (f) => f.startsWith("merged_3yr_sales") && f.endsWith(".xlsx")
+            );
+
+          console.log(
+            `📂 Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}`
+          );
+
+          if (processedFiles.length < 3) {
+            console.log(
+              `⛔ User ${userId} has only ${processedFiles.length} processed file(s). ` +
+                `Training skipped — need at least 3 years of data.`
+            );
+            return;
+          }
+
+          if (mergedFiles.length === 0) {
+            console.log(
+              `⚠️ No merged 3-year dataset found for user ${userId}. Training blocked.`
+            );
+            return;
+          }
+
+          // ✅ Proceed to training only if validation passed
           console.log(`🚀 Starting model training for user ${userId}...`);
           try {
             await PythonService.trainModel(userId);
@@ -125,10 +159,9 @@ class DataController {
             );
           }
         })
-        .catch((err) =>
-          console.error(`⚠️ Python preprocessing error: ${err.message}`)
-        );
-        
+        .catch((err) => {
+          console.error(`⚠️ Python preprocessing error: ${err.message}`);
+        });
     } catch (err) {
       console.error("❌ Upload failed:", err.message);
       return res.status(400).json({ message: err.message });
@@ -165,10 +198,14 @@ class DataController {
     try {
       // Fetch record to get userId and fileName
       const [record] = await new Promise((resolve, reject) => {
-        db.query("SELECT userId, fileName FROM salesdata WHERE salesID = ?", [id], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
+        db.query(
+          "SELECT userId, fileName FROM salesdata WHERE salesID = ?",
+          [id],
+          (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          }
+        );
       });
 
       if (!record) {
@@ -187,15 +224,27 @@ class DataController {
       });
 
       // Delete files from filesystem
-      const salesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
-      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${userId}`);
+      const salesDir = path.join(
+        __dirname,
+        "../files/salesData",
+        `user_${userId}`
+      );
+      const cleanDir = path.join(
+        __dirname,
+        "../files/cleanData",
+        `user_${userId}`
+      );
 
       // salesData file
       const salesFilePath = path.join(salesDir, fileName);
       try {
         if (fs.existsSync(salesFilePath)) fs.unlinkSync(salesFilePath);
       } catch (e) {
-        console.warn("⚠️ Could not delete salesData file:", salesFilePath, e.message);
+        console.warn(
+          "⚠️ Could not delete salesData file:",
+          salesFilePath,
+          e.message
+        );
       }
 
       // cleanData files that start with base name + '_processed_'
@@ -209,7 +258,11 @@ class DataController {
               try {
                 fs.unlinkSync(path.join(cleanDir, f));
               } catch (e) {
-                console.warn("⚠️ Could not delete cleanData file:", f, e.message);
+                console.warn(
+                  "⚠️ Could not delete cleanData file:",
+                  f,
+                  e.message
+                );
               }
             });
         }
@@ -229,7 +282,9 @@ class DataController {
     try {
       const userId = req.session.user?.id;
       if (!userId) {
-        return res.status(401).json({ message: "Unauthorized: User not logged in" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized: User not logged in" });
       }
       const status = PythonService.getPreprocessStatus(userId);
       return res.json(status);
