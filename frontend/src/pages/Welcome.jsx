@@ -74,12 +74,15 @@ export default function Welcome() {
               How it works <FaRegQuestionCircle className="info-icon" />
             </h4>
           </a>
+
+          
         </div>
+                <button className="upload-btn">Upload File Now</button>
+
       </div>
       <div className="right-section">
         <img src={Welcomed} alt="Welcome Illustration" />
 
-        <button className="upload-btn">Upload File Now</button>
       </div>
     </div>
   );
