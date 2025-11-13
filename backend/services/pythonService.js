@@ -5,7 +5,8 @@ const fs = require("fs");
 
 class PythonService {
   constructor() {
-    this.pythonPath = "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe"; // ✅ central path
+    this.pythonPath =
+      "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe"; // ✅ central path
     this.preprocessStatusByUserId = new Map();
   }
 
@@ -30,7 +31,10 @@ class PythonService {
 
   async convertToCsv(filePath) {
     console.log("🧮 Auto-converting Excel to CSV for faster processing...");
-    const convertScript = path.join(__dirname, "../../ml-service/convertToCsv.py");
+    const convertScript = path.join(
+      __dirname,
+      "../../ml-service/convertToCsv.py"
+    );
     const stdout = await this.runScript(convertScript, [filePath]);
     const convertedPath = stdout.trim();
 
@@ -52,7 +56,10 @@ class PythonService {
 
   async preprocessData(userId) {
     console.log(`🚀 Launching Python preprocessing for User ID: ${userId}...`);
-    const processScript = path.join(__dirname, "../../ml-service/processData.py");
+    const processScript = path.join(
+      __dirname,
+      "../../ml-service/processData.py"
+    );
 
     return new Promise((resolve, reject) => {
       this.preprocessStatusByUserId.set(String(userId), {
@@ -112,7 +119,8 @@ class PythonService {
         console.error("🐍 Python Error:", text);
         this.preprocessStatusByUserId.set(String(userId), {
           state: "error",
-          progress: this.preprocessStatusByUserId.get(String(userId))?.progress || 0,
+          progress:
+            this.preprocessStatusByUserId.get(String(userId))?.progress || 0,
           message: text,
           updatedAt: Date.now(),
         });
@@ -120,8 +128,11 @@ class PythonService {
 
       python.on("close", (code) => {
         if (code === 0) {
-          console.log(`✅ Python preprocessing finished for User ID: ${userId}`);
-          const status = this.preprocessStatusByUserId.get(String(userId)) || {};
+          console.log(
+            `✅ Python preprocessing finished for User ID: ${userId}`
+          );
+          const status =
+            this.preprocessStatusByUserId.get(String(userId)) || {};
           this.preprocessStatusByUserId.set(String(userId), {
             state: "done",
             progress: 100,
@@ -132,7 +143,8 @@ class PythonService {
         } else {
           this.preprocessStatusByUserId.set(String(userId), {
             state: "error",
-            progress: this.preprocessStatusByUserId.get(String(userId))?.progress || 0,
+            progress:
+              this.preprocessStatusByUserId.get(String(userId))?.progress || 0,
             message: `Python script exited with code ${code}`,
             updatedAt: Date.now(),
           });
@@ -150,12 +162,18 @@ class PythonService {
     return new Promise((resolve, reject) => {
       const python = spawn(this.pythonPath, [trainScript, userId.toString()]);
 
-      python.stdout.on("data", (data) => console.log("🧩 Python Train:", data.toString()));
-      python.stderr.on("data", (data) => console.error("🐍 Python Train Error:", data.toString()));
+      python.stdout.on("data", (data) =>
+        console.log("🧩 Python Train:", data.toString())
+      );
+      python.stderr.on("data", (data) =>
+        console.error("🐍 Python Train Error:", data.toString())
+      );
 
       python.on("close", (code) => {
         if (code === 0) {
-          console.log(`✅ Model training completed successfully for User ID: ${userId}`);
+          console.log(
+            `✅ Model training completed successfully for User ID: ${userId}`
+          );
           resolve();
         } else {
           reject(new Error(`Training script exited with code ${code}`));
@@ -166,11 +184,19 @@ class PythonService {
 
   // ✅ Added missing method
   getPreprocessStatus(userId) {
-    return this.preprocessStatusByUserId.get(String(userId)) || {
-      state: "idle",
-      progress: 0,
-      message: "No preprocessing started yet.",
-    };
+    return (
+      this.preprocessStatusByUserId.get(String(userId)) || {
+        state: "idle",
+        progress: 0,
+        message: "No preprocessing started yet.",
+      }
+    );
+  }
+
+  async generateForecast(userId) {
+    const scriptPath = path.join(__dirname, "../../ml-service/forecastModel.py"
+    );
+    return this.runScript(scriptPath, [userId]);
   }
 }
 

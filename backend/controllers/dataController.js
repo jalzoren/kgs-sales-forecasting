@@ -152,9 +152,16 @@ class DataController {
             console.log(
               `🎯 Model training completed successfully for user ${userId}!`
             );
+
+            // 🚀 Step 7: Generate forecasts automatically after training
+            console.log(
+              `📈 Starting forecast generation for user ${userId}...`
+            );
+            await PythonService.generateForecast(userId);
+            console.log(`✅ Forecast generation completed for user ${userId}!`);
           } catch (trainErr) {
             console.error(
-              `⚠️ Training failed for user ${userId}:`,
+              `⚠️ Training or forecast failed for user ${userId}:`,
               trainErr.message
             );
           }
