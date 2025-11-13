@@ -57,8 +57,8 @@ class DataController {
 
       // STEP 4️⃣: Check if this user already uploaded the same file
       const checkSql = `
-  SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?
-`;
+          SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?
+        `;
 
       const existing = await new Promise((resolve, reject) => {
         db.query(checkSql, [userId, fileName], (err, results) => {
@@ -75,9 +75,9 @@ class DataController {
 
       // Now safely insert the new record
       const insertSql = `
-  INSERT INTO salesdata (userId, fileName, records, status)
-  VALUES (?, ?, ?, ?)
-`;
+          INSERT INTO salesdata (userId, fileName, records, status)
+          VALUES (?, ?, ?, ?)
+        `;
       await db.query(insertSql, [userId, fileName, rowCount, "Completed"]);
 
       // STEP 5️⃣: Move final file to salesData folder (if converted)
@@ -111,60 +111,44 @@ class DataController {
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
 
-          // 🧩 Before training, verify data span and merged dataset
-          const cleanDir = path.resolve(
+          // Check number of processed (cleaned) files
+          const userCleanDir = path.resolve(
             __dirname,
             "../files/cleanData",
             `user_${userId}`
           );
-          const processedFiles = fs
-            .readdirSync(cleanDir)
-            .filter((f) => f.includes("_processed") && f.endsWith(".xlsx")); // ✅ Fixed filter
-          const mergedFiles = fs
-            .readdirSync(cleanDir)
-            .filter(
-              (f) => f.startsWith("merged_3yr_sales") && f.endsWith(".xlsx")
-            );
+          const cleanedFiles = fs
+            .readdirSync(userCleanDir)
+            .filter((f) => f.endsWith("_processed.xlsx"));
 
-          console.log(
-            `📂 Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}`
-          );
+          // Check if model exists
+          const modelDir = path.resolve(`ml-service/models/user_${userId}`);
+          const modelExists =
+            fs.existsSync(modelDir) && fs.readdirSync(modelDir).length > 0;
 
-          if (processedFiles.length < 3) {
-            console.log(
-              `⛔ User ${userId} has only ${processedFiles.length} processed file(s). ` +
-                `Training skipped — need at least 3 years of data.`
-            );
-            return;
-          }
-
-          if (mergedFiles.length === 0) {
-            console.log(
-              `⚠️ No merged 3-year dataset found for user ${userId}. Training blocked.`
-            );
-            return;
-          }
-
-          // ✅ Proceed to training only if validation passed
-          console.log(`🚀 Starting model training for user ${userId}...`);
-          try {
+          if (cleanedFiles.length >= 3 && !modelExists) {
+            console.log("🧠 Training new model (3-year dataset detected)...");
             await PythonService.trainModel(userId);
             console.log(
               `🎯 Model training completed successfully for user ${userId}!`
             );
+            return;
+          }
 
-            // 🚀 Step 7: Generate forecasts automatically after training
+          if (modelExists) {
             console.log(
-              `📈 Starting forecast generation for user ${userId}...`
+              "📈 Trained model found — generating forecast using latest weekly data..."
             );
             await PythonService.generateForecast(userId);
             console.log(`✅ Forecast generation completed for user ${userId}!`);
-          } catch (trainErr) {
-            console.error(
-              `⚠️ Training or forecast failed for user ${userId}:`,
-              trainErr.message
-            );
+            return;
           }
+
+          // Not enough data yet (less than 3 years uploaded)
+          const remaining = 3 - cleanedFiles.length;
+          console.log(
+            `⏳ Need ${remaining} more yearly datasets before model training.`
+          );
         })
         .catch((err) => {
           console.error(`⚠️ Python preprocessing error: ${err.message}`);

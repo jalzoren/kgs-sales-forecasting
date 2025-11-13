@@ -198,6 +198,56 @@ class PythonService {
     );
     return this.runScript(scriptPath, [userId]);
   }
+
+
+   static runPythonScript(scriptPath, args = []) {
+    return new Promise((resolve, reject) => {
+      const python = spawn("python", [scriptPath, ...args]);
+
+      let output = "";
+      let errorOutput = "";
+
+      python.stdout.on("data", (data) => {
+        console.log(`🐍 Python STDOUT: ${data.toString()}`);
+        output += data.toString();
+      });
+
+      python.stderr.on("data", (data) => {
+        console.error(`🐍 Python STDERR: ${data.toString()}`);
+        errorOutput += data.toString();
+      });
+
+      python.on("close", (code) => {
+        if (code === 0) {
+          resolve(output);
+        } else {
+          reject(new Error(`Python script failed with code ${code}\n${errorOutput}`));
+        }
+      });
+    });
+  }
+
+  static async trainModel(userId) {
+    console.log(`🚀 Starting training for user ${userId}...`);
+    const script = path.join(__dirname, "../../ml-service/trainModel.py");
+    return this.runPythonScript(script, [userId.toString()]);
+  }
+
+  static async generateForecast(userId) {
+    console.log(`📊 Starting forecast for user ${userId}...`);
+    const script = path.join(__dirname, "../../ml-service/forecastModel.py");
+    return this.runPythonScript(script, [userId.toString()]);
+  }
+
+  static checkIfModelExists(userId) {
+    const fs = require("fs");
+    const modelDir = path.join(__dirname, "../../ml-service/models", `user_${userId}`);
+    const lstmPath = path.join(modelDir, "lstm_model.keras");
+    const xgbPath = path.join(modelDir, "xgb_model.json");
+    return fs.existsSync(lstmPath) && fs.existsSync(xgbPath);
+  }
 }
+
+
 
 module.exports = new PythonService();

@@ -1,4 +1,3 @@
-# ml-service/trainModel.py
 import os
 import numpy as np
 import pandas as pd
@@ -11,8 +10,7 @@ from tensorflow.keras.callbacks import EarlyStopping
 
 import xgboost as xgb
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
-
+from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # ========================
 # CONFIGURATION
@@ -20,7 +18,16 @@ from sklearn.metrics import mean_squared_error
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CLEAN_DIR = os.path.join(BASE_DIR, "../backend/files/cleanData")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
+REPORT_DIR = os.path.join(BASE_DIR, "reports")
+os.makedirs(REPORT_DIR, exist_ok=True)
 
+# ========================
+# HELPER: MAPE Metric
+# ========================
+def mean_absolute_percentage_error(y_true, y_pred):
+    y_true, y_pred = np.array(y_true), np.array(y_pred)
+    mask = y_true != 0
+    return np.mean(np.abs((y_true[mask] - y_pred[mask]) / y_true[mask])) * 100
 
 # ========================
 # DATA LOADER
@@ -33,16 +40,10 @@ class DataLoader:
             raise FileNotFoundError(f"No cleaned data found for user {user_id}")
 
     def get_merged_or_latest_file(self):
-        """
-        Automatically detects if a merged 3-year dataset exists.
-        If yes → use it.
-        Otherwise → fall back to the latest processed file.
-        """
         all_files = os.listdir(self.clean_path)
         merged_files = [f for f in all_files if f.startswith("merged_3yr_sales") and f.endswith(".xlsx")]
         processed_files = [f for f in all_files if "_processed" in f and f.endswith(".xlsx")]
 
-        # ✅ Prefer merged multi-year file
         if merged_files:
             latest_merged = max(
                 merged_files,
@@ -50,6 +51,15 @@ class DataLoader:
             )
             print(f" Found merged 3-year dataset: {latest_merged}")
             return os.path.join(self.clean_path, latest_merged)
+        elif processed_files:
+            latest_processed = max(
+                processed_files,
+                key=lambda f: os.path.getctime(os.path.join(self.clean_path, f))
+            )
+            print(f" Using latest processed file: {latest_processed}")
+            return os.path.join(self.clean_path, latest_processed)
+        else:
+            raise FileNotFoundError("No processed or merged files found.")
 
     def load_data(self):
         file_path = self.get_merged_or_latest_file()
@@ -58,7 +68,6 @@ class DataLoader:
         df = df.sort_values("Date")
         print(f" Dataset shape: {df.shape}")
         return df
-
 
 # ========================
 # LSTM TRAINER
@@ -98,15 +107,15 @@ class LSTMTrainer:
 
         y_pred = model.predict(X_test)
         rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-        print(f" LSTM RMSE: {rmse:.4f}")
+        mae = mean_absolute_error(y_test, y_pred)
+        mape = mean_absolute_percentage_error(y_test, y_pred)
+
+        print(f" LSTM Evaluation → RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
+
         self.model = model
-        return model
+        return model, {"RMSE": rmse, "MAE": mae, "MAPE": mape}
 
     def extract_features(self, sales_series):
-        """
-        Feed the full series through the trained LSTM and extract hidden states
-        as temporal context features.
-        """
         print(" Extracting LSTM temporal context features...")
         data = sales_series.values.reshape(-1, 1)
         X, _ = self.create_sequences(data)
@@ -119,7 +128,6 @@ class LSTMTrainer:
         features = feature_extractor.predict(X, verbose=1)
         padded_features = np.vstack([np.zeros((self.lookback, features.shape[1])), features])
         return padded_features
-
 
 # ========================
 # XGBOOST TRAINER
@@ -140,10 +148,13 @@ class XGBoostTrainer:
 
         model.fit(X_train, y_train)
         preds = model.predict(X_test)
-        rmse = np.sqrt(mean_squared_error(y_test, preds))
-        print(f" XGBoost RMSE: {rmse:.4f}")
-        return model
 
+        rmse = np.sqrt(mean_squared_error(y_test, preds))
+        mae = mean_absolute_error(y_test, preds)
+        mape = mean_absolute_percentage_error(y_test, preds)
+
+        print(f" XGBoost Evaluation → RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
+        return model, {"RMSE": rmse, "MAE": mae, "MAPE": mape}
 
 # ========================
 # SALES FORECAST PIPELINE
@@ -162,7 +173,7 @@ class SalesForecasterPipeline:
         sales_series = df["Total_Sales"]
 
         # 1️⃣ Train LSTM
-        lstm_model = self.lstm_trainer.train(sales_series)
+        lstm_model, lstm_metrics = self.lstm_trainer.train(sales_series)
         temporal_features = self.lstm_trainer.extract_features(sales_series)
 
         # 2️⃣ Merge with static features
@@ -180,7 +191,7 @@ class SalesForecasterPipeline:
         y = feature_df["Total_Sales"]
 
         # 3️⃣ Train XGBoost
-        xgb_model = self.xgb_trainer.train(X, y)
+        xgb_model, xgb_metrics = self.xgb_trainer.train(X, y)
 
         # 4️⃣ Save models
         user_model_dir = os.path.join(MODEL_DIR, f"user_{self.user_id}")
@@ -189,12 +200,23 @@ class SalesForecasterPipeline:
         lstm_path = os.path.join(user_model_dir, "lstm_model.keras")
         xgb_path = os.path.join(user_model_dir, "xgb_model.json")
 
-        lstm_model.save(lstm_path)  # ✅ Use modern Keras format
+        lstm_model.save(lstm_path)
         xgb_model.save_model(xgb_path)
 
-        print(f" Models saved:\n - {lstm_path}\n - {xgb_path}")
-        print(" Training pipeline completed successfully!")
+        # 5️⃣ Save evaluation report
+        report = {
+            "User_ID": self.user_id,
+            "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "LSTM": lstm_metrics,
+            "XGBoost": xgb_metrics
+        }
+        report_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_report.csv")
+        pd.DataFrame([report]).to_csv(report_path, index=False)
 
+        print(f"\n📊 Training Completed for User {self.user_id}")
+        print(f" Models saved:\n - {lstm_path}\n - {xgb_path}")
+        print(f" Evaluation report: {report_path}")
+        print("✅ Model is ready for forecast generation!\n")
 
 # ========================
 # MAIN ENTRY POINT
