@@ -124,14 +124,7 @@ select {
 
 }
 
-.table-toolbar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 15px;
-  align-items: center;
-  justify-content: space-evenly;
-  
-}
+
 
 .table-toolbar input {
   padding: 10px 10px;

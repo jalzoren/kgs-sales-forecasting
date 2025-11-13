@@ -1,5 +1,4 @@
-// Analytics.jsx
-import React from "react";
+import React, { useState } from "react";
 import "../css/Analytics.css";
 import {
   LineChart,
@@ -12,6 +11,8 @@ import {
 } from "recharts";
 
 export default function Analytics() {
+  const [activeTab, setActiveTab] = useState("sales"); // Track active tab
+
   const data = [
     { date: "Mon", actual: 1000, forecasted: 1200, future: 1500 },
     { date: "Tue", actual: 1500, forecasted: 1700, future: 2000 },
@@ -37,7 +38,9 @@ export default function Analytics() {
              a 15.9155 15.9155 0 0 1 0 31.831
              a 15.9155 15.9155 0 0 1 0 -31.831"
         />
-        <text x="18" y="20.35" className="analytics-percentage">96.25%</text>
+        <text x="18" y="20.35" className="analytics-percentage">
+          96.25%
+        </text>
       </svg>
       <p className="analytics-metric-label">{label}</p>
     </div>
@@ -49,47 +52,128 @@ export default function Analytics() {
 
       {/* Tabs */}
       <div className="analytics-tab-buttons">
-        <button className="analytics-tab active">Sales Performance</button>
-        <button className="analytics-tab">Inventory Alerts</button>
+        <button
+          className={`analytics-tab ${activeTab === "sales" ? "active" : ""}`}
+          onClick={() => setActiveTab("sales")}
+        >
+          Sales Performance
+        </button>
+        <button
+          className={`analytics-tab ${activeTab === "inventory" ? "active" : ""}`}
+          onClick={() => setActiveTab("inventory")}
+        >
+          Inventory Alerts
+        </button>
       </div>
 
       {/* Toolbar / Filters */}
       <div className="analytics-toolbar">
         <div className="analytics-filters">
-          <select><option>Date Range</option></select>
-          <select><option>Chart Type</option></select>
-          <select><option>Next Week</option></select>
+          <select>
+            <option>Date Range</option>
+          </select>
+          <select>
+            <option>Chart Type</option>
+          </select>
+          <select>
+            <option>Next Week</option>
+          </select>
         </div>
       </div>
 
-      {/* Metrics Box */}
-      <div className="analytics-metrics-box">
-        <div className="analytics-metrics-info">
-          <p><strong>Date Generated:</strong></p>
-          <p><strong>Forecast Period:</strong></p>
-          <p><strong>Forecast Horizon:</strong></p>
-          <p><strong>Model Used:</strong></p>
-        </div>
-        <div className="analytics-metrics-charts">
-          {renderCircularChart("")}
-          {renderCircularChart("")}
-          {renderCircularChart("Forecast Accuracy")}
-        </div>
-      </div>
+      {/* Conditional Rendering Based on Active Tab */}
+      {activeTab === "sales" ? (
+        <>
+          {/* Metrics Box */}
+          <div className="analytics-metrics-box">
+            <div className="analytics-metrics-info">
+              <p>
+                <strong>Date Generated:</strong>
+              </p>
+              <p>
+                <strong>Forecast Period:</strong>
+              </p>
+              <p>
+                <strong>Forecast Horizon:</strong>
+              </p>
+              <p>
+                <strong>Model Used:</strong>
+              </p>
+            </div>
+            <div className="analytics-metrics-charts">
+              {renderCircularChart("")}
+              {renderCircularChart("")}
+              {renderCircularChart("Forecast Accuracy")}
+            </div>
+          </div>
 
-      {/* Line Chart */}
-      <div className="analytics-chart-section">
-        <LineChart width={900} height={350} data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#c9d6e3" />
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="actual" stroke="#41a7dd" strokeWidth={2} name="Actual Sales" />
-          <Line type="monotone" dataKey="forecasted" stroke="#0a4174" strokeWidth={2} name="Forecasted Sales" />
-          <Line type="monotone" dataKey="future" stroke="#bbc8d8" strokeWidth={2} name="Future Forecast" />
-        </LineChart>
-      </div>
+          {/* Line Chart */}
+          <div className="analytics-chart-section">
+            <LineChart width={900} height={350} data={data}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#c9d6e3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="actual"
+                stroke="#41a7dd"
+                strokeWidth={2}
+                name="Actual Sales"
+              />
+              <Line
+                type="monotone"
+                dataKey="forecasted"
+                stroke="#0a4174"
+                strokeWidth={2}
+                name="Forecasted Sales"
+              />
+              <Line
+                type="monotone"
+                dataKey="future"
+                stroke="#bbc8d8"
+                strokeWidth={2}
+                name="Future Forecast"
+              />
+            </LineChart>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Inventory Alerts Content */}
+          <div className="analytics-inventory-alerts">
+            <h3>Inventory Alerts</h3>
+            <p>Here you can show low stock items, reorder suggestions, or alerts.</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Stock Level</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Product A</td>
+                  <td>5</td>
+                  <td style={{ color: "red" }}>Low Stock</td>
+                </tr>
+                <tr>
+                  <td>Product B</td>
+                  <td>50</td>
+                  <td style={{ color: "green" }}>Good</td>
+                </tr>
+                <tr>
+                  <td>Product C</td>
+                  <td>0</td>
+                  <td style={{ color: "red" }}>Out of Stock</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
   );
 }

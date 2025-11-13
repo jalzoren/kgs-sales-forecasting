@@ -51,24 +51,25 @@ body {
 
 /* Toolbar */
 .rp-table-toolbar {
- display: flex;
-    justify-content: space-between;
+  display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
     margin: 20px;
-    flex-direction: column-reverse;
+    flex-direction: column;
+    align-content: center;
+    justify-content: flex-end;
 }
 
 select {
-  padding: 10px 14px;             /* same as input */
-  border-radius: 6px;            /* same as input */
-  border: 1px solid #c9d6e3;    /* same as input */
+  padding: 10px 14px;           
+  border-radius: 6px;           
+  border: 1px solid #c9d6e3;    
   background-color: #fff;
-  font-size: 14px;               /* same as input */
+  font-size: 14px;            
   cursor: pointer;
-  outline: none;                 /* remove default outline */
-  appearance: none;              /* removes default arrow in some browsers */
+  outline: none;               
+  appearance: none;              
 }
 
 
@@ -136,7 +137,7 @@ select {
 
 .rp-upload-table th,
 .rp-upload-table td {
-  padding: 10px 14px;
+  padding: 8px 12px;
   text-align: center;
   border: 1px solid #c9d6e3;
 }
@@ -165,12 +166,10 @@ select {
 }
 
 .rp-status.success {
-  background-color: #d4f1dc;
   color: #1a7f37;
 }
 
 .rp-status.failed {
-  background-color: #f8d6d6;
   color: #c92a2a;
 }
 
@@ -219,36 +218,36 @@ select {
   background-color: #970000;
 }
 
-/* Pagination */
 .rp-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 15px;
+    font-size: 14px;
 }
 
-.rp-pagination button {
-  padding: 4px 10px;
-  border: 1px solid #c9d6e3;
-  border-radius: 4px;
-  background-color: #fff;
-  cursor: pointer;
-  font-size: 14px;
-    padding: 10px 14px;
 
+
+.rp-pagination button {
+  border: 1px solid #c9d6e3;
+  background: white;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
 }
 
 .rp-pagination button.active {
-  background-color: var(--rp-accent);
+  background: #001d39;
   color: white;
-  border-color: var(--rp-accent);
+  border-color: #001d39;
 }
 
 .rp-pagination button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 
 /* Responsive toolbar */
 @media (max-width: 600px) {
