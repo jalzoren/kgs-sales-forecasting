@@ -141,17 +141,10 @@ class DataController {
             `📂 Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`
           );
 
-          if (processedFiles.length < 3 && !modelExists) {
-            console.log(
-              `⛔ User ${userId} has only ${processedFiles.length} processed file(s). ` +
-                `Training skipped — need at least 3 years of data.`
-            );
-            return;
-          }
-
+      
           // 🧩 Case 1: No model yet, but 3+ years available
           if (
-            processedFiles.length >= 3 &&
+            processedFiles.length == 3 &&
             mergedFiles.length > 0 &&
             !modelExists
           ) {
