@@ -110,7 +110,7 @@ class LSTMTrainer:
         mae = mean_absolute_error(y_test, y_pred)
         mape = mean_absolute_percentage_error(y_test, y_pred)
 
-        print(f" LSTM Evaluation → RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
+        print(f" LSTM Evaluation: RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
 
         self.model = model
         return model, {"RMSE": rmse, "MAE": mae, "MAPE": mape}
@@ -153,7 +153,7 @@ class XGBoostTrainer:
         mae = mean_absolute_error(y_test, preds)
         mape = mean_absolute_percentage_error(y_test, preds)
 
-        print(f" XGBoost Evaluation → RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
+        print(f" XGBoost Evaluation: RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
         return model, {"RMSE": rmse, "MAE": mae, "MAPE": mape}
 
 # ========================
@@ -213,10 +213,10 @@ class SalesForecasterPipeline:
         report_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_report.csv")
         pd.DataFrame([report]).to_csv(report_path, index=False)
 
-        print(f"\n📊 Training Completed for User {self.user_id}")
+        print(f"\n Training Completed for User {self.user_id}")
         print(f" Models saved:\n - {lstm_path}\n - {xgb_path}")
         print(f" Evaluation report: {report_path}")
-        print("✅ Model is ready for forecast generation!\n")
+        print(" Model is ready for forecast generation!\n")
 
 # ========================
 # MAIN ENTRY POINT
