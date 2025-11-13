@@ -111,44 +111,93 @@ class DataController {
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
 
-          // Check number of processed (cleaned) files
-          const userCleanDir = path.resolve(
+          const cleanDir = path.resolve(
             __dirname,
             "../files/cleanData",
             `user_${userId}`
           );
-          const cleanedFiles = fs
-            .readdirSync(userCleanDir)
-            .filter((f) => f.endsWith("_processed.xlsx"));
+          const processedFiles = fs
+            .readdirSync(cleanDir)
+            .filter((f) => f.includes("_processed") && f.endsWith(".xlsx"));
 
-          // Check if model exists
-          const modelDir = path.resolve(`ml-service/models/user_${userId}`);
+          const mergedFiles = fs
+            .readdirSync(cleanDir)
+            .filter(
+              (f) => f.startsWith("merged_3yr_sales") && f.endsWith(".xlsx")
+            );
+
+          const modelDir = path.resolve(
+            __dirname,
+            "../../ml-service/models",
+            `user_${userId}`
+          );
           const modelExists =
-            fs.existsSync(modelDir) && fs.readdirSync(modelDir).length > 0;
+            fs.existsSync(modelDir) &&
+            fs
+              .readdirSync(modelDir)
+              .some((f) => f.match(/lstm_model\.keras|xgb_model\.json/));
 
-          if (cleanedFiles.length >= 3 && !modelExists) {
-            console.log("🧠 Training new model (3-year dataset detected)...");
-            await PythonService.trainModel(userId);
+          console.log(
+            `📂 Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`
+          );
+
+          if (processedFiles.length < 3 && !modelExists) {
             console.log(
-              `🎯 Model training completed successfully for user ${userId}!`
+              `⛔ User ${userId} has only ${processedFiles.length} processed file(s). ` +
+                `Training skipped — need at least 3 years of data.`
             );
             return;
           }
 
+          // 🧩 Case 1: No model yet, but 3+ years available
+          if (
+            processedFiles.length >= 3 &&
+            mergedFiles.length > 0 &&
+            !modelExists
+          ) {
+            console.log(
+              `🚀 Starting initial model training for user ${userId}...`
+            );
+            try {
+              await PythonService.trainModel(userId);
+              console.log(
+                `🎯 Model training completed successfully for user ${userId}!`
+              );
+
+              console.log(`📈 Generating first forecast for user ${userId}...`);
+              await PythonService.generateForecast(userId);
+              console.log(
+                `✅ Forecast generation completed for user ${userId}!`
+              );
+            } catch (trainErr) {
+              console.error(
+                `⚠️ Training or forecast failed for user ${userId}:`,
+                trainErr.message
+              );
+            }
+            return;
+          }
+
+          // 🧩 Case 2: Model already exists — use weekly upload for new forecast
           if (modelExists) {
             console.log(
-              "📈 Trained model found — generating forecast using latest weekly data..."
+              `📅 Weekly data upload detected — generating forecast using existing model...`
             );
-            await PythonService.generateForecast(userId);
-            console.log(`✅ Forecast generation completed for user ${userId}!`);
+            try {
+              await PythonService.generateForecast(userId);
+              console.log(
+                `✅ Weekly forecast generation completed for user ${userId}!`
+              );
+            } catch (forecastErr) {
+              console.error(
+                `⚠️ Forecast generation failed for user ${userId}:`,
+                forecastErr.message
+              );
+            }
             return;
           }
 
-          // Not enough data yet (less than 3 years uploaded)
-          const remaining = 3 - cleanedFiles.length;
-          console.log(
-            `⏳ Need ${remaining} more yearly datasets before model training.`
-          );
+          console.log(`⚠️ No valid case matched for user ${userId}.`);
         })
         .catch((err) => {
           console.error(`⚠️ Python preprocessing error: ${err.message}`);
