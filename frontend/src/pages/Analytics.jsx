@@ -81,9 +81,10 @@ export default function Analytics() {
         </div>
       </div>
 
-      {/* Conditional Rendering Based on Active Tab */}
+      {/* Conditional Rendering */}
       {activeTab === "sales" ? (
         <>
+        
           {/* Metrics Box */}
           <div className="analytics-metrics-box">
             <div className="analytics-metrics-info">
@@ -141,7 +142,7 @@ export default function Analytics() {
         </>
       ) : (
         <>
-          {/* Inventory Alerts Content */}
+          {/* Inventory Alerts */}
           <div className="analytics-inventory-alerts">
             <h3>Inventory Alerts</h3>
             <p>Here you can show low stock items, reorder suggestions, or alerts.</p>
