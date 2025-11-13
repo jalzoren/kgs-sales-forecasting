@@ -97,7 +97,6 @@ export default function Reports() {
                   <td>{f.accuracy}</td>
                   <td className="rp-actions">
                     <button className="rp-btn-view">View</button>
-                    <button className="rp-btn-download">Download</button>
                     <button className="rp-btn-reforecast">Delete</button>
                   </td>
                 </tr>
