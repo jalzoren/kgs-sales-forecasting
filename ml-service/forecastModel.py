@@ -18,6 +18,9 @@ import sys
 import json
 from datetime import datetime, timedelta
 
+import io
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+
 import numpy as np
 import pandas as pd
 
@@ -120,10 +123,10 @@ class DataLoader:
 
 
 # ==========================================
-# MODEL LOADER
+# MODEL LOADER (OPTIMIZED WITH PROGRESS)
 # ==========================================
 def load_product_models(user_id: str):
-    """Load all trained product models"""
+    """Load all trained product models with progress tracking"""
     user_model_dir = os.path.join(MODEL_DIR, f"user_{user_id}")
     if not os.path.exists(user_model_dir):
         raise FileNotFoundError(f"No models found for user {user_id}")
@@ -136,11 +139,17 @@ def load_product_models(user_id: str):
     if not product_dirs:
         raise FileNotFoundError(f"No product models found for user {user_id}")
     
-    print(f"[Models] Found {len(product_dirs)} trained product models")
+    print(f"[Models] Loading {len(product_dirs)} product models...")
+    print(f"[Models] This may take 2-3 minutes for 300 products...\n")
     
     models = {}
-    for product_dir in product_dirs:
+    for idx, product_dir in enumerate(product_dirs, 1):
         product_path = os.path.join(user_model_dir, product_dir)
+        
+        # Show progress every 50 products
+        if idx % 50 == 0 or idx == len(product_dirs):
+            progress = (idx / len(product_dirs)) * 100
+            print(f"   Loading models: {idx}/{len(product_dirs)} ({progress:.0f}%)")
         
         # Load norm stats (contains product metadata)
         stats_path = os.path.join(product_path, "norm_stats.json")
@@ -149,9 +158,9 @@ def load_product_models(user_id: str):
         
         product_id = stats["product_id"]
         
-        # Load LSTM model
+        # Load LSTM model (suppress verbose output)
         lstm_path = os.path.join(product_path, "lstm_model.keras")
-        lstm_model = load_model(lstm_path)
+        lstm_model = load_model(lstm_path, compile=False)  # ✅ Skip compilation for speed
         
         # Load XGBoost model
         xgb_path = os.path.join(product_path, "xgb_model.json")
@@ -172,6 +181,7 @@ def load_product_models(user_id: str):
             "stats": stats
         }
     
+    print(f"\n[Models]  All {len(models)} models loaded successfully!\n")
     return models
 
 
@@ -248,7 +258,7 @@ class ProductForecaster:
             feat_dict = {
                 "Day_of_Week": row["Day_of_Week"],
                 "Month": row["Month"],
-                "Week_of_Year": row["Week_of_Year"],
+                "Week_of_Week": row["Week_of_Year"],
                 "Quarter": row["Quarter"],
                 "Is_Weekend": row["Is_Weekend"],
                 "Promotion_Flag": row["Promotion_Flag"],
@@ -267,7 +277,7 @@ class ProductForecaster:
             # Update rolling averages for next iteration
             rolling7.append(xgb_pred)
             rolling30.append(xgb_pred)
-            if len(rolling7) > 7:
+            if len(rolling7) > 30:
                 rolling7.pop(0)
             if len(rolling30) > 30:
                 rolling30.pop(0)
@@ -346,7 +356,7 @@ def calculate_inventory_risk(forecast_df):
 def forecast_for_user(user_id: str):
     """Generate product-level forecasts for all trained products"""
     print("\n" + "="*70)
-    print(f"Starting Product-Level Forecasting for User {user_id}")
+    print(f" Starting Product-Level Forecasting for User {user_id}")
     print("="*70 + "\n")
     
     # Load data and models
@@ -372,17 +382,17 @@ def forecast_for_user(user_id: str):
             for horizon in HORIZONS:
                 forecast_df = forecaster.forecast_horizon(horizon)
                 all_forecasts[horizon].append(forecast_df)
-                print(f"{horizon}-day forecast generated ({len(forecast_df)} days)")
+                print(f"    {horizon}-day forecast generated ({len(forecast_df)} days)")
             
             print()
         
         except Exception as e:
-            print(f"Failed: {str(e)}\n")
+            print(f"    Failed: {str(e)}\n")
             continue
     
     # Combine all forecasts
     print("="*70)
-    print("Consolidating Forecasts...")
+    print(" Consolidating Forecasts...")
     print("="*70 + "\n")
     
     combined_forecasts = {}
@@ -392,13 +402,13 @@ def forecast_for_user(user_id: str):
                 all_forecasts[horizon], 
                 ignore_index=True
             )
-            print(f"{horizon}-day forecast: {len(combined_forecasts[f'{horizon}d_forecast'])} records")
+            print(f" {horizon}-day forecast: {len(combined_forecasts[f'{horizon}d_forecast'])} records")
     
     # Calculate inventory risk alerts
     if "90d_forecast" in combined_forecasts:
-        print("\nCalculating Inventory Risk Alerts...")
+        print("\n Calculating Inventory Risk Alerts...")
         inventory_alerts = calculate_inventory_risk(combined_forecasts["90d_forecast"])
-        print(f"Risk assessment completed for {len(inventory_alerts)} products")
+        print(f" Risk assessment completed for {len(inventory_alerts)} products")
     else:
         inventory_alerts = pd.DataFrame()
     
@@ -407,7 +417,7 @@ def forecast_for_user(user_id: str):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_path = os.path.join(out_dir, f"forecast_{timestamp}.xlsx")
     
-    print(f"\nSaving forecast to: {out_path}")
+    print(f"\n Saving forecast to: {out_path}")
     
     with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
         for sheet_name, forecast_df in combined_forecasts.items():
@@ -417,11 +427,11 @@ def forecast_for_user(user_id: str):
             inventory_alerts.to_excel(writer, sheet_name="inventory_alerts", index=False)
     
     print("\n" + "="*70)
-    print("Forecasting Completed Successfully!")
-    print(f"Output file: {out_path}")
-    print(f"Forecast sheets: {list(combined_forecasts.keys())}")
+    print(" Forecasting Completed Successfully!")
+    print(f"    Output file: {out_path}")
+    print(f"    Forecast sheets: {list(combined_forecasts.keys())}")
     if not inventory_alerts.empty:
-        print(f"  High-risk products: {len(inventory_alerts[inventory_alerts['Risk_Level'] == 'HIGH'])}")
+        print(f"    High-risk products: {len(inventory_alerts[inventory_alerts['Risk_Level'] == 'HIGH'])}")
     print("="*70 + "\n")
     
     return out_path
@@ -432,7 +442,7 @@ def forecast_for_user(user_id: str):
 # ==========================================
 def main():
     if len(sys.argv) < 2:
-        print("\n Error: User ID required")
+        print("\nError: User ID required")
         print("Usage: python forecastModel.py <user_id>")
         print("Example: python forecastModel.py 3\n")
         sys.exit(1)
