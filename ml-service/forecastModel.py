@@ -3,7 +3,7 @@
 Product-Level Sales Forecasting Generation Script
 Generates separate forecasts for each trained product.
 
-Usage:
+Usage: 
     python forecastModel.py <user_id>
 Example:
     python forecastModel.py 3
@@ -73,7 +73,7 @@ def build_static_features_for_dates(dates: list):
             "Week_of_Year": dt.isocalendar()[1],
             "Quarter": dt.quarter,
             "Is_Weekend": 1 if dt.dayofweek in (5, 6) else 0,
-            "Promotion_Flag": 0,  # Can be updated if promotion data available
+            "Promotion_Flag": 0,
             "Rolling_7d_Sales": 0.0,
             "Rolling_30d_Sales": 0.0,
         })
