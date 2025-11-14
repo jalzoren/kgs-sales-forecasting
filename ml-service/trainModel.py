@@ -1,6 +1,8 @@
+# ml-service/trainModel.py
 import os
 import numpy as np
 import pandas as pd
+import json
 from datetime import datetime
 
 from tensorflow.keras import Input
@@ -69,13 +71,30 @@ class DataLoader:
         print(f" Dataset shape: {df.shape}")
         return df
 
+class Normalizer:
+    def __init__(self):
+        self.mean = None
+        self.std = None
+
+    def fit(self, series):
+        self.mean = float(series.mean())
+        self.std = float(series.std())
+
+    def transform(self, series):
+        return (series - self.mean) / self.std
+
+    def inverse(self, arr):
+        return (arr * self.std) + self.mean
+
+
 # ========================
-# LSTM TRAINER
+# LSTM TRAINER (Optimized)
 # ========================
 class LSTMTrainer:
     def __init__(self, lookback=30):
         self.lookback = lookback
         self.model = None
+        self.norm = Normalizer()
 
     def create_sequences(self, data):
         X, y = [], []
@@ -85,24 +104,28 @@ class LSTMTrainer:
         return np.array(X), np.array(y)
 
     def train(self, sales_series):
-        print(" Training LSTM model...")
-        data = sales_series.values.reshape(-1, 1)
+        print(" Normalizing sales data...")
+        self.norm.fit(sales_series)
+        data = self.norm.transform(sales_series).values.reshape(-1, 1)
+        
         X, y = self.create_sequences(data)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
+        print(" Training optimized LSTM model...")
         model = Sequential([
-            LSTM(64, return_sequences=False, input_shape=(X_train.shape[1], 1)),
-            Dropout(0.2),
-            Dense(32, activation='relu'),
+            LSTM(128, return_sequences=False, input_shape=(X_train.shape[1], 1)),
+            Dropout(0.3),
+            Dense(64, activation='relu'),
             Dense(1)
         ])
         model.compile(optimizer="adam", loss="mse")
-        es = EarlyStopping(patience=5, restore_best_weights=True)
+
+        es = EarlyStopping(monitor="val_loss", patience=3, restore_best_weights=True, verbose=1)
 
         model.fit(
             X_train, y_train,
             validation_data=(X_test, y_test),
-            epochs=30, batch_size=32, verbose=1, callbacks=[es]
+            epochs=15, batch_size=64, verbose=1, callbacks=[es]
         )
 
         y_pred = model.predict(X_test)
@@ -110,14 +133,15 @@ class LSTMTrainer:
         mae = mean_absolute_error(y_test, y_pred)
         mape = mean_absolute_percentage_error(y_test, y_pred)
 
-        print(f" LSTM Evaluation: RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
+        print(f" LSTM Evaluation: RMSE={rmse:.2f}, MAE={mae:.2f}, MAPE={mape:.2f}%")
 
         self.model = model
         return model, {"RMSE": rmse, "MAE": mae, "MAPE": mape}
 
     def extract_features(self, sales_series):
         print(" Extracting LSTM temporal context features...")
-        data = sales_series.values.reshape(-1, 1)
+        data = self.norm.transform(sales_series).values.reshape(-1, 1)
+
         X, _ = self.create_sequences(data)
         print(f"Extracting from {len(X)} sequences (lookback={self.lookback})")
 
@@ -129,21 +153,25 @@ class LSTMTrainer:
         padded_features = np.vstack([np.zeros((self.lookback, features.shape[1])), features])
         return padded_features
 
-# ========================
-# XGBOOST TRAINER
-# ========================
+
+# ==========================
+# XGBOOST TRAINER (Optimized)
+# ==========================
 class XGBoostTrainer:
     def train(self, X, y):
-        print(" Training XGBoost model...")
+        print("Training optimized XGBoost model...")
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
         model = xgb.XGBRegressor(
-            n_estimators=300,
-            learning_rate=0.05,
-            max_depth=6,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            random_state=42
+            n_estimators=400,
+            learning_rate=0.03,
+            max_depth=7,
+            subsample=0.85,
+            colsample_bytree=0.85,
+            reg_lambda=1.2,
+            random_state=42,
+            tree_method="hist",
+            verbosity=0
         )
 
         model.fit(X_train, y_train)
@@ -153,8 +181,9 @@ class XGBoostTrainer:
         mae = mean_absolute_error(y_test, preds)
         mape = mean_absolute_percentage_error(y_test, preds)
 
-        print(f" XGBoost Evaluation: RMSE: {rmse:.4f}, MAE: {mae:.4f}, MAPE: {mape:.2f}%")
+        print(f" XGBoost Evaluation: RMSE={rmse:.2f}, MAE={mae:.2f}, MAPE={mape:.2f}%")
         return model, {"RMSE": rmse, "MAE": mae, "MAPE": mape}
+
 
 # ========================
 # SALES FORECAST PIPELINE
@@ -202,6 +231,14 @@ class SalesForecasterPipeline:
 
         lstm_model.save(lstm_path)
         xgb_model.save_model(xgb_path)
+
+        # Save normalization stats
+        norm_stats = {
+            "mean": self.lstm_trainer.norm.mean,
+            "std": self.lstm_trainer.norm.std
+        }
+        with open(os.path.join(user_model_dir, "norm_stats.json"), "w") as f:
+            json.dump(norm_stats, f, indent=4)
 
         # 5️⃣ Save evaluation report
         report = {
