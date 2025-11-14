@@ -208,7 +208,7 @@ def forecast_for_user(user_id: str, horizon_days: int = DEFAULT_HORIZON):
             lstm_features = extractor.predict(seq_in, verbose=0).reshape(-1)
 
             # ----------------------------------------------------
-            # FIXED: Removed LSTM_Pred from XGB input features
+            # FIXED: Removed LSTM_Pred from XGB input features, try
             # ----------------------------------------------------
             feat_dict = {
                 **{c: row[c] for c in STATIC_COLS},
