@@ -211,6 +211,10 @@ def forecast_for_user(user_id: str, horizon_days: int = DEFAULT_HORIZON):
             lstm_next = float(lstm_model.predict(seq_in, verbose=0).reshape(-1)[0])
             lstm_features = extractor.predict(seq_in, verbose=0).reshape(-1)
 
+            current_rolling_7 = float(np.mean(rolling7[-7:])) if len(rolling7) > 0 else 0.0
+            current_rolling_30 = float(np.mean(rolling30[-30:])) if len(rolling30) > 0 else 0.0
+
+
             # ✅ Build feature dict with UPDATED rolling values
             feat_dict = {
                 "Day_of_Week": row["Day_of_Week"],
