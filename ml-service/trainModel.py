@@ -22,6 +22,7 @@ CLEAN_DIR = os.path.join(BASE_DIR, "../backend/files/cleanData")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 REPORT_DIR = os.path.join(BASE_DIR, "reports")
 os.makedirs(REPORT_DIR, exist_ok=True)
+os.makedirs(MODEL_DIR, exist_ok=True)
 
 # ========================
 # HELPER: MAPE Metric
@@ -88,7 +89,7 @@ class Normalizer:
 
 
 # ========================
-# LSTM TRAINER (Optimized)
+# LSTM TRAINER
 # ========================
 class LSTMTrainer:
     def __init__(self, lookback=90):
@@ -155,7 +156,7 @@ class LSTMTrainer:
 
 
 # ==========================
-# XGBOOST TRAINER (Optimized)
+# XGBOOST TRAINER
 # ==========================
 class XGBoostTrainer:
     def train(self, X, y):
@@ -197,15 +198,14 @@ class SalesForecasterPipeline:
 
     def run(self):
         df = self.data_loader.load_data()
-
         print(" Preparing features...")
         sales_series = df["Total_Sales"]
 
-        # 1️⃣ Train LSTM
+        # 1. Train LSTM
         lstm_model, lstm_metrics = self.lstm_trainer.train(sales_series)
         temporal_features = self.lstm_trainer.extract_features(sales_series)
 
-        # 2️⃣ Merge with static features
+        # 2. Merge with static features
         feature_df = df.copy()
         for i in range(temporal_features.shape[1]):
             feature_df[f"LSTM_Feature_{i+1}"] = temporal_features[:, i]
@@ -219,10 +219,10 @@ class SalesForecasterPipeline:
         X = feature_df[feature_cols].fillna(0)
         y = feature_df["Total_Sales"]
 
-        # 3️⃣ Train XGBoost
+        # 3. Train XGBoost
         xgb_model, xgb_metrics = self.xgb_trainer.train(X, y)
 
-        # 4️⃣ Save models
+        # 4. Save models
         user_model_dir = os.path.join(MODEL_DIR, f"user_{self.user_id}")
         os.makedirs(user_model_dir, exist_ok=True)
 
@@ -234,36 +234,68 @@ class SalesForecasterPipeline:
 
         # Save normalization stats
         norm_stats = {
-            "mean": self.lstm_trainer.norm.mean,
-            "std": self.lstm_trainer.norm.std
+            "mean": float(self.lstm_trainer.norm.mean),
+            "std": float(self.lstm_trainer.norm.std)
         }
         with open(os.path.join(user_model_dir, "norm_stats.json"), "w") as f:
             json.dump(norm_stats, f, indent=4)
 
-        # 5️⃣ Save evaluation report
+        # 5. Enhanced Report: CSV + JSON + TXT
         report = {
             "User_ID": self.user_id,
             "Timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "LSTM": lstm_metrics,
-            "XGBoost": xgb_metrics
+            "Dataset_Rows": len(df),
+            "Lookback_Days": self.lstm_trainer.lookback,
+            "LSTM": {
+                "RMSE": float(lstm_metrics["RMSE"]),
+                "MAE": float(lstm_metrics["MAE"]),
+                "MAPE": float(lstm_metrics["MAPE"])
+            },
+            "XGBoost": {
+                "RMSE": float(xgb_metrics["RMSE"]),
+                "MAE": float(xgb_metrics["MAE"]),
+                "MAPE": float(xgb_metrics["MAPE"])
+            }
         }
-        report_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_report.csv")
-        pd.DataFrame([report]).to_csv(report_path, index=False)
 
-        print(f"\n Training Completed for User {self.user_id}")
-        print(f" Models saved:\n - {lstm_path}\n - {xgb_path}")
-        print(f" Evaluation report: {report_path}")
-        print(" Model is ready for forecast generation!\n")
+        # Save CSV
+        csv_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_report.csv")
+        pd.DataFrame([report]).to_csv(csv_path, index=False)
+
+        # Save JSON (best for frontend)
+        json_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_report.json")
+        with open(json_path, "w") as f:
+            json.dump(report, f, indent=4)
+
+        # Save readable TXT
+        txt_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_report.txt")
+        with open(txt_path, "w") as f:
+            f.write(f"Sales Forecasting Training Report - User {self.user_id}\n")
+            f.write("=" * 60 + "\n")
+            f.write(f"Trained on      : {report['Timestamp']}\n")
+            f.write(f"Dataset size    : {report['Dataset_Rows']} days\n\n")
+            f.write(f"LSTM  → RMSE: {report['LSTM']['RMSE']:.2f} | MAE: {report['LSTM']['MAE']:.2f} | MAPE: {report['LSTM']['MAPE']:.2f}%\n")
+            f.write(f"XGB   → RMSE: {report['XGBoost']['RMSE']:.2f} | MAE: {report['XGBoost']['MAE']:.2f} | MAPE: {report['XGBoost']['MAPE']:.2f}%\n")
+
+        print(f"\nTraining Completed Successfully for User {self.user_id}!")
+        print(f"Models saved → {user_model_dir}")
+        print(f"Reports:")
+        print(f"   CSV  → {csv_path}")
+        print(f"   JSON → {json_path}")
+        print(f"   TXT  → {txt_path}")
+        print("Model is ready for forecasting!\n")
+
 
 # ========================
 # MAIN ENTRY POINT
 # ========================
 if __name__ == "__main__":
     import sys
+    if len(sys.argv) < 2:
+        print("Usage: python trainModel.py <user_id>")
+        print("Example: python trainModel.py 3")
+        sys.exit(1)
 
-    user_id = sys.argv[1] if len(sys.argv) > 1 else None
-    if not user_id:
-        raise ValueError("User ID must be provided, e.g. `python trainModel.py 3`")
-
+    user_id = sys.argv[1]
     pipeline = SalesForecasterPipeline(user_id)
     pipeline.run()
