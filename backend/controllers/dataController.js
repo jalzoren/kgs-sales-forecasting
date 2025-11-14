@@ -1,4 +1,4 @@
-// controllers/dataController.js
+// controllers/dataController.js (FIXED MODEL DETECTION)
 const db = require("../config/db.js");
 const fs = require("fs");
 const path = require("path");
@@ -12,11 +12,9 @@ class DataController {
 
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
-    const userId = req.session.user?.id; // ✅ Get logged-in user's ID
+    const userId = req.session.user?.id;
     if (!userId) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: User not logged in" });
+      return res.status(401).json({ message: "Unauthorized: User not logged in" });
     }
 
     const originalFile = req.file;
@@ -33,20 +31,15 @@ class DataController {
         console.log("📘 Detected Excel file — converting to CSV...");
         const convertedPath = await PythonService.convertToCsv(filePath);
 
-        // Ensure conversion succeeded
         if (!convertedPath || !fs.existsSync(convertedPath)) {
           throw new Error("Conversion failed — cannot process Excel file");
         }
 
-        filePath = convertedPath; // continue with CSV version
+        filePath = convertedPath;
         fileName = path.basename(convertedPath);
-        console.log(
-          "✅ Conversion successful, using converted CSV for next steps"
-        );
+        console.log("✅ Conversion successful, using converted CSV for next steps");
       } else if (!fileName.endsWith(".csv")) {
-        throw new Error(
-          "Unsupported file type. Please upload CSV or XLSX only."
-        );
+        throw new Error("Unsupported file type. Please upload CSV or XLSX only.");
       }
 
       // STEP 2️⃣: Validate file headers
@@ -56,10 +49,7 @@ class DataController {
       const rowCount = await PythonService.countRows(filePath);
 
       // STEP 4️⃣: Check if this user already uploaded the same file
-      const checkSql = `
-          SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?
-        `;
-
+      const checkSql = `SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?`;
       const existing = await new Promise((resolve, reject) => {
         db.query(checkSql, [userId, fileName], (err, results) => {
           if (err) return reject(err);
@@ -68,29 +58,18 @@ class DataController {
       });
 
       if (existing.length > 0) {
-        throw new Error(
-          `A file named "${fileName}" already exists for your account.`
-        );
+        throw new Error(`A file named "${fileName}" already exists for your account.`);
       }
 
-      // Now safely insert the new record
-      const insertSql = `
-          INSERT INTO salesdata (userId, fileName, records, status)
-          VALUES (?, ?, ?, ?)
-        `;
+      // Insert new record
+      const insertSql = `INSERT INTO salesdata (userId, fileName, records, status) VALUES (?, ?, ?, ?)`;
       await db.query(insertSql, [userId, fileName, rowCount, "Completed"]);
 
-      // STEP 5️⃣: Move final file to salesData folder (if converted)
-      const finalSalesDir = path.join(
-        __dirname,
-        "../files/salesData",
-        `user_${userId}`
-      );
-      if (!fs.existsSync(finalSalesDir))
-        fs.mkdirSync(finalSalesDir, { recursive: true });
+      // STEP 5️⃣: Move final file to salesData folder
+      const finalSalesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
+      if (!fs.existsSync(finalSalesDir)) fs.mkdirSync(finalSalesDir, { recursive: true });
 
       const finalFilePath = path.join(finalSalesDir, path.basename(filePath));
-
       if (filePath !== finalFilePath) {
         fs.renameSync(filePath, finalFilePath);
         console.log(`📂 File moved to: ${finalFilePath}`);
@@ -111,86 +90,54 @@ class DataController {
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
 
-          const cleanDir = path.resolve(
-            __dirname,
-            "../files/cleanData",
-            `user_${userId}`
-          );
+          const cleanDir = path.resolve(__dirname, "../files/cleanData", `user_${userId}`);
           const processedFiles = fs
             .readdirSync(cleanDir)
             .filter((f) => f.includes("_processed") && f.endsWith(".xlsx"));
 
           const mergedFiles = fs
             .readdirSync(cleanDir)
-            .filter(
-              (f) => f.startsWith("merged_3yr_sales") && f.endsWith(".xlsx")
-            );
+            .filter((f) => f.startsWith("merged_3yr_sales") && f.endsWith(".xlsx"));
 
-          const modelDir = path.resolve(
-            __dirname,
-            "../../ml-service/models",
-            `user_${userId}`
-          );
-          const modelExists =
-            fs.existsSync(modelDir) &&
-            fs
-              .readdirSync(modelDir)
-              .some((f) => f.match(/lstm_model\.keras|xgb_model\.json/));
+          const modelDir = path.resolve(__dirname, "../../ml-service/models", `user_${userId}`);
+          
+          // ✅ FIXED: Check for product-level models
+          const modelExists = this.checkProductModelsExist(modelDir);
 
           console.log(
             `📂 Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`
           );
 
-      
           // 🧩 Case 1: No model yet, but 3+ years available
-          if (
-            processedFiles.length == 3 &&
-            mergedFiles.length > 0 &&
-            !modelExists
-          ) {
-            console.log(
-              `🚀 Starting initial model training for user ${userId}...`
-            );
+          if (processedFiles.length >= 3 && mergedFiles.length > 0 && !modelExists) {
+            console.log(`🚀 Starting initial model training for user ${userId}...`);
             try {
               await PythonService.trainModel(userId);
-              console.log(
-                `🎯 Model training completed successfully for user ${userId}!`
-              );
+              console.log(`🎯 Model training completed successfully for user ${userId}!`);
 
               console.log(`📈 Generating first forecast for user ${userId}...`);
               await PythonService.generateForecast(userId);
-              console.log(
-                `✅ Forecast generation completed for user ${userId}!`
-              );
+              console.log(`✅ Forecast generation completed for user ${userId}!`);
             } catch (trainErr) {
-              console.error(
-                `⚠️ Training or forecast failed for user ${userId}:`,
-                trainErr.message
-              );
+              console.error(`⚠️ Training or forecast failed for user ${userId}:`, trainErr.message);
             }
             return;
           }
 
           // 🧩 Case 2: Model already exists — use weekly upload for new forecast
           if (modelExists) {
-            console.log(
-              `📅 Weekly data upload detected — generating forecast using existing model...`
-            );
+            console.log(`📅 Weekly data upload detected — generating forecast using existing model...`);
             try {
               await PythonService.generateForecast(userId);
-              console.log(
-                `✅ Weekly forecast generation completed for user ${userId}!`
-              );
+              console.log(`✅ Weekly forecast generation completed for user ${userId}!`);
             } catch (forecastErr) {
-              console.error(
-                `⚠️ Forecast generation failed for user ${userId}:`,
-                forecastErr.message
-              );
+              console.error(`⚠️ Forecast generation failed for user ${userId}:`, forecastErr.message);
             }
             return;
           }
 
           console.log(`⚠️ No valid case matched for user ${userId}.`);
+          console.log(`   Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`);
         })
         .catch((err) => {
           console.error(`⚠️ Python preprocessing error: ${err.message}`);
@@ -201,26 +148,60 @@ class DataController {
     }
   }
 
+  /**
+   * ✅ NEW METHOD: Check if product-level models exist
+   * Returns true if at least one product model directory contains both LSTM and XGBoost models
+   */
+  checkProductModelsExist(modelDir) {
+    try {
+      if (!fs.existsSync(modelDir)) {
+        console.log(`   ℹ️  Model directory doesn't exist: ${modelDir}`);
+        return false;
+      }
+
+      const productDirs = fs.readdirSync(modelDir).filter((d) => {
+        const fullPath = path.join(modelDir, d);
+        return fs.statSync(fullPath).isDirectory() && d.startsWith("product_");
+      });
+
+      if (productDirs.length === 0) {
+        console.log(`   ℹ️  No product model directories found in ${modelDir}`);
+        return false;
+      }
+
+      // Check if at least one product has both models
+      const hasValidModels = productDirs.some((productDir) => {
+        const productPath = path.join(modelDir, productDir);
+        const lstmPath = path.join(productPath, "lstm_model.keras");
+        const xgbPath = path.join(productPath, "xgb_model.json");
+        return fs.existsSync(lstmPath) && fs.existsSync(xgbPath);
+      });
+
+      console.log(`   ✅ Found ${productDirs.length} product model directories`);
+      console.log(`   ✅ Valid models: ${hasValidModels ? "Yes" : "No"}`);
+
+      return hasValidModels;
+    } catch (err) {
+      console.error(`   ❌ Error checking models: ${err.message}`);
+      return false;
+    }
+  }
+
   async getUploads(req, res) {
     console.log("📡 Fetching uploaded data records...");
     const userId = req.session.user?.id;
 
     if (!userId) {
-      return res
-        .status(401)
-        .json({ message: "Unauthorized: User not logged in" });
+      return res.status(401).json({ message: "Unauthorized: User not logged in" });
     }
 
-    const sql =
-      "SELECT * FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC";
+    const sql = "SELECT * FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC";
     db.query(sql, [userId], (err, results) => {
       if (err) {
         console.error("❌ Database fetch error:", err);
         return res.status(500).json({ message: "Database error", error: err });
       }
-      console.log(
-        `✅ Fetched ${results.length} upload records for user ${userId}`
-      );
+      console.log(`✅ Fetched ${results.length} upload records for user ${userId}`);
       res.json(results);
     });
   }
@@ -229,16 +210,11 @@ class DataController {
     const { id } = req.params;
     console.log(`🗑️ Deleting upload record ID: ${id}`);
     try {
-      // Fetch record to get userId and fileName
       const [record] = await new Promise((resolve, reject) => {
-        db.query(
-          "SELECT userId, fileName FROM salesdata WHERE salesID = ?",
-          [id],
-          (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          }
-        );
+        db.query("SELECT userId, fileName FROM salesdata WHERE salesID = ?", [id], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
       });
 
       if (!record) {
@@ -248,7 +224,6 @@ class DataController {
       const userId = record.userId;
       const fileName = record.fileName;
 
-      // Delete database record
       await new Promise((resolve, reject) => {
         db.query("DELETE FROM salesdata WHERE salesID = ?", [id], (err) => {
           if (err) return reject(err);
@@ -256,31 +231,16 @@ class DataController {
         });
       });
 
-      // Delete files from filesystem
-      const salesDir = path.join(
-        __dirname,
-        "../files/salesData",
-        `user_${userId}`
-      );
-      const cleanDir = path.join(
-        __dirname,
-        "../files/cleanData",
-        `user_${userId}`
-      );
+      const salesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
+      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${userId}`);
 
-      // salesData file
       const salesFilePath = path.join(salesDir, fileName);
       try {
         if (fs.existsSync(salesFilePath)) fs.unlinkSync(salesFilePath);
       } catch (e) {
-        console.warn(
-          "⚠️ Could not delete salesData file:",
-          salesFilePath,
-          e.message
-        );
+        console.warn("⚠️ Could not delete salesData file:", salesFilePath, e.message);
       }
 
-      // cleanData files that start with base name + '_processed_'
       const base = fileName.split(".")[0];
       try {
         if (fs.existsSync(cleanDir)) {
@@ -291,11 +251,7 @@ class DataController {
               try {
                 fs.unlinkSync(path.join(cleanDir, f));
               } catch (e) {
-                console.warn(
-                  "⚠️ Could not delete cleanData file:",
-                  f,
-                  e.message
-                );
+                console.warn("⚠️ Could not delete cleanData file:", f, e.message);
               }
             });
         }
@@ -315,9 +271,7 @@ class DataController {
     try {
       const userId = req.session.user?.id;
       if (!userId) {
-        return res
-          .status(401)
-          .json({ message: "Unauthorized: User not logged in" });
+        return res.status(401).json({ message: "Unauthorized: User not logged in" });
       }
       const status = PythonService.getPreprocessStatus(userId);
       return res.json(status);
