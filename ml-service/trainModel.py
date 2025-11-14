@@ -91,7 +91,7 @@ class Normalizer:
 # LSTM TRAINER (Optimized)
 # ========================
 class LSTMTrainer:
-    def __init__(self, lookback=30):
+    def __init__(self, lookback=90):
         self.lookback = lookback
         self.model = None
         self.norm = Normalizer()
@@ -192,7 +192,7 @@ class SalesForecasterPipeline:
     def __init__(self, user_id):
         self.user_id = user_id
         self.data_loader = DataLoader(user_id)
-        self.lstm_trainer = LSTMTrainer(lookback=30)
+        self.lstm_trainer = LSTMTrainer(lookback=90)
         self.xgb_trainer = XGBoostTrainer()
 
     def run(self):

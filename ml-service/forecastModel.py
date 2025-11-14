@@ -30,7 +30,7 @@ CLEAN_DIR = os.path.join(BASE_DIR, "../backend/files/cleanData")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 FORECAST_DIR = os.path.join(BASE_DIR, "../backend/files/forecastData")
 
-LOOKBACK = 30
+LOOKBACK = 90
 DEFAULT_HORIZON = 90
 STATIC_COLS = [
     "Day_of_Week", "Month", "Week_of_Year",
@@ -145,7 +145,8 @@ def prepare_recent_rolling_values(df, lookback=LOOKBACK):
 
     return series, last_rolling_7, last_rolling_30, target_col
 
-
+def normalize_sequence(seq, mean, std):
+    return (seq - mean) / std
 # ==========================================
 # Forecast Pipeline
 # ==========================================
@@ -188,12 +189,13 @@ def forecast_for_user(user_id: str, horizon_days: int = DEFAULT_HORIZON):
         print(f"\n[Forecast] Generating {horizon}-day forecast...")
         future_dates = make_future_dates(last_date, horizon)
         future_static = build_static_features_for_dates(future_dates)
-        future_static["Rolling_7d_Sales"] = np.mean(rolling7[-7:])
-        future_static["Rolling_30d_Sales"] = np.mean(rolling30[-30:])
 
         results = []
         current_series = series.copy()
 
+         # Reset rolling values at start of each horizon
+        rolling7 = series[-7:].copy()
+        rolling30 = series[-30:].copy()
         sample_input = np.zeros((1, LOOKBACK, 1))
         sample_feat = extractor.predict(sample_input)
         lstm_feat_dim = sample_feat.shape[1]
@@ -202,31 +204,41 @@ def forecast_for_user(user_id: str, horizon_days: int = DEFAULT_HORIZON):
             seq = np.array(current_series[-LOOKBACK:], dtype=float)
             if len(seq) < LOOKBACK:
                 seq = np.concatenate([np.zeros(LOOKBACK - len(seq)), seq])
-            seq_in = seq.reshape(1, LOOKBACK, 1)
+            
+            seq_normalized = normalize_sequence(seq, stats['mean'], stats['std'])
+            seq_in = seq_normalized.reshape(1, LOOKBACK, 1)
 
             lstm_next = float(lstm_model.predict(seq_in, verbose=0).reshape(-1)[0])
             lstm_features = extractor.predict(seq_in, verbose=0).reshape(-1)
 
-            # ----------------------------------------------------
-            # FIXED: Removed LSTM_Pred from XGB input features, try
-            # ----------------------------------------------------
+            # ✅ Build feature dict with UPDATED rolling values
             feat_dict = {
-                **{c: row[c] for c in STATIC_COLS},
-                **{f"LSTM_Feature_{i+1}": lstm_features[i]
-                   for i in range(lstm_feat_dim)}
+                "Day_of_Week": row["Day_of_Week"],
+                "Month": row["Month"],
+                "Week_of_Year": row["Week_of_Year"],
+                "Quarter": row["Quarter"],
+                "Is_Weekend": row["Is_Weekend"],
+                "Promotion_Flag": row["Promotion_Flag"],
+                "Rolling_7d_Sales": current_rolling_7,    # ✅ Uses current calculated value
+                "Rolling_30d_Sales": current_rolling_30,  # ✅ Uses current calculated value
+                **{f"LSTM_Feature_{i+1}": lstm_features[i] for i in range(lstm_feat_dim)}
             }
-            # ----------------------------------------------------
 
             X_row = pd.DataFrame([feat_dict])
             xgb_pred = float(xgb_model.predict(X_row)[0])
-
+            
+            # Update rolling lists for next iteration
             rolling7.append(xgb_pred)
             rolling30.append(xgb_pred)
-
+            if len(rolling7) > 30:
+                rolling7.pop(0)
+            if len(rolling30) > 30:
+                rolling30.pop(0)
+            
             results.append({
                 "Date": row["Date"],
-                "LSTM_Pred": lstm_next,        # kept in OUTPUT
-                "Forecast_Sales": xgb_pred     # XGB final output
+                "LSTM_Pred": lstm_next,
+                "Forecast_Sales": xgb_pred
             })
 
             current_series.append(xgb_pred)
