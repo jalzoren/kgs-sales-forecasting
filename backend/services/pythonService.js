@@ -9,8 +9,7 @@ class PythonService {
     this.pythonPath =
       "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe";
 
-    // Forecast history JSON
-    this.historyPath = path.join(__dirname, "../../ml-service/forecast_history.json");
+    // Note: Removed historyPath - we now read directly from Excel files per user, not JSON storage
 
     // Preprocess status tracking
     this.preprocessStatusByUserId = new Map();
@@ -101,61 +100,17 @@ class PythonService {
       status = "Failed";
     }
 
-    // Save history record
-    const record = {
-      userId: String(userId),
-      date: new Date().toLocaleString(),
-      horizon: horizonDays === 7 ? "Next Week" : horizonDays === 30 ? "Next 30 days" : "Next 90 days",
-      scope: "All Products",
-      status,
-      filePath: resultPath ? path.relative(path.join(__dirname, "../../backend"), resultPath).replace(/\\/g, "/") : null
-    };
-
-    try {
-      this.saveForecastHistory(record);
-    } catch (e) {
-      console.error("❌ Could not save forecast history:", e);
-    }
+    // Note: No longer saving to JSON - forecast history is read directly from Excel files per user
+    // The /api/forecast/history endpoint reads from backend/files/forecastData/user_{userId}/
 
     return resultPath;
   }
 
   // =====================================================
-  // ✅ Save forecast history to JSON
+  // ❌ Removed: Save forecast history to JSON
+  // Forecast history is now read directly from Excel files per user
+  // See: /api/forecast/history endpoint in backend/routes/forecast.js
   // =====================================================
-  saveForecastHistory(record) {
-    try {
-      const dir = path.dirname(this.historyPath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-
-      let history = [];
-      if (fs.existsSync(this.historyPath)) {
-        const raw = fs.readFileSync(this.historyPath, "utf8").trim();
-        history = raw ? JSON.parse(raw) : [];
-      }
-
-      history.push(record);
-      fs.writeFileSync(this.historyPath, JSON.stringify(history, null, 2), "utf8");
-      console.log("📁 Forecast history saved:", this.historyPath);
-    } catch (err) {
-      console.error("❌ Failed to save forecast history:", err);
-      throw err;
-    }
-  }
-
-  // =====================================================
-  // ✅ Read forecast history
-  // =====================================================
-  getForecastHistory() {
-    try {
-      if (!fs.existsSync(this.historyPath)) return [];
-      const raw = fs.readFileSync(this.historyPath, "utf8").trim();
-      return raw ? JSON.parse(raw) : [];
-    } catch (err) {
-      console.error("❌ Failed to read forecast history:", err);
-      return [];
-    }
-  }
 
   // =====================================================
   // ✅ Check if model exists
