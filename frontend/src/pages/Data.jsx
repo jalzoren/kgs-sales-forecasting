@@ -7,6 +7,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Swal from "sweetalert2";
 import { useNotifications } from "../components/Notifications";
+import LoadingOverlay from "../components/LoadingOverlay";
 import {
   FaBell,
   FaCog,
@@ -33,18 +34,11 @@ export default function UploadBox() {
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const itemsPerPage = 5;
 
   const fetchUploads = async () => {
-    // Show loading indicator
-    Swal.fire({
-      title: "Loading...",
-      text: "Fetching upload history...",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showConfirmButton: false,
-      didOpen: () => Swal.showLoading(),
-    });
+    setIsLoading(true);
 
     try {
       const res = await fetch("http://localhost:5000/api/data", {
@@ -52,14 +46,14 @@ export default function UploadBox() {
       });
       
       if (res.status === 401) {
-        Swal.close();
+        setIsLoading(false);
         window.location.href = "/";
         return;
       }
       
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ message: res.statusText }));
-        Swal.close();
+        setIsLoading(false);
         Swal.fire({
           icon: "error",
           title: "Failed to Load Data",
@@ -73,14 +67,13 @@ export default function UploadBox() {
       const data = await res.json();
       if (Array.isArray(data)) {
         setUploads(data);
-        Swal.close();
       } else {
-        Swal.close();
         setUploads([]);
       }
+      setIsLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err);
-      Swal.close();
+      setIsLoading(false);
       Swal.fire({
         icon: "error",
         title: "Connection Error",
@@ -393,6 +386,7 @@ export default function UploadBox() {
   };
   return (
     <div>
+      {isLoading && <LoadingOverlay message="Fetching upload history..." />}
       <h2 className="titled">Data Management</h2>
 
       {/* Upload Box */}
