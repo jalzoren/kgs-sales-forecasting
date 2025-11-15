@@ -190,13 +190,12 @@ router.post("/api/forecast", requireAuth, async (req, res) => {
       return res.status(401).json({ message: "Unauthorized: User not logged in" });
     }
 
-    const { horizon } = req.body;
-    const horizonDays = horizon || 90; // Default to 90 days
+    // Generate forecast for all horizons (7d, 30d, 90d) - no specific horizon needed
+    // The forecastModel.py generates all horizons by default
+    console.log(`📈 Generating forecast for user ${userId} (all horizons: 7d, 30d, 90d)`);
 
-    console.log(`📈 Generating forecast for user ${userId} with horizon: ${horizonDays} days`);
-
-    // Generate forecast asynchronously
-    PythonService.generateForecast(userId, horizonDays)
+    // Generate forecast asynchronously - pass null or undefined to generate all horizons
+    PythonService.generateForecast(userId, null)
       .then((resultPath) => {
         if (resultPath) {
           console.log(`✅ Forecast generated successfully: ${resultPath}`);
@@ -210,8 +209,7 @@ router.post("/api/forecast", requireAuth, async (req, res) => {
 
     // Return immediately (forecast runs in background)
     res.json({
-      message: "Forecast generation started. It will appear in your history when complete.",
-      horizon: horizonDays,
+      message: "Forecast generation started for all horizons (Next Week, Next 30 days, Next 90 days). It will appear in your history when complete.",
     });
   } catch (err) {
     console.error("❌ Forecast request error:", err);
