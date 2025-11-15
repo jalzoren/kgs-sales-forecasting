@@ -69,18 +69,15 @@ class PythonService {
   }
 
   // =====================================================
-  // ✅ Generate Forecast (generates all horizons: 7d, 30d, 90d by default)
+  // ✅ Generate Forecast
   // =====================================================
-  async generateForecast(userId, horizonDays = null) {
+  async generateForecast(userId, horizonDays = 90) {
     console.log(`📈 Generating forecast for User ID: ${userId}...`);
-    if (horizonDays) {
-      console.log(`   Note: horizonDays parameter is ignored - forecastModel.py generates all horizons (7d, 30d, 90d) by default`);
-    }
 
     const script = path.join(__dirname, "../../ml-service/forecastModel.py");
 
-    // Python args: only userId (forecastModel.py generates all horizons by default)
-    const args = [userId.toString()];
+    // Python args: userId + optional horizon
+    const args = [userId.toString(), "--horizon", String(horizonDays)];
 
     let status = "Completed";
     let resultPath = null;

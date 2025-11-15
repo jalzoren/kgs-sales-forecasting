@@ -102,14 +102,14 @@ export default function Forecast() {
   }, []);
 
   // ======================================================
-  // 🔁 Handle Reforecast (Generates all horizons: 7d, 30d, 90d)
+  // 🔁 Handle Reforecast
   // ======================================================
-  const handleReforecast = async () => {
+  const handleReforecast = async (horizonDays) => {
     // Show confirmation dialog
     const confirmResult = await Swal.fire({
       icon: "question",
       title: "Generate New Forecast?",
-      text: "This will generate a new forecast for all horizons (Next Week, Next 30 days, Next 90 days). This may take a few minutes.",
+      text: `This will generate a new ${horizonDays === 7 ? "7-day" : horizonDays === 30 ? "30-day" : "90-day"} forecast. This may take a few minutes.`,
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
@@ -124,18 +124,17 @@ export default function Forecast() {
     // Show loading
     Swal.fire({
       title: "Generating Forecast...",
-      text: "Please wait while the forecast is being generated for all horizons.",
+      text: "Please wait while the forecast is being generated.",
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading(),
     });
 
     try {
-      // Generate forecast without specifying horizon - backend will generate all horizons (7d, 30d, 90d)
       const res = await fetch("http://localhost:5000/api/forecast", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), // Empty body - generates all horizons by default
+        body: JSON.stringify({ horizon: horizonDays }),
       });
 
       if (res.status === 401) {
@@ -168,7 +167,7 @@ export default function Forecast() {
       Swal.fire({
         icon: "success",
         title: "Forecast Generation Started",
-        text: "Your forecast is being generated for all horizons (Next Week, Next 30 days, Next 90 days). It will appear in the history when complete.",
+        text: "Your forecast is being generated. It will appear in the history when complete.",
         confirmButtonColor: "#28a745",
         timer: 3000,
         timerProgressBar: true,
@@ -336,13 +335,35 @@ export default function Forecast() {
                           Download
                         </button>
                       )}
-                      <button
-                        className="btn-reforecast"
-                        onClick={() => handleReforecast()}
-                        style={{ marginTop: "4px" }}
-                      >
-                        Reforecast
-                      </button>
+                      {f.horizons && Array.isArray(f.horizons) && f.horizons.length > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
+                          {f.horizons.map((h, hIdx) => (
+                            <button
+                              key={hIdx}
+                              className="btn-reforecast"
+                              style={{ fontSize: "0.85em", padding: "4px 8px" }}
+                              onClick={() => handleReforecast(h.days)}
+                            >
+                              Reforecast {h.label}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <button
+                          className="btn-reforecast"
+                          onClick={() =>
+                            handleReforecast(
+                              f.horizon && f.horizon.includes("Week")
+                                ? 7
+                                : f.horizon && f.horizon.includes("30")
+                                ? 30
+                                : 90
+                            )
+                          }
+                        >
+                          Reforecast
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
