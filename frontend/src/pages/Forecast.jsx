@@ -1,6 +1,12 @@
 import React, { useState, useMemo, useEffect } from "react";
 import "../css/Forecast.css";
 import Swal from "sweetalert2";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Manila");
 
 export default function Forecast() {
   const [forecasts, setForecasts] = useState([]);
@@ -18,12 +24,24 @@ export default function Forecast() {
   const fetchHistory = async () => {
     try {
       setLoading(true);
+      
+      // Show loading indicator
+      Swal.fire({
+        title: "Loading...",
+        text: "Fetching forecast history...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      
       const res = await fetch("http://localhost:5000/api/forecast/history", {
         credentials: "include",
       });
       
       if (res.status === 401) {
         // Authentication error - redirect to login
+        Swal.close();
         Swal.fire({
           icon: "warning",
           title: "Session Expired",
@@ -41,6 +59,7 @@ export default function Forecast() {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ message: res.statusText }));
         console.error("Failed to fetch forecast history:", res.status, errorData);
+        Swal.close();
         Swal.fire({
           icon: "error",
           title: "Failed to Load Forecast History",
@@ -62,9 +81,11 @@ export default function Forecast() {
         return dateB - dateA;
       });
       setForecasts(sorted);
+      Swal.close();
       setLoading(false);
     } catch (err) {
       console.error("Failed to fetch forecast history:", err);
+      Swal.close();
       Swal.fire({
         icon: "error",
         title: "Connection Error",
@@ -174,14 +195,15 @@ export default function Forecast() {
   const filteredForecasts = useMemo(() => {
     let result = [...forecasts];
 
-    // Search by horizon, scope, or date
+    // Search by horizon, scope, date, or filename
     if (search.trim() !== "") {
       const s = search.toLowerCase();
       result = result.filter(
         (f) =>
           f.horizon.toLowerCase().includes(s) ||
           f.scope.toLowerCase().includes(s) ||
-          f.date.toLowerCase().includes(s)
+          f.date.toLowerCase().includes(s) ||
+          (f.fileName && f.fileName.toLowerCase().includes(s))
       );
     }
 
@@ -251,6 +273,7 @@ export default function Forecast() {
             <thead>
               <tr>
                 <th>Date</th>
+                <th>Filename</th>
                 <th>Forecast Horizon</th>
                 <th>Scope</th>
                 <th>Status</th>
@@ -261,14 +284,23 @@ export default function Forecast() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center", padding: "1rem" }}>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "1rem" }}>
                     Loading...
                   </td>
                 </tr>
               ) : currentForecasts.length > 0 ? (
                 currentForecasts.map((f, idx) => (
                   <tr key={f.id || idx}>
-                    <td>{f.date}</td>
+                    <td>
+                      {f.dateISO 
+                        ? dayjs(f.dateISO).tz().format("MMMM D, YYYY • h:mm A")
+                        : f.date 
+                        ? dayjs(f.date).tz().format("MMMM D, YYYY • h:mm A")
+                        : "—"}
+                    </td>
+                    <td style={{ fontSize: "0.9em", color: "#666" }}>
+                      {f.fileName || f.filePath?.split("/").pop() || "—"}
+                    </td>
                     <td>
                       {f.horizons && Array.isArray(f.horizons) && f.horizons.length > 0 ? (
                         <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
@@ -337,7 +369,7 @@ export default function Forecast() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" style={{ textAlign: "center", padding: "1rem" }}>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "1rem" }}>
                     No forecasts found
                   </td>
                 </tr>

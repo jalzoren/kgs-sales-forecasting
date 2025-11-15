@@ -36,18 +36,57 @@ export default function UploadBox() {
   const itemsPerPage = 5;
 
   const fetchUploads = async () => {
+    // Show loading indicator
+    Swal.fire({
+      title: "Loading...",
+      text: "Fetching upload history...",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
     try {
       const res = await fetch("http://localhost:5000/api/data", {
         credentials: "include",
       });
+      
       if (res.status === 401) {
+        Swal.close();
         window.location.href = "/";
         return;
       }
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: res.statusText }));
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Load Data",
+          text: errorData.message || "Failed to fetch upload history.",
+          confirmButtonColor: "#d33",
+        });
+        setUploads([]);
+        return;
+      }
+      
       const data = await res.json();
-      if (Array.isArray(data)) setUploads(data);
+      if (Array.isArray(data)) {
+        setUploads(data);
+        Swal.close();
+      } else {
+        Swal.close();
+        setUploads([]);
+      }
     } catch (err) {
       console.error("Error fetching data:", err);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Connection Error",
+        text: `Failed to connect to server: ${err.message}. Please make sure the backend server is running.`,
+        confirmButtonColor: "#d33",
+      });
       setUploads([]);
     }
   };

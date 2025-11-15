@@ -64,45 +64,13 @@ router.get("/api/forecast/history", requireAuth, (req, res) => {
 
     for (const file of files) {
       try {
-        // Extract date from filename patterns:
-        // New format: forecast_week_20251111_to_20251118.xlsx
-        // Old format: forecast_20251115_094424.xlsx or forecast_summary_20251114_123342.xlsx
-        let forecastDate;
-        const weekMatch = file.fileName.match(/forecast_week_(\d{8})_to_(\d{8})\.xlsx/);
-        const timestampMatch = file.fileName.match(/(\d{8})_(\d{6})/);
-
-        if (weekMatch) {
-          // New week-based format: use the week start date
-          const weekStartStr = weekMatch[1]; // YYYYMMDD
-          forecastDate = new Date(
-            `${weekStartStr.substring(0, 4)}-${weekStartStr.substring(4, 6)}-${weekStartStr.substring(6, 8)}`
-          );
-          console.log(`📅 Found week-based forecast: ${file.fileName} (Week: ${weekMatch[1]} to ${weekMatch[2]})`);
-        } else if (timestampMatch) {
-          // Old timestamp format
-          const dateStr = timestampMatch[1]; // YYYYMMDD
-          const timeStr = timestampMatch[2]; // HHMMSS
-          forecastDate = new Date(
-            `${dateStr.substring(0, 4)}-${dateStr.substring(4, 6)}-${dateStr.substring(6, 8)} ` +
-            `${timeStr.substring(0, 2)}:${timeStr.substring(2, 4)}:${timeStr.substring(4, 6)}`
-          );
-        } else {
-          // Fallback to file modification time
-          forecastDate = file.mtime;
-        }
-
-        // Format date for display: "November 15, 2025 | 12:33 PM"
-        const datePart = forecastDate.toLocaleString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        });
-        const timePart = forecastDate.toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
-        const formattedDate = `${datePart} | ${timePart}`;
+        // Use file modification time as the primary date (represents when forecast was generated/uploaded)
+        // This matches the behavior in Data.jsx which shows uploadDate
+        // mtime is when the file was created/modified, which is when the forecast was generated
+        const uploadDate = file.mtime; // This is when the file was created = when forecast was generated
+        
+        console.log(`📅 File: ${file.fileName}`);
+        console.log(`   Modification time (upload/generation date): ${uploadDate.toISOString()}`);
 
         // Read Excel file to check available horizons
         if (!fs.existsSync(file.filePath)) {
@@ -120,20 +88,11 @@ router.get("/api/forecast/history", requireAuth, (req, res) => {
         } catch (xlsxErr) {
           console.error(`❌ Error reading Excel file ${file.fileName}:`, xlsxErr.message);
           // Add entry with "Failed" status
-          const fallbackDate = file.mtime.toLocaleString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          });
-          const fallbackTime = file.mtime.toLocaleString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          });
           forecasts.push({
             id: `${file.fileName}_error`,
-            date: `${fallbackDate} | ${fallbackTime}`,
+            date: file.mtime.toISOString(), // ISO string for frontend formatting
             dateISO: file.mtime.toISOString(),
+            fileName: file.fileName, // Add filename for display
             horizons: [],
             horizon: "Error",
             scope: "All Products",
@@ -168,8 +127,9 @@ router.get("/api/forecast/history", requireAuth, (req, res) => {
         if (availableHorizons.length > 0) {
           forecasts.push({
             id: file.fileName,
-            date: formattedDate,
-            dateISO: forecastDate.toISOString(), // For sorting
+            date: uploadDate.toISOString(), // ISO string for frontend formatting (upload/generation date)
+            dateISO: uploadDate.toISOString(), // For sorting (upload/generation date)
+            fileName: file.fileName, // Add filename for display
             horizons: availableHorizons, // Array of all available horizons
             horizon: availableHorizons.map(h => h.label).join(", "), // Combined string for display/search
             scope: "All Products",
@@ -183,8 +143,9 @@ router.get("/api/forecast/history", requireAuth, (req, res) => {
           console.log(`⚠️ No standard forecast sheets found in ${file.fileName}, but file has ${sheetNames.length} sheet(s). Adding generic entry.`);
           forecasts.push({
             id: file.fileName,
-            date: formattedDate,
-            dateISO: forecastDate.toISOString(),
+            date: uploadDate.toISOString(), // ISO string for frontend formatting (upload/generation date)
+            dateISO: uploadDate.toISOString(),
+            fileName: file.fileName, // Add filename for display
             horizons: [],
             horizon: "Available",
             scope: "All Products",
@@ -197,20 +158,11 @@ router.get("/api/forecast/history", requireAuth, (req, res) => {
         console.error(`⚠️ Error processing forecast file ${file.fileName}:`, err.message);
         console.error(`   Stack:`, err.stack);
         // Add entry even if file read fails
-        const fallbackDate = file.mtime.toLocaleString("en-US", {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        });
-        const fallbackTime = file.mtime.toLocaleString("en-US", {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        });
         forecasts.push({
           id: `${file.fileName}_unknown`,
-          date: `${fallbackDate} | ${fallbackTime}`,
+          date: file.mtime.toISOString(), // ISO string for frontend formatting
           dateISO: file.mtime.toISOString(), // For sorting
+          fileName: file.fileName, // Add filename for display
           horizons: [],
           horizon: "Unknown",
           scope: "All Products",
