@@ -91,7 +91,23 @@ export default function UploadBox() {
         credentials: "include",
         body: formData,
       });
+      
       const result = await res.json();
+
+      if (!res.ok) {
+        // Close loading
+        Swal.close();
+        removeNotification(uploadingId);
+        
+        // Show error with details
+        Swal.fire({
+          icon: "error",
+          title: "Upload Failed",
+          text: result.message || "Failed to upload file. Please check the file format and try again.",
+          confirmButtonColor: "#d33",
+        });
+        return;
+      }
 
       if (res.ok) {
         // Close loader and switch to notifications-only UX

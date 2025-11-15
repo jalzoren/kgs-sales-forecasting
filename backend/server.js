@@ -1,43 +1,62 @@
-// server.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+
+// ROUTES
+const sessionConfig = require("./config/sessionConfig");
 const authRoutes = require("./routes/authRoutes");
 const dataRoutes = require("./routes/dataRoutes");
-const sessionConfig = require("./config/sessionConfig");
+const forecastRoutes = require("./routes/forecast"); // ✅ forecast.js
 
 const app = express();
 const PORT = 5000;
 
-// ✅ 1. Enable CORS first
+// =====================================================
+// Enable CORS
+// =====================================================
 app.use(cors({
-  origin: "http://localhost:5173",   // your React app
-  credentials: true,                 // allow cookies
+  origin: "http://localhost:5173",
+  credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// ✅ 2. Setup session BEFORE body parsing
+// =====================================================
+// Sessions
+// =====================================================
 app.use(sessionConfig);
 
-// ✅ 3. Then enable JSON parsing
+// =====================================================
+// JSON Body Parser
+// =====================================================
 app.use(express.json());
 
-// ✅ 4. Routes
+// =====================================================
+// Serve static files (forecast Excel files)
+// =====================================================
+app.use(
+  "/files",
+  express.static(path.join(__dirname, "files"))
+);
+
+// =====================================================
+// Mount routes
+// =====================================================
 app.use("/", authRoutes);
 app.use("/", dataRoutes);
+app.use("/", forecastRoutes);
 
-// ✅ 5. Default route
+// =====================================================
+// Default route
+// =====================================================
 app.get("/", (req, res) => {
   res.send("Sales Forecasting System - Backend Running 🚀");
 });
 
-// ✅ 6. Start server
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
-
-
+// =====================================================
+// Session check endpoint
+// =====================================================
 app.get("/api/check-session", (req, res) => {
   if (req.session && req.session.user) {
     res.json({ loggedIn: true, user: req.session.user });
@@ -46,3 +65,9 @@ app.get("/api/check-session", (req, res) => {
   }
 });
 
+// =====================================================
+// Start server
+// =====================================================
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});

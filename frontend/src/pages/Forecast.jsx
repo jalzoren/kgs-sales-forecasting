@@ -1,70 +1,187 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import "../css/Forecast.css";
+import Swal from "sweetalert2";
 
 export default function Forecast() {
+  const [forecasts, setForecasts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [search, setSearch] = useState("");
   const [sortStatus, setSortStatus] = useState("All");
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const forecasts = [
-    {
-      date: "October 13, 2025 | 12:00 AM",
-      horizon: "Next Week",
-      scope: "All Products",
-      status: "Completed",
-      accuracy: "98.25%",
-    },
-    {
-      date: "October 13, 2025 | 12:00 AM",
-      horizon: "Next 30 days",
-      scope: "All Products",
-      status: "Completed",
-      accuracy: "98.25%",
-    },
-    {
-      date: "October 13, 2025 | 12:00 AM",
-      horizon: "Next 90 days",
-      scope: "All Products",
-      status: "Completed",
-      accuracy: "98.25%",
-    },
-    {
-      date: "October 1, 2025 | 12:00 AM",
-      horizon: "Next 30 days",
-      scope: "All Products",
-      status: "Failed",
-      accuracy: "5.25%",
-    },
-    {
-      date: "September 20, 2025 | 12:00 AM",
-      horizon: "Next Week",
-      scope: "All Products",
-      status: "Completed",
-      accuracy: "97.50%",
-    },
-    {
-      date: "September 10, 2025 | 12:00 AM",
-      horizon: "Next 90 days",
-      scope: "All Products",
-      status: "Failed",
-      accuracy: "12.40%",
-    },
-  ];
+  // ======================================================
+  // ✅ Fetch forecast history from backend
+  // ======================================================
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("http://localhost:5000/api/forecast/history", {
+        credentials: "include",
+      });
+      
+      if (res.status === 401) {
+        // Authentication error - redirect to login
+        Swal.fire({
+          icon: "warning",
+          title: "Session Expired",
+          text: "Your session has expired. Please log in again.",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "Go to Login",
+        }).then(() => {
+          window.location.href = "/login";
+        });
+        setForecasts([]);
+        setLoading(false);
+        return;
+      }
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: res.statusText }));
+        console.error("Failed to fetch forecast history:", res.status, errorData);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Load Forecast History",
+          text: errorData.message || res.statusText || "An error occurred while loading forecast history.",
+          confirmButtonColor: "#d33",
+        });
+        setForecasts([]);
+        setLoading(false);
+        return;
+      }
+      
+      const data = await res.json();
+      console.log("📊 Received forecast data:", data);
+      
+      // Sort newest first by default (use dateISO if available, otherwise try parsing date)
+      const sorted = data.sort((a, b) => {
+        const dateA = a.dateISO ? new Date(a.dateISO) : new Date(a.date);
+        const dateB = b.dateISO ? new Date(b.dateISO) : new Date(b.date);
+        return dateB - dateA;
+      });
+      setForecasts(sorted);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch forecast history:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Connection Error",
+        html: `Unable to connect to the server.<br/><br/>${err.message}<br/><br/><small>Please make sure the backend server is running on port 5000.</small>`,
+        confirmButtonColor: "#d33",
+      });
+      setForecasts([]);
+      setLoading(false);
+    }
+  };
 
-  // 🔍 Filtering, sorting, and pagination logic
+  useEffect(() => {
+    fetchHistory();
+  }, []);
+
+  // ======================================================
+  // 🔁 Handle Reforecast
+  // ======================================================
+  const handleReforecast = async (horizonDays) => {
+    // Show confirmation dialog
+    const confirmResult = await Swal.fire({
+      icon: "question",
+      title: "Generate New Forecast?",
+      text: `This will generate a new ${horizonDays === 7 ? "7-day" : horizonDays === 30 ? "30-day" : "90-day"} forecast. This may take a few minutes.`,
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Generate",
+      cancelButtonText: "Cancel",
+    });
+
+    if (!confirmResult.isConfirmed) {
+      return;
+    }
+
+    // Show loading
+    Swal.fire({
+      title: "Generating Forecast...",
+      text: "Please wait while the forecast is being generated.",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
+    try {
+      const res = await fetch("http://localhost:5000/api/forecast", {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ horizon: horizonDays }),
+      });
+
+      if (res.status === 401) {
+        Swal.close();
+        Swal.fire({
+          icon: "warning",
+          title: "Session Expired",
+          text: "Your session has expired. Please log in again.",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "Go to Login",
+        }).then(() => {
+          window.location.href = "/login";
+        });
+        return;
+      }
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ message: res.statusText }));
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Reforecast Failed",
+          text: errorData.message || "Failed to start forecast generation. Please try again.",
+          confirmButtonColor: "#d33",
+        });
+        return;
+      }
+
+      Swal.close();
+      Swal.fire({
+        icon: "success",
+        title: "Forecast Generation Started",
+        text: "Your forecast is being generated. It will appear in the history when complete.",
+        confirmButtonColor: "#28a745",
+        timer: 3000,
+        timerProgressBar: true,
+      });
+
+      // Refresh the history after a short delay
+      setTimeout(() => {
+        fetchHistory();
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Connection Error",
+        text: `Failed to connect to server: ${err.message}. Please make sure the backend server is running.`,
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
+
+  // ======================================================
+  // 🔍 Filtering + Sorting + Pagination
+  // ======================================================
   const filteredForecasts = useMemo(() => {
     let result = [...forecasts];
 
     // Search by horizon, scope, or date
     if (search.trim() !== "") {
-      const lower = search.toLowerCase();
+      const s = search.toLowerCase();
       result = result.filter(
         (f) =>
-          f.horizon.toLowerCase().includes(lower) ||
-          f.scope.toLowerCase().includes(lower) ||
-          f.date.toLowerCase().includes(lower)
+          f.horizon.toLowerCase().includes(s) ||
+          f.scope.toLowerCase().includes(s) ||
+          f.date.toLowerCase().includes(s)
       );
     }
 
@@ -73,25 +190,30 @@ export default function Forecast() {
       result = result.filter((f) => f.status === sortStatus);
     }
 
-    // Sort by date
+    // Sort
     result.sort((a, b) => {
-      const dateA = new Date(a.date.split("|")[0]);
-      const dateB = new Date(b.date.split("|")[0]);
-      return sortOrder === "Newest First" ? dateB - dateA : dateA - dateB;
+      const dA = a.dateISO ? new Date(a.dateISO) : new Date(a.date);
+      const dB = b.dateISO ? new Date(b.dateISO) : new Date(b.date);
+      return sortOrder === "Newest First" ? dB - dA : dA - dB;
     });
 
     return result;
   }, [search, sortStatus, sortOrder, forecasts]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredForecasts.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentForecasts = filteredForecasts.slice(startIndex, startIndex + itemsPerPage);
+  const currentForecasts = filteredForecasts.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   const goToPage = (page) => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
 
+  // ======================================================
+  // 🔹 Render
+  // ======================================================
   return (
     <div>
       <h2 className="titled">Forecast History</h2>
@@ -129,7 +251,7 @@ export default function Forecast() {
             <thead>
               <tr>
                 <th>Date</th>
-                <th>Horizon</th>
+                <th>Forecast Horizon</th>
                 <th>Scope</th>
                 <th>Status</th>
                 <th>Accuracy</th>
@@ -137,26 +259,79 @@ export default function Forecast() {
               </tr>
             </thead>
             <tbody>
-              {currentForecasts.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan="6" style={{ textAlign: "center", padding: "1rem" }}>
+                    Loading...
+                  </td>
+                </tr>
+              ) : currentForecasts.length > 0 ? (
                 currentForecasts.map((f, idx) => (
-                  <tr key={idx}>
+                  <tr key={f.id || idx}>
                     <td>{f.date}</td>
-                    <td>{f.horizon}</td>
+                    <td>
+                      {f.horizons && Array.isArray(f.horizons) && f.horizons.length > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                          {f.horizons.map((h, hIdx) => (
+                            <span key={hIdx} style={{ fontSize: "0.9em" }}>
+                              {h.label}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        f.horizon || "N/A"
+                      )}
+                    </td>
                     <td>{f.scope}</td>
                     <td>
-                      <span
-                        className={`status ${
-                          f.status === "Completed" ? "success" : "failed"
-                        }`}
-                      >
+                      <span className={`status ${f.status === "Completed" ? "success" : "failed"}`}>
                         {f.status}
                       </span>
                     </td>
-                    <td>{f.accuracy}</td>
+                    <td>{f.accuracy || "N/A"}</td>
                     <td className="actions">
-                      <button className="btn-view">View</button>
-                      <button className="btn-download">Download</button>
-                      <button className="btn-reforecast">Reforecast</button>
+                      {f.filePath ? (
+                        <a
+                          href={`http://localhost:5000/${f.filePath}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <button className="btn-download">Download</button>
+                        </a>
+                      ) : (
+                        <button className="btn-download" disabled>
+                          Download
+                        </button>
+                      )}
+                      {f.horizons && Array.isArray(f.horizons) && f.horizons.length > 0 ? (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "4px", marginTop: "4px" }}>
+                          {f.horizons.map((h, hIdx) => (
+                            <button
+                              key={hIdx}
+                              className="btn-reforecast"
+                              style={{ fontSize: "0.85em", padding: "4px 8px" }}
+                              onClick={() => handleReforecast(h.days)}
+                            >
+                              Reforecast {h.label}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <button
+                          className="btn-reforecast"
+                          onClick={() =>
+                            handleReforecast(
+                              f.horizon && f.horizon.includes("Week")
+                                ? 7
+                                : f.horizon && f.horizon.includes("30")
+                                ? 30
+                                : 90
+                            )
+                          }
+                        >
+                          Reforecast
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))

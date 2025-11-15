@@ -6,7 +6,7 @@ import os
 
 # ==== CONFIGURATION ===
 CONFIG = {
-    "start_date": "2024-11-11",  # first day of the week to simulate
+    "start_date": "2025-11-17",  # first day of the week to simulate
     "min_quantity": 1,
     "max_quantity": 10,
     "min_tx_per_day": 200,

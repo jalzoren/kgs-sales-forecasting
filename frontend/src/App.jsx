@@ -3,8 +3,6 @@ import Navbar from "./components/Navbar";
 import Navbar2 from "./components/Navbar2";
 import { NotificationProvider } from "./components/Notifications";
 
-// Import the SSE connector
-import NotificationSSE from "./components/NotificationSSE";   // ADD THIS
 
 import Home from "./pages/Home";
 import Data from "./pages/Data";
@@ -29,7 +27,6 @@ function App() {
   return (
     <NotificationProvider>
       {/* This connects to your FastAPI SSE stream */}
-      <NotificationSSE />
 
       {noNavbarPaths.includes(path) ? null : navbar2Paths.includes(path) ? (
         <Navbar2 />

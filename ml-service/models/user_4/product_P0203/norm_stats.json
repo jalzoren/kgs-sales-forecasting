@@ -5,5 +5,6 @@
     "product_id": "P0203",
     "product_name": "Jin Ramen Spicy Cup",
     "category": "Noodles",
-    "avg_unit_price": 50.0
+    "avg_unit_price": 50.0,
+    "total_samples": 1055
 }

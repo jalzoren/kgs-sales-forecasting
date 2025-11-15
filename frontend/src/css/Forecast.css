@@ -91,13 +91,19 @@ select {
   padding: 10px 14px;
   text-align: left;
   border: 1px solid #c9d6e3;
+  vertical-align: middle;
 }
 
-
+/* Center align specific columns */
 .upload-table th,
 .upload-table td {
   text-align: center;
-  justify-content: center;
+}
+
+/* Actions column specific styling */
+.upload-table td.actions {
+  background-color: #fafbfc;
+  border-left: 2px solid var(--accent-lightest);
 }
 
 .upload-table thead {
@@ -112,6 +118,10 @@ select {
 .upload-table tbody tr:hover {
   background-color: #eef5fb;
   transition: 0.2s;
+}
+
+.upload-table tbody tr:hover td.actions {
+  background-color: #f0f7ff;
 }
 
 .status {
@@ -130,51 +140,94 @@ select {
 .actions {
   display: flex;
   justify-content: center;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   flex-wrap: wrap;
+  padding: 12px;
+  min-height: 60px;
 }
 
-/* Standard filled button style */
+/* Modern button base style */
 .btn-view, .btn-download, .btn-reforecast {
   border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-size: 14px;
-  font-weight: 400;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
   cursor: pointer;
-  color: #fff; /* text color white */
-  text-decoration: none; /* no underline */
-  transition: all 0.2s ease;
-  min-width: 80px;
-  list-style: none;
+  color: #fff;
   text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 90px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
+/* Button hover effect with scale */
+.btn-view:hover, .btn-download:hover, .btn-reforecast:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
 
-/* Individual button colors */
+/* Button active effect */
+.btn-view:active, .btn-download:active, .btn-reforecast:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Disabled button style */
+.btn-download:disabled, .btn-reforecast:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-download:disabled:hover, .btn-reforecast:disabled:hover {
+  transform: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Individual button colors with gradients */
 .btn-view {
-  background-color: #41a7dd; /* blue */
+  background: linear-gradient(135deg, var(--accent-lighter) 0%, var(--accent-light) 100%);
+}
+
+.btn-view:hover {
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--accent) 100%);
 }
 
 .btn-download {
-  background-color: #1a7f37; /* green */
-}
-
-.btn-reforecast {
-  background-color: #c97c00; /* orange */
-}
-
-/* Hover effects: slightly darker */
-.btn-view:hover {
-  background-color: #0a4174;
+  background: linear-gradient(135deg, #28a745 0%, #1a7f37 100%);
 }
 
 .btn-download:hover {
-  background-color: #145c2e;
+  background: linear-gradient(135deg, #34ce57 0%, #28a745 100%);
+}
+
+.btn-reforecast {
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
 }
 
 .btn-reforecast:hover {
-  background-color: #974f00;
+  background: linear-gradient(135deg, #ffb74d 0%, #ff9800 100%);
+}
+
+/* Special styling for multiple reforecast buttons in a column */
+.actions > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  align-items: center;
+}
+
+.actions > div > button {
+  width: 100%;
+  max-width: 140px;
 }
 
 /* Pagination */

@@ -5,5 +5,6 @@
     "product_id": "P0100",
     "product_name": "Binggrae Ice Cream Sandwich",
     "category": "Food Frozen",
-    "avg_unit_price": 80.0
+    "avg_unit_price": 80.0,
+    "total_samples": 1079
 }

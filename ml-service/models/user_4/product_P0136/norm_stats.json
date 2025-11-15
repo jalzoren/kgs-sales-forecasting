@@ -5,5 +5,6 @@
     "product_id": "P0136",
     "product_name": "Cass Fresh Beer",
     "category": "Liquor/Beverage",
-    "avg_unit_price": 85.0
+    "avg_unit_price": 85.0,
+    "total_samples": 1065
 }

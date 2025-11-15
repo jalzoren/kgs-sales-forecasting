@@ -8,11 +8,16 @@ class PythonService {
     // ✅ Central Python path (venv)
     this.pythonPath =
       "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe";
+
+    // Forecast history JSON
+    this.historyPath = path.join(__dirname, "../../ml-service/forecast_history.json");
+
+    // Preprocess status tracking
     this.preprocessStatusByUserId = new Map();
   }
 
   // =====================================================
-  // ✅ Core runner for all Python scripts
+  // ✅ Core runner for Python scripts
   // =====================================================
   runScript(scriptPath, args = [], options = {}) {
     return new Promise((resolve, reject) => {
@@ -43,155 +48,11 @@ class PythonService {
           resolve(output.trim());
         } else {
           reject(
-            new Error(
-              `Python exited with code ${code}. Error:\n${
-                errorMsg || "Unknown"
-              }`
-            )
+            new Error(`Python exited with code ${code}. Error:\n${errorMsg || "Unknown"}`)
           );
         }
       });
     });
-  }
-
-  // =====================================================
-  // ✅ Excel → CSV Converter
-  // =====================================================
-  async convertToCsv(filePath) {
-    console.log("🧮 Auto-converting Excel to CSV for faster processing...");
-    const script = path.join(__dirname, "../../ml-service/convertToCsv.py");
-    const stdout = await this.runScript(script, [filePath]);
-    const convertedPath = stdout.trim();
-
-    if (convertedPath && fs.existsSync(convertedPath)) {
-      console.log(`✅ Excel converted successfully: ${convertedPath}`);
-      return convertedPath;
-    }
-    console.log("⚠️ Conversion failed, using original Excel file.");
-    return filePath;
-  }
-
-  // =====================================================
-  // ✅ Row Counter
-  // =====================================================
-  async countRows(filePath) {
-    const script = path.join(__dirname, "../../ml-service/countRows.py");
-    const output = await this.runScript(script, [filePath]);
-    const count = parseInt(output.trim(), 10);
-    if (isNaN(count)) throw new Error("Invalid row count output");
-    return count;
-  }
-
-  // =====================================================
-  // ✅ Data Preprocessing with Status Tracking
-  // =====================================================
-  async preprocessData(userId) {
-    console.log(`🚀 Launching Python preprocessing for User ID: ${userId}...`);
-    const script = path.join(__dirname, "../../ml-service/processData.py");
-
-    return new Promise((resolve, reject) => {
-      this.preprocessStatusByUserId.set(String(userId), {
-        state: "running",
-        progress: 0,
-        message: "Starting preprocessing...",
-        updatedAt: Date.now(),
-      });
-
-      const python = spawn(this.pythonPath, [script, userId.toString()]);
-
-      python.stdout.on("data", (data) => {
-        const text = data.toString();
-        console.log("Python:", text);
-
-        const status = this.preprocessStatusByUserId.get(String(userId)) || {};
-        let progress = status.progress || 0;
-        let message = status.message || "";
-
-        if (text.includes("Reading sales data")) {
-          progress = Math.max(progress, 10);
-          message = "Reading sales data...";
-        } else if (text.includes("Cleaning raw data")) {
-          progress = Math.max(progress, 20);
-          message = "Cleaning raw data...";
-        } else if (text.includes("Aggregating daily sales data")) {
-          progress = Math.max(progress, 40);
-          message = "Aggregating daily sales data...";
-        } else if (text.includes("Generating features")) {
-          progress = Math.max(progress, 55);
-          message = "Generating features...";
-        } else if (text.includes("Computing rolling & lag features")) {
-          progress = Math.max(progress, 70);
-          message = "Computing rolling and lag features...";
-        } else if (text.includes("Calculating trend index")) {
-          progress = Math.max(progress, 85);
-          message = "Calculating trend index...";
-        } else if (text.includes("Processed data saved")) {
-          progress = 100;
-          message = "Preprocessing complete.";
-        }
-
-        this.preprocessStatusByUserId.set(String(userId), {
-          state: progress >= 100 ? "done" : "running",
-          progress,
-          message,
-          updatedAt: Date.now(),
-        });
-      });
-
-      python.stderr.on("data", (data) => {
-        console.error("🐍 Python Error:", data.toString());
-        this.preprocessStatusByUserId.set(String(userId), {
-          state: "error",
-          progress:
-            this.preprocessStatusByUserId.get(String(userId))?.progress || 0,
-          message: data.toString(),
-          updatedAt: Date.now(),
-        });
-      });
-
-      python.on("close", (code) => {
-        if (code === 0) {
-          console.log(`✅ Preprocessing finished for User ID: ${userId}`);
-          this.preprocessStatusByUserId.set(String(userId), {
-            state: "done",
-            progress: 100,
-            message: "Preprocessing complete.",
-            updatedAt: Date.now(),
-          });
-          resolve();
-        } else {
-          reject(new Error(`Python exited with code ${code}`));
-        }
-      });
-    });
-  }
-
-  // =====================================================
-  // ✅ Model Training
-  // =====================================================
-  async trainModel(userId) {
-    console.log(`🧠 Starting model training for User ID: ${userId}...`);
-    const script = path.join(__dirname, "../../ml-service/trainModel.py");
-    if (!this.checkIfModelExists(userId)) {
-      console.log("⚠️ No model found. Training new model...");
-    }
-
-    await this.runScript(script, [userId.toString()]);
-    console.log(`✅ Model training completed successfully for User ${userId}`);
-  }
-
-  // =====================================================
-  // ✅ Forecast Generation (supports weekly/30/90-day horizon)
-  // =====================================================
-  async generateForecast(userId, horizonDays = 90) {
-    console.log(`📈 Generating forecast for User ID: ${userId}...`);
-    const script = path.join(__dirname, "../../ml-service/forecastModel.py");
-
-    // ensure horizon is an integer
-    const args = [userId.toString(), "--horizon", String(horizonDays)];
-    const result = await this.runScript(script, args);
-    console.log(`✅ Forecast generation completed for User ${userId}`);
-    return result;
   }
 
   // =====================================================
@@ -208,17 +69,245 @@ class PythonService {
   }
 
   // =====================================================
-  // ✅ Utility: Check if user’s model already exists
+  // ✅ Generate Forecast
+  // =====================================================
+  async generateForecast(userId, horizonDays = 90) {
+    console.log(`📈 Generating forecast for User ID: ${userId}...`);
+
+    const script = path.join(__dirname, "../../ml-service/forecastModel.py");
+
+    // Python args: userId + optional horizon
+    const args = [userId.toString(), "--horizon", String(horizonDays)];
+
+    let status = "Completed";
+    let resultPath = null;
+
+    try {
+      const stdout = await this.runScript(script, args);
+
+      // Extract the saved file path from Python stdout
+      const pathMatch = stdout.match(/Output file:\s*(.+\.xlsx)/i);
+      if (pathMatch) {
+        resultPath = pathMatch[1].trim();
+        console.log("✅ Forecast saved at:", resultPath);
+      } else {
+        console.warn("⚠️ Could not parse output file path from Python stdout");
+      }
+    } catch (err) {
+      console.error("❌ Forecast generation failed:", err.message || err);
+      status = "Failed";
+    }
+
+    // Save history record
+    const record = {
+      userId: String(userId),
+      date: new Date().toLocaleString(),
+      horizon: horizonDays === 7 ? "Next Week" : horizonDays === 30 ? "Next 30 days" : "Next 90 days",
+      scope: "All Products",
+      status,
+      filePath: resultPath ? path.relative(path.join(__dirname, "../../backend"), resultPath).replace(/\\/g, "/") : null
+    };
+
+    try {
+      this.saveForecastHistory(record);
+    } catch (e) {
+      console.error("❌ Could not save forecast history:", e);
+    }
+
+    return resultPath;
+  }
+
+  // =====================================================
+  // ✅ Save forecast history to JSON
+  // =====================================================
+  saveForecastHistory(record) {
+    try {
+      const dir = path.dirname(this.historyPath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+      let history = [];
+      if (fs.existsSync(this.historyPath)) {
+        const raw = fs.readFileSync(this.historyPath, "utf8").trim();
+        history = raw ? JSON.parse(raw) : [];
+      }
+
+      history.push(record);
+      fs.writeFileSync(this.historyPath, JSON.stringify(history, null, 2), "utf8");
+      console.log("📁 Forecast history saved:", this.historyPath);
+    } catch (err) {
+      console.error("❌ Failed to save forecast history:", err);
+      throw err;
+    }
+  }
+
+  // =====================================================
+  // ✅ Read forecast history
+  // =====================================================
+  getForecastHistory() {
+    try {
+      if (!fs.existsSync(this.historyPath)) return [];
+      const raw = fs.readFileSync(this.historyPath, "utf8").trim();
+      return raw ? JSON.parse(raw) : [];
+    } catch (err) {
+      console.error("❌ Failed to read forecast history:", err);
+      return [];
+    }
+  }
+
+  // =====================================================
+  // ✅ Check if model exists
   // =====================================================
   checkIfModelExists(userId) {
-    const modelDir = path.join(
-      __dirname,
-      "../../ml-service/models",
-      `user_${userId}`
-    );
+    const modelDir = path.join(__dirname, "../../ml-service/models", `user_${userId}`);
     const lstmPath = path.join(modelDir, "lstm_model.keras");
     const xgbPath = path.join(modelDir, "xgb_model.json");
     return fs.existsSync(lstmPath) && fs.existsSync(xgbPath);
+  }
+
+  // =====================================================
+  // ✅ Preprocess Data
+  // =====================================================
+  async preprocessData(userId) {
+    console.log(`🔄 Starting preprocessing for User ID: ${userId}...`);
+    
+    // Update status
+    this.preprocessStatusByUserId.set(String(userId), {
+      state: "running",
+      progress: 0,
+      message: "Starting data preprocessing...",
+    });
+
+    const script = path.join(__dirname, "../../ml-service/processData.py");
+    const args = [userId.toString()];
+
+    try {
+      const output = await this.runScript(script, args);
+      
+      this.preprocessStatusByUserId.set(String(userId), {
+        state: "done",
+        progress: 100,
+        message: "Preprocessing completed successfully!",
+      });
+      
+      console.log(`✅ Preprocessing completed for user ${userId}`);
+      return output;
+    } catch (err) {
+      this.preprocessStatusByUserId.set(String(userId), {
+        state: "error",
+        progress: 0,
+        message: `Preprocessing failed: ${err.message}`,
+      });
+      console.error(`❌ Preprocessing failed for user ${userId}:`, err.message);
+      throw err;
+    }
+  }
+
+  // =====================================================
+  // ✅ Train Model
+  // =====================================================
+  async trainModel(userId) {
+    console.log(`🎯 Starting model training for User ID: ${userId}...`);
+
+    const script = path.join(__dirname, "../../ml-service/trainModel.py");
+    const args = [userId.toString()];
+
+    try {
+      const output = await this.runScript(script, args);
+      console.log(`✅ Model training completed for user ${userId}`);
+      return output;
+    } catch (err) {
+      console.error(`❌ Model training failed for user ${userId}:`, err.message);
+      throw err;
+    }
+  }
+
+  // =====================================================
+  // ✅ Convert Excel to CSV
+  // =====================================================
+  async convertToCsv(excelPath) {
+    console.log(`🔄 Converting Excel to CSV: ${excelPath}`);
+    
+    const script = path.join(__dirname, "../../ml-service/convertToCsv.py");
+    const args = [excelPath];
+
+    try {
+      const output = await this.runScript(script, args);
+      // The Python script should output the CSV file path
+      // Extract it from output or construct it
+      const csvPath = excelPath.replace(/\.xlsx?$/, ".csv");
+      
+      if (fs.existsSync(csvPath)) {
+        console.log(`✅ Excel converted to CSV: ${csvPath}`);
+        return csvPath;
+      } else {
+        // Try to extract path from output
+        const pathMatch = output.match(/([^\s]+\.csv)/);
+        if (pathMatch && fs.existsSync(pathMatch[1])) {
+          return pathMatch[1];
+        }
+        throw new Error("CSV file not found after conversion");
+      }
+    } catch (err) {
+      console.error(`❌ Excel to CSV conversion failed:`, err.message);
+      throw err;
+    }
+  }
+
+  // =====================================================
+  // ✅ Count rows in CSV or Excel file
+  // =====================================================
+  async countRows(filePath) {
+    try {
+      // Create a simple Python script to count rows
+      const countScript = `
+import sys
+import pandas as pd
+
+file_path = sys.argv[1]
+
+try:
+    if file_path.endswith('.csv'):
+        df = pd.read_csv(file_path, encoding='utf-8', on_bad_lines='skip', engine='python')
+    elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
+        df = pd.read_excel(file_path)
+    else:
+        print(0)
+        sys.exit(0)
+    
+    # Count non-empty rows (excluding header)
+    row_count = len(df.dropna(how='all'))
+    print(row_count)
+except Exception as e:
+    print(0)
+    sys.exit(1)
+`;
+
+      // Write temporary script
+      const tempScriptPath = path.join(__dirname, "../../ml-service/temp_count_rows.py");
+      fs.writeFileSync(tempScriptPath, countScript, "utf8");
+
+      try {
+        const output = await this.runScript(tempScriptPath, [filePath]);
+        const count = parseInt(output.trim(), 10);
+        
+        // Clean up temp script
+        if (fs.existsSync(tempScriptPath)) {
+          fs.unlinkSync(tempScriptPath);
+        }
+        
+        return isNaN(count) ? 0 : count;
+      } catch (err) {
+        // Clean up temp script on error
+        if (fs.existsSync(tempScriptPath)) {
+          fs.unlinkSync(tempScriptPath);
+        }
+        console.error("❌ Error counting rows:", err.message);
+        return 0;
+      }
+    } catch (err) {
+      console.error("❌ Failed to count rows:", err.message);
+      return 0;
+    }
   }
 }
 

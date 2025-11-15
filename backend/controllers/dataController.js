@@ -29,41 +29,71 @@ class DataController {
       // STEP 1️⃣: Detect & Convert if Excel
       if (fileName.endsWith(".xlsx")) {
         console.log("📘 Detected Excel file — converting to CSV...");
-        const convertedPath = await PythonService.convertToCsv(filePath);
+        try {
+          const convertedPath = await PythonService.convertToCsv(filePath);
 
-        if (!convertedPath || !fs.existsSync(convertedPath)) {
-          throw new Error("Conversion failed — cannot process Excel file");
+          if (!convertedPath || !fs.existsSync(convertedPath)) {
+            throw new Error("Conversion failed — cannot process Excel file");
+          }
+
+          filePath = convertedPath;
+          fileName = path.basename(convertedPath);
+          console.log("✅ Conversion successful, using converted CSV for next steps");
+        } catch (convertErr) {
+          console.error("❌ Excel conversion error:", convertErr);
+          throw new Error(`Excel conversion failed: ${convertErr.message}`);
         }
-
-        filePath = convertedPath;
-        fileName = path.basename(convertedPath);
-        console.log("✅ Conversion successful, using converted CSV for next steps");
       } else if (!fileName.endsWith(".csv")) {
         throw new Error("Unsupported file type. Please upload CSV or XLSX only.");
       }
 
       // STEP 2️⃣: Validate file headers
-      SalesFileValidator.validate(filePath, fileName);
-
-      // STEP 3️⃣: Count rows
-      const rowCount = await PythonService.countRows(filePath);
-
-      // STEP 4️⃣: Check if this user already uploaded the same file
-      const checkSql = `SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?`;
-      const existing = await new Promise((resolve, reject) => {
-        db.query(checkSql, [userId, fileName], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
-      });
-
-      if (existing.length > 0) {
-        throw new Error(`A file named "${fileName}" already exists for your account.`);
+      try {
+        SalesFileValidator.validate(filePath, fileName);
+      } catch (validateErr) {
+        console.error("❌ File validation error:", validateErr.message);
+        throw new Error(`File validation failed: ${validateErr.message}`);
       }
 
-      // Insert new record
-      const insertSql = `INSERT INTO salesdata (userId, fileName, records, status) VALUES (?, ?, ?, ?)`;
-      await db.query(insertSql, [userId, fileName, rowCount, "Completed"]);
+      // STEP 3️⃣: Count rows
+      let rowCount;
+      try {
+        rowCount = await PythonService.countRows(filePath);
+        if (!rowCount || rowCount === 0) {
+          throw new Error("File appears to be empty or could not count rows");
+        }
+        console.log(`📊 Row count: ${rowCount}`);
+      } catch (countErr) {
+        console.error("❌ Row counting error:", countErr);
+        throw new Error(`Failed to count rows: ${countErr.message}`);
+      }
+
+      // STEP 4️⃣: Check if this user already uploaded the same file
+      try {
+        const checkSql = `SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?`;
+        const existing = await new Promise((resolve, reject) => {
+          db.query(checkSql, [userId, fileName], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+
+        if (existing.length > 0) {
+          throw new Error(`A file named "${fileName}" already exists for your account.`);
+        }
+
+        // Insert new record
+        const insertSql = `INSERT INTO salesdata (userId, fileName, records, status) VALUES (?, ?, ?, ?)`;
+        await new Promise((resolve, reject) => {
+          db.query(insertSql, [userId, fileName, rowCount, "Completed"], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+      } catch (dbErr) {
+        console.error("❌ Database error:", dbErr);
+        throw new Error(`Database operation failed: ${dbErr.message}`);
+      }
 
       // STEP 5️⃣: Move final file to salesData folder
       const finalSalesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
@@ -144,7 +174,11 @@ class DataController {
         });
     } catch (err) {
       console.error("❌ Upload failed:", err.message);
-      return res.status(400).json({ message: err.message });
+      console.error("   Stack:", err.stack);
+      return res.status(400).json({ 
+        message: err.message || "Upload failed",
+        error: process.env.NODE_ENV === "development" ? err.stack : undefined
+      });
     }
   }
 

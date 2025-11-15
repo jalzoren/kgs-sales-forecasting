@@ -14,6 +14,8 @@ Outputs:
 """
 
 import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import sys
 import json
 from datetime import datetime, timedelta
@@ -125,7 +127,13 @@ class DataLoader:
 # ==========================================
 # MODEL LOADER (OPTIMIZED WITH PROGRESS)
 # ==========================================
+MODEL_CACHE = {}
 def load_product_models(user_id: str):
+    # Use cached models if available
+    if user_id in MODEL_CACHE:
+        print(f"[Models] Loaded {len(MODEL_CACHE[user_id])} cached models")
+        return MODEL_CACHE[user_id]
+    
     """Load all trained product models with progress tracking"""
     user_model_dir = os.path.join(MODEL_DIR, f"user_{user_id}")
     if not os.path.exists(user_model_dir):
@@ -174,6 +182,9 @@ def load_product_models(user_id: str):
         feature_output = lstm_layer(input_layer, training=False)
         extractor = Model(inputs=input_layer, outputs=feature_output)
         
+        lstm_model.make_predict_function()
+        extractor.make_predict_function()
+
         models[product_id] = {
             "lstm_model": lstm_model,
             "xgb_model": xgb_model,
@@ -181,6 +192,7 @@ def load_product_models(user_id: str):
             "stats": stats
         }
     
+    MODEL_CACHE[user_id] = models
     print(f"\n[Models]  All {len(models)} models loaded successfully!\n")
     return models
 
@@ -211,93 +223,91 @@ class ProductForecaster:
         return series, last_date
 
     def forecast_horizon(self, horizon_days: int):
-        """Generate forecast for specified horizon"""
-        series, last_date = self.prepare_recent_data()
-        
-        # Initialize rolling averages
-        rolling7 = series[-7:].copy() if len(series) >= 7 else series.copy()
-        rolling30 = series[-30:].copy() if len(series) >= 30 else series.copy()
-        
-        # Generate future dates
-        future_dates = make_future_dates(last_date, horizon_days)
-        future_static = build_static_features_for_dates(future_dates)
-        
-        # Get LSTM feature dimension
-        sample_input = np.zeros((1, self.lookback, 1))
-        sample_feat = self.extractor.predict(sample_input, verbose=0)
-        lstm_feat_dim = sample_feat.shape[1]
-        
-        results = []
-        current_series = series.copy()
-        
-        for idx, row in future_static.iterrows():
-            # Prepare sequence for LSTM
-            seq = np.array(current_series[-self.lookback:], dtype=float)
-            if len(seq) < self.lookback:
-                seq = np.concatenate([np.zeros(self.lookback - len(seq)), seq])
-            
-            # Normalize sequence
-            seq_normalized = normalize_sequence(
-                seq, 
-                self.stats['mean'], 
-                self.stats['std']
-            )
-            seq_in = seq_normalized.reshape(1, self.lookback, 1)
-            
-            # LSTM prediction (for reference, not used in final prediction)
-            lstm_pred = float(self.lstm_model.predict(seq_in, verbose=0).reshape(-1)[0])
-            
-            # Extract LSTM temporal features
-            lstm_features = self.extractor.predict(seq_in, verbose=0).reshape(-1)
-            
-            # Calculate current rolling averages
-            current_rolling_7 = float(np.mean(rolling7[-7:])) if len(rolling7) >= 7 else float(np.mean(rolling7))
-            current_rolling_30 = float(np.mean(rolling30[-30:])) if len(rolling30) >= 30 else float(np.mean(rolling30))
-            
-            # Build feature dictionary for XGBoost
-            feat_dict = {
-                "Day_of_Week": row["Day_of_Week"],
-                "Month": row["Month"],
-                "Week_of_Week": row["Week_of_Year"],
-                "Quarter": row["Quarter"],
-                "Is_Weekend": row["Is_Weekend"],
-                "Promotion_Flag": row["Promotion_Flag"],
-                "Rolling_7d_Sales": current_rolling_7,
-                "Rolling_30d_Sales": current_rolling_30,
-                **{f"LSTM_Feature_{i+1}": lstm_features[i] for i in range(lstm_feat_dim)}
-            }
-            
-            # XGBoost final prediction
-            X_row = pd.DataFrame([feat_dict])
-            xgb_pred = float(self.xgb_model.predict(X_row)[0])
-            
-            # Ensure non-negative forecast
-            xgb_pred = max(0, xgb_pred)
-            
-            # Update rolling averages for next iteration
-            rolling7.append(xgb_pred)
-            rolling30.append(xgb_pred)
-            if len(rolling7) > 30:
-                rolling7.pop(0)
-            if len(rolling30) > 30:
-                rolling30.pop(0)
-            
-            # Calculate revenue estimate
-            revenue_estimate = xgb_pred * self.avg_unit_price
-            
-            results.append({
-                "Date": row["Date"],
-                "Product_ID": self.product_id,
-                "Product_Name": self.product_name,
-                "Category": self.category,
-                "Forecast_Qty": round(xgb_pred, 2),
-                "Revenue_Estimate": round(revenue_estimate, 2),
-                "Avg_Unit_Price": round(self.avg_unit_price, 2)
-            })
-            
-            current_series.append(xgb_pred)
-        
-        return pd.DataFrame(results)
+      """Generate forecast for specified horizon using batched LSTM processing"""
+      series, last_date = self.prepare_recent_data()
+
+      # Rolling windows
+      rolling7 = series[-7:].copy() if len(series) >= 7 else series.copy()
+      rolling30 = series[-30:].copy() if len(series) >= 30 else series.copy()
+
+      # Generate future dates
+      future_dates = make_future_dates(last_date, horizon_days)
+      future_static = build_static_features_for_dates(future_dates)
+
+      # Prepare all sequences ahead of time
+      sequences = []
+      temp_series = series.copy()
+
+      for _ in future_static.itertuples():
+          seq = np.array(temp_series[-self.lookback:], dtype=float)
+          if len(seq) < self.lookback:
+              seq = np.concatenate([np.zeros(self.lookback - len(seq)), seq])
+
+          seq_norm = normalize_sequence(seq, self.stats["mean"], self.stats["std"])
+          sequences.append(seq_norm.reshape(self.lookback, 1))
+
+          # TEMP append a placeholder to maintain rolling values
+          temp_series.append(0)
+
+      # Convert to numpy batch [N, lookback, 1]
+      seq_batch = np.stack(sequences, axis=0)
+
+      # Run extractor ONCE — big speed boost
+      lstm_features_batch = self.extractor.predict(seq_batch, verbose=0)
+
+      results = []
+      current_series = series.copy()
+
+      # Loop normally but use precomputed LSTM features
+      for idx, row in future_static.iterrows():
+          lstm_features = lstm_features_batch[idx]
+
+          # Rolling windows
+          current_rolling_7 = float(np.mean(rolling7[-7:])) if len(rolling7) >= 7 else float(np.mean(rolling7))
+          current_rolling_30 = float(np.mean(rolling30[-30:])) if len(rolling30) >= 30 else float(np.mean(rolling30))
+
+          # Build features for XGB
+          feat_dict = {
+              "Day_of_Week": row["Day_of_Week"],
+              "Month": row["Month"],
+              "Week_of_Year": row["Week_of_Year"],
+              "Quarter": row["Quarter"],
+              "Is_Weekend": row["Is_Weekend"],
+              "Promotion_Flag": row["Promotion_Flag"],
+              "Rolling_7d_Sales": current_rolling_7,
+              "Rolling_30d_Sales": current_rolling_30,
+              **{f"LSTM_Feature_{i+1}": lstm_features[i] for i in range(len(lstm_features))}
+          }
+
+          # XGB prediction
+          X_row = pd.DataFrame.from_dict([feat_dict])
+          xgb_pred = float(self.xgb_model.predict(X_row)[0])
+          xgb_pred = max(0, xgb_pred)
+
+          # Update rolling windows
+          rolling7.append(xgb_pred)
+          rolling30.append(xgb_pred)
+          if len(rolling7) > 7: 
+              rolling7.pop(0)
+          if len(rolling30) > 30: 
+              rolling30.pop(0)
+
+          # Revenue
+          revenue = xgb_pred * self.avg_unit_price
+
+          results.append({
+              "Date": row["Date"],
+              "Product_ID": self.product_id,
+              "Product_Name": self.product_name,
+              "Category": self.category,
+              "Forecast_Qty": round(xgb_pred, 2),
+              "Revenue_Estimate": round(revenue, 2),
+              "Avg_Unit_Price": round(self.avg_unit_price, 2)
+          })
+
+          current_series.append(xgb_pred)
+
+      return pd.DataFrame(results)
 
 
 # ==========================================
@@ -328,7 +338,7 @@ def calculate_inventory_risk(forecast_df):
         # Determine risk level
         if avg_daily_sales >= 10:
             risk_level = "HIGH"
-            action = "Restock ASAP - Fast moving product"
+            action = "Recommend to Restock - Fast moving product"
         elif avg_daily_sales >= 5:
             risk_level = "MEDIUM"
             action = "Monitor closely - Moderate demand"
@@ -414,10 +424,31 @@ def forecast_for_user(user_id: str):
     
     # Save outputs
     out_dir = ensure_dir(os.path.join(FORECAST_DIR, f"user_{user_id}"))
+    
+    # Extract date range from the latest data
+    latest_date = df["Date"].max()
+    forecast_start_date = latest_date + timedelta(days=1)  # Start forecasting from day after latest data
+    forecast_end_date_7d = forecast_start_date + timedelta(days=6)  # 7 days (including start)
+    forecast_end_date_30d = forecast_start_date + timedelta(days=29)  # 30 days
+    forecast_end_date_90d = forecast_start_date + timedelta(days=89)  # 90 days
+    
+    # Create filename with week date range: forecast_week_YYYYMMDD_to_YYYYMMDD.xlsx
+    week_start_str = forecast_start_date.strftime("%Y%m%d")
+    week_end_str = forecast_end_date_7d.strftime("%Y%m%d")
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    out_path = os.path.join(out_dir, f"forecast_{timestamp}.xlsx")
+    
+    # Use week-based naming: forecast_week_YYYYMMDD_to_YYYYMMDD.xlsx
+    # This allows updating the same week's forecast file
+    filename = f"forecast_week_{week_start_str}_to_{week_end_str}.xlsx"
+    out_path = os.path.join(out_dir, filename)
+    
+    # If file exists, remove it to update (replace with new forecast)
+    if os.path.exists(out_path):
+        print(f"⚠️  Existing forecast file found for week {week_start_str} to {week_end_str}. Updating...")
+        os.remove(out_path)
     
     print(f"\n Saving forecast to: {out_path}")
+    print(f" Forecast period: {forecast_start_date.strftime('%Y-%m-%d')} to {forecast_end_date_90d.strftime('%Y-%m-%d')}")
     
     with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
         for sheet_name, forecast_df in combined_forecasts.items():
