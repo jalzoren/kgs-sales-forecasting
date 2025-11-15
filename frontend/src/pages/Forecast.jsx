@@ -4,6 +4,12 @@ import Swal from "sweetalert2";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
+import { IoClose } from "react-icons/io5";
+import { Viewer, Worker } from "@react-pdf-viewer/core";
+import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
@@ -11,12 +17,27 @@ dayjs.tz.setDefault("Asia/Manila");
 export default function Forecast() {
   const [forecasts, setForecasts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewingFile, setViewingFile] = useState(null);
+  const [pdfBlob, setPdfBlob] = useState(null);
+  const [pdfBlobUrl, setPdfBlobUrl] = useState(null);
+  
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   const [search, setSearch] = useState("");
   const [sortStatus, setSortStatus] = useState("All");
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+
+  // Cleanup blob URL when component unmounts or modal closes
+  useEffect(() => {
+    return () => {
+      if (pdfBlobUrl) {
+        URL.revokeObjectURL(pdfBlobUrl);
+      }
+    };
+  }, [pdfBlobUrl]);
 
   // ======================================================
   // ✅ Fetch forecast history from backend
@@ -25,7 +46,6 @@ export default function Forecast() {
     try {
       setLoading(true);
       
-      // Show loading indicator
       Swal.fire({
         title: "Loading...",
         text: "Fetching forecast history...",
@@ -40,7 +60,6 @@ export default function Forecast() {
       });
       
       if (res.status === 401) {
-        // Authentication error - redirect to login
         Swal.close();
         Swal.fire({
           icon: "warning",
@@ -74,7 +93,6 @@ export default function Forecast() {
       const data = await res.json();
       console.log("📊 Received forecast data:", data);
       
-      // Sort newest first by default (use dateISO if available, otherwise try parsing date)
       const sorted = data.sort((a, b) => {
         const dateA = a.dateISO ? new Date(a.dateISO) : new Date(a.date);
         const dateB = b.dateISO ? new Date(b.dateISO) : new Date(b.date);
@@ -102,10 +120,121 @@ export default function Forecast() {
   }, []);
 
   // ======================================================
-  // 🔁 Handle Reforecast (Generates all horizons: 7d, 30d, 90d)
+  // 👁️ Handle View PDF File - Download as Blob
+  // ======================================================
+  const handleViewFile = async (fileName) => {
+    try {
+      // Cleanup previous blob URL
+      if (pdfBlobUrl) {
+        URL.revokeObjectURL(pdfBlobUrl);
+        setPdfBlobUrl(null);
+      }
+      
+      setViewingFile(fileName);
+      setViewModalOpen(true);
+      setPdfBlob(null);
+      
+      Swal.fire({
+        title: "Loading PDF...",
+        text: "Preparing forecast report...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading(),
+      });
+      
+      const encodedFileName = encodeURIComponent(fileName);
+      const pdfViewUrl = `http://localhost:5000/api/forecast/view/${encodedFileName}`;
+      
+      console.log(`📄 Fetching PDF: ${pdfViewUrl}`);
+      
+      // Fetch PDF as blob with credentials
+      const response = await fetch(pdfViewUrl, {
+        credentials: "include",
+        method: "GET",
+      });
+      
+      Swal.close();
+      
+      if (response.status === 401) {
+        Swal.fire({
+          icon: "warning",
+          title: "Session Expired",
+          text: "Your session has expired. Please log in again.",
+          confirmButtonColor: "#3085d6",
+          confirmButtonText: "Go to Login",
+        }).then(() => {
+          window.location.href = "/login";
+        });
+        setViewModalOpen(false);
+        return;
+      }
+      
+      if (!response.ok) {
+        const contentType = response.headers.get("content-type");
+        let errorMessage = "Failed to load forecast PDF.";
+        
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+          console.error("❌ PDF fetch error:", errorData);
+        } else {
+          const errorText = await response.text();
+          console.error("❌ PDF fetch error:", errorText);
+          errorMessage = errorText || errorMessage;
+        }
+        
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Load PDF",
+          text: errorMessage,
+          confirmButtonColor: "#d33",
+        });
+        setViewModalOpen(false);
+        return;
+      }
+      
+      // Get the PDF as a blob
+      const blob = await response.blob();
+      
+      // Verify it's a PDF
+      if (!blob.type.includes("pdf")) {
+        console.error("❌ Response is not a PDF:", blob.type);
+        Swal.fire({
+          icon: "error",
+          title: "Invalid File Type",
+          text: `Expected PDF but received: ${blob.type}`,
+          confirmButtonColor: "#d33",
+        });
+        setViewModalOpen(false);
+        return;
+      }
+      
+      console.log(`✅ PDF blob received: ${(blob.size / 1024).toFixed(2)} KB`);
+      
+      // Create blob URL for the PDF viewer
+      const blobUrl = URL.createObjectURL(blob);
+      setPdfBlob(blob);
+      setPdfBlobUrl(blobUrl);
+      
+      console.log(`🔍 Opening PDF view for: ${fileName}`);
+    } catch (err) {
+      console.error("❌ Failed to view PDF:", err);
+      Swal.close();
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `Failed to load PDF: ${err.message}`,
+        confirmButtonColor: "#d33",
+      });
+      setViewModalOpen(false);
+    }
+  };
+
+  // ======================================================
+  // 🔁 Handle Reforecast
   // ======================================================
   const handleReforecast = async () => {
-    // Show confirmation dialog
     const confirmResult = await Swal.fire({
       icon: "question",
       title: "Generate New Forecast?",
@@ -121,21 +250,21 @@ export default function Forecast() {
       return;
     }
 
-    // Show loading
     Swal.fire({
       title: "Generating Forecast...",
       text: "Please wait while the forecast is being generated for all horizons.",
       allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
       didOpen: () => Swal.showLoading(),
     });
 
     try {
-      // Generate forecast for all horizons - backend generates all by default
       const res = await fetch("http://localhost:5000/api/forecast", {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}), // Empty body - generates all horizons
+        body: JSON.stringify({}),
       });
 
       if (res.status === 401) {
@@ -174,7 +303,6 @@ export default function Forecast() {
         timerProgressBar: true,
       });
 
-      // Refresh the history after a short delay
       setTimeout(() => {
         fetchHistory();
       }, 2000);
@@ -196,7 +324,6 @@ export default function Forecast() {
   const filteredForecasts = useMemo(() => {
     let result = [...forecasts];
 
-    // Search by horizon, scope, date, or filename
     if (search.trim() !== "") {
       const s = search.toLowerCase();
       result = result.filter(
@@ -208,12 +335,10 @@ export default function Forecast() {
       );
     }
 
-    // Filter by status
     if (sortStatus !== "All") {
       result = result.filter((f) => f.status === sortStatus);
     }
 
-    // Sort
     result.sort((a, b) => {
       const dA = a.dateISO ? new Date(a.dateISO) : new Date(a.date);
       const dB = b.dateISO ? new Date(b.dateISO) : new Date(b.date);
@@ -324,13 +449,21 @@ export default function Forecast() {
                     <td>{f.accuracy || "N/A"}</td>
                     <td className="actions">
                       {f.filePath ? (
-                        <a
-                          href={`http://localhost:5000/${f.filePath}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <button className="btn-download">Download</button>
-                        </a>
+                        <>
+                          <button 
+                            className="btn-view"
+                            onClick={() => handleViewFile(f.fileName)}
+                          >
+                            View
+                          </button>
+                          <a
+                            href={`http://localhost:5000/${f.filePath}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <button className="btn-download">Download</button>
+                          </a>
+                        </>
                       ) : (
                         <button className="btn-download" disabled>
                           Download
@@ -339,7 +472,6 @@ export default function Forecast() {
                       <button
                         className="btn-reforecast"
                         onClick={() => handleReforecast()}
-                        style={{ marginTop: "4px" }}
                       >
                         Reforecast
                       </button>
@@ -381,6 +513,135 @@ export default function Forecast() {
           </button>
         </div>
       </div>
+
+      {/* View PDF Modal */}
+      {viewModalOpen && (
+        <div 
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.75)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+            padding: "20px",
+          }}
+          onClick={() => {
+            setViewModalOpen(false);
+            if (pdfBlobUrl) {
+              URL.revokeObjectURL(pdfBlobUrl);
+              setPdfBlobUrl(null);
+            }
+          }}
+        >
+          <div 
+            style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              width: "90%",
+              maxWidth: "1200px",
+              height: "90vh",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div 
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "16px 24px",
+                borderBottom: "1px solid #e5e7eb",
+              }}
+            >
+              <h3 style={{
+                fontSize: "18px",
+                fontWeight: "600",
+                color: "#1a1a1a",
+                margin: 0,
+              }}>
+                Forecast Report: {viewingFile || "Loading..."}
+              </h3>
+              <button 
+                style={{
+                  padding: "8px",
+                  border: "none",
+                  backgroundColor: "transparent",
+                  cursor: "pointer",
+                  borderRadius: "6px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "24px",
+                  color: "#6b7280",
+                  transition: "all 0.2s",
+                }}
+                onClick={() => {
+                  setViewModalOpen(false);
+                  if (pdfBlobUrl) {
+                    URL.revokeObjectURL(pdfBlobUrl);
+                    setPdfBlobUrl(null);
+                  }
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f3f4f6"}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+              >
+                <IoClose />
+              </button>
+            </div>
+            
+            <div style={{
+              flex: 1,
+              overflow: "hidden",
+              padding: "16px",
+            }}>
+              {pdfBlobUrl ? (
+                <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                  <div style={{ height: "100%", width: "100%" }}>
+                    <Viewer
+                      fileUrl={pdfBlobUrl}
+                      plugins={[defaultLayoutPluginInstance]}
+                      onDocumentLoad={(e) => {
+                        console.log("✅ PDF loaded successfully:", e.doc.numPages, "pages");
+                      }}
+                      onLoadError={(error) => {
+                        console.error("❌ PDF load error:", error);
+                        Swal.fire({
+                          icon: "error",
+                          title: "Failed to Load PDF",
+                          text: "The PDF could not be loaded. Please try again or check if the forecast file exists.",
+                          confirmButtonColor: "#d33",
+                        });
+                        setViewModalOpen(false);
+                      }}
+                    />
+                  </div>
+                </Worker>
+              ) : (
+                <div style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
+                  color: "#6b7280",
+                }}>
+                  <div style={{ fontSize: "16px", fontWeight: "500" }}>Loading PDF...</div>
+                  <div style={{ fontSize: "14px", marginTop: "8px" }}>
+                    If this is the first time viewing, the PDF is being generated...
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -82,14 +82,15 @@ class DataController {
           throw new Error(`A file named "${fileName}" already exists for your account.`);
         }
 
-        // Insert new record
+        // Insert new record with "Uploaded" status (will be updated as processing progresses)
         const insertSql = `INSERT INTO salesdata (userId, fileName, records, status) VALUES (?, ?, ?, ?)`;
-        await new Promise((resolve, reject) => {
-          db.query(insertSql, [userId, fileName, rowCount, "Completed"], (err, results) => {
+        const insertResult = await new Promise((resolve, reject) => {
+          db.query(insertSql, [userId, fileName, rowCount, "Uploaded"], (err, results) => {
             if (err) return reject(err);
             resolve(results);
           });
         });
+        const salesID = insertResult.insertId;
       } catch (dbErr) {
         console.error("❌ Database error:", dbErr);
         throw new Error(`Database operation failed: ${dbErr.message}`);
@@ -113,9 +114,14 @@ class DataController {
       res.json({
         message: `File uploaded successfully (${rowCount.toLocaleString()} records)`,
         records: rowCount,
+        salesID: salesID,
       });
 
       // STEP 6️⃣: Launch preprocessing asynchronously
+      // Update status to "Preprocessing"
+      this.updateUploadStatus(salesID, "Preprocessing")
+        .catch(err => console.error("Failed to update status to Preprocessing:", err));
+
       PythonService.preprocessData(userId)
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
@@ -141,6 +147,10 @@ class DataController {
           // 🧩 Case 1: No model yet, but 3+ years available
           if (processedFiles.length >= 3 && mergedFiles.length > 0 && !modelExists) {
             console.log(`🚀 Starting initial model training for user ${userId}...`);
+            // Update status to "Training"
+            this.updateUploadStatus(salesID, "Training")
+              .catch(err => console.error("Failed to update status to Training:", err));
+            
             try {
               await PythonService.trainModel(userId);
               console.log(`🎯 Model training completed successfully for user ${userId}!`);
@@ -148,8 +158,15 @@ class DataController {
               console.log(`📈 Generating first forecast for user ${userId}...`);
               await PythonService.generateForecast(userId);
               console.log(`✅ Forecast generation completed for user ${userId}!`);
+              
+              // Update status to "Completed"
+              this.updateUploadStatus(salesID, "Completed")
+                .catch(err => console.error("Failed to update status to Completed:", err));
             } catch (trainErr) {
               console.error(`⚠️ Training or forecast failed for user ${userId}:`, trainErr.message);
+              // Update status to "Failed"
+              this.updateUploadStatus(salesID, "Failed")
+                .catch(err => console.error("Failed to update status to Failed:", err));
             }
             return;
           }
@@ -160,17 +177,31 @@ class DataController {
             try {
               await PythonService.generateForecast(userId);
               console.log(`✅ Weekly forecast generation completed for user ${userId}!`);
+              
+              // Update status to "Completed"
+              this.updateUploadStatus(salesID, "Completed")
+                .catch(err => console.error("Failed to update status to Completed:", err));
             } catch (forecastErr) {
               console.error(`⚠️ Forecast generation failed for user ${userId}:`, forecastErr.message);
+              // Update status to "Failed"
+              this.updateUploadStatus(salesID, "Failed")
+                .catch(err => console.error("Failed to update status to Failed:", err));
             }
             return;
           }
+
+          // If no model training needed, just mark as completed
+          this.updateUploadStatus(salesID, "Completed")
+            .catch(err => console.error("Failed to update status to Completed:", err));
 
           console.log(`⚠️ No valid case matched for user ${userId}.`);
           console.log(`   Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`);
         })
         .catch((err) => {
           console.error(`⚠️ Python preprocessing error: ${err.message}`);
+          // Update status to "Failed"
+          this.updateUploadStatus(salesID, "Failed")
+            .catch(updateErr => console.error("Failed to update status to Failed:", updateErr));
         });
     } catch (err) {
       console.error("❌ Upload failed:", err.message);

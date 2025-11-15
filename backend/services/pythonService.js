@@ -88,12 +88,105 @@ class PythonService {
       const stdout = await this.runScript(script, args);
 
       // Extract the saved file path from Python stdout
-      const pathMatch = stdout.match(/Output file:\s*(.+\.xlsx)/i);
+      // Try multiple patterns to catch the output file path
+      let pathMatch = stdout.match(/Output file:\s*(.+\.xlsx)/i);
+      if (!pathMatch) {
+        // Try alternative pattern
+        pathMatch = stdout.match(/Output file:\s*(.+)/i);
+      }
+      if (!pathMatch) {
+        // Try pattern without colon
+        pathMatch = stdout.match(/Output file\s+(.+\.xlsx)/i);
+      }
+      if (!pathMatch) {
+        // Try to find any .xlsx file path in the output
+        pathMatch = stdout.match(/([^\s]+\.xlsx)/i);
+      }
+      
       if (pathMatch) {
         resultPath = pathMatch[1].trim();
         console.log("✅ Forecast saved at:", resultPath);
+        console.log("📋 Full stdout (last 500 chars):", stdout.slice(-500));
+        
+        // Auto-generate PDF after Excel is created
+        try {
+          const PDFService = require("./pdfService");
+          const path = require("path");
+          const fs = require("fs");
+          
+          // Normalize the resultPath (it might be absolute or relative)
+          let absoluteExcelPath;
+          if (path.isAbsolute(resultPath)) {
+            absoluteExcelPath = resultPath;
+          } else {
+            // Try to resolve relative to backend directory
+            const backendDir = path.join(__dirname, "..");
+            absoluteExcelPath = path.resolve(backendDir, resultPath);
+            
+            // If still doesn't exist, try resolving from current working directory
+            if (!fs.existsSync(absoluteExcelPath)) {
+              absoluteExcelPath = path.resolve(resultPath);
+            }
+          }
+          
+          console.log(`🔍 Checking Excel file at: ${absoluteExcelPath}`);
+          
+          // Ensure the Excel file exists
+          if (!fs.existsSync(absoluteExcelPath)) {
+            console.warn(`⚠️ Excel file not found at: ${absoluteExcelPath}`);
+            console.warn(`   Trying to find file in forecastData directory...`);
+            
+            // Try to find it in the forecastData directory
+            const forecastDir = path.join(__dirname, "../files/forecastData", `user_${userId}`);
+            const fileName = path.basename(resultPath);
+            const altPath = path.join(forecastDir, fileName);
+            
+            if (fs.existsSync(altPath)) {
+              absoluteExcelPath = altPath;
+              console.log(`✅ Found Excel file at: ${absoluteExcelPath}`);
+            } else {
+              console.error(`❌ Excel file not found at any location`);
+              console.error(`   Tried: ${absoluteExcelPath}`);
+              console.error(`   Tried: ${altPath}`);
+              return;
+            }
+          }
+          
+          const pdfFileName = path.basename(absoluteExcelPath).replace(".xlsx", ".pdf");
+          // PDF directory should be: backend/files/forecastPdf/user_{userId}/
+          const filesDir = path.join(__dirname, "../files");
+          const pdfDir = path.join(filesDir, "forecastPdf", `user_${userId}`);
+          const pdfPath = path.join(pdfDir, pdfFileName);
+          
+          // Ensure PDF directory exists
+          if (!fs.existsSync(pdfDir)) {
+            fs.mkdirSync(pdfDir, { recursive: true });
+            console.log(`📁 Created PDF directory: ${pdfDir}`);
+          }
+          
+          console.log(`📄 Auto-generating PDF report...`);
+          console.log(`   Excel: ${absoluteExcelPath}`);
+          console.log(`   PDF: ${pdfPath}`);
+          
+          await PDFService.generateForecastReport(absoluteExcelPath, pdfPath);
+          
+          // Verify PDF was created
+          if (fs.existsSync(pdfPath)) {
+            const pdfStats = fs.statSync(pdfPath);
+            console.log(`✅ PDF report generated successfully!`);
+            console.log(`   Path: ${pdfPath}`);
+            console.log(`   Size: ${(pdfStats.size / 1024).toFixed(2)} KB`);
+          } else {
+            console.error(`❌ PDF file was not created at: ${pdfPath}`);
+          }
+        } catch (pdfErr) {
+          console.error("❌ Failed to auto-generate PDF (forecast still successful):", pdfErr.message);
+          console.error("   Stack:", pdfErr.stack);
+          // Don't fail the forecast if PDF generation fails
+        }
       } else {
         console.warn("⚠️ Could not parse output file path from Python stdout");
+        console.warn("   Full stdout:", stdout);
       }
     } catch (err) {
       console.error("❌ Forecast generation failed:", err.message || err);
