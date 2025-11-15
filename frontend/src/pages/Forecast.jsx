@@ -168,7 +168,7 @@ export default function Forecast() {
       Swal.fire({
         icon: "success",
         title: "Forecast Generation Started",
-        text: "Your forecast is being generated. It will appear in the history when complete.",
+        text: "Your forecast is being generated for all horizons (Next Week, Next 30 days, Next 90 days). It will appear in the history when complete.",
         confirmButtonColor: "#28a745",
         timer: 3000,
         timerProgressBar: true,
