@@ -369,17 +369,10 @@ export default function Forecast() {
       <div className="table-wrapper">
         {/* Toolbar */}
         <div className="table-toolbar">
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search forecasts..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <button className="btn-search" onClick={() => setCurrentPage(1)}>
-              Search
-            </button>
-          </div>
+          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
+            <option>Newest First</option>
+            <option>Oldest First</option>
+          </select>
 
           <select value={sortStatus} onChange={(e) => setSortStatus(e.target.value)}>
             <option>All</option>
@@ -387,10 +380,22 @@ export default function Forecast() {
             <option>Failed</option>
           </select>
 
-          <select value={sortOrder} onChange={(e) => setSortOrder(e.target.value)}>
-            <option>Newest First</option>
-            <option>Oldest First</option>
-          </select>
+          <div className="search-box">
+            <input
+              type="text"
+              placeholder="Search forecasts..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  setCurrentPage(1);
+                }
+              }}
+            />
+            <button className="btn-search" onClick={() => setCurrentPage(1)}>
+              Search
+            </button>
+          </div>
         </div>
 
         {/* Table */}
