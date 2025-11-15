@@ -14,6 +14,11 @@ router.get("/api/data/preprocess-status", requireAuth, (req, res) =>
   DataController.getPreprocessStatus(req, res)
 );
 
+// Training status polling
+router.get("/api/data/training-status", requireAuth, (req, res) =>
+  DataController.getTrainingStatus(req, res)
+);
+
 router.post(
   "/api/data/upload",
   requireAuth,

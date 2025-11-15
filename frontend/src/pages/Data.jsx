@@ -34,17 +34,22 @@ export default function UploadBox() {
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [uploadStatusMap, setUploadStatusMap] = useState({}); // Track status by salesID
 
-  const fetchUploads = async () => {
-    // Show loading indicator
-    Swal.fire({
-      title: "Loading...",
-      text: "Fetching upload history...",
-      allowOutsideClick: false,
-      allowEscapeKey: false,
-      showConfirmButton: false,
-      didOpen: () => Swal.showLoading(),
-    });
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  const fetchUploads = async (showLoading = false) => {
+    // Only show loading indicator on initial load
+    if (showLoading && isInitialLoad) {
+      Swal.fire({
+        title: "Loading...",
+        text: "Fetching upload history...",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => Swal.showLoading(),
+      });
+    }
 
     try {
       const res = await fetch("http://localhost:5000/api/data", {
@@ -52,20 +57,24 @@ export default function UploadBox() {
       });
       
       if (res.status === 401) {
-        Swal.close();
+        if (showLoading && isInitialLoad) {
+          Swal.close();
+        }
         window.location.href = "/";
         return;
       }
       
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({ message: res.statusText }));
-        Swal.close();
-        Swal.fire({
-          icon: "error",
-          title: "Failed to Load Data",
-          text: errorData.message || "Failed to fetch upload history.",
-          confirmButtonColor: "#d33",
-        });
+        if (showLoading && isInitialLoad) {
+          Swal.close();
+          Swal.fire({
+            icon: "error",
+            title: "Failed to Load Data",
+            text: errorData.message || "Failed to fetch upload history.",
+            confirmButtonColor: "#d33",
+          });
+        }
         setUploads([]);
         return;
       }
@@ -73,26 +82,43 @@ export default function UploadBox() {
       const data = await res.json();
       if (Array.isArray(data)) {
         setUploads(data);
-        Swal.close();
+        if (showLoading && isInitialLoad) {
+          Swal.close();
+          setIsInitialLoad(false);
+        }
       } else {
-        Swal.close();
+        if (showLoading && isInitialLoad) {
+          Swal.close();
+          setIsInitialLoad(false);
+        }
         setUploads([]);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
-      Swal.close();
-      Swal.fire({
-        icon: "error",
-        title: "Connection Error",
-        text: `Failed to connect to server: ${err.message}. Please make sure the backend server is running.`,
-        confirmButtonColor: "#d33",
-      });
+      if (showLoading && isInitialLoad) {
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Connection Error",
+          text: `Failed to connect to server: ${err.message}. Please make sure the backend server is running.`,
+          confirmButtonColor: "#d33",
+        });
+        setIsInitialLoad(false);
+      }
       setUploads([]);
     }
   };
 
   useEffect(() => {
-    fetchUploads();
+    // Initial load with loading indicator
+    fetchUploads(true);
+    
+    // Periodically refresh uploads silently (without SWAL) to get status updates
+    const refreshInterval = setInterval(() => {
+      fetchUploads(false); // Silent refresh
+    }, 5000); // Refresh every 5 seconds (reduced frequency)
+    
+    return () => clearInterval(refreshInterval);
   }, []);
 
   // Handle file upload
@@ -156,6 +182,17 @@ export default function UploadBox() {
         removeNotification(uploadingId);
         showSuccess(`Sales data uploaded successfully: ${file.name}`);
 
+        // Get salesID from response
+        const salesID = result.salesID;
+        
+        // Update local status to "Uploaded"
+        if (salesID) {
+          setUploadStatusMap(prev => ({ ...prev, [salesID]: "Uploaded" }));
+        }
+
+        // Refresh uploads to get the new record
+        await fetchUploads();
+
         // 3) Start preprocessing progress polling
         let progressNotifId = null;
         const poll = async () => {
@@ -170,6 +207,14 @@ export default function UploadBox() {
             const status = await statusRes.json(); // { state, progress, message }
 
             if (status.state === "running") {
+              // Update status to "Preprocessing"
+              if (salesID) {
+                setUploadStatusMap(prev => ({ ...prev, [salesID]: "Preprocessing" }));
+                setUploads(prev => prev.map(u => 
+                  u.salesID === salesID ? { ...u, status: "Preprocessing" } : u
+                ));
+              }
+
               if (!progressNotifId) {
                 progressNotifId = showProgress(
                   "Preprocessing sales data...",
@@ -194,7 +239,21 @@ export default function UploadBox() {
                 progress: undefined,
               });
               clearInterval(pollInterval);
+              
+              // Refresh uploads to get updated status from backend
+              fetchUploads();
+              
+              // Start training status polling if needed
+              startTrainingStatusPolling(salesID);
             } else if (status.state === "error") {
+              // Update status to "Failed"
+              if (salesID) {
+                setUploadStatusMap(prev => ({ ...prev, [salesID]: "Failed" }));
+                setUploads(prev => prev.map(u => 
+                  u.salesID === salesID ? { ...u, status: "Failed" } : u
+                ));
+              }
+
               showError(
                 `Preprocessing error: ${status.message || "Unknown error"}`
               );
@@ -206,6 +265,9 @@ export default function UploadBox() {
                 });
               }
               clearInterval(pollInterval);
+              
+              // Refresh uploads to get updated status from backend
+              fetchUploads();
             }
           } catch (e) {
             // ignore transient polling errors
@@ -214,7 +276,108 @@ export default function UploadBox() {
         const pollInterval = setInterval(poll, 1500);
         poll(); // fire immediately
 
-        fetchUploads();
+        // Function to poll training status
+        const startTrainingStatusPolling = (fileSalesID) => {
+          let trainingNotifId = null;
+          const pollTraining = async () => {
+            try {
+              const trainingStatusRes = await fetch(
+                "http://localhost:5000/api/data/training-status",
+                {
+                  credentials: "include",
+                }
+              );
+              if (!trainingStatusRes.ok) return;
+              const trainingStatus = await trainingStatusRes.json();
+
+              if (trainingStatus.state === "running") {
+                // Update status to "Training"
+                if (fileSalesID) {
+                  setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Training" }));
+                  setUploads(prev => prev.map(u => 
+                    u.salesID === fileSalesID ? { ...u, status: "Training" } : u
+                  ));
+                }
+
+                if (!trainingNotifId) {
+                  const title = trainingStatus.datasetInfo || "Training Model";
+                  const message = trainingStatus.message || "Training model...";
+                  trainingNotifId = showProgress(message, trainingStatus.progress || 0, title);
+                } else {
+                  const message = trainingStatus.currentProduct 
+                    ? `Training model for: ${trainingStatus.currentProduct}`
+                    : trainingStatus.message || "Training model...";
+                  updateNotification(trainingNotifId, {
+                    message: message,
+                    progress: typeof trainingStatus.progress === "number" ? trainingStatus.progress : undefined,
+                    title: trainingStatus.datasetInfo || "Training Model",
+                  });
+                }
+              } else if (trainingStatus.state === "done") {
+                // Update status to "Completed"
+                if (fileSalesID) {
+                  setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Completed" }));
+                  setUploads(prev => prev.map(u => 
+                    u.salesID === fileSalesID ? { ...u, status: "Completed" } : u
+                  ));
+                }
+
+                if (!trainingNotifId) {
+                  trainingNotifId = showProgress("Training complete.", 100, "Training Model");
+                }
+                updateNotification(trainingNotifId, {
+                  type: "success",
+                  message: trainingStatus.message || "Done training model.",
+                  progress: undefined,
+                });
+                clearInterval(trainingPollInterval);
+                
+                // Refresh uploads to get updated status from backend
+                fetchUploads();
+              } else if (trainingStatus.state === "error") {
+                // Update status to "Failed"
+                if (fileSalesID) {
+                  setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Failed" }));
+                  setUploads(prev => prev.map(u => 
+                    u.salesID === fileSalesID ? { ...u, status: "Failed" } : u
+                  ));
+                }
+
+                showError(
+                  `Training error: ${trainingStatus.message || "Unknown error"}`
+                );
+                if (trainingNotifId) {
+                  updateNotification(trainingNotifId, {
+                    type: "error",
+                    message: "Training failed.",
+                    progress: undefined,
+                  });
+                }
+                clearInterval(trainingPollInterval);
+                
+                // Refresh uploads to get updated status from backend
+                fetchUploads();
+              } else if (trainingStatus.state === "idle") {
+                // Training not started yet, but preprocessing is done - mark as completed
+                if (fileSalesID) {
+                  setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Completed" }));
+                  setUploads(prev => prev.map(u => 
+                    u.salesID === fileSalesID ? { ...u, status: "Completed" } : u
+                  ));
+                }
+                clearInterval(trainingPollInterval);
+                
+                // Refresh uploads to get updated status from backend
+                fetchUploads();
+              }
+            } catch (e) {
+              // ignore transient polling errors
+            }
+          };
+          const trainingPollInterval = setInterval(pollTraining, 1500);
+          pollTraining(); // fire immediately
+        };
+
         setCurrentPage(1);
       } else {
         Swal.close();
@@ -333,12 +496,13 @@ export default function UploadBox() {
   const filteredUploads = uploads.filter((item) => {
     const matchesSearch =
       item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
+    const currentStatus = uploadStatusMap[item.salesID] || item.status;
     const matchesStatus =
       statusFilter === "All"
         ? true
         : statusFilter === "Active Uploads"
-        ? item.status !== "Completed" && item.status !== "Failed"
-        : item.status === statusFilter;
+        ? currentStatus !== "Completed" && currentStatus !== "Failed" && currentStatus !== "Error"
+        : currentStatus === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -463,6 +627,9 @@ export default function UploadBox() {
           >
             <option>All</option>
             <option>Active Uploads</option>
+            <option>Uploaded</option>
+            <option>Preprocessing</option>
+            <option>Training</option>
             <option>Completed</option>
             <option>Failed</option>
           </select>
@@ -508,12 +675,16 @@ export default function UploadBox() {
                         className={`status ${
                           item.status === "Completed"
                             ? "success"
-                            : item.status === "Failed"
+                            : item.status === "Failed" || item.status === "Error"
                             ? "failed"
+                            : item.status === "Preprocessing" || item.status === "Training"
+                            ? "processing"
+                            : item.status === "Uploaded"
+                            ? "uploaded"
                             : "pending"
                         }`}
                       >
-                        {item.status}
+                        {uploadStatusMap[item.salesID] || item.status}
                       </span>
                     </td>
                     <td className="actions">
