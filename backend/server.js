@@ -47,6 +47,12 @@ app.use("/", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
 
+// Debug: Log all registered routes
+console.log("📋 Registered routes:");
+console.log("  - /api/forecast/history");
+console.log("  - /api/forecast/analytics");
+console.log("  - /api/forecast");
+
 // =====================================================
 // Default route
 // =====================================================
