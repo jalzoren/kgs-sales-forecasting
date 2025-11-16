@@ -1,3 +1,4 @@
+// frontend/src/pages/Login.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -34,6 +35,50 @@ const Login = () => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  // ✅ Check if user has forecasts to determine redirect
+  const checkUserStatus = async () => {
+    try {
+      console.log("🔍 Checking user forecast status...");
+      
+      const forecastRes = await fetch("http://localhost:5000/api/forecast/history", {
+        credentials: "include",
+      });
+      
+      console.log("📡 Forecast API response status:", forecastRes.status);
+      
+      // ✅ Check for 404 (no forecasts) or check if array is empty
+      if (forecastRes.status === 404) {
+        console.log("ℹ️ No forecast found (404) - redirecting to /welcome");
+        return "/welcome";
+      }
+      
+      if (forecastRes.ok) {
+        try {
+          const data = await forecastRes.json();
+          console.log("📊 Forecast data:", data);
+          
+          // ✅ Check if user actually has forecast data
+          if (Array.isArray(data) && data.length > 0) {
+            console.log("✅ User has forecast - redirecting to /home");
+            return "/home";
+          } else {
+            console.log("ℹ️ User has no forecasts (empty array) - redirecting to /welcome");
+            return "/welcome";
+          }
+        } catch (parseErr) {
+          console.error("❌ Error parsing forecast response:", parseErr);
+          return "/welcome";
+        }
+      } else {
+        console.log(`⚠️ Forecast check returned ${forecastRes.status} - redirecting to /welcome`);
+        return "/welcome";
+      }
+    } catch (err) {
+      console.error("❌ Error checking user status:", err);
+      return "/welcome";
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -60,13 +105,16 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
+        // ✅ Check user status and redirect accordingly
+        const redirectPath = await checkUserStatus();
+        
         Swal.fire({
           icon: "success",
           title: "Login Successful",
           text: "Welcome back!",
           confirmButtonColor: "#001D39",
         }).then(() => {
-          navigate("/home");
+          navigate(redirectPath); // ✅ Smart redirect
         });
       } else {
         // Handle account lockout with SweetAlert countdown
@@ -88,14 +136,12 @@ const Login = () => {
             },
           });
 
-          // Update the timer every second
           timerInterval = setInterval(() => {
             Swal.getHtmlContainer().querySelector("b").textContent = Math.ceil(
               Swal.getTimerLeft() / 1000
             ).toString();
           }, 1000);
         } else {
-          // Regular failed attempt
           Swal.fire({
             icon: "error",
             title: "Login Failed",
@@ -105,7 +151,6 @@ const Login = () => {
         }
       }
     } catch (error) {
-
       console.error("Error:", error);
       Swal.fire({
         icon: "error",

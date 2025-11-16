@@ -1,6 +1,6 @@
+// frontend/src/pages/Home.jsx
 import React from "react";
 import "../css/Home.css";
-
 
 import {
   LineChart,

@@ -531,33 +531,108 @@ export default function UploadBox() {
 
   const handleInfoClick = () => {
     Swal.fire({
-      title: "User Manual",
+      title: "📖 Data Management User Guide",
       html: `
-        <div style=" max-height: 250px; overflow-y: auto; text-align: left; padding: 0 10px;">
-          <h4>Uploading Files</h4>
-          <ol style="padding-left: 20px;">
-            <li>As much as possible, CSV files should be uploaded.</li>
-            <li>Note: Excel files may take longer to upload.</li>
-            <li>Sales data must contain required columns such as:
-              <ul>
-                <li>date</li>
-                <li>product_id</li>
-                <li>product_name</li>
-                <li>quantity</li>
-                <li>discount</li>
-                <li>unit_price</li>
-                <li>total_amount</li>
-              </ul>
-            </li>
+        <div class="user-manual-container">
+          
+          <h3 class="manual-section-title">📁 Uploading Sales Data</h3>
+          
+          <h4 class="manual-subsection-title">Supported File Formats</h4>
+          <ul class="manual-list">
+            <li><strong>CSV files (.csv)</strong> - Recommended for faster uploads</li>
+            <li><strong>Excel files (.xlsx)</strong> - Supported but may take longer to process</li>
+          </ul>
+          
+          <h4 class="manual-subsection-title">How to Upload</h4>
+          <ol class="manual-list">
+            <li><strong>Drag & Drop:</strong> Drag your file directly into the upload box</li>
+            <li><strong>Browse:</strong> Click "Browse" to select a file from your computer</li>
+            <li>Wait for the upload to complete (progress will be shown)</li>
           </ol>
+          
+          <h4 class="manual-subsection-title">Required Data Columns</h4>
+          <p>Your sales data file <strong>must include</strong> these columns:</p>
+          <ul class="manual-list">
+            <li><code class="manual-code">date</code> - Transaction date (YYYY-MM-DD format)</li>
+            <li><code class="manual-code">product_id</code> - Unique product identifier</li>
+            <li><code class="manual-code">product_name</code> - Name of the product</li>
+            <li><code class="manual-code">category</code> - Product category</li>
+            <li><code class="manual-code">quantity</code> - Number of units sold</li>
+            <li><code class="manual-code">unit_price</code> - Price per unit</li>
+            <li><code class="manual-code">discount</code> - Discount amount (if any)</li>
+            <li><code class="manual-code">total_amount</code> - Total sales amount</li>
+          </ul>
+          
+          <h3 class="manual-section-title">📊 Initial Setup (First Time Users)</h3>
+          <div class="manual-alert manual-alert-warning">
+            <strong>⚠️ Important:</strong> To train accurate forecasting models, you need to upload <strong>at least 3 years</strong> of historical sales data.
+          </div>
+          <ul class="manual-list">
+            <li>Upload one year at a time (e.g., 2022.csv, 2023.csv, 2024.csv)</li>
+            <li>Model training will start automatically once 3 years of data is uploaded</li>
+            <li>Training may take 10-30 minutes depending on data size</li>
+          </ul>
+          
+          <h3 class="manual-section-title">🔄 Weekly Updates (After Initial Setup)</h3>
+          <ul class="manual-list">
+            <li>Upload your latest weekly sales data regularly</li>
+            <li>System will automatically generate new forecasts</li>
+            <li>Keep your forecasts accurate by uploading consistently</li>
+          </ul>
+          
+          <h3 class="manual-section-title">📋 Upload Status Guide</h3>
+          <ul class="manual-status-list">
+            <li><span class="manual-status manual-status-uploaded">Uploaded</span> - File successfully received</li>
+            <li><span class="manual-status manual-status-processing">Preprocessing</span> - Data is being cleaned and validated</li>
+            <li><span class="manual-status manual-status-processing">Training</span> - AI models are being trained</li>
+            <li><span class="manual-status manual-status-completed">Completed</span> - Processing finished successfully</li>
+            <li><span class="manual-status manual-status-failed">Failed</span> - An error occurred (check file format)</li>
+          </ul>
+          
+          <h3 class="manual-section-title">💡 Best Practices</h3>
+          <ul class="manual-list">
+            <li>✅ Use CSV format when possible for faster uploads</li>
+            <li>✅ Ensure all required columns are present</li>
+            <li>✅ Check that dates are in YYYY-MM-DD format</li>
+            <li>✅ Remove any empty rows or columns</li>
+            <li>✅ Avoid duplicate file names</li>
+            <li>✅ Upload files during off-peak hours for large datasets</li>
+          </ul>
+          
+          <h3 class="manual-section-title">🔍 Managing Uploaded Files</h3>
+          <ul class="manual-list">
+            <li><strong>Search:</strong> Find files by name using the search box</li>
+            <li><strong>Filter:</strong> View files by status (All, Active, Completed, etc.)</li>
+            <li><strong>Sort:</strong> Sort by upload date (Newest/Oldest first)</li>
+            <li><strong>Delete:</strong> Remove files you no longer need</li>
+          </ul>
+          
+          <h3 class="manual-section-title">⚠️ Troubleshooting</h3>
+          <div class="manual-alert manual-alert-danger">
+            <strong>Upload Failed?</strong> Check these common issues:
+            <ul class="manual-alert-list">
+              <li>Missing required columns</li>
+              <li>Invalid date format (must be YYYY-MM-DD)</li>
+              <li>File is corrupted or empty</li>
+              <li>File name already exists</li>
+              <li>File size too large (split into smaller files)</li>
+            </ul>
+          </div>
+          
+          <div class="manual-alert manual-alert-info">
+            <strong>💡 Pro Tip:</strong> The system automatically validates your data during upload. If there are any issues, you'll receive a detailed error message explaining what needs to be fixed.
+          </div>
+          
         </div>
       `,
       icon: "info",
-      confirmButtonText: "Understood!",
+      confirmButtonText: "Got it!",
       confirmButtonColor: "var(--accent)",
-      background: "#f5f7fa",
-      color: "#001d39",
-      width: "400px",
+      width: "750px",
+      customClass: {
+        popup: 'user-manual-popup',
+        htmlContainer: 'user-manual-content'
+      }
     });
   };
   return (

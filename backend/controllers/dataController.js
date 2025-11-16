@@ -436,6 +436,42 @@ class DataController {
     }
   }
   
+
+  // Add this method to DataController class (fix the SQL and logic)
+  async getUserDataStatus(req, res) {
+    const userId = req.session.user?.id; // ✅ Fixed: was req.session.userId
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: User not logged in" });
+    }
+
+    try {
+      const sql = `SELECT salesID, status FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC`;
+      
+      db.query(sql, [userId], (err, uploads) => {
+        if (err) {
+          console.error("❌ getUserDataStatus error:", err);
+          return res.status(500).json({ message: "Database error", error: err });
+        }
+        
+        const hasData = uploads.length > 0;
+        const hasCompletedTraining = uploads.some(u => u.status === "Completed");
+        const isProcessing = uploads.some(u => 
+          u.status === "Preprocessing" || u.status === "Training"
+        );
+        
+        res.json({
+          hasData,
+          hasCompletedTraining,
+          isProcessing,
+          totalUploads: uploads.length
+        });
+      });
+    } catch (error) {
+      console.error("❌ Error checking user data status:", error);
+      res.status(500).json({ message: "Failed to check data status" });
+    }
+  }
 }
 
 module.exports = new DataController();

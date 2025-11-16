@@ -57,9 +57,13 @@ router.get("/api/forecast/history", requireAuth, async (req, res) => {
 
     console.log(`📂 Checking forecast directory: ${absoluteForecastDir}`);
 
+    // ✅ FIXED: Return 404 status for new users without forecast directory
     if (!fs.existsSync(absoluteForecastDir)) {
       console.log(`📂 No forecast directory found for user ${userId}`);
-      return res.json([]);
+      return res.status(404).json({ 
+        message: "No forecasts found",
+        forecasts: [] 
+      });
     }
 
     // Get all Excel files, excluding temp files

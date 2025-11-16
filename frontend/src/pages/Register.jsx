@@ -1,3 +1,4 @@
+// frontend/src/pages/Register.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
@@ -156,10 +157,10 @@ const Register = () => {
         Swal.fire({
           icon: "success",
           title: "Registration Successful!",
-          text: data.message,
+          text: "Welcome! Let's get started with setting up your forecasting system.",
           confirmButtonColor: "#001D39",
         }).then(() => {
-          navigate("/home");
+          navigate("/welcome"); // ✅ Changed from /home to /welcome
         });
       } else {
         Swal.fire({

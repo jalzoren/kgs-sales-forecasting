@@ -9,6 +9,11 @@ router.get("/api/data", requireAuth, (req, res) =>
   DataController.getUploads(req, res)
 );
 
+// Check user's overall data status (for Welcome page)
+router.get("/api/data/status", requireAuth, (req, res) =>
+  DataController.getUserDataStatus(req, res)
+);
+
 // Preprocess status polling
 router.get("/api/data/preprocess-status", requireAuth, (req, res) =>
   DataController.getPreprocessStatus(req, res)

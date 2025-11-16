@@ -1,8 +1,10 @@
+// frontend/src/App.jsx
 import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Navbar2 from "./components/Navbar2";
 import { NotificationProvider } from "./components/Notifications";
-
+import ProtectedRoute from "./components/ProtectedRoute";
+import AuthRoute from "./components/AuthRoute"; // ✅ NEW
 
 import Home from "./pages/Home";
 import Data from "./pages/Data";
@@ -26,8 +28,6 @@ function App() {
 
   return (
     <NotificationProvider>
-      {/* This connects to your FastAPI SSE stream */}
-
       {noNavbarPaths.includes(path) ? null : navbar2Paths.includes(path) ? (
         <Navbar2 />
       ) : navbarPaths.includes(path) ? (
@@ -40,12 +40,45 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot" element={<Forgot />} />
-          <Route path="/welcome" element={<Welcome />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/data" element={<Data />} />
-          <Route path="/forecast" element={<Forecast />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/analytics" element={<Analytics />} />
+          
+          {/* Welcome page - requires authentication only */}
+          <Route path="/welcome" element={
+            <AuthRoute>
+              <Welcome />
+            </AuthRoute>
+          } />
+          
+          {/* Data page - requires authentication */}
+          <Route path="/data" element={
+            <AuthRoute>
+              <Data />
+            </AuthRoute>
+          } />
+          
+          {/* Protected routes - requires authentication + forecast */}
+          <Route path="/home" element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/forecast" element={
+            <ProtectedRoute>
+              <Forecast />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/reports" element={
+            <ProtectedRoute>
+              <Reports />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/analytics" element={
+            <ProtectedRoute>
+              <Analytics />
+            </ProtectedRoute>
+          } />
         </Routes>
       </div>
     </NotificationProvider>
