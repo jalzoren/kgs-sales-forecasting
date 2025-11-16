@@ -197,12 +197,14 @@
   color: #c92a2a;
 }
 
-/* Action buttons */
+/* Action button POss */
 .actions {
-  display: flex;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
+ display: flex;
+    justify-content: space-around;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-content: space-around;
+    flex-direction: column;
 }
 
 .btn-view,

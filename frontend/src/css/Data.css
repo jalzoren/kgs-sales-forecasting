@@ -211,14 +211,46 @@ hr {
 /* Status Indicators */
 .status {
   font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  display: inline-block;
 }
 
 .status.success {
   color: #1a7f37;
+  background-color: #d4edda;
 }
 
-.status.failed {
+.status.failed,
+.status.error {
   color: #c92a2a;
+  background-color: #f8d7da;
+}
+
+.status.processing {
+  color: #0a4174;
+  background-color: #d1ecf1;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.status.uploaded {
+  color: #856404;
+  background-color: #fff3cd;
+}
+
+.status.pending {
+  color: #6c757d;
+  background-color: #e2e3e5;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
 }
 
 /* Table Actions */

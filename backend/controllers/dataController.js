@@ -29,41 +29,72 @@ class DataController {
       // STEP 1️⃣: Detect & Convert if Excel
       if (fileName.endsWith(".xlsx")) {
         console.log("📘 Detected Excel file — converting to CSV...");
-        const convertedPath = await PythonService.convertToCsv(filePath);
+        try {
+          const convertedPath = await PythonService.convertToCsv(filePath);
 
-        if (!convertedPath || !fs.existsSync(convertedPath)) {
-          throw new Error("Conversion failed — cannot process Excel file");
+          if (!convertedPath || !fs.existsSync(convertedPath)) {
+            throw new Error("Conversion failed — cannot process Excel file");
+          }
+
+          filePath = convertedPath;
+          fileName = path.basename(convertedPath);
+          console.log("✅ Conversion successful, using converted CSV for next steps");
+        } catch (convertErr) {
+          console.error("❌ Excel conversion error:", convertErr);
+          throw new Error(`Excel conversion failed: ${convertErr.message}`);
         }
-
-        filePath = convertedPath;
-        fileName = path.basename(convertedPath);
-        console.log("✅ Conversion successful, using converted CSV for next steps");
       } else if (!fileName.endsWith(".csv")) {
         throw new Error("Unsupported file type. Please upload CSV or XLSX only.");
       }
 
       // STEP 2️⃣: Validate file headers
-      SalesFileValidator.validate(filePath, fileName);
-
-      // STEP 3️⃣: Count rows
-      const rowCount = await PythonService.countRows(filePath);
-
-      // STEP 4️⃣: Check if this user already uploaded the same file
-      const checkSql = `SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?`;
-      const existing = await new Promise((resolve, reject) => {
-        db.query(checkSql, [userId, fileName], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
-      });
-
-      if (existing.length > 0) {
-        throw new Error(`A file named "${fileName}" already exists for your account.`);
+      try {
+        SalesFileValidator.validate(filePath, fileName);
+      } catch (validateErr) {
+        console.error("❌ File validation error:", validateErr.message);
+        throw new Error(`File validation failed: ${validateErr.message}`);
       }
 
-      // Insert new record
-      const insertSql = `INSERT INTO salesdata (userId, fileName, records, status) VALUES (?, ?, ?, ?)`;
-      await db.query(insertSql, [userId, fileName, rowCount, "Completed"]);
+      // STEP 3️⃣: Count rows
+      let rowCount;
+      try {
+        rowCount = await PythonService.countRows(filePath);
+        if (!rowCount || rowCount === 0) {
+          throw new Error("File appears to be empty or could not count rows");
+        }
+        console.log(`📊 Row count: ${rowCount}`);
+      } catch (countErr) {
+        console.error("❌ Row counting error:", countErr);
+        throw new Error(`Failed to count rows: ${countErr.message}`);
+      }
+
+      // STEP 4️⃣: Check if this user already uploaded the same file
+      try {
+        const checkSql = `SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?`;
+        const existing = await new Promise((resolve, reject) => {
+          db.query(checkSql, [userId, fileName], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+
+        if (existing.length > 0) {
+          throw new Error(`A file named "${fileName}" already exists for your account.`);
+        }
+
+        // Insert new record with "Uploaded" status (will be updated as processing progresses)
+        const insertSql = `INSERT INTO salesdata (userId, fileName, records, status) VALUES (?, ?, ?, ?)`;
+        const insertResult = await new Promise((resolve, reject) => {
+          db.query(insertSql, [userId, fileName, rowCount, "Uploaded"], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+        const salesID = insertResult.insertId;
+      } catch (dbErr) {
+        console.error("❌ Database error:", dbErr);
+        throw new Error(`Database operation failed: ${dbErr.message}`);
+      }
 
       // STEP 5️⃣: Move final file to salesData folder
       const finalSalesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
@@ -83,9 +114,14 @@ class DataController {
       res.json({
         message: `File uploaded successfully (${rowCount.toLocaleString()} records)`,
         records: rowCount,
+        salesID: salesID,
       });
 
       // STEP 6️⃣: Launch preprocessing asynchronously
+      // Update status to "Preprocessing"
+      this.updateUploadStatus(salesID, "Preprocessing")
+        .catch(err => console.error("Failed to update status to Preprocessing:", err));
+
       PythonService.preprocessData(userId)
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
@@ -111,6 +147,10 @@ class DataController {
           // 🧩 Case 1: No model yet, but 3+ years available
           if (processedFiles.length >= 3 && mergedFiles.length > 0 && !modelExists) {
             console.log(`🚀 Starting initial model training for user ${userId}...`);
+            // Update status to "Training"
+            this.updateUploadStatus(salesID, "Training")
+              .catch(err => console.error("Failed to update status to Training:", err));
+            
             try {
               await PythonService.trainModel(userId);
               console.log(`🎯 Model training completed successfully for user ${userId}!`);
@@ -118,8 +158,15 @@ class DataController {
               console.log(`📈 Generating first forecast for user ${userId}...`);
               await PythonService.generateForecast(userId);
               console.log(`✅ Forecast generation completed for user ${userId}!`);
+              
+              // Update status to "Completed"
+              this.updateUploadStatus(salesID, "Completed")
+                .catch(err => console.error("Failed to update status to Completed:", err));
             } catch (trainErr) {
               console.error(`⚠️ Training or forecast failed for user ${userId}:`, trainErr.message);
+              // Update status to "Failed"
+              this.updateUploadStatus(salesID, "Failed")
+                .catch(err => console.error("Failed to update status to Failed:", err));
             }
             return;
           }
@@ -130,21 +177,39 @@ class DataController {
             try {
               await PythonService.generateForecast(userId);
               console.log(`✅ Weekly forecast generation completed for user ${userId}!`);
+              
+              // Update status to "Completed"
+              this.updateUploadStatus(salesID, "Completed")
+                .catch(err => console.error("Failed to update status to Completed:", err));
             } catch (forecastErr) {
               console.error(`⚠️ Forecast generation failed for user ${userId}:`, forecastErr.message);
+              // Update status to "Failed"
+              this.updateUploadStatus(salesID, "Failed")
+                .catch(err => console.error("Failed to update status to Failed:", err));
             }
             return;
           }
+
+          // If no model training needed, just mark as completed
+          this.updateUploadStatus(salesID, "Completed")
+            .catch(err => console.error("Failed to update status to Completed:", err));
 
           console.log(`⚠️ No valid case matched for user ${userId}.`);
           console.log(`   Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`);
         })
         .catch((err) => {
           console.error(`⚠️ Python preprocessing error: ${err.message}`);
+          // Update status to "Failed"
+          this.updateUploadStatus(salesID, "Failed")
+            .catch(updateErr => console.error("Failed to update status to Failed:", updateErr));
         });
     } catch (err) {
       console.error("❌ Upload failed:", err.message);
-      return res.status(400).json({ message: err.message });
+      console.error("   Stack:", err.stack);
+      return res.status(400).json({ 
+        message: err.message || "Upload failed",
+        error: process.env.NODE_ENV === "development" ? err.stack : undefined
+      });
     }
   }
 
