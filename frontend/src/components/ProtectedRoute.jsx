@@ -55,7 +55,7 @@ export default function ProtectedRoute({ children }) {
     Swal.fire({
       icon: "info",
       title: "Generate a Forecast First",
-      text: "Please upload sales data and generate a forecast to access the dashboard.",
+      text: "Please upload sales data and generate a forecast to access the full potential of our system.",
       confirmButtonColor: "#001D39",
       confirmButtonText: "Go to Welcome Page"
     });

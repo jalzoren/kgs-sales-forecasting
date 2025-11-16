@@ -584,7 +584,7 @@ export default function UploadBox() {
           <ul class="manual-status-list">
             <li><span class="manual-status manual-status-uploaded">Uploaded</span> - File successfully received</li>
             <li><span class="manual-status manual-status-processing">Preprocessing</span> - Data is being cleaned and validated</li>
-            <li><span class="manual-status manual-status-processing">Training</span> - AI models are being trained</li>
+            <li><span class="manual-status manual-status-processing">Training</span> - Machine Learning are being trained</li>
             <li><span class="manual-status manual-status-completed">Completed</span> - Processing finished successfully</li>
             <li><span class="manual-status manual-status-failed">Failed</span> - An error occurred (check file format)</li>
           </ul>

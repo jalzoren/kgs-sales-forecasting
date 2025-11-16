@@ -110,7 +110,7 @@ export default function Welcome() {
       title: "How Our Sales Forecasting System Works",
       html: `
         <div style="text-align:left; max-height:60vh; overflow-y:auto; padding:0 20px; font-size: 14px; line-height:1.6;">
-          <p><strong>🎯 Our AI-powered system helps you predict future sales and prevent stockouts!</strong></p>
+          <p><strong>🎯 Our Machine Learning powered system helps you predict future sales and prevent stockouts!</strong></p>
           
           <h4>📊 Step 1: Initial Setup (3 Years of Data)</h4>
           <ul>
@@ -120,9 +120,9 @@ export default function Welcome() {
             <li><strong>Required Columns:</strong> date, product_id, product_name, category, quantity, unit_price, discount, total_amount</li>
           </ul>
           
-          <h4>🤖 Step 2: Model Training (Automatic)</h4>
+          <h4>🤖 Step 2: Machine Learning Training (Automatic)</h4>
           <ul>
-            <li>Our AI analyzes your historical sales patterns.</li>
+            <li>Our Machine Learning Models analyzes your historical sales patterns.</li>
             <li>Trains forecasting models for each product (one model per product).</li>
             <li>Takes 10-30 minutes depending on data size.</li>
             <li>You'll receive notifications when training is complete.</li>
@@ -170,7 +170,7 @@ export default function Welcome() {
         {/* Dynamic content based on user status */}
         {!userStatus.hasData && !userStatus.isProcessing && (
           <>
-            <h2 className="welcome-title">Get Started with AI-Powered Predictions</h2>
+            <h2 className="welcome-title">Get Started with Machine Learning-Powered Predictions</h2>
             <p>
               To unlock accurate sales forecasts, we need to build your data history first. 
               Upload <strong>3 years of historical sales data</strong> to train your forecasting models.
