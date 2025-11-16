@@ -20,6 +20,7 @@ class DataController {
     const originalFile = req.file;
     let filePath = originalFile.path;
     let fileName = originalFile.originalname;
+    let salesID = null; 
 
     console.log(`📦 File uploaded: ${fileName}`);
     console.log(`📍 Path: ${filePath}`);
@@ -90,7 +91,8 @@ class DataController {
             resolve(results);
           });
         });
-        const salesID = insertResult.insertId;
+        salesID = insertResult.insertId;  // ✅ Now properly assigned
+        console.log(`✅ Database record created with salesID: ${salesID}`);
       } catch (dbErr) {
         console.error("❌ Database error:", dbErr);
         throw new Error(`Database operation failed: ${dbErr.message}`);
@@ -137,7 +139,7 @@ class DataController {
 
           const modelDir = path.resolve(__dirname, "../../ml-service/models", `user_${userId}`);
           
-          // ✅ FIXED: Check for product-level models
+          // Check for product-level models
           const modelExists = this.checkProductModelsExist(modelDir);
 
           console.log(
@@ -155,15 +157,15 @@ class DataController {
               await PythonService.trainModel(userId);
               console.log(`🎯 Model training completed successfully for user ${userId}!`);
 
-              console.log(`📈 Generating first forecast for user ${userId}...`);
-              await PythonService.generateForecast(userId);
-              console.log(`✅ Forecast generation completed for user ${userId}!`);
+              // ✅ FIXED: Mark as completed WITHOUT generating forecast
+              // User must upload weekly sales data to trigger forecast generation
+              console.log(`✅ Models are ready! Upload weekly sales data to generate forecasts.`);
               
               // Update status to "Completed"
               this.updateUploadStatus(salesID, "Completed")
                 .catch(err => console.error("Failed to update status to Completed:", err));
             } catch (trainErr) {
-              console.error(`⚠️ Training or forecast failed for user ${userId}:`, trainErr.message);
+              console.error(`⚠️ Training failed for user ${userId}:`, trainErr.message);
               // Update status to "Failed"
               this.updateUploadStatus(salesID, "Failed")
                 .catch(err => console.error("Failed to update status to Failed:", err));
@@ -213,6 +215,28 @@ class DataController {
     }
   }
 
+  /** ✅ NEW METHOD: Update upload status in database */
+  async updateUploadStatus(salesID, status) {
+    if (!salesID) {
+      console.warn("⚠️ Cannot update status: salesID is null/undefined");
+      return;
+    }
+    
+    try {
+      const sql = `UPDATE salesdata SET status = ? WHERE salesID = ?`;
+      await new Promise((resolve, reject) => {
+        db.query(sql, [status, salesID], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
+      });
+      console.log(`✅ Updated salesID ${salesID} status to: ${status}`);
+    } catch (err) {
+      console.error(`❌ Failed to update status for salesID ${salesID}:`, err.message);
+      throw err;
+    }
+  }
+
   /**
    * ✅ NEW METHOD: Check if product-level models exist
    * Returns true if at least one product model directory contains both LSTM and XGBoost models
@@ -253,7 +277,6 @@ class DataController {
   }
 
   async getUploads(req, res) {
-    console.log("📡 Fetching uploaded data records...");
     const userId = req.session.user?.id;
 
     if (!userId) {
@@ -266,7 +289,14 @@ class DataController {
         console.error("❌ Database fetch error:", err);
         return res.status(500).json({ message: "Database error", error: err });
       }
-      console.log(`✅ Fetched ${results.length} upload records for user ${userId}`);
+      
+      // ✅ Only log if explicitly requested (not during polling)
+      const isPolling = req.query.polling === "true";
+      if (!isPolling) {
+        console.log(`📡 Fetching uploaded data records...`);
+        console.log(`✅ Fetched ${results.length} upload records for user ${userId}`);
+      }
+      
       res.json(results);
     });
   }
@@ -345,6 +375,67 @@ class DataController {
       return res.status(500).json({ message: "Failed to get status" });
     }
   }
+
+  /**
+   * ✅ NEW METHOD: Get training status for frontend polling
+   * Returns the status of the most recent upload for the user
+   */
+  async getTrainingStatus(req, res) {
+    try {
+      const userId = req.session.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: "Unauthorized: User not logged in" });
+      }
+
+      // Get the most recent upload record
+      const sql = `SELECT salesID, fileName, status, uploadDate 
+                   FROM salesdata 
+                   WHERE userId = ? 
+                   ORDER BY uploadDate DESC 
+                   LIMIT 1`;
+      
+      db.query(sql, [userId], (err, results) => {
+        if (err) {
+          console.error("❌ Training status fetch error:", err);
+          return res.status(500).json({ message: "Database error", error: err });
+        }
+
+        if (results.length === 0) {
+          return res.json({
+            status: "idle",
+            message: "No uploads found"
+          });
+        }
+
+        const record = results[0];
+        
+        // Map database status to frontend-friendly response
+        const statusMap = {
+          "Uploaded": { status: "preprocessing", message: "Preparing data..." },
+          "Preprocessing": { status: "preprocessing", message: "Processing data..." },
+          "Training": { status: "training", message: "Training models..." },
+          "Completed": { status: "completed", message: "Processing complete!" },
+          "Failed": { status: "failed", message: "Processing failed" }
+        };
+
+        const response = statusMap[record.status] || {
+          status: "unknown",
+          message: record.status
+        };
+
+        return res.json({
+          ...response,
+          salesID: record.salesID,
+          fileName: record.fileName,
+          uploadDate: record.uploadDate
+        });
+      });
+    } catch (err) {
+      console.error("❌ Training status error:", err);
+      return res.status(500).json({ message: "Failed to get training status" });
+    }
+  }
+  
 }
 
 module.exports = new DataController();

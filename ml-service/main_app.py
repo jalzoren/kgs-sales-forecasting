@@ -75,7 +75,7 @@ async def get_user_forecast(user_id: str):
 
     # List all Excel files in the user's folder (exclude temp files)
     all_files = [f for f in os.listdir(absolute_folder_path) 
-                  if f.endswith((".xlsx", ".xls")) and not f.startswith("~$")]
+                if f.endswith((".xlsx", ".xls")) and not f.startswith("~$")]
 
     if not all_files:
         return {"error": f"No forecast files found for user {user_id}"}

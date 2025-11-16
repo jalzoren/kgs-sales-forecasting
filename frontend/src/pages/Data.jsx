@@ -52,9 +52,14 @@ export default function UploadBox() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/data", {
-        credentials: "include",
-      });
+      // ✅ Add ?polling=true for background refreshes
+    const url = showLoading 
+      ? "http://localhost:5000/api/data"  // Initial load - logs
+      : "http://localhost:5000/api/data?polling=true";  // Background refresh - silent
+    
+    const res = await fetch(url, {
+      credentials: "include",
+    });
       
       if (res.status === 401) {
         if (showLoading && isInitialLoad) {
