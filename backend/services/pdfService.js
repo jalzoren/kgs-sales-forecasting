@@ -503,7 +503,7 @@ class PDFService {
         };
       },
       content: [
-        // =========a= PAGE 1: LEFT SIDE - COVER & SUMMARY ===aaaa=======
+        // ========== PAGE 1: LEFT SIDE - COVER & SUMMARY ==========
         {
           columns: [
             {
