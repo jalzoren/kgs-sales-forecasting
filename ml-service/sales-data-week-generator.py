@@ -74,7 +74,7 @@ purchase_prob_map = {
     "Dry Food": 0.60
 }
 
-default_prob = 0.30
+default_prob = 0.10
 
 products["Purchase_Prob"] = products["Category"].apply(
     lambda c: purchase_prob_map.get(c, default_prob)
