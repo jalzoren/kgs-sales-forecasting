@@ -29,6 +29,12 @@ export default function Analytics() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  // Inventory Alerts filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [sortBy, setSortBy] = useState("demand-asc");
+
   // Fetch forecast data from backend when horizon changes
   useEffect(() => {
     setLoading(true);
@@ -528,17 +534,97 @@ export default function Analytics() {
         </>
       ) : (
         <>
-          {/* Inventory Alerts with Horizon Dropdown */}
+          {/* Inventory Alerts with Horizon Dropdown and Filters */}
           <div className="analytics-toolbar">
             <div className="analytics-filters">
               <label>
                 Forecast Horizon:{" "}
-                <select value={forecastHorizon} onChange={(e) => setForecastHorizon(e.target.value)}>
+                <select value={forecastHorizon} onChange={(e) => {
+                  setForecastHorizon(e.target.value);
+                  setCurrentPage(1);
+                }}>
                   <option value="7d">Next 7 Days</option>
                   <option value="30d">Next 30 Days</option>
                   <option value="90d">Next 90 Days</option>
                 </select>
               </label>
+
+              <label>
+                Search:{" "}
+                <input 
+                  type="text" 
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                  style={{ padding: "5px 10px", minWidth: "200px" }}
+                />
+              </label>
+
+              <label>
+                Category:{" "}
+                <select value={filterCategory} onChange={(e) => {
+                  setFilterCategory(e.target.value);
+                  setCurrentPage(1);
+                }}>
+                  <option value="all">All Categories</option>
+                  {Array.from(new Set(forecastData.map((d) => d.category).filter(Boolean))).sort().map((c, i) => (
+                    <option key={i} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label>
+                Status:{" "}
+                <select value={filterStatus} onChange={(e) => {
+                  setFilterStatus(e.target.value);
+                  setCurrentPage(1);
+                }}>
+                  <option value="all">All Status</option>
+                  <option value="critical">Critical - Low Stock</option>
+                  <option value="warning">Warning - Monitor Stock</option>
+                  <option value="good">Good</option>
+                </select>
+              </label>
+
+              <label>
+                Sort By:{" "}
+                <select value={sortBy} onChange={(e) => {
+                  setSortBy(e.target.value);
+                  setCurrentPage(1);
+                }}>
+                  <option value="demand-asc">Demand (Low to High)</option>
+                  <option value="demand-desc">Demand (High to Low)</option>
+                  <option value="name-asc">Product Name (A-Z)</option>
+                  <option value="name-desc">Product Name (Z-A)</option>
+                  <option value="status">Status (Critical First)</option>
+                </select>
+              </label>
+
+              <button 
+                onClick={() => {
+                  setSearchQuery("");
+                  setFilterCategory("all");
+                  setFilterStatus("all");
+                  setSortBy("demand-asc");
+                  setCurrentPage(1);
+                }}
+                style={{ 
+                  padding: "5px 15px", 
+                  marginLeft: "10px",
+                  cursor: "pointer",
+                  backgroundColor: "#0a4174",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px"
+                }}
+              >
+                Clear Filters
+              </button>
             </div>
           </div>
           
@@ -560,7 +646,8 @@ export default function Analytics() {
                   </thead>
                   <tbody>
                     {(() => {
-                      const aggregated = Object.values(
+                      // Aggregate data by product
+                      let aggregated = Object.values(
                         forecastData.reduce((acc, row) => {
                           const productKey = row.product || "Unknown";
                           if (!acc[productKey]) {
@@ -573,30 +660,87 @@ export default function Analytics() {
                           acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
                           return acc;
                         }, {})
-                      ).sort((a, b) => a.totalForecasted - b.totalForecasted); // lowest demand first
+                      );
+
+                      // Apply search filter
+                      if (searchQuery.trim()) {
+                        const query = searchQuery.toLowerCase();
+                        aggregated = aggregated.filter(item => 
+                          item.product.toLowerCase().includes(query)
+                        );
+                      }
+
+                      // Apply category filter
+                      if (filterCategory !== "all") {
+                        aggregated = aggregated.filter(item => item.category === filterCategory);
+                      }
+
+                      // Calculate status for filtering
+                      const lowThreshold = forecastHorizon === "7d" ? 10 : forecastHorizon === "30d" ? 50 : 100;
+                      const outThreshold = forecastHorizon === "7d" ? 5 : forecastHorizon === "30d" ? 20 : 50;
+
+                      aggregated = aggregated.map(item => {
+                        const forecasted = Math.round(item.totalForecasted);
+                        let statusType = "good";
+                        if (forecasted <= outThreshold) statusType = "critical";
+                        else if (forecasted <= lowThreshold) statusType = "warning";
+                        
+                        return { ...item, statusType, forecasted };
+                      });
+
+                      // Apply status filter
+                      if (filterStatus !== "all") {
+                        aggregated = aggregated.filter(item => item.statusType === filterStatus);
+                      }
+
+                      // Apply sorting
+                      aggregated.sort((a, b) => {
+                        switch (sortBy) {
+                          case "demand-asc":
+                            return a.forecasted - b.forecasted;
+                          case "demand-desc":
+                            return b.forecasted - a.forecasted;
+                          case "name-asc":
+                            return a.product.localeCompare(b.product);
+                          case "name-desc":
+                            return b.product.localeCompare(a.product);
+                          case "status":
+                            const statusOrder = { critical: 0, warning: 1, good: 2 };
+                            return statusOrder[a.statusType] - statusOrder[b.statusType];
+                          default:
+                            return 0;
+                        }
+                      });
 
                       const totalItems = aggregated.length;
                       const totalPages = Math.ceil(totalItems / itemsPerPage);
                       const startIdx = (currentPage - 1) * itemsPerPage;
                       const paginatedData = aggregated.slice(startIdx, startIdx + itemsPerPage);
 
+                      // Show message if no results
+                      if (aggregated.length === 0) {
+                        return (
+                          <tr>
+                            <td colSpan="4" style={{ textAlign: "center", padding: "20px" }}>
+                              No products match your filters. Try adjusting your search or filters.
+                            </td>
+                          </tr>
+                        );
+                      }
+
                       return paginatedData.map((item, idx) => {
-                        const forecasted = Math.round(item.totalForecasted);
-                        const lowThreshold = forecastHorizon === "7d" ? 10 : forecastHorizon === "30d" ? 50 : 100;
-                        const outThreshold = forecastHorizon === "7d" ? 5 : forecastHorizon === "30d" ? 20 : 50;
-                        
-                        const status = forecasted <= outThreshold ? "Critical - Low Stock" : 
-                                       forecasted <= lowThreshold ? "Warning - Monitor Stock" : 
+                        const status = item.statusType === "critical" ? "Critical - Low Stock" : 
+                                       item.statusType === "warning" ? "Warning - Monitor Stock" : 
                                        "Good";
-                        const statusColor = forecasted <= outThreshold ? "red" : 
-                                            forecasted <= lowThreshold ? "orange" : 
+                        const statusColor = item.statusType === "critical" ? "red" : 
+                                            item.statusType === "warning" ? "orange" : 
                                             "green";
                         
                         return (
                           <tr key={startIdx + idx}>
                             <td>{item.product}</td>
                             <td>{item.category}</td>
-                            <td>{forecasted.toLocaleString()} units</td>
+                            <td>{item.forecasted.toLocaleString()} units</td>
                             <td style={{ color: statusColor, fontWeight: "bold" }}>
                               {status}
                             </td>
@@ -609,15 +753,51 @@ export default function Analytics() {
 
                 {/* Pagination Controls */}
                 {(() => {
-                  const aggregated = Object.values(
+                  // Recalculate with filters for pagination
+                  let aggregated = Object.values(
                     forecastData.reduce((acc, row) => {
                       const productKey = row.product || "Unknown";
-                      if (!acc[productKey]) acc[productKey] = { totalForecasted: 0 };
+                      if (!acc[productKey]) {
+                        acc[productKey] = {
+                          product: productKey,
+                          category: row.category || "All",
+                          totalForecasted: 0
+                        };
+                      }
                       acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
                       return acc;
                     }, {})
                   );
+
+                  // Apply search filter
+                  if (searchQuery.trim()) {
+                    const query = searchQuery.toLowerCase();
+                    aggregated = aggregated.filter(item => 
+                      item.product.toLowerCase().includes(query)
+                    );
+                  }
+
+                  // Apply category filter
+                  if (filterCategory !== "all") {
+                    aggregated = aggregated.filter(item => item.category === filterCategory);
+                  }
+
+                  // Apply status filter
+                  if (filterStatus !== "all") {
+                    const lowThreshold = forecastHorizon === "7d" ? 10 : forecastHorizon === "30d" ? 50 : 100;
+                    const outThreshold = forecastHorizon === "7d" ? 5 : forecastHorizon === "30d" ? 20 : 50;
+                    
+                    aggregated = aggregated.filter(item => {
+                      const forecasted = Math.round(item.totalForecasted);
+                      let statusType = "good";
+                      if (forecasted <= outThreshold) statusType = "critical";
+                      else if (forecasted <= lowThreshold) statusType = "warning";
+                      return statusType === filterStatus;
+                    });
+                  }
+
                   const totalPages = Math.ceil(aggregated.length / itemsPerPage);
+                  const totalItems = aggregated.length;
 
                   if (totalPages <= 1) return null;
 
@@ -626,19 +806,29 @@ export default function Analytics() {
                       <button
                         onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
-                        style={{ margin: "0 5px", padding: "8px 12px" }}
+                        style={{ 
+                          margin: "0 5px", 
+                          padding: "8px 12px",
+                          cursor: currentPage === 1 ? "not-allowed" : "pointer",
+                          opacity: currentPage === 1 ? 0.5 : 1
+                        }}
                       >
                         Previous
                       </button>
                       
                       <span style={{ margin: "0 15px", fontWeight: "bold" }}>
-                        Page {currentPage} of {totalPages}
+                        Page {currentPage} of {totalPages} ({totalItems} items)
                       </span>
                       
                       <button
                         onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
-                        style={{ margin: "0 5px", padding: "8px 12px" }}
+                        style={{ 
+                          margin: "0 5px", 
+                          padding: "8px 12px",
+                          cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+                          opacity: currentPage === totalPages ? 0.5 : 1
+                        }}
                       >
                         Next
                       </button>
