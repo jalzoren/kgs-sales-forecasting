@@ -749,7 +749,7 @@ export default function UploadBox() {
                         : "—"}
                     </td>
                     <td>{item.fileName}</td>
-                    <td>{item.records?.toLocaleString() || 0}</td>
+                    <td>{item.records?.toLocaleString() || 0}</td>x1
                     <td>
                       <span
                         className={`status ${
