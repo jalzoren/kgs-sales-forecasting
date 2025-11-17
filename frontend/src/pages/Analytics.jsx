@@ -25,9 +25,14 @@ export default function Analytics() {
   const [loading, setLoading] = useState(true);
   const [chartType, setChartType] = useState("line"); // New state for chart type
 
+  // Pagination state for Inventory Alerts
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   // Fetch forecast data from backend when horizon changes
   useEffect(() => {
     setLoading(true);
+    setCurrentPage(1); // Reset to first page when horizon changes
     
     // ⭐ SHOW SWEET ALERT LOADING
     Swal.fire({
@@ -229,8 +234,6 @@ export default function Analytics() {
     const endDate = new Date(sortedDates[sortedDates.length - 1].date).toLocaleDateString();
     return `${startDate} - ${endDate}`;
   };
-
-  // ⭐ REMOVED: if (loading) return <p>Loading forecast data...</p>;
 
   return (
     <div className="analytics-page-container">
@@ -543,66 +546,106 @@ export default function Analytics() {
             <h3>Inventory Alerts - {forecastHorizon === "7d" ? "Next 7 Days" : forecastHorizon === "30d" ? "Next 30 Days" : "Next 90 Days"}</h3>
             <p>Date Range: {getDateRange()}</p>
             <p>Shows forecasted demand based on {forecastHorizon} forecast.</p>
+
             {forecastData.length > 0 ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Category</th>
-                    <th>Forecasted Demand</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {forecastData.length > 0 ? (
-                    Object.values(
-                      forecastData.reduce((acc, row) => {
-                        const productKey = row.product || "Unknown";
-                        if (!acc[productKey]) {
-                          acc[productKey] = {
-                            product: productKey,
-                            category: row.category || "All",
-                            totalForecasted: 0
-                          };
-                        }
-                        acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
-                        return acc;
-                      }, {})
-                    )
-                    .sort((a, b) => a.totalForecasted - b.totalForecasted) // Sort by demand (lowest first)
-                    .map((item, idx) => {
-                      const forecasted = Math.round(item.totalForecasted);
-                      // Adjust thresholds based on forecast horizon
-                      const lowThreshold = forecastHorizon === "7d" ? 10 : forecastHorizon === "30d" ? 50 : 100;
-                      const outThreshold = forecastHorizon === "7d" ? 5 : forecastHorizon === "30d" ? 20 : 50;
-                      
-                      const status = forecasted <= outThreshold ? "Critical - Low Stock" : 
-                                     forecasted <= lowThreshold ? "Warning - Monitor Stock" : 
-                                     "Good";
-                      const statusColor = forecasted <= outThreshold ? "red" : 
-                                          forecasted <= lowThreshold ? "orange" : 
-                                          "green";
-                      
-                      return (
-                        <tr key={idx}>
-                          <td>{item.product}</td>
-                          <td>{item.category}</td>
-                          <td>{forecasted.toLocaleString()} units</td>
-                          <td style={{ color: statusColor, fontWeight: "bold" }}>
-                            {status}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
+              <>
+                <table>
+                  <thead>
                     <tr>
-                      <td colSpan="4" style={{ textAlign: "center", padding: "20px" }}>
-                        No forecast data available
-                      </td>
+                      <th>Item</th>
+                      <th>Category</th>
+                      <th>Forecasted Demand</th>
+                      <th>Status</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const aggregated = Object.values(
+                        forecastData.reduce((acc, row) => {
+                          const productKey = row.product || "Unknown";
+                          if (!acc[productKey]) {
+                            acc[productKey] = {
+                              product: productKey,
+                              category: row.category || "All",
+                              totalForecasted: 0
+                            };
+                          }
+                          acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
+                          return acc;
+                        }, {})
+                      ).sort((a, b) => a.totalForecasted - b.totalForecasted); // lowest demand first
+
+                      const totalItems = aggregated.length;
+                      const totalPages = Math.ceil(totalItems / itemsPerPage);
+                      const startIdx = (currentPage - 1) * itemsPerPage;
+                      const paginatedData = aggregated.slice(startIdx, startIdx + itemsPerPage);
+
+                      return paginatedData.map((item, idx) => {
+                        const forecasted = Math.round(item.totalForecasted);
+                        const lowThreshold = forecastHorizon === "7d" ? 10 : forecastHorizon === "30d" ? 50 : 100;
+                        const outThreshold = forecastHorizon === "7d" ? 5 : forecastHorizon === "30d" ? 20 : 50;
+                        
+                        const status = forecasted <= outThreshold ? "Critical - Low Stock" : 
+                                       forecasted <= lowThreshold ? "Warning - Monitor Stock" : 
+                                       "Good";
+                        const statusColor = forecasted <= outThreshold ? "red" : 
+                                            forecasted <= lowThreshold ? "orange" : 
+                                            "green";
+                        
+                        return (
+                          <tr key={startIdx + idx}>
+                            <td>{item.product}</td>
+                            <td>{item.category}</td>
+                            <td>{forecasted.toLocaleString()} units</td>
+                            <td style={{ color: statusColor, fontWeight: "bold" }}>
+                              {status}
+                            </td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
+
+                {/* Pagination Controls */}
+                {(() => {
+                  const aggregated = Object.values(
+                    forecastData.reduce((acc, row) => {
+                      const productKey = row.product || "Unknown";
+                      if (!acc[productKey]) acc[productKey] = { totalForecasted: 0 };
+                      acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
+                      return acc;
+                    }, {})
+                  );
+                  const totalPages = Math.ceil(aggregated.length / itemsPerPage);
+
+                  if (totalPages <= 1) return null;
+
+                  return (
+                    <div className="pagination-controls" style={{ marginTop: "20px", textAlign: "center" }}>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        style={{ margin: "0 5px", padding: "8px 12px" }}
+                      >
+                        Previous
+                      </button>
+                      
+                      <span style={{ margin: "0 15px", fontWeight: "bold" }}>
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        style={{ margin: "0 5px", padding: "8px 12px" }}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  );
+                })()}
+              </>
             ) : (
               <p>No forecast data available for inventory alerts</p>
             )}
