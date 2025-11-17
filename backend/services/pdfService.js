@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const XLSX = require("xlsx");
 
-// Define fonts for pdfmake with better error handling
+// Define fonts for apdfmake with better error handling
 let fonts;
 try {
   const fontsPath = path.join(__dirname, "../../node_modules/pdfmake/build/vfs_fonts.js");
