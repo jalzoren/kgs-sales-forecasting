@@ -4,6 +4,10 @@ import Swal from 'sweetalert2';
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -19,10 +23,16 @@ export default function Analytics() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [forecastHorizon, setForecastHorizon] = useState("90d");
   const [loading, setLoading] = useState(true);
+  const [chartType, setChartType] = useState("line"); // New state for chart type
+
+  // Pagination state for Inventory Alerts
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   // Fetch forecast data from backend when horizon changes
   useEffect(() => {
     setLoading(true);
+    setCurrentPage(1); // Reset to first page when horizon changes
     
     // ⭐ SHOW SWEET ALERT LOADING
     Swal.fire({
@@ -225,8 +235,6 @@ export default function Analytics() {
     return `${startDate} - ${endDate}`;
   };
 
-  // ⭐ REMOVED: if (loading) return <p>Loading forecast data...</p>;
-
   return (
     <div className="analytics-page-container">
       <h2 className="analytics-title">Analytics Page</h2>
@@ -270,6 +278,15 @@ export default function Analytics() {
               </select>
             </label>
             
+            <label>
+              Chart Type:{" "}
+              <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
+                <option value="line">Line Chart</option>
+                <option value="bar">Bar Chart</option>
+                <option value="area">Area Chart</option>
+              </select>
+            </label>
+            
             {chartMode === "product" && (
               <label>
                 Product:{" "}
@@ -310,95 +327,203 @@ export default function Analytics() {
       {/* Conditional Rendering */}
       {activeTab === "sales" ? (
         <>
-          {/* Metrics Box */}
-          <div className="analytics-metrics-box">
-            <div className="analytics-metrics-info">
-              <p>
-                <strong>Forecast Date Range:</strong> {getDateRange()}
-              </p>
-              <p>
-                <strong>Number of Days:</strong> {forecastData.length > 0 ? Array.from(new Set(forecastData.map(d => d.date))).length : "N/A"} days
-              </p>
-              <p>
-                <strong>Forecast Horizon:</strong> {forecastHorizon === "7d" ? "Next 7 Days" : forecastHorizon === "30d" ? "Next 30 Days" : "Next 90 Days"}
-              </p>
-              <p>
-                <strong>Total Forecasted Units:</strong> {forecastData.reduce((sum, d) => sum + (parseFloat(d.forecasted) || 0), 0).toLocaleString()}
-              </p>
-            </div>
-            <div className="analytics-metrics-charts">
-              {renderCircularChart("Total Products")}
-              {renderCircularChart("Categories")}
-              {renderCircularChart("Forecast Accuracy")}
-            </div>
-          </div>
-
-          {/* Line Chart */}
-          <div className="analytics-chart-section">
-            {chartData.length > 0 ? (
-              <>
-                {console.log("🎨 Rendering chart with data:", chartData.length, "points")}
-                {console.log("🎨 First 3 dates:", chartData.slice(0, 3).map(d => d.date))}
-                {console.log("🎨 Last 3 dates:", chartData.slice(-3).map(d => d.date))}
-                <LineChart width={900} height={350} data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#c9d6e3" />
-                  <XAxis 
-                    dataKey="date" 
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                    tickFormatter={(value) => {
-                      try {
-                        const date = new Date(value);
-                        if (!isNaN(date.getTime())) {
-                          return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                        }
-                        return value;
-                      } catch {
-                        return value;
-                      }
-                    }}
-                  />
-                  <YAxis />
-                  <Tooltip 
-                    labelFormatter={(value) => {
-                      try {
-                        const date = new Date(value);
-                        if (!isNaN(date.getTime())) {
-                          return `Date: ${date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}`;
-                        }
-                        return `Date: ${value}`;
-                      } catch {
-                        return `Date: ${value}`;
-                      }
-                    }}
-                  />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="forecasted"
-                    stroke="#0a4174"
-                    strokeWidth={2}
-                    name="Forecast Qty"
-                    dot={false}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="revenue"
-                    stroke="#41a7dd"
-                    strokeWidth={2}
-                    name="Revenue Estimate"
-                    dot={false}
-                  />
-                </LineChart>
-              </>
-            ) : (
-              <div style={{ padding: "50px", textAlign: "center" }}>
-                <p>No chart data available. 
-                  {forecastData.length > 0 ? ` (${forecastData.length} forecast records loaded, but no data for current filter)` : " Please ensure forecast data exists."}
+          {/* Side-by-side wrapper for metrics and chart */}
+          <div className="analytics-content-wrapper">
+            {/* Metrics Box */}
+            <div className="analytics-metrics-box">
+              <div className="analytics-metrics-info">
+                <p>
+                  <strong>Forecast Date Range:</strong> {getDateRange()}
+                </p>
+                <p>
+                  <strong>Number of Days:</strong> {forecastData.length > 0 ? Array.from(new Set(forecastData.map(d => d.date))).length : "N/A"} days
+                </p>
+                <p>
+                  <strong>Forecast Horizon:</strong> {forecastHorizon === "7d" ? "Next 7 Days" : forecastHorizon === "30d" ? "Next 30 Days" : "Next 90 Days"}
+                </p>
+                <p>
+                  <strong>Total Forecasted Units:</strong> {forecastData.reduce((sum, d) => sum + (parseFloat(d.forecasted) || 0), 0).toLocaleString()}
                 </p>
               </div>
-            )}
+              <div className="analytics-metrics-charts">
+                {renderCircularChart("Total Products")}
+                {renderCircularChart("Categories")}
+                {renderCircularChart("Forecast Accuracy")}
+              </div>
+            </div>
+
+            {/* Line Chart */}
+            <div className="analytics-chart-section">
+              {chartData.length > 0 ? (
+                <>
+                  {console.log("🎨 Rendering chart with data:", chartData.length, "points")}
+                  {console.log("🎨 First 3 dates:", chartData.slice(0, 3).map(d => d.date))}
+                  {console.log("🎨 Last 3 dates:", chartData.slice(-3).map(d => d.date))}
+                  
+                  {chartType === "line" && (
+                    <LineChart width={900} height={350} data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#c9d6e3" />
+                      <XAxis 
+                        dataKey="date" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        tickFormatter={(value) => {
+                          try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }
+                            return value;
+                          } catch {
+                            return value;
+                          }
+                        }}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        labelFormatter={(value) => {
+                          try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                              return `Date: ${date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}`;
+                            }
+                            return `Date: ${value}`;
+                          } catch {
+                            return `Date: ${value}`;
+                          }
+                        }}
+                      />
+                      <Legend />
+                      <Line
+                        type="monotone"
+                        dataKey="forecasted"
+                        stroke="#0a4174"
+                        strokeWidth={2}
+                        name="Forecast Qty"
+                        dot={false}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#41a7dd"
+                        strokeWidth={2}
+                        name="Revenue Estimate"
+                        dot={false}
+                      />
+                    </LineChart>
+                  )}
+
+                  {chartType === "bar" && (
+                    <BarChart width={900} height={350} data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#c9d6e3" />
+                      <XAxis 
+                        dataKey="date" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        tickFormatter={(value) => {
+                          try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }
+                            return value;
+                          } catch {
+                            return value;
+                          }
+                        }}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        labelFormatter={(value) => {
+                          try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                              return `Date: ${date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}`;
+                            }
+                            return `Date: ${value}`;
+                          } catch {
+                            return `Date: ${value}`;
+                          }
+                        }}
+                      />
+                      <Legend />
+                      <Bar
+                        dataKey="forecasted"
+                        fill="#0a4174"
+                        name="Forecast Qty"
+                      />
+                      <Bar
+                        dataKey="revenue"
+                        fill="#41a7dd"
+                        name="Revenue Estimate"
+                      />
+                    </BarChart>
+                  )}
+
+                  {chartType === "area" && (
+                    <AreaChart width={900} height={350} data={chartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#c9d6e3" />
+                      <XAxis 
+                        dataKey="date" 
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        tickFormatter={(value) => {
+                          try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                              return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            }
+                            return value;
+                          } catch {
+                            return value;
+                          }
+                        }}
+                      />
+                      <YAxis />
+                      <Tooltip 
+                        labelFormatter={(value) => {
+                          try {
+                            const date = new Date(value);
+                            if (!isNaN(date.getTime())) {
+                              return `Date: ${date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}`;
+                            }
+                            return `Date: ${value}`;
+                          } catch {
+                            return `Date: ${value}`;
+                          }
+                        }}
+                      />
+                      <Legend />
+                      <Area
+                        type="monotone"
+                        dataKey="forecasted"
+                        stroke="#0a4174"
+                        fill="#0a4174"
+                        fillOpacity={0.6}
+                        name="Forecast Qty"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#41a7dd"
+                        fill="#41a7dd"
+                        fillOpacity={0.6}
+                        name="Revenue Estimate"
+                      />
+                    </AreaChart>
+                  )}
+                </>
+              ) : (
+                <div style={{ padding: "50px", textAlign: "center" }}>
+                  <p>No chart data available. 
+                    {forecastData.length > 0 ? ` (${forecastData.length} forecast records loaded, but no data for current filter)` : " Please ensure forecast data exists."}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </>
       ) : (
@@ -421,66 +546,106 @@ export default function Analytics() {
             <h3>Inventory Alerts - {forecastHorizon === "7d" ? "Next 7 Days" : forecastHorizon === "30d" ? "Next 30 Days" : "Next 90 Days"}</h3>
             <p>Date Range: {getDateRange()}</p>
             <p>Shows forecasted demand based on {forecastHorizon} forecast.</p>
+
             {forecastData.length > 0 ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th>Category</th>
-                    <th>Forecasted Demand</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {forecastData.length > 0 ? (
-                    Object.values(
-                      forecastData.reduce((acc, row) => {
-                        const productKey = row.product || "Unknown";
-                        if (!acc[productKey]) {
-                          acc[productKey] = {
-                            product: productKey,
-                            category: row.category || "All",
-                            totalForecasted: 0
-                          };
-                        }
-                        acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
-                        return acc;
-                      }, {})
-                    )
-                    .sort((a, b) => a.totalForecasted - b.totalForecasted) // Sort by demand (lowest first)
-                    .map((item, idx) => {
-                      const forecasted = Math.round(item.totalForecasted);
-                      // Adjust thresholds based on forecast horizon
-                      const lowThreshold = forecastHorizon === "7d" ? 10 : forecastHorizon === "30d" ? 50 : 100;
-                      const outThreshold = forecastHorizon === "7d" ? 5 : forecastHorizon === "30d" ? 20 : 50;
-                      
-                      const status = forecasted <= outThreshold ? "Critical - Low Stock" : 
-                                     forecasted <= lowThreshold ? "Warning - Monitor Stock" : 
-                                     "Good";
-                      const statusColor = forecasted <= outThreshold ? "red" : 
-                                          forecasted <= lowThreshold ? "orange" : 
-                                          "green";
-                      
-                      return (
-                        <tr key={idx}>
-                          <td>{item.product}</td>
-                          <td>{item.category}</td>
-                          <td>{forecasted.toLocaleString()} units</td>
-                          <td style={{ color: statusColor, fontWeight: "bold" }}>
-                            {status}
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
+              <>
+                <table>
+                  <thead>
                     <tr>
-                      <td colSpan="4" style={{ textAlign: "center", padding: "20px" }}>
-                        No forecast data available
-                      </td>
+                      <th>Item</th>
+                      <th>Category</th>
+                      <th>Forecasted Demand</th>
+                      <th>Status</th>
                     </tr>
-                  )}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {(() => {
+                      const aggregated = Object.values(
+                        forecastData.reduce((acc, row) => {
+                          const productKey = row.product || "Unknown";
+                          if (!acc[productKey]) {
+                            acc[productKey] = {
+                              product: productKey,
+                              category: row.category || "All",
+                              totalForecasted: 0
+                            };
+                          }
+                          acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
+                          return acc;
+                        }, {})
+                      ).sort((a, b) => a.totalForecasted - b.totalForecasted); // lowest demand first
+
+                      const totalItems = aggregated.length;
+                      const totalPages = Math.ceil(totalItems / itemsPerPage);
+                      const startIdx = (currentPage - 1) * itemsPerPage;
+                      const paginatedData = aggregated.slice(startIdx, startIdx + itemsPerPage);
+
+                      return paginatedData.map((item, idx) => {
+                        const forecasted = Math.round(item.totalForecasted);
+                        const lowThreshold = forecastHorizon === "7d" ? 10 : forecastHorizon === "30d" ? 50 : 100;
+                        const outThreshold = forecastHorizon === "7d" ? 5 : forecastHorizon === "30d" ? 20 : 50;
+                        
+                        const status = forecasted <= outThreshold ? "Critical - Low Stock" : 
+                                       forecasted <= lowThreshold ? "Warning - Monitor Stock" : 
+                                       "Good";
+                        const statusColor = forecasted <= outThreshold ? "red" : 
+                                            forecasted <= lowThreshold ? "orange" : 
+                                            "green";
+                        
+                        return (
+                          <tr key={startIdx + idx}>
+                            <td>{item.product}</td>
+                            <td>{item.category}</td>
+                            <td>{forecasted.toLocaleString()} units</td>
+                            <td style={{ color: statusColor, fontWeight: "bold" }}>
+                              {status}
+                            </td>
+                          </tr>
+                        );
+                      });
+                    })()}
+                  </tbody>
+                </table>
+
+                {/* Pagination Controls */}
+                {(() => {
+                  const aggregated = Object.values(
+                    forecastData.reduce((acc, row) => {
+                      const productKey = row.product || "Unknown";
+                      if (!acc[productKey]) acc[productKey] = { totalForecasted: 0 };
+                      acc[productKey].totalForecasted += parseFloat(row.forecasted || 0);
+                      return acc;
+                    }, {})
+                  );
+                  const totalPages = Math.ceil(aggregated.length / itemsPerPage);
+
+                  if (totalPages <= 1) return null;
+
+                  return (
+                    <div className="pagination-controls" style={{ marginTop: "20px", textAlign: "center" }}>
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                        style={{ margin: "0 5px", padding: "8px 12px" }}
+                      >
+                        Previous
+                      </button>
+                      
+                      <span style={{ margin: "0 15px", fontWeight: "bold" }}>
+                        Page {currentPage} of {totalPages}
+                      </span>
+                      
+                      <button
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                        style={{ margin: "0 5px", padding: "8px 12px" }}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  );
+                })()}
+              </>
             ) : (
               <p>No forecast data available for inventory alerts</p>
             )}
