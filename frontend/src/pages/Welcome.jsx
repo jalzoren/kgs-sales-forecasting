@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 
 export default function Welcome() {
   const navigate = useNavigate();
-  const [isInitialLoad, setIsInitialLoad] = useState(true); // ✅ NEW
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   
   const [userStatus, setUserStatus] = useState({
     hasData: false,

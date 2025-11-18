@@ -528,7 +528,6 @@ export default function Analytics() {
         </>
       ) : (
         <>
-          {/* Inventory Alerts with Horizon Dropdown */}
           <div className="analytics-toolbar">
             <div className="analytics-filters">
               <label>

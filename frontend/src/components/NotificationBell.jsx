@@ -11,7 +11,7 @@ import { useNotifications } from "./Notifications";
 import "../components/components-css/NotificationBell.css";
 
 export default function NotificationBell() {
-  const { notifications, markAsRead, unreadCount, removeNotification } =
+  const { notifications, markAsRead, markAllAsRead, unreadCount, removeNotification } =
     useNotifications();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -95,11 +95,23 @@ export default function NotificationBell() {
 
       {dropdownOpen && (
         <div className="notifications-dropdown">
-          <h3 className="title-notif">Notifications</h3>
-          <p className="notif-numbers">
-            You have <span>{unreadCount}</span>{" "}
-            {unreadCount === 1 ? "notification" : "notifications"}
-          </p>
+          <div className="notif-header-section">
+            <div>
+              <h3 className="title-notif">Notifications</h3>
+              <p className="notif-numbers">
+                You have <span>{unreadCount}</span>{" "}
+                {unreadCount === 1 ? "notification" : "notifications"}
+              </p>
+            </div>
+            <button
+              className="mark-all-read-btn"
+              onClick={markAllAsRead}
+              title="Mark all as read"
+              disabled={unreadCount === 0}
+            >
+              Mark all as read
+            </button>
+          </div>
 
           {notifications.length === 0 ? (
             <div className="notification-item empty">
