@@ -1,10 +1,10 @@
 {
-    "mean": 35.532333645735704,
-    "std": 19.906103094815144,
+    "mean": 35.48696461824954,
+    "std": 19.867977989683816,
     "lookback": 90,
     "product_id": "P0138",
     "product_name": "Kirin Ichiban Beer 330mL",
     "category": "Liquor/Beverage",
     "avg_unit_price": 68.0,
-    "total_samples": 1067
+    "total_samples": 1074
 }

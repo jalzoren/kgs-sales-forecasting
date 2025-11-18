@@ -1,10 +1,10 @@
 {
-    "mean": 40.86617100371747,
-    "std": 21.875859661503597,
+    "mean": 40.716528162511544,
+    "std": 21.907003373525615,
     "lookback": 90,
     "product_id": "P0023",
     "product_name": "Dongwon  Luncheon Meat 340g",
     "category": "Dry Food",
     "avg_unit_price": 155.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }

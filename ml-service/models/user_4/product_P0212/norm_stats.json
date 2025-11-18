@@ -1,10 +1,10 @@
 {
-    "mean": 50.71880819366853,
-    "std": 25.882577343616006,
+    "mean": 50.55504162812211,
+    "std": 25.889526250317097,
     "lookback": 90,
     "product_id": "P0212",
     "product_name": "Beef Dasida (Soup Stock) 1Kg",
     "category": "Seasoned/Sauce/Powder",
     "avg_unit_price": 550.0,
-    "total_samples": 1074
+    "total_samples": 1081
 }

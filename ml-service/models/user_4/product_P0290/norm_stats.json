@@ -1,10 +1,10 @@
 {
-    "mean": 29.65809523809524,
-    "std": 16.84534758226376,
+    "mean": 29.612689393939394,
+    "std": 16.825521969245283,
     "lookback": 90,
     "product_id": "P0290",
     "product_name": "Doritos Galbi Chicken",
     "category": "Snacks",
     "avg_unit_price": 77.0,
-    "total_samples": 1050
+    "total_samples": 1056
 }

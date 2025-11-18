@@ -1,10 +1,10 @@
 {
-    "mean": 30.45679012345679,
-    "std": 17.698555395029533,
+    "mean": 30.31132075471698,
+    "std": 17.732863601566166,
     "lookback": 90,
     "product_id": "P0198",
     "product_name": "Paldo Koreno Beef Noodle 100g",
     "category": "Noodles",
     "avg_unit_price": 50.0,
-    "total_samples": 1053
+    "total_samples": 1060
 }

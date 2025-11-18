@@ -1,10 +1,10 @@
 {
-    "mean": 176.48843663274747,
-    "std": 69.70968970227133,
+    "mean": 175.83731617647058,
+    "std": 70.00193324287456,
     "lookback": 90,
     "product_id": "P0004",
     "product_name": "O'Food Korean Chili Oil",
     "category": "Condiments",
     "avg_unit_price": 160.0,
-    "total_samples": 1081
+    "total_samples": 1088
 }

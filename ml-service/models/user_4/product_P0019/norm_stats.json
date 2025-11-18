@@ -1,10 +1,10 @@
 {
-    "mean": 40.827586206896555,
-    "std": 21.52617080058779,
+    "mean": 40.71666666666667,
+    "std": 21.529153456731287,
     "lookback": 90,
     "product_id": "P0019",
     "product_name": "Haepyo Crispy Seaweed 9Pcs",
     "category": "Dry Food",
     "avg_unit_price": 188.0,
-    "total_samples": 1073
+    "total_samples": 1080
 }

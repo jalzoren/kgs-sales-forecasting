@@ -1,10 +1,10 @@
 {
-    "mean": 177.84195933456562,
-    "std": 71.3237331295538,
+    "mean": 177.23691460055096,
+    "std": 71.51780730041851,
     "lookback": 90,
     "product_id": "P0008",
     "product_name": "Ottogi Corn Syrup",
     "category": "Condiments",
     "avg_unit_price": 98.0,
-    "total_samples": 1082
+    "total_samples": 1089
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 41.09692451071761,
-    "std": 20.847436218293748,
+    "mean": 40.949074074074076,
+    "std": 20.875068586326847,
     "lookback": 90,
     "product_id": "P0017",
     "product_name": "Bibigo Seaweed Flakes 50g",
     "category": "Dry Food",
     "avg_unit_price": 210.0,
-    "total_samples": 1073
+    "total_samples": 1080
 }

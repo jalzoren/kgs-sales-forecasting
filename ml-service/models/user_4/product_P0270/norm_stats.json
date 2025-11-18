@@ -1,10 +1,10 @@
 {
-    "mean": 29.613421550094518,
-    "std": 16.98329329374074,
+    "mean": 29.48075117370892,
+    "std": 17.011988679566652,
     "lookback": 90,
     "product_id": "P0270",
     "product_name": "Samlip Custard Cream Cake",
     "category": "Snacks",
     "avg_unit_price": 105.0,
-    "total_samples": 1058
+    "total_samples": 1065
 }

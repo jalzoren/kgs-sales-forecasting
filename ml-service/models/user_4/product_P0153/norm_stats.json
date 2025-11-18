@@ -1,10 +1,10 @@
 {
-    "mean": 30.01789077212806,
-    "std": 18.679010383628867,
+    "mean": 29.90271281571562,
+    "std": 18.690708554431502,
     "lookback": 90,
     "product_id": "P0153",
     "product_name": "Samyang Buldak Cheese Cup",
     "category": "Noodles",
     "avg_unit_price": 110.0,
-    "total_samples": 1062
+    "total_samples": 1069
 }

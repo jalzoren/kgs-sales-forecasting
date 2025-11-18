@@ -1,10 +1,10 @@
 {
-    "mean": 29.486641221374047,
-    "std": 16.532790287967757,
+    "mean": 29.400947867298576,
+    "std": 16.524015041886468,
     "lookback": 90,
     "product_id": "P0291",
     "product_name": "Crown Sando Biscuit",
     "category": "Snacks",
     "avg_unit_price": 75.0,
-    "total_samples": 1048
+    "total_samples": 1055
 }

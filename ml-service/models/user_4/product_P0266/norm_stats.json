@@ -1,10 +1,10 @@
 {
-    "mean": 30.03530534351145,
-    "std": 16.86373540549208,
+    "mean": 29.921327014218008,
+    "std": 16.873411658812838,
     "lookback": 90,
     "product_id": "P0266",
     "product_name": "Bibigo Seaweed Crisps",
     "category": "Snacks",
     "avg_unit_price": 110.0,
-    "total_samples": 1048
+    "total_samples": 1055
 }

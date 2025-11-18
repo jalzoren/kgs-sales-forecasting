@@ -1,10 +1,10 @@
 {
-    "mean": 29.193973634651602,
-    "std": 16.615404586903267,
+    "mean": 29.144059869036482,
+    "std": 16.59892078246293,
     "lookback": 90,
     "product_id": "P0258",
     "product_name": "Orion Custard Choco Cake",
     "category": "Snacks",
     "avg_unit_price": 130.0,
-    "total_samples": 1062
+    "total_samples": 1069
 }

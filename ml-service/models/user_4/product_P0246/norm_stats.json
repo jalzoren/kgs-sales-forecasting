@@ -1,10 +1,10 @@
 {
-    "mean": 29.55038022813688,
-    "std": 17.303424416141656,
+    "mean": 29.45420207743154,
+    "std": 17.30070228151465,
     "lookback": 90,
     "product_id": "P0246",
     "product_name": "Post Almond Flakes",
     "category": "Snacks",
     "avg_unit_price": 245.0,
-    "total_samples": 1052
+    "total_samples": 1059
 }

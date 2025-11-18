@@ -1,10 +1,10 @@
 {
-    "mean": 49.968460111317256,
-    "std": 24.768996398416274,
+    "mean": 49.884792626728114,
+    "std": 24.738048273056894,
     "lookback": 90,
     "product_id": "P0218",
     "product_name": "CJ Beksul Beef Bulgogi Sauce 500g",
     "category": "Seasoned/Sauce/Powder",
     "avg_unit_price": 250.0,
-    "total_samples": 1078
+    "total_samples": 1085
 }

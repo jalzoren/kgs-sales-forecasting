@@ -1,10 +1,10 @@
 {
-    "mean": 36.14058106841612,
-    "std": 19.614409472352136,
+    "mean": 36.0074487895717,
+    "std": 19.628182669362147,
     "lookback": 90,
     "product_id": "P0119",
     "product_name": "Sempio Yuzu Tea",
     "category": "Liquor/Beverage",
     "avg_unit_price": 250.0,
-    "total_samples": 1067
+    "total_samples": 1074
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 64.61595547309832,
-    "std": 29.977258566554664,
+    "mean": 64.4626728110599,
+    "std": 29.95629870883393,
     "lookback": 90,
     "product_id": "P0061",
     "product_name": "Dried Anchovy Medium 100g",
     "category": "Food Fresh/Meat/Sidedish",
     "avg_unit_price": 240.0,
-    "total_samples": 1078
+    "total_samples": 1085
 }

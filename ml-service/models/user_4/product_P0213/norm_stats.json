@@ -1,10 +1,10 @@
 {
-    "mean": 50.05380333951763,
-    "std": 24.85188957441751,
+    "mean": 49.89953917050691,
+    "std": 24.859569603966424,
     "lookback": 90,
     "product_id": "P0213",
     "product_name": "Sempio Yondu 500mL",
     "category": "Seasoned/Sauce/Powder",
     "avg_unit_price": 345.0,
-    "total_samples": 1078
+    "total_samples": 1085
 }

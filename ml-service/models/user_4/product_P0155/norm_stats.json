@@ -1,10 +1,10 @@
 {
-    "mean": 30.518939393939394,
-    "std": 17.38462635136051,
+    "mean": 30.408278457196612,
+    "std": 17.390897654610097,
     "lookback": 90,
     "product_id": "P0155",
     "product_name": "Nongshim Dungji Mul Nengmyeon (Cold Noodle)",
     "category": "Noodles",
     "avg_unit_price": 95.0,
-    "total_samples": 1056
+    "total_samples": 1063
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 41.54248366013072,
-    "std": 21.804351297571554,
+    "mean": 41.44897959183673,
+    "std": 21.780168969316744,
     "lookback": 90,
     "product_id": "P0048",
     "product_name": "Dongwon Light Tuna",
     "category": "Dry Food",
     "avg_unit_price": 75.0,
-    "total_samples": 1071
+    "total_samples": 1078
 }

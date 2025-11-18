@@ -1,10 +1,10 @@
 {
-    "mean": 30.350330500472143,
-    "std": 18.02411290246796,
+    "mean": 30.24788732394366,
+    "std": 18.03360891540038,
     "lookback": 90,
     "product_id": "P0201",
     "product_name": "Sewoo Tang Small Cup",
     "category": "Noodles",
     "avg_unit_price": 50.0,
-    "total_samples": 1059
+    "total_samples": 1065
 }

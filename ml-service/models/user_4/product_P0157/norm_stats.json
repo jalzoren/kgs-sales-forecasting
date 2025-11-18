@@ -1,10 +1,10 @@
 {
-    "mean": 30.026440037771483,
-    "std": 17.555185999075555,
+    "mean": 29.940845070422537,
+    "std": 17.5549425713581,
     "lookback": 90,
     "product_id": "P0157",
     "product_name": "Nongshim Yachae Ramyeon 100g",
     "category": "Noodles",
     "avg_unit_price": 93.0,
-    "total_samples": 1059
+    "total_samples": 1065
 }

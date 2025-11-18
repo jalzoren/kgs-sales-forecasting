@@ -1,10 +1,10 @@
 {
-    "mean": 35.95970009372071,
-    "std": 19.15188788777935,
+    "mean": 35.84171322160149,
+    "std": 19.17139769326191,
     "lookback": 90,
     "product_id": "P0120",
     "product_name": "Aloe Vera Juice 1.5L",
     "category": "Liquor/Beverage",
     "avg_unit_price": 175.0,
-    "total_samples": 1067
+    "total_samples": 1074
 }

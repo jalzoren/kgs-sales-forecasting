@@ -1,10 +1,10 @@
 {
-    "mean": 51.78697674418605,
-    "std": 25.62086079890252,
+    "mean": 51.59889094269871,
+    "std": 25.660595467193005,
     "lookback": 90,
     "product_id": "P0102",
     "product_name": "MWC Tteok Galbi Bar",
     "category": "Food Frozen",
     "avg_unit_price": 75.0,
-    "total_samples": 1075
+    "total_samples": 1082
 }

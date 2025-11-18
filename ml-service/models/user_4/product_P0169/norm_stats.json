@@ -1,10 +1,10 @@
 {
-    "mean": 30.783834586466167,
-    "std": 17.658255858310607,
+    "mean": 30.69094304388422,
+    "std": 17.649831275768847,
     "lookback": 90,
     "product_id": "P0169",
     "product_name": "Samyang Buldak Stew Type 145g",
     "category": "Noodles",
     "avg_unit_price": 80.0,
-    "total_samples": 1064
+    "total_samples": 1071
 }

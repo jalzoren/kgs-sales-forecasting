@@ -1,10 +1,10 @@
 {
-    "mean": 30.42721217887726,
-    "std": 17.48335757586092,
+    "mean": 30.31947069943289,
+    "std": 17.48008784456016,
     "lookback": 90,
     "product_id": "P0156",
     "product_name": "Nongshim Ramyun King Bowl",
     "category": "Noodles",
     "avg_unit_price": 95.0,
-    "total_samples": 1051
+    "total_samples": 1058
 }

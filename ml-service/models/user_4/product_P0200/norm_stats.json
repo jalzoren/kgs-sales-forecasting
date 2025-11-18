@@ -1,10 +1,10 @@
 {
-    "mean": 30.68169014084507,
-    "std": 18.026377210527574,
+    "mean": 30.580223880597014,
+    "std": 18.020661985617437,
     "lookback": 90,
     "product_id": "P0200",
     "product_name": "Paldo Koreno Kimchi Noodle",
     "category": "Noodles",
     "avg_unit_price": 50.0,
-    "total_samples": 1065
+    "total_samples": 1072
 }

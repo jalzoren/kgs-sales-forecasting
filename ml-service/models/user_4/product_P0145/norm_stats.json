@@ -1,10 +1,10 @@
 {
-    "mean": 36.38540692235734,
-    "std": 19.56773533762748,
+    "mean": 36.22026022304833,
+    "std": 19.62923302479043,
     "lookback": 90,
     "product_id": "P0145",
     "product_name": "Binggrae Melon Soda",
     "category": "Liquor/Beverage",
     "avg_unit_price": 60.0,
-    "total_samples": 1069
+    "total_samples": 1076
 }

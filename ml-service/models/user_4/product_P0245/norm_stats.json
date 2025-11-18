@@ -1,10 +1,10 @@
 {
-    "mean": 29.3480714957667,
-    "std": 16.378733557391918,
+    "mean": 29.21588785046729,
+    "std": 16.40897818045372,
     "lookback": 90,
     "product_id": "P0245",
     "product_name": "Honey Butter Almond 190g",
     "category": "Snacks",
     "avg_unit_price": 420.0,
-    "total_samples": 1063
+    "total_samples": 1070
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 50.90985130111524,
-    "std": 25.252147144742537,
+    "mean": 50.76084949215143,
+    "std": 25.262705849854136,
     "lookback": 90,
     "product_id": "P0222",
     "product_name": "CJ  Soybean Paste 1Kg",
     "category": "Seasoned/Sauce/Powder",
     "avg_unit_price": 208.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }

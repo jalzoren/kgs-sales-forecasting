@@ -1,10 +1,10 @@
 {
-    "mean": 30.000943396226415,
-    "std": 16.97053490088335,
+    "mean": 29.935272045028142,
+    "std": 16.97052218581548,
     "lookback": 90,
     "product_id": "P0249",
     "product_name": "Lotte Chocopie 12Pcs",
     "category": "Snacks",
     "avg_unit_price": 200.0,
-    "total_samples": 1060
+    "total_samples": 1066
 }

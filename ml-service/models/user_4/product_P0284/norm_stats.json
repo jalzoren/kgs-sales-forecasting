@@ -1,10 +1,10 @@
 {
-    "mean": 29.18515037593985,
-    "std": 16.909157020220388,
+    "mean": 29.12044817927171,
+    "std": 16.904610392115757,
     "lookback": 90,
     "product_id": "P0284",
     "product_name": "Kkokal Sweet Corn Snack",
     "category": "Snacks",
     "avg_unit_price": 80.0,
-    "total_samples": 1064
+    "total_samples": 1071
 }

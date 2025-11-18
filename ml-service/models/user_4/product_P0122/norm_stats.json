@@ -1,10 +1,10 @@
 {
-    "mean": 35.85861423220974,
-    "std": 20.033796439138058,
+    "mean": 35.72372093023256,
+    "std": 20.04387517767117,
     "lookback": 90,
     "product_id": "P0122",
     "product_name": "Chamisul Original Soju",
     "category": "Liquor/Beverage",
     "avg_unit_price": 175.0,
-    "total_samples": 1068
+    "total_samples": 1075
 }

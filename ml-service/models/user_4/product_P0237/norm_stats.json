@@ -1,10 +1,10 @@
 {
-    "mean": 51.00185873605948,
-    "std": 24.15981665344199,
+    "mean": 50.83656509695291,
+    "std": 24.192200054119898,
     "lookback": 90,
     "product_id": "P0237",
     "product_name": "O'Food Tteokbokki Sauce",
     "category": "Seasoned/Sauce/Powder",
     "avg_unit_price": 120.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }

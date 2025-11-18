@@ -1,10 +1,10 @@
 {
-    "mean": 36.73733583489681,
-    "std": 19.447737936064236,
+    "mean": 36.57036346691519,
+    "std": 19.51135666136577,
     "lookback": 90,
     "product_id": "P0142",
     "product_name": "Nongshim Welchs White Grape 355mL",
     "category": "Liquor/Beverage",
     "avg_unit_price": 60.0,
-    "total_samples": 1066
+    "total_samples": 1073
 }

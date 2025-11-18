@@ -1,10 +1,10 @@
 {
-    "mean": 28.712796208530804,
-    "std": 16.57327978117515,
+    "mean": 28.63490566037736,
+    "std": 16.584681501912915,
     "lookback": 90,
     "product_id": "P0264",
     "product_name": "Lotte Ghana Dark Chocolate",
     "category": "Snacks",
     "avg_unit_price": 115.0,
-    "total_samples": 1055
+    "total_samples": 1060
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 52.01115241635688,
-    "std": 25.786274809114367,
+    "mean": 51.86611265004617,
+    "std": 25.780130808170348,
     "lookback": 90,
     "product_id": "P0093",
     "product_name": "Bibigo Kimchi Fried Rice",
     "category": "Food Frozen",
     "avg_unit_price": 190.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }

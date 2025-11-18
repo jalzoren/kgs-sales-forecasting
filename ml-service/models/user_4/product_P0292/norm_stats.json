@@ -1,10 +1,10 @@
 {
-    "mean": 29.41254752851711,
-    "std": 16.559524277969977,
+    "mean": 29.364494806421153,
+    "std": 16.528125339119217,
     "lookback": 90,
     "product_id": "P0292",
     "product_name": "Orion Goraebab Crackers",
     "category": "Snacks",
     "avg_unit_price": 75.0,
-    "total_samples": 1052
+    "total_samples": 1059
 }

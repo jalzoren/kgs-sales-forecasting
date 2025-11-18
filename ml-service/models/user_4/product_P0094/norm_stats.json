@@ -1,10 +1,10 @@
 {
-    "mean": 50.823584029712165,
-    "std": 24.951411537233998,
+    "mean": 50.72970479704797,
+    "std": 24.93211102590894,
     "lookback": 90,
     "product_id": "P0094",
     "product_name": "MWC Frank Sausage 5Pcs",
     "category": "Food Frozen",
     "avg_unit_price": 173.0,
-    "total_samples": 1077
+    "total_samples": 1084
 }

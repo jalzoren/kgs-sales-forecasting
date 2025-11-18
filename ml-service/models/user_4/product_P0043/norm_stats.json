@@ -1,10 +1,10 @@
 {
-    "mean": 41.88443616029823,
-    "std": 21.69207998402798,
+    "mean": 41.797222222222224,
+    "std": 21.67667439556644,
     "lookback": 90,
     "product_id": "P0043",
     "product_name": "CJ Hetbahn Cooked Barley",
     "category": "Dry Food",
     "avg_unit_price": 95.0,
-    "total_samples": 1073
+    "total_samples": 1080
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 29.96866096866097,
-    "std": 17.67449575522562,
+    "mean": 29.920604914933836,
+    "std": 17.65787901767621,
     "lookback": 90,
     "product_id": "P0161",
     "product_name": "Paldo Wang Cup",
     "category": "Noodles",
     "avg_unit_price": 90.0,
-    "total_samples": 1053
+    "total_samples": 1058
 }

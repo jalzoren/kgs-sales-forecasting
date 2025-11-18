@@ -1,10 +1,10 @@
 {
-    "mean": 29.463207547169812,
-    "std": 16.62130460734593,
+    "mean": 29.4020618556701,
+    "std": 16.59444841117707,
     "lookback": 90,
     "product_id": "P0299",
     "product_name": "Lotte Xylitol Green Gum",
     "category": "Snacks",
     "avg_unit_price": 55.0,
-    "total_samples": 1060
+    "total_samples": 1067
 }

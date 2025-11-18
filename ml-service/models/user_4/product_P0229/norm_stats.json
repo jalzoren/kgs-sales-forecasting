@@ -1,10 +1,10 @@
 {
-    "mean": 49.967381174277726,
-    "std": 24.745832197343567,
+    "mean": 49.863762743280816,
+    "std": 24.747987177073004,
     "lookback": 90,
     "product_id": "P0229",
     "product_name": "O'Food Korean BBQ Sauce",
     "category": "Seasoned/Sauce/Powder",
     "avg_unit_price": 145.0,
-    "total_samples": 1073
+    "total_samples": 1079
 }

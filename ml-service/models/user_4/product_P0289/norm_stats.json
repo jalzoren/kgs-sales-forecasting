@@ -1,10 +1,10 @@
 {
-    "mean": 30.463207547169812,
-    "std": 17.89470738785677,
+    "mean": 30.370544090056285,
+    "std": 17.891657118486037,
     "lookback": 90,
     "product_id": "P0289",
     "product_name": "Crown Corn Chips",
     "category": "Snacks",
     "avg_unit_price": 80.0,
-    "total_samples": 1060
+    "total_samples": 1066
 }

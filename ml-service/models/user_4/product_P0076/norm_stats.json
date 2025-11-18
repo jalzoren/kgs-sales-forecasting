@@ -1,10 +1,10 @@
 {
-    "mean": 52.65953488372093,
-    "std": 26.404343884053223,
+    "mean": 52.47134935304991,
+    "std": 26.430640066933204,
     "lookback": 90,
     "product_id": "P0076",
     "product_name": "CJ  Crispy Hotdog",
     "category": "Food Frozen",
     "avg_unit_price": 640.0,
-    "total_samples": 1075
+    "total_samples": 1082
 }

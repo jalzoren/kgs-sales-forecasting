@@ -1,10 +1,10 @@
 {
-    "mean": 30.189035916824196,
-    "std": 17.4496489547478,
+    "mean": 30.092018779342723,
+    "std": 17.451085833453583,
     "lookback": 90,
     "product_id": "P0188",
     "product_name": "Nagasaki Jjampong",
     "category": "Noodles",
     "avg_unit_price": 60.0,
-    "total_samples": 1058
+    "total_samples": 1065
 }

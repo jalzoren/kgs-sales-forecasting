@@ -1,10 +1,10 @@
 {
-    "mean": 35.55586854460094,
-    "std": 18.94255576751088,
+    "mean": 35.45658263305322,
+    "std": 18.945118254945424,
     "lookback": 90,
     "product_id": "P0107",
     "product_name": "Ottogi Honey Ginger Tea 1Kg",
     "category": "Liquor/Beverage",
     "avg_unit_price": 530.0,
-    "total_samples": 1065
+    "total_samples": 1071
 }
