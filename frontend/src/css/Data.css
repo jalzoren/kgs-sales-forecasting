@@ -55,8 +55,7 @@ hr {
   pointer-events: none;
   transition: opacity 0.2s ease;
   z-index: 10;
-    border: 1px solid var(--accent);
-
+  border: 1px solid var(--accent);
 }
 
 .btn-custom-swal::before {
@@ -323,13 +322,14 @@ hr {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .table-toolbar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    align-items: center;
-    justify-content: space-evenly;
-    flex-direction: row-reverse;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: row-reverse;
 }
 
 /* Equal width for all controls */
@@ -337,7 +337,7 @@ hr {
 .table-toolbar select {
   flex: 1;
   min-width: 200px;
-  max-width:320px;
+  max-width: 320px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -388,6 +388,11 @@ hr {
   color: var(--accent);
   height: 38px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2300143b' d='M1.5 0L6 4.5 10.5 0 12 1.5 6 7.5 0 1.5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
 }
 
 .table-toolbar select:focus {
@@ -565,7 +570,6 @@ hr {
 .user-manual-container::-webkit-scrollbar-thumb:hover {
   background: var(--accent-lighter);
 }
-
 
 /* Responsive (mobile-friendly) */
 @media (max-width: 768px) {

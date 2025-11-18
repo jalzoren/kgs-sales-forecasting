@@ -48,20 +48,154 @@
   color: white;
   border-color: var(--analytics-accent);
 }
-
-/* Toolbar / Filters */
-.analytics-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin: 20px;
+.analytics-grid-3 {
+  width: 100%;
+  max-width: 1100px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 20px 24px;
 }
+
+.analytics-grid-3 label {
+  display: flex;
+  flex-direction: column;
+  font-size: 14px;
+  color: var(--analytics-accent);
+  font-weight: 600;
+}
+
+.analytics-grid-3 select,
+.analytics-grid-3 input {
+  margin-top: 6px;
+  padding: 10px 14px;
+  height: 44px;
+  font-size: 14px;
+  border: 1px solid #c9d6e3;
+  border-radius: 6px;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+/* Search input formatting */
+.search-cont {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Clear filters button cell */
+.button-cell {
+  display: flex;
+  align-items: flex-end;
+}
+
+.button-cell .clear-filters {
+  width: 100%;
+  height: 44px;
+  background: var(--analytics-accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 6px;
+  font-family: "Poppins", sans-serif;
+}
+
+.button-cell .clear-filters:hover {
+  background: var(--analytics-accent-light);
+}
+
+/* Search box + button wrapper */
+.analytics-toolbar .search-wrapper {
+  display: flex;
+  border: 1px solid #c9d6e3;
+  border-radius: 6px;
+  overflow: hidden;
+  background-color: #fff;
+}
+.analytics-toolbar .search-wrapper input {
+  border: none;
+  outline: none;
+  flex: 1;
+  padding: 0 12px;
+  height: 100%;
+}
+.analytics-toolbar .search-wrapper button {
+  border: none;
+  background: var(--analytics-accent);
+  color: white;
+  width: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.analytics-toolbar .search-wrapper button:hover {
+  background: var(--analytics-accent-light);
+}
+
+/* Buttons (Clear Filters, etc.) */
+.analytics-toolbar button.clear-filters {
+  background: var(--analytics-accent);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+.analytics-toolbar button.clear-filters:hover {
+  background: var(--analytics-accent-light);
+}
+.analytics-toolbar {
+  width: 100%;
+  display: flex;
+  justify-content: center;   /* centers the grid */
+  margin-top: 20px;
+  padding: 10px 14px;
+}
+
+.analytics-grid-3 {
+  max-width: 1100px;         /* keeps it from stretching too wide */
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(220px, 1fr));
+  gap: 20px 24px;
+  justify-content: center;   /* ensures grid columns center if narrower */
+}
+
 
 .analytics-filters {
   display: flex;
   gap: 10px;
+  flex-wrap: nowrap;
+  align-content: flex-end;
+  justify-content: center;
+  align-items: baseline;
+  flex-direction: row;
 }
 
 .analytics-filters select {
+  padding: 10px 14px;
+  border: 1px solid #c9d6e3;
+  border-radius: 6px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--analytics-accent);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2300143b' d='M1.5 0L6 4.5 10.5 0 12 1.5 6 7.5 0 1.5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+
+.analytics-filters select:focus {
+  border-color: var(--analytics-accent-lighter);
+  box-shadow: 0 0 0 2px rgba(65, 167, 221, 0.2);
+}
+
+.analytics-filters select:hover {
+  border-color: var(--analytics-accent-light);
+}
+
+.analytics-toolbar input {
   padding: 10px 14px;
   border-radius: 6px;
   border: 1px solid #c9d6e3;
@@ -151,6 +285,13 @@
   margin-top: 4px;
 }
 
+.search-cont {
+  display: flex;
+  align-items: left;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
 /* Chart Section */
 .analytics-chart-section {
   background: white;
@@ -213,12 +354,12 @@
 
 /* Action button POss */
 .actions {
- display: flex;
-    justify-content: space-around;
-    gap: 6px;
-    flex-wrap: wrap;
-    align-content: space-around;
-    flex-direction: column;
+  display: flex;
+  justify-content: space-around;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-content: space-around;
+  flex-direction: column;
 }
 
 .btn-view,
