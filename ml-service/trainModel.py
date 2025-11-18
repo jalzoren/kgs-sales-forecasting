@@ -1,4 +1,4 @@
-# ml-service/trainModel.py (REFACTORED FOR PRODUCT-LEVEL FORECASTING)
+# ml-service/trainModel.py
 
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
