@@ -1,10 +1,10 @@
 {
-    "mean": 63.125,
-    "std": 29.863019446988204,
+    "mean": 62.9834406623735,
+    "std": 29.83020861747352,
     "lookback": 90,
     "product_id": "P0049",
     "product_name": "Our Home Kimchi 1Kg",
     "category": "Food Fresh/Meat/Sidedish",
     "avg_unit_price": 320.5,
-    "total_samples": 1080
+    "total_samples": 1087
 }

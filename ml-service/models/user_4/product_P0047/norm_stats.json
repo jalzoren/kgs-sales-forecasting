@@ -1,10 +1,10 @@
 {
-    "mean": 41.88422035480859,
-    "std": 21.191596891397147,
+    "mean": 41.80148423005566,
+    "std": 21.173806930511514,
     "lookback": 90,
     "product_id": "P0047",
     "product_name": "Dongwon Spicy Tuna",
     "category": "Dry Food",
     "avg_unit_price": 80.0,
-    "total_samples": 1071
+    "total_samples": 1078
 }

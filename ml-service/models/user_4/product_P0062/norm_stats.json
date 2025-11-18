@@ -1,10 +1,10 @@
 {
-    "mean": 64.31417979610751,
-    "std": 29.737604689998598,
+    "mean": 64.11878453038673,
+    "std": 29.758252958909285,
     "lookback": 90,
     "product_id": "P0062",
     "product_name": "Dried Anchovy Small 100g",
     "category": "Food Fresh/Meat/Sidedish",
     "avg_unit_price": 240.0,
-    "total_samples": 1079
+    "total_samples": 1086
 }

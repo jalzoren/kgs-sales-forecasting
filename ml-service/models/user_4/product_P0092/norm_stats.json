@@ -1,10 +1,10 @@
 {
-    "mean": 51.020446096654275,
-    "std": 24.506469011849088,
+    "mean": 50.92336103416436,
+    "std": 24.492117238156677,
     "lookback": 90,
     "product_id": "P0092",
     "product_name": "Daerim  Crab Stick 500g",
     "category": "Food Frozen",
     "avg_unit_price": 210.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }

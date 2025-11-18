@@ -1,10 +1,10 @@
 {
-    "mean": 177.17668825161888,
-    "std": 71.5610931208558,
+    "mean": 176.5496323529412,
+    "std": 71.76339355742947,
     "lookback": 90,
     "product_id": "P0001",
     "product_name": "Ottogi Sesame Oil 500mL",
     "category": "Condiments",
     "avg_unit_price": 590.5,
-    "total_samples": 1081
+    "total_samples": 1088
 }

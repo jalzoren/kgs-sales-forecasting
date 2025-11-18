@@ -1,10 +1,10 @@
 {
-    "mean": 177.79406307977737,
-    "std": 70.01810537841901,
+    "mean": 177.2036866359447,
+    "std": 70.18828121805318,
     "lookback": 90,
     "product_id": "P0007",
     "product_name": "Samyang Spicy Mayo",
     "category": "Condiments",
     "avg_unit_price": 130.0,
-    "total_samples": 1078
+    "total_samples": 1085
 }

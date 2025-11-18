@@ -1,10 +1,10 @@
 {
-    "mean": 41.353159851301115,
-    "std": 21.663511262918803,
+    "mean": 41.22437673130194,
+    "std": 21.66687114953663,
     "lookback": 90,
     "product_id": "P0029",
     "product_name": "CJ Beksul Pancake Flour",
     "category": "Dry Food",
     "avg_unit_price": 125.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 41.23716153127918,
-    "std": 21.835103371069373,
+    "mean": 41.12987012987013,
+    "std": 21.83656304863451,
     "lookback": 90,
     "product_id": "P0021",
     "product_name": "Bibigo Kimbab Kim 10Sheets",
     "category": "Dry Food",
     "avg_unit_price": 161.0,
-    "total_samples": 1071
+    "total_samples": 1078
 }

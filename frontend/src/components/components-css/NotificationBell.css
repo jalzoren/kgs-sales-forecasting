@@ -112,6 +112,7 @@
   border-left: 4px solid rgba(1, 46, 114, 1);
   background: linear-gradient(to right, rgba(1, 46, 114, 0.60), #ffffff);
 }
+
 .notif-content {
   display: flex;
   flex-direction: column; 
@@ -128,14 +129,13 @@
 
 .notif{
     border-bottom: 1px solid #000000; 
-
 }
 
 .notif-icon-wrapper {
   font-size: 24px;
   display: flex;
-  align-items: center;   /* vertical center */
-  justify-content: center; /* horizontal center if needed */
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   color: #000;
 }
@@ -143,7 +143,7 @@
 .notif-title {
   font-weight: 600;
   font-size: 16px;
-  margin: 0; /* remove margin */
+  margin: 0;
 }
 
 .notif-message {
@@ -161,13 +161,30 @@
   gap: 4px;
 }
 
-
+/* --- UPDATED CLOSE BUTTON (Same Style as Clear Notifications) --- */
 .close-icon {
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
+  color: #0A4174;
+  background: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 4px 6px;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
-/* Spin animation for processing icons */
+.close-icon:hover {
+  color: #073661;
+}
+
+/* Optional disabled state */
+.close-icon:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/* -------------------------------------------------------------- */
+
+/* Spin animation */
 .spin {
   animation: spin 1s linear infinite;
 }
@@ -194,24 +211,12 @@
   transition: width 0.4s ease;
 }
 
-/* Mark all as read button */
-.mark-all-read {
-  margin-bottom: 0.5rem;
-  background: #0a4174;
-  color: white;
-  border: none;
-  padding: 0.25rem 0.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
 .title-head{
   color: #000;
   font-weight: 200;
   border-bottom: #000 1px solid ;
   align-items: flex-start;
 }
-
 
 .title-notif{
   color: #000;
@@ -250,33 +255,73 @@
 }
 
 .notif-header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-direction: column;
 }
 
-.mark-all-read-btn {
-  cursor: pointer;
-  padding: 6px 12px;
-  background-color: #0a4174;
-  color: white;
+/* Button styling */
+.btn-mark-read {
+  margin-bottom: 0.5rem;
+  color: #0A4174;
   border: none;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.2s;
-  font-family: "Poppins", sans-serif;
+  font-size: 26px;
+  background-color: #fff;
 }
 
-.mark-all-read-btn:hover {
-  background-color: #357abd;
+.btn-mark-read:hover {
+  color: #073661;
 }
 
-.mark-all-read-btn:disabled {
-  background-color: #cccccc;
+.btn-mark-read:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.tooltip-mark-read {
+  position: relative;
+  display: inline-block;
+  z-index: 9999;
+}
+
+.tooltip-text-mark-read {
+  visibility: hidden;
+  width: 140px;
+  background-color: #073661;
+  color: #fff;
+  text-align: center;
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 14px;
+  position: absolute;
+  z-index: 10000;
+
+  top: 50%;
+  left: 125%;
+  transform: translateY(-50%);
+
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip-mark-read:hover .tooltip-text-mark-read {
+  visibility: visible;
+  opacity: 1;
+}
+
+.tooltip-text-mark-read::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -10px; 
+  transform: translateY(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #073661 transparent transparent;
 }

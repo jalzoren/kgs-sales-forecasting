@@ -1,10 +1,10 @@
 {
-    "mean": 52.26858736059479,
-    "std": 25.66273886038953,
+    "mean": 52.16805170821792,
+    "std": 25.66248681927834,
     "lookback": 90,
     "product_id": "P0084",
     "product_name": "Assi Vegetable Dumplings 675g",
     "category": "Food Frozen",
     "avg_unit_price": 285.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 40.87174721189591,
-    "std": 21.94170503042289,
+    "mean": 40.81625115420129,
+    "std": 21.904312870921437,
     "lookback": 90,
     "product_id": "P0040",
     "product_name": "Ottogi Sweet Corn 340g",
     "category": "Dry Food",
     "avg_unit_price": 95.0,
-    "total_samples": 1076
+    "total_samples": 1083
 }
