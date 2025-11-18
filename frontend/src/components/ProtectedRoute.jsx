@@ -3,47 +3,37 @@ import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
+const FORECAST_API = "http://localhost:5000/api/forecast/history";
+
 export default function ProtectedRoute({ children }) {
-  const [hasForecast, setHasForecast] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [hasForecast, setHasForecast] = useState(false);
 
   useEffect(() => {
-    checkForecastAccess();
-  }, []);
+    const checkAccess = async () => {
+      try {
+        const res = await fetch(FORECAST_API, { credentials: "include" });
 
-  const checkForecastAccess = async () => {
-    try {
-      const res = await fetch("http://localhost:5000/api/forecast/history", {
-        credentials: "include",
-      });
-      
-      // ✅ Check both status and data content
-      if (res.ok) {
-        const data = await res.json();
-        const hasForecasts = Array.isArray(data) && data.length > 0;
-        setHasForecast(hasForecasts);
-      } else {
+        if (res.ok) {
+          const data = await res.json();
+          setHasForecast(Array.isArray(data) && data.length > 0);
+        } else {
+          setHasForecast(false);
+        }
+      } catch (err) {
+        console.error("Forecast access error:", err);
         setHasForecast(false);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
-    } catch (err) {
-      console.error("Error checking forecast access:", err);
-      setHasForecast(false);
-      setLoading(false);
-    }
-  };
+    };
+
+    checkAccess();
+  }, []);
 
   if (loading) {
     return (
-      <div style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        height: '100vh',
-        flexDirection: 'column',
-        gap: '20px'
-      }}>
+      <div className="center-loading">
         <div className="spinner"></div>
         <p>Checking access...</p>
       </div>
@@ -51,14 +41,13 @@ export default function ProtectedRoute({ children }) {
   }
 
   if (!hasForecast) {
-    // Show message and redirect
     Swal.fire({
       icon: "info",
       title: "Generate a Forecast First",
-      text: "Please upload sales data and generate a forecast to access the full potential of our system.",
+      text: "Please upload sales data and generate a forecast.",
       confirmButtonColor: "#001D39",
-      confirmButtonText: "Go to Welcome Page"
     });
+
     return <Navigate to="/welcome" replace />;
   }
 

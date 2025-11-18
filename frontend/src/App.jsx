@@ -4,7 +4,8 @@ import Navbar from "./components/Navbar";
 import Navbar2 from "./components/Navbar2";
 import { NotificationProvider } from "./components/Notifications";
 import ProtectedRoute from "./components/ProtectedRoute";
-import AuthRoute from "./components/AuthRoute"; // ✅ NEW
+import AuthRoute from "./components/AuthRoute";
+import LoadingCheck from "./pages/LoadingCheck";
 
 import Home from "./pages/Home";
 import Data from "./pages/Data";
@@ -40,6 +41,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot" element={<Forgot />} />
+          <Route path="/loading-check" element={<LoadingCheck />} />
           
           {/* Welcome page - requires authentication only */}
           <Route path="/welcome" element={

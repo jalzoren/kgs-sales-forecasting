@@ -1,0 +1,42 @@
+.loader-wrapper {
+  height: 100vh;
+  width: 100%;
+  background: #001d39;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.loader-spinner {
+  width: 80px;
+  height: 80px;
+  border: 8px solid #ffffff33;
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loader-message {
+  margin-top: 18px;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
