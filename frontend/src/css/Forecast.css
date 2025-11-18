@@ -26,13 +26,13 @@ body {
 }
 
 .table-toolbar {
-display: flex;
-    gap: 10px;
-    margin-bottom: 35px;
-    align-items: center;
-    justify-content: space-around;
-    flex-direction: row;
-    flex-wrap: nowrap;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 35px;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: row;
+  flex-wrap: nowrap;
 }
 
 .search-box {
@@ -70,6 +70,11 @@ select {
   background-color: #fff;
   font-size: 14px;
   cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2300143b' d='M1.5 0L6 4.5 10.5 0 12 1.5 6 7.5 0 1.5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
 }
 
 .table-container {
@@ -396,6 +401,11 @@ select {
   cursor: pointer;
   min-width: 200px;
   color: var(--accent);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2300143b' d='M1.5 0L6 4.5 10.5 0 12 1.5 6 7.5 0 1.5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
 }
 
 .sheet-select:focus {

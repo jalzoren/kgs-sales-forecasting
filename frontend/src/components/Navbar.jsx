@@ -47,7 +47,8 @@ function Navbar() {
           <li><NavLink to="/home">Home</NavLink></li>
           <li><NavLink to="/data">Data</NavLink></li>
           <li><NavLink to="/forecast">Forecast</NavLink></li>
-          <li><NavLink to="/reports">Reports</NavLink></li>
+          {/* 
+          <li><NavLink to="/reports">Reports</NavLink></li>*/}
           <li><NavLink to="/analytics">Analytics</NavLink></li>
         </ul>
 

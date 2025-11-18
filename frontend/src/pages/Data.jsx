@@ -726,70 +726,66 @@ export default function UploadBox() {
           </select>
         </div>
 
-        <div className="table-container">
-          <table className="upload-table">
-            <thead>
-              <tr>
-                <th>Upload Date</th>
-                <th>File Name</th>
-                <th>Records</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentData.length > 0 ? (
-                currentData.map((item) => (
-                  <tr key={item.salesID}>
-                    <td>
-                      {item.uploadDate
-                        ? dayjs(item.uploadDate)
-                            .tz()
-                            .format("MMMM D, YYYY • h:mm A")
-                        : "—"}
-                    </td>
-                    <td>{item.fileName}</td>
-                    <td>{item.records?.toLocaleString() || 0}</td>x1
-                    <td>
-                      <span
-                        className={`status ${
-                          item.status === "Completed"
-                            ? "success"
-                            : item.status === "Failed" || item.status === "Error"
-                            ? "failed"
-                            : item.status === "Preprocessing" || item.status === "Training"
-                            ? "processing"
-                            : item.status === "Uploaded"
-                            ? "uploaded"
-                            : "pending"
-                        }`}
-                      >
-                        {uploadStatusMap[item.salesID] || item.status}
-                      </span>
-                    </td>
-                    <td className="actions">
-                      <button
-                        className="btn-delete"
-                        onClick={() => handleDelete(item.salesID)}
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td
-                    colSpan="5"
-                    style={{ textAlign: "center", padding: "1rem" }}
-                  >
-                    No data available
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+      <div className="data-table-container">
+  <table className="data-table">
+    <thead>
+      <tr>
+        <th>Upload Date</th>
+        <th>File Name</th>
+        <th>Records</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {currentData.length > 0 ? (
+        currentData.map((item) => (
+          <tr key={item.salesID}>
+            <td>
+              {item.uploadDate
+                ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A")
+                : "—"}
+            </td>
+            <td>{item.fileName}</td>
+            <td>{item.records?.toLocaleString() || 0}</td>
+            <td>
+              <span
+                className={`status ${
+                  item.status === "Completed"
+                    ? "success"
+                    : item.status === "Failed" || item.status === "Error"
+                    ? "failed"
+                    : item.status === "Preprocessing" || item.status === "Training"
+                    ? "processing"
+                    : item.status === "Uploaded"
+                    ? "uploaded"
+                    : "pending"
+                }`}
+              >
+                {uploadStatusMap[item.salesID] || item.status}
+              </span>
+            </td>
+            <td className="actions">
+              <button
+                className="btn-delete"
+                onClick={() => handleDelete(item.salesID)}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan="5" style={{ textAlign: "center", padding: "1rem" }}>
+            No data available
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
 
         {/* Pagination  AA*/}
         <div className="pagination">

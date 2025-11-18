@@ -534,99 +534,112 @@ export default function Analytics() {
         </>
       ) : (
         <>
-          {/* Inventory Alerts with Horizon Dropdown and Filters */}
           <div className="analytics-toolbar">
-            <div className="analytics-filters">
-              <label>
-                Forecast Horizon:{" "}
-                <select value={forecastHorizon} onChange={(e) => {
-                  setForecastHorizon(e.target.value);
-                  setCurrentPage(1);
-                }}>
-                  <option value="7d">Next 7 Days</option>
-                  <option value="30d">Next 30 Days</option>
-                  <option value="90d">Next 90 Days</option>
-                </select>
-              </label>
+  <div className="analytics-grid-3">
 
-              <label>
-                Search:{" "}
-                <input 
-                  type="text" 
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                  style={{ padding: "5px 10px", minWidth: "200px" }}
-                />
-              </label>
+    {/* Column 1 – Row 1 */}
+    <label>
+      Forecast Horizon
+      <select
+        value={forecastHorizon}
+        onChange={(e) => {
+          setForecastHorizon(e.target.value);
+          setCurrentPage(1);
+        }}
+      >
+        <option value="7d">Next 7 Days</option>
+        <option value="30d">Next 30 Days</option>
+        <option value="90d">Next 90 Days</option>
+      </select>
+    </label>
 
-              <label>
-                Category:{" "}
-                <select value={filterCategory} onChange={(e) => {
-                  setFilterCategory(e.target.value);
-                  setCurrentPage(1);
-                }}>
-                  <option value="all">All Categories</option>
-                  {Array.from(new Set(forecastData.map((d) => d.category).filter(Boolean))).sort().map((c, i) => (
-                    <option key={i} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </label>
+    {/* Column 2 – Row 1 */}
+    <label>
+      Category
+      <select
+        value={filterCategory}
+        onChange={(e) => {
+          setFilterCategory(e.target.value);
+          setCurrentPage(1);
+        }}
+      >
+        <option value="all">All Categories</option>
+        {Array.from(new Set(forecastData.map((d) => d.category).filter(Boolean)))
+          .sort()
+          .map((c, i) => (
+            <option key={i} value={c}>{c}</option>
+          ))}
+      </select>
+    </label>
 
-              <label>
-                Status:{" "}
-                <select value={filterStatus} onChange={(e) => {
-                  setFilterStatus(e.target.value);
-                  setCurrentPage(1);
-                }}>
-                  <option value="all">All Status</option>
-                  <option value="critical">Critical - Low Stock</option>
-                  <option value="warning">Warning - Monitor Stock</option>
-                  <option value="good">Good</option>
-                </select>
-              </label>
+    {/* Column 3 – Row 1 (SEARCH) */}
+    <label className="search-cont">
+      Search
+      <input
+        type="text"
+        placeholder="Search products..."
+        value={searchQuery}
+        onChange={(e) => {
+          setSearchQuery(e.target.value);
+          setCurrentPage(1);
+        }}
+      />
+    </label>
 
-              <label>
-                Sort By:{" "}
-                <select value={sortBy} onChange={(e) => {
-                  setSortBy(e.target.value);
-                  setCurrentPage(1);
-                }}>
-                  <option value="demand-asc">Demand (Low to High)</option>
-                  <option value="demand-desc">Demand (High to Low)</option>
-                  <option value="name-asc">Product Name (A-Z)</option>
-                  <option value="name-desc">Product Name (Z-A)</option>
-                  <option value="status">Status (Critical First)</option>
-                </select>
-              </label>
+    {/* Column 1 – Row 2 */}
+    <label>
+      Status
+      <select
+        value={filterStatus}
+        onChange={(e) => {
+          setFilterStatus(e.target.value);
+          setCurrentPage(1);
+        }}
+      >
+        <option value="all">All Status</option>
+        <option value="critical">Critical - Low Stock</option>
+        <option value="warning">Warning - Monitor Stock</option>
+        <option value="good">Good</option>
+      </select>
+    </label>
 
-              <button 
-                onClick={() => {
-                  setSearchQuery("");
-                  setFilterCategory("all");
-                  setFilterStatus("all");
-                  setSortBy("demand-asc");
-                  setCurrentPage(1);
-                }}
-                style={{ 
-                  padding: "5px 15px", 
-                  marginLeft: "10px",
-                  cursor: "pointer",
-                  backgroundColor: "#0a4174",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px"
-                }}
-              >
-                Clear Filters
-              </button>
-            </div>
-          </div>
+    {/* Column 2 – Row 2 */}
+    <label>
+      Sort By
+      <select
+        value={sortBy}
+        onChange={(e) => {
+          setSortBy(e.target.value);
+          setCurrentPage(1);
+        }}
+      >
+        <option value="demand-asc">Demand (Low to High)</option>
+        <option value="demand-desc">Demand (High to Low)</option>
+        <option value="name-asc">Product Name (A-Z)</option>
+        <option value="name-desc">Product Name (Z-A)</option>
+        <option value="status">Status (Critical First)</option>
+      </select>
+    </label>
+
+    {/* Column 3 – Row 2 (CLEAR FILTERS) */}
+    <div className="button-cell">
+      <button
+        className="clear-filters"
+        onClick={() => {
+          setSearchQuery("");
+          setFilterCategory("all");
+          setFilterStatus("all");
+          setSortBy("demand-asc");
+          setCurrentPage(1);
+        }}
+      >
+        Clear Filters
+      </button>
+    </div>
+
+  </div>
+</div>
+
           
           <div className="analytics-inventory-alerts">
             <h3>Inventory Alerts - {forecastHorizon === "7d" ? "Next 7 Days" : forecastHorizon === "30d" ? "Next 30 Days" : "Next 90 Days"}</h3>
@@ -670,7 +683,6 @@ export default function Analytics() {
                         );
                       }
 
-                      // Apply category filter
                       if (filterCategory !== "all") {
                         aggregated = aggregated.filter(item => item.category === filterCategory);
                       }

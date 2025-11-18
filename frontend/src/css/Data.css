@@ -55,8 +55,7 @@ hr {
   pointer-events: none;
   transition: opacity 0.2s ease;
   z-index: 10;
-    border: 1px solid var(--accent);
-
+  border: 1px solid var(--accent);
 }
 
 .btn-custom-swal::before {
@@ -163,21 +162,13 @@ hr {
   cursor: pointer;
 }
 
-/* Table Section */
-.table-wrapper {
-  max-width: 1000px;
-  margin: 40px auto;
-  font-family: "Poppins", sans-serif;
-  color: var(--accent);
-}
-
-.table-container {
+.data-table-container {
   background: #f5f7fa;
   padding: 10px;
   border-radius: 8px;
 }
 
-.upload-table {
+.data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
@@ -186,24 +177,24 @@ hr {
   text-align: center;
 }
 
-.upload-table th,
-.upload-table td {
+.data-table th,
+.data-table td {
   padding: 10px 14px;
   text-align: center;
   vertical-align: middle;
   border: 1px solid #c9d6e3;
 }
 
-.upload-table thead {
+.data-table thead {
   background-color: #e6edf5;
   font-weight: 600;
 }
 
-.upload-table tbody tr:nth-child(even) {
+.data-table tbody tr:nth-child(even) {
   background-color: #f9fbfd;
 }
 
-.upload-table tbody tr:hover {
+.data-table tbody tr:hover {
   background-color: #eef5fb;
   transition: 0.2s;
 }
@@ -245,12 +236,8 @@ hr {
 }
 
 @keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
 }
 
 /* Table Actions */
@@ -278,7 +265,7 @@ hr {
   color: #0077cc;
 }
 
-/* Delete Button (standalone red style) */
+/* Delete Button */
 .btn-delete {
   background-color: #e53935;
   color: white;
@@ -293,6 +280,7 @@ hr {
 .btn-delete:hover {
   background-color: #c62828;
 }
+
 
 /* Pagination */
 .pagination {
@@ -323,13 +311,14 @@ hr {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
 .table-toolbar {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
-    align-items: center;
-    justify-content: space-evenly;
-    flex-direction: row-reverse;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: row-reverse;
 }
 
 /* Equal width for all controls */
@@ -337,7 +326,7 @@ hr {
 .table-toolbar select {
   flex: 1;
   min-width: 200px;
-  max-width:320px;
+  max-width: 320px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -388,6 +377,11 @@ hr {
   color: var(--accent);
   height: 38px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2300143b' d='M1.5 0L6 4.5 10.5 0 12 1.5 6 7.5 0 1.5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
 }
 
 .table-toolbar select:focus {
@@ -565,7 +559,6 @@ hr {
 .user-manual-container::-webkit-scrollbar-thumb:hover {
   background: var(--accent-lighter);
 }
-
 
 /* Responsive (mobile-friendly) */
 @media (max-width: 768px) {
