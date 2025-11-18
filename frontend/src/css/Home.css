@@ -53,6 +53,8 @@ h4{
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
+  border: #001d39 1px solid;
+  margin-top: 10px;
 }
 
 .box:hover {
