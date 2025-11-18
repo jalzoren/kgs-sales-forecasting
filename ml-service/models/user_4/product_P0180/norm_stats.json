@@ -1,0 +1,10 @@
+{
+    "mean": 30.760563380281692,
+    "std": 17.851779666920866,
+    "lookback": 90,
+    "product_id": "P0180",
+    "product_name": "Samyang Curry Ramen",
+    "category": "Noodles",
+    "avg_unit_price": 68.0,
+    "total_samples": 1065
+}
