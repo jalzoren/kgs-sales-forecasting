@@ -53,7 +53,7 @@ h4{
   transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  border: #001d39 1px solid;
+  border: rgb(0, 29, 57,0.30) 1px solid;
   margin-top: 10px;
 }
 
@@ -64,4 +64,32 @@ h4{
 
 .right-side .box {
   flex: 1;
+}
+
+.title-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.title-header i {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  cursor: pointer;
+  height: 32px;
+  width: 32px;
+}
+
+.title-header i:hover {
+  border-radius: 6px;
+  color: var(--accent-light);
+    transition: all 0.25s ease;  
+  font-size: 23px;
+
+}
+.title-home {
+  margin: 0;
 }

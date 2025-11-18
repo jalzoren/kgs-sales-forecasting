@@ -9,6 +9,7 @@ import {
 import { IoClose } from "react-icons/io5";
 import { useNotifications } from "./Notifications";
 import "../components/components-css/NotificationBell.css";
+import { MdOutlineMarkAsUnread } from "react-icons/md";
 
 export default function NotificationBell() {
   const { notifications, markAsRead, markAllAsRead, unreadCount, removeNotification } =
@@ -103,14 +104,17 @@ export default function NotificationBell() {
                 {unreadCount === 1 ? "notification" : "notifications"}
               </p>
             </div>
-            <button
-              className="mark-all-read-btn"
-              onClick={markAllAsRead}
-              title="Mark all as read"
-              disabled={unreadCount === 0}
-            >
-              Mark all as read
-            </button>
+         <span className="tooltip-mark-read">
+  <i
+    className="btn-mark-read"
+    onClick={markAllAsRead}
+    disabled={unreadCount === 0}
+  >
+    <MdOutlineMarkAsUnread />
+  </i>
+  <span className="tooltip-text-mark-read">Mark all as read</span>
+</span>
+
           </div>
 
           {notifications.length === 0 ? (

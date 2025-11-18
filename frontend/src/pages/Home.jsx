@@ -1,6 +1,7 @@
 // frontend/src/pages/Home.jsx
 import React, { useState, useEffect } from "react";
 import "../css/Home.css";
+import { GoScreenFull } from "react-icons/go";
 import Swal from 'sweetalert2';
 import {
   LineChart,
@@ -131,7 +132,12 @@ export default function Home() {
         <div className="left-side">
           <div className="box sales-overview">
             <div className="box-header">
-              <h3>Sales Overview</h3>
+              <div className="title-header">
+              <h3 className="title-home">Sales Overview</h3>
+             <i><GoScreenFull /></i> 
+
+
+              </div>
               <div className="dropdowns">
                 <select>
                   <option>Line Chart</option>
