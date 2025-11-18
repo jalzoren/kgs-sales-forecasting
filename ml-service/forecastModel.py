@@ -311,53 +311,59 @@ class ProductForecaster:
 
 
 # ==========================================
-# INVENTORY RISK CALCULATOR
+# DEMAND-LEVEL CLASSIFIER
 # ==========================================
-def calculate_inventory_risk(forecast_df):
+def calculate_demand_levels(forecast_df):
     """
-    Calculate stockout risk based on sales velocity.
-    
-    Risk Levels:
-    - HIGH: Avg daily sales > 10 units (fast-moving)
-    - MEDIUM: Avg daily sales 5-10 units (moderate)
-    - LOW: Avg daily sales < 5 units (slow-moving)
+    Percentile-based demand classification.
+    Automatically adapts to dataset scale.
     """
-    risk_summary = []
-    
-    for product_id in forecast_df["Product_ID"].unique():
-        product_forecast = forecast_df[forecast_df["Product_ID"] == product_id]
-        
-        product_name = product_forecast["Product_Name"].iloc[0]
-        category = product_forecast["Category"].iloc[0]
-        
-        # Calculate metrics
-        forecast_7d_qty = product_forecast.head(7)["Forecast_Qty"].sum()
-        forecast_30d_qty = product_forecast.head(30)["Forecast_Qty"].sum()
-        avg_daily_sales = forecast_7d_qty / 7
-        
-        # Determine risk level
-        if avg_daily_sales >= 10:
-            risk_level = "HIGH"
-            action = "Recommend to Restock - Fast moving product"
-        elif avg_daily_sales >= 5:
-            risk_level = "MEDIUM"
-            action = "Monitor closely - Moderate demand"
+    demand_summary = []
+
+    # Compute average daily forecast per product (using all forecast rows)
+    product_avg = (
+        forecast_df
+        .groupby("Product_ID")["Forecast_Qty"]
+        .mean()
+        .reset_index()
+        .rename(columns={"Forecast_Qty": "Avg_Daily_Sales"})
+    )
+
+    # Bring Product_Name and Category
+    meta = forecast_df.groupby("Product_ID").agg({
+        "Product_Name": "first",
+        "Category": "first"
+    }).reset_index()
+
+    product_avg = product_avg.merge(meta, on="Product_ID", how="left")
+
+    # Compute percentiles for classification
+    p40 = np.percentile(product_avg["Avg_Daily_Sales"], 40)
+    p80 = np.percentile(product_avg["Avg_Daily_Sales"], 80)
+
+    # Assign demand levels
+    def classify(avg):
+        if avg >= p80:
+            return "HIGH DEMAND"
+        elif avg >= p40:
+            return "MEDIUM DEMAND"
         else:
-            risk_level = "LOW"
-            action = "Sufficient stock - Slow moving"
-        
-        risk_summary.append({
-            "Product_ID": product_id,
-            "Product_Name": product_name,
-            "Category": category,
-            "7d_Forecast_Qty": round(forecast_7d_qty, 2),
-            "30d_Forecast_Qty": round(forecast_30d_qty, 2),
-            "Avg_Daily_Sales": round(avg_daily_sales, 2),
-            "Risk_Level": risk_level,
-            "Action": action
-        })
-    
-    return pd.DataFrame(risk_summary).sort_values("Avg_Daily_Sales", ascending=False)
+            return "LOW DEMAND"
+
+    product_avg["Demand_Level"] = product_avg["Avg_Daily_Sales"].apply(classify)
+
+    # Assign recommendations
+    def recommendation(level):
+        if level == "HIGH DEMAND":
+            return "Fast-moving product. Monitor stock frequently."
+        elif level == "MEDIUM DEMAND":
+            return "Moderate demand. Review weekly."
+        else:
+            return "Slow-moving product. Stock minimal quantities."
+
+    product_avg["Recommendation"] = product_avg["Demand_Level"].apply(recommendation)
+
+    return product_avg.sort_values("Avg_Daily_Sales", ascending=False)
 
 
 # ==========================================
@@ -414,13 +420,13 @@ def forecast_for_user(user_id: str):
             )
             print(f" {horizon}-day forecast: {len(combined_forecasts[f'{horizon}d_forecast'])} records")
     
-    # Calculate inventory risk alerts
+    # Calculate inventory demand alerts
     if "90d_forecast" in combined_forecasts:
-        print("\n Calculating Inventory Risk Alerts...")
-        inventory_alerts = calculate_inventory_risk(combined_forecasts["90d_forecast"])
-        print(f" Risk assessment completed for {len(inventory_alerts)} products")
+        print("\n Calculating Demand Level Alerts...")
+        demand_alerts = calculate_demand_levels(combined_forecasts["90d_forecast"])
+        print(f" Demand assessment completed for {len(demand_alerts)} products")
     else:
-        inventory_alerts = pd.DataFrame()
+        demand_alerts = pd.DataFrame()
     
     # Save outputs
     out_dir = ensure_dir(os.path.join(FORECAST_DIR, f"user_{user_id}"))
@@ -454,16 +460,17 @@ def forecast_for_user(user_id: str):
         for sheet_name, forecast_df in combined_forecasts.items():
             forecast_df.to_excel(writer, sheet_name=sheet_name, index=False)
         
-        if not inventory_alerts.empty:
-            inventory_alerts.to_excel(writer, sheet_name="inventory_alerts", index=False)
+        if not demand_alerts.empty:
+            demand_alerts.to_excel(writer, sheet_name="demand_alerts", index=False)
+
     
     print("\n" + "="*70)
     print(" Forecasting Completed Successfully!")
     print(f"    Output file: {out_path}")
     print(f"    Forecast sheets: {list(combined_forecasts.keys())}")
-    if not inventory_alerts.empty:
-        print(f"    High-risk products: {len(inventory_alerts[inventory_alerts['Risk_Level'] == 'HIGH'])}")
-    print("="*70 + "\n")
+    if not demand_alerts.empty:
+        high_count = len(demand_alerts[demand_alerts["Demand_Level"] == "HIGH DEMAND"])
+    print(f"    High-demand products: {high_count}")
     
     return out_path
 

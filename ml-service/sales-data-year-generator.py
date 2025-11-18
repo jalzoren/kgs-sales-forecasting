@@ -1,3 +1,4 @@
+# sales data year generator
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -10,7 +11,7 @@ CONFIG = {
     "min_quantity": 1,
     "max_quantity": 10,
     "min_tx_per_day": 200,
-    "max_tx_per_day": 680,
+    "max_tx_per_day": 700,
     "min_items_per_tx": 1,
     "max_items_per_tx": 10,
     "open_hour": 8,
