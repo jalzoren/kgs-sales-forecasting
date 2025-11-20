@@ -51,11 +51,20 @@ class HomeController {
           : "No historical forecast found for this sales period"
       );
 
-      // 3. Future forecast: always from the LATEST forecast file
-      const latestForecastFile = forecastFiles[0]; // newest first
+      // 3. Future forecast: always from the forecast file with the MOST FUTURE date range
+      const latestForecastFile = [...forecastFiles]
+        .sort((a, b) => {
+          const rangeA = homeService.extractDateRangeFromFilename(a.fileName);
+          const rangeB = homeService.extractDateRangeFromFilename(b.fileName);
+          if (!rangeA) return 1;
+          if (!rangeB) return -1;
+          return rangeB.start - rangeA.start; // newest week first
+        })[0];
+
       console.log(`Reading future forecast from latest file: ${latestForecastFile.fileName}`);
 
       const allFutureForecast = homeService.readForecastData(latestForecastFile, '7d_forecast');
+      
 
       const futureData = allFutureForecast
         .filter(d => new Date(d.date) > lastSalesDate)
