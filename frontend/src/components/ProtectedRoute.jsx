@@ -65,8 +65,8 @@ export default function ProtectedRoute({ children }) {
       title: "No Forecast Yet",
       text: "Please upload sales data and generate your first forecast.",
       confirmButtonColor: "#001D39",
-      background: "#1e293b",
-      color: "#e2e8f0",
+      background: "#ffffffff",
+      color: "#4f4f4fff",
     });
     return <Navigate to="/welcome" replace />;
   }

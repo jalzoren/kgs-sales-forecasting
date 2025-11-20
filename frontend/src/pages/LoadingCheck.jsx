@@ -78,7 +78,7 @@ export default function LoadingCheck() {
       {/* This beautiful loader stays on top for full 35 seconds */}
       {showLoader && (
         <FullScreenLoader
-          message="Accessing your forecast data..."
+          message="Setting Up Your Experience..."
           duration={LOADER_DURATION}
         />
       )}
