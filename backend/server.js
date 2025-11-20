@@ -7,7 +7,9 @@ const path = require("path");
 const sessionConfig = require("./config/sessionConfig");
 const authRoutes = require("./routes/authRoutes");
 const dataRoutes = require("./routes/dataRoutes");
-const forecastRoutes = require("./routes/forecast"); // ✅ forecast.js
+const forecastRoutes = require("./routes/forecast"); 
+const analyticsRoutes = require("./routes/analyticsRoutes"); 
+const homeRoutes = require("./routes/homeRoutes"); 
 
 const app = express();
 const PORT = 5000;
@@ -46,12 +48,8 @@ app.use(
 app.use("/", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
-
-// Debug: Log all registered routes
-console.log("📋 Registered routes:");
-console.log("  - /api/forecast/history");
-console.log("  - /api/forecast/analytics");
-console.log("  - /api/forecast");
+app.use("/", analyticsRoutes); 
+app.use("/", homeRoutes); 
 
 // =====================================================
 // Default route

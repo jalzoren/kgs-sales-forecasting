@@ -10,6 +10,9 @@ export default function LoadingCheck() {
 
   useEffect(() => {
     const runCheck = async () => {
+
+      // Force loader to render first
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       try {
         // -------------------------------
         // 1. Use cached data if valid
@@ -57,5 +60,6 @@ export default function LoadingCheck() {
     runCheck();
   }, [navigate]);
 
+  console.log("Loader rendered");
   return <FullScreenLoader message="Preparing your dashboard..." />;
 }
