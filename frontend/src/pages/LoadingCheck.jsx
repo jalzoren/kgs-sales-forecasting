@@ -1,61 +1,87 @@
 // frontend/src/pages/LoadingCheck.jsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FullScreenLoader from "../components/FullScreenLoader.jsx";
 
 const FORECAST_API = "http://localhost:5000/api/forecast/history";
+const NAVIGATE_AFTER = 5_000;   // Navigate after 5 seconds
+const LOADER_DURATION = 35_000; // Loader stays for 35 seconds
 
 export default function LoadingCheck() {
   const navigate = useNavigate();
+  const [hasNavigated, setHasNavigated] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
-    const runCheck = async () => {
+    let isMounted = true;
+
+    const runValidation = async () => {
       try {
-        // -------------------------------
-        // 1. Use cached data if valid
-        // -------------------------------
-        const cached = sessionStorage.getItem("forecastHistory");
-
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          const isFresh = Date.now() - parsed.time < 5 * 60 * 1000;
-
-          if (isFresh) {
-            return navigate(parsed.hasForecast ? "/home" : "/welcome");
-          }
-        }
-
-        // -------------------------------
-        // 2. Fetch from backend
-        // -------------------------------
-        const res = await fetch(FORECAST_API, {
-          credentials: "include",
-        });
+        const res = await fetch(FORECAST_API, { credentials: "include" });
+        let hasForecast = false;
 
         if (res.status === 404) {
-          sessionStorage.setItem(
-            "forecastHistory",
-            JSON.stringify({ hasForecast: false, time: Date.now() })
-          );
-          return navigate("/welcome");
+          hasForecast = false;
+        } else if (res.ok) {
+          const data = await res.json();
+          hasForecast = Array.isArray(data) && data.length > 0;
         }
 
-        const data = await res.json();
-        const hasForecast = Array.isArray(data) && data.length > 0;
+        sessionStorage.setItem("forecastHistory", JSON.stringify({
+          hasForecast,
+          time: Date.now()
+        }));
 
-        sessionStorage.setItem(
-          "forecastHistory",
-          JSON.stringify({ hasForecast, time: Date.now() })
-        );
+        // Navigate after 5 seconds (even if loader still showing)
+        setTimeout(() => {
+          if (isMounted) {
+            setHasNavigated(true);
+            navigate(hasForecast ? "/home" : "/welcome", { replace: true });
+          }
+        }, NAVIGATE_AFTER);
 
-        navigate(hasForecast ? "/home" : "/welcome");
-      } catch {
-        navigate("/welcome");
+      } catch (err) {
+        sessionStorage.setItem("forecastHistory", JSON.stringify({
+          hasForecast: false,
+          time: Date.now()
+        }));
+
+        setTimeout(() => {
+          if (isMounted) {
+            setHasNavigated(true);
+            navigate("/welcome", { replace: true });
+          }
+        }, NAVIGATE_AFTER);
       }
     };
 
-    runCheck();
+    runValidation();
+
+    // Keep loader for full 35 seconds no matter what
+    const hideLoaderTimer = setTimeout(() => {
+      if (isMounted) setShowLoader(false);
+    }, LOADER_DURATION);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(hideLoaderTimer);
+    };
   }, [navigate]);
 
-  return <FullScreenLoader message="Preparing your dashboard..." />;
+  // Show loader for 35 seconds
+  // But render the target page underneath after 5 seconds
+  return (
+    <>
+      {/* This renders /home or /welcome after 5 seconds */}
+      {hasNavigated && <Outlet />}
+
+      {/* This beautiful loader stays on top for full 35 seconds */}
+      {showLoader && (
+        <FullScreenLoader
+          message="Accessing your forecast data..."
+          duration={LOADER_DURATION}
+        />
+      )}
+    </>
+  );
 }
