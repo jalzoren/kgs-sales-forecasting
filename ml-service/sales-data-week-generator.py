@@ -8,7 +8,7 @@ import os
 # ==== CONFIGURATION (Simplified for 1-week generation) ===
 CONFIG = {
     # YYYY - MM - DD
-    "start_date": "2025-11-10",
+    "start_date": "2025-11-17",
 
     # Quantity settings
     "min_quantity": 1,
