@@ -48,14 +48,8 @@ app.use(
 app.use("/", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
-app.use("/", analyticsRoutes); // ✅ New
+app.use("/", analyticsRoutes); 
 app.use("/", homeRoutes); 
-
-// Debug: Log all registered routes
-console.log("📋 Registered routes:");
-console.log("  - /api/forecast/history");
-console.log("  - /api/forecast/analytics");
-console.log("  - /api/forecast");
 
 // =====================================================
 // Default route
