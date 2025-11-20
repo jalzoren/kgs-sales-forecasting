@@ -37,6 +37,13 @@ class HomeService {
    * @param {Array} exts - Array of file extensions to filter (e.g., ['.xlsx', '.csv'])
    * @returns {Array} Array of file objects with fileName, filePath, and mtime
    */
+
+  getFutureForecast(forecastData, lastSalesDate) {
+  return forecastData
+    .filter(d => new Date(d.date) > lastSalesDate)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .slice(0, 7);
+}
   getFiles(folder, exts = ['.xlsx', '.csv']) {
     return fs.readdirSync(folder)
       .filter(f => exts.includes(path.extname(f)) && !f.startsWith('~$'))
@@ -204,30 +211,35 @@ class HomeService {
    * @param {Array} forecastFiles - Array of forecast file objects
    * @returns {Array} Forecast data from matching file, or empty array
    */
-  findMatchingForecast(salesData, forecastFiles) {
-    if (salesData.length === 0) return [];
+  
+findMatchingForecast(salesData, forecastFiles) {
+  if (salesData.length === 0 || forecastFiles.length === 0) return [];
 
-    const firstSalesDate = new Date(salesData[0].date);
-    const lastSalesDate = new Date(salesData[salesData.length - 1].date);
+  const firstSalesDate = new Date(salesData[0].date);
+  const lastSalesDate = new Date(salesData[salesData.length - 1].date);
 
-    // Search for forecast file that covers the sales date range
-    for (const file of forecastFiles) {
-      const dateRange = this.extractDateRangeFromFilename(file.fileName);
-      if (!dateRange) continue;
+  for (const file of forecastFiles) {
+    const range = this.extractDateRangeFromFilename(file.fileName);
+    if (!range) continue;
 
-      const { start, end } = dateRange;
+    // Does this forecast file cover our sales week?
+    if (range.start <= lastSalesDate && range.end >= firstSalesDate) {
+      console.log(`MATCHED historical forecast file: ${file.fileName}`);
 
-      // Check if sales dates fall within forecast range
-      const isFirstInRange = firstSalesDate >= start && firstSalesDate <= end;
-      const isLastInRange = lastSalesDate >= start && lastSalesDate <= end;
+      const fullData = this.readForecastData(file, '7d_forecast');
 
-      if (isFirstInRange || isLastInRange) {
-        return this.readForecastData(file, '7d_forecast');
-      }
+      return fullData
+        .filter(d => {
+          const dDate = new Date(d.date);
+          return dDate >= firstSalesDate && dDate <= lastSalesDate;
+        })
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
     }
-
-    return [];
   }
+
+  return [];
+}
+
 
   /**
    * Combine sales, forecast, and future data by date
@@ -236,6 +248,28 @@ class HomeService {
    * @param {Array} futureData - Future forecast data
    * @returns {Array} Combined array with actual_revenue, forecasted_revenue, future_revenue
    */
+
+  /**
+ * Prepare combined dashboard data with exactly 7 days
+ * @param {Array} salesData - Actual sales data
+ * @param {Array} forecastData - Forecast data matched to sales
+ * @param {Array} futureData - Full future forecast data
+ * @returns {Array} Combined data array
+ */
+prepare7DayDashboard(salesData, forecastData, futureData) {
+  // Ensure forecastData is only 7 days
+  const forecast7Days = forecastData.slice(0, 7);
+
+  // Get last date of sales
+  const lastSalesDate = new Date(salesData[salesData.length - 1].date);
+
+  // Get exactly 7 days of future forecast after last sales date
+  const future7Days = this.getFutureForecast(futureData, lastSalesDate);
+
+  // Combine everything by date
+  return this.combineDataByDate(salesData, forecast7Days, future7Days);
+}
+
   combineDataByDate(salesData, forecastData, futureData) {
     const dataMap = new Map();
 
