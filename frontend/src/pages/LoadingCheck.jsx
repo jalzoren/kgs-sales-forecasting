@@ -9,57 +9,66 @@ export default function LoadingCheck() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    let mounted = true;
+
     const runCheck = async () => {
+      // Allow loader to paint for 200ms (not blocking)
+      setTimeout(async () => {
+        if (!mounted) return;
 
-      // Force loader to render first
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      try {
-        // -------------------------------
-        // 1. Use cached data if valid
-        // -------------------------------
-        const cached = sessionStorage.getItem("forecastHistory");
+        try {
+          // -------------------------------
+          // 1. Use cached data if valid
+          // -------------------------------
+          const cached = sessionStorage.getItem("forecastHistory");
 
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          const isFresh = Date.now() - parsed.time < 5 * 60 * 1000;
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            const isFresh = Date.now() - parsed.time < 5 * 60 * 1000;
 
-          if (isFresh) {
-            return navigate(parsed.hasForecast ? "/home" : "/welcome");
+            if (isFresh) {
+              return navigate(parsed.hasForecast ? "/home" : "/welcome");
+            }
           }
-        }
 
-        // -------------------------------
-        // 2. Fetch from backend
-        // -------------------------------
-        const res = await fetch(FORECAST_API, {
-          credentials: "include",
-        });
+          // -------------------------------
+          // 2. Fetch from backend
+          // -------------------------------
+          const res = await fetch(FORECAST_API, {
+            credentials: "include",
+          });
 
-        if (res.status === 404) {
+          if (!mounted) return;
+
+          if (res.status === 404) {
+            sessionStorage.setItem(
+              "forecastHistory",
+              JSON.stringify({ hasForecast: false, time: Date.now() })
+            );
+            return navigate("/welcome");
+          }
+
+          const data = await res.json();
+          const hasForecast = Array.isArray(data) && data.length > 0;
+
           sessionStorage.setItem(
             "forecastHistory",
-            JSON.stringify({ hasForecast: false, time: Date.now() })
+            JSON.stringify({ hasForecast, time: Date.now() })
           );
-          return navigate("/welcome");
+
+          navigate(hasForecast ? "/home" : "/welcome");
+        } catch (err) {
+          if (mounted) navigate("/welcome");
         }
-
-        const data = await res.json();
-        const hasForecast = Array.isArray(data) && data.length > 0;
-
-        sessionStorage.setItem(
-          "forecastHistory",
-          JSON.stringify({ hasForecast, time: Date.now() })
-        );
-
-        navigate(hasForecast ? "/home" : "/welcome");
-      } catch {
-        navigate("/welcome");
-      }
+      }, 34 * 1000);
     };
 
     runCheck();
+
+    return () => {
+      mounted = false;
+    };
   }, [navigate]);
 
-  console.log("Loader rendered");
   return <FullScreenLoader message="Preparing your dashboard..." />;
 }
