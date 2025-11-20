@@ -1,85 +1,87 @@
 // frontend/src/pages/LoadingCheck.jsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FullScreenLoader from "../components/FullScreenLoader.jsx";
 
 const FORECAST_API = "http://localhost:5000/api/forecast/history";
+const NAVIGATE_AFTER = 5_000;   // Navigate after 5 seconds
+const LOADER_DURATION = 35_000; // Loader stays for 35 seconds
 
 export default function LoadingCheck() {
   const navigate = useNavigate();
+  const [hasNavigated, setHasNavigated] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
-    let mounted = true;
+    let isMounted = true;
 
-    const checkAndNavigate = async () => {
+    const runValidation = async () => {
       try {
+        const res = await fetch(FORECAST_API, { credentials: "include" });
         let hasForecast = false;
 
-        // 1. Check cache first (fast path)
-        const cached = sessionStorage.getItem("forecastHistory");
-        let shouldFetch = true;
+        if (res.status === 404) {
+          hasForecast = false;
+        } else if (res.ok) {
+          const data = await res.json();
+          hasForecast = Array.isArray(data) && data.length > 0;
+        }
 
-        if (cached) {
-          try {
-            const parsed = JSON.parse(cached);
-            const isFresh = Date.now() - parsed.time < 5 * 60 * 1000; // 5 minutes
+        sessionStorage.setItem("forecastHistory", JSON.stringify({
+          hasForecast,
+          time: Date.now()
+        }));
 
-            if (isFresh) {
-              hasForecast = parsed.hasForecast;
-              shouldFetch = false; // Cache is fresh → skip API call
-            }
-          } catch (e) {
-            sessionStorage.removeItem("forecastHistory"); // Corrupted cache
+        // Navigate after 5 seconds (even if loader still showing)
+        setTimeout(() => {
+          if (isMounted) {
+            setHasNavigated(true);
+            navigate(hasForecast ? "/home" : "/welcome", { replace: true });
           }
-        }
+        }, NAVIGATE_AFTER);
 
-        // 2. Fetch from backend if no fresh cache
-        if (shouldFetch) {
-          const res = await fetch(FORECAST_API, {
-            credentials: "include",
-          });
-
-          if (!mounted) return;
-
-          if (res.status === 404) {
-            hasForecast = false;
-          } else if (res.ok) {
-            const data = await res.json();
-            hasForecast = Array.isArray(data) && data.length > 0;
-          } else {
-            // Any other error → treat as no forecast (safe fallback)
-            hasForecast = false;
-          }
-
-          // Update cache
-          sessionStorage.setItem(
-            "forecastHistory",
-            JSON.stringify({ hasForecast, time: Date.now() })
-          );
-        }
-
-        // Optional: Minimum loading time to avoid flashing (feels smoother)
-        await new Promise((resolve) => setTimeout(resolve, 600));
-
-        if (mounted) {
-          navigate(hasForecast ? "/home" : "/welcome");
-        }
       } catch (err) {
-        console.error("LoadingCheck error:", err);
-        if (mounted) {
-          await new Promise((resolve) => setTimeout(resolve, 600));
-          navigate("/welcome"); // Safe fallback
-        }
+        sessionStorage.setItem("forecastHistory", JSON.stringify({
+          hasForecast: false,
+          time: Date.now()
+        }));
+
+        setTimeout(() => {
+          if (isMounted) {
+            setHasNavigated(true);
+            navigate("/welcome", { replace: true });
+          }
+        }, NAVIGATE_AFTER);
       }
     };
 
-    checkAndNavigate();
+    runValidation();
 
-    // Cleanup: prevent navigation if component unmounts
+    // Keep loader for full 35 seconds no matter what
+    const hideLoaderTimer = setTimeout(() => {
+      if (isMounted) setShowLoader(false);
+    }, LOADER_DURATION);
+
     return () => {
-      mounted = false;
+      isMounted = false;
+      clearTimeout(hideLoaderTimer);
     };
-  }, [navigate]); // Dependency array is correct
+  }, [navigate]);
 
-  return <FullScreenLoader message="Preparing your dashboard..." />;
+  // Show loader for 35 seconds
+  // But render the target page underneath after 5 seconds
+  return (
+    <>
+      {/* This renders /home or /welcome after 5 seconds */}
+      {hasNavigated && <Outlet />}
+
+      {/* This beautiful loader stays on top for full 35 seconds */}
+      {showLoader && (
+        <FullScreenLoader
+          message="Accessing your forecast data..."
+          duration={LOADER_DURATION}
+        />
+      )}
+    </>
+  );
 }
