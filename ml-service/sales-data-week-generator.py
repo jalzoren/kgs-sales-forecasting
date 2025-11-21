@@ -7,16 +7,16 @@ import os
 
 # ============================= CONFIGURATION =============================
 CONFIG = {
-    "start_date": "2025-11-3",          # Monday
+    "start_date": "2025-11-10",          # Monday
     "min_quantity": 1,
-    "max_quantity": 10,
+    "max_quantity": 5,
 
     # Realistic daily transactions for a medium-sized Korean mart in PH
-    "base_tx_per_day": 480,              # Average ~480 transactions/day
-    "tx_variation": 0.18,                # ±18% random daily noise
+    "base_tx_per_day": 100,              # Lowered to ~145 tx/day average → realistic for 300 products
+    "tx_variation": 0.10,                # Tighter variation for stability
 
     "min_items_per_tx": 1,
-    "max_items_per_tx": 9,               # Real baskets often 2–7 items
+    "max_items_per_tx": 5,               # Lowered max basket → 1-5 items (real for small stores)
 
     "open_hour": 8,
     "close_hour": 22,
@@ -44,26 +44,27 @@ CONFIG = {
     "regular_holiday_drop": 0.65,
 
     # === NEW: REALISTIC CATEGORY APPEARANCE PROBABILITY (per basket) ===
+# Lower category probabilities (especially expensive ones)
     "category_in_basket_prob": {
-        "Liquor/Beverage": 0.88,
-        "Snacks":           0.82,
-        "Noodles":          0.68,
-        "Food Frozen":      0.42,
-        "Dry Food":         0.38,
-        "Seasoned/Sauce/Powder": 0.32,
-        "Condiments":       0.28,
-        "Food Fresh/Meat/Sidedish": 0.22
-    },
+            "Liquor/Beverage":          0.62,   # Most common
+            "Snacks":                   0.68,   # Very common
+            "Noodles":                  0.55,
+            "Dry Food":                 0.28,
+            "Condiments":               0.18,
+            "Seasoned/Sauce/Powder":    0.15,
+            "Food Frozen":              0.12,   # Rare in small baskets
+            "Food Fresh/Meat/Sidedish": 0.06    # Very rare (expensive!)
+        },
 
     # === NEW: COMPLEMENTARY PAIRS (very common real combos) ===
     "complements": [
-        ("Chamisul Original Soju",           ["Pepero", "Honey Butter Almond", "Choco Pie", "Buldak"]),
         ("Jinro Fresh Soju",                 ["Pepero", "Choco Pie", "Samyang Buldak"]),
-        ("Cass Cold Brewed Beer 500mL",      ["Pepero", "Honey Butter Almond", "Buldak"]),
+        ("Chamisul Original Soju",      ["Pepero", "Honey Butter Almond", "Buldak"]),
         ("Yopokki Sweet & Spicy 280g",       ["Ottogi Cheese Bokki", "Bibigo Mandu"]),
         ("Bibigo Mul Mandu",                 ["Ottogi Jin Ramen", "Sempio Soy Sauce"]),
         ("Beef Dasida",                      ["Ottogi Jin Ramen", "Nongshim Shin"]),
-    ]
+    ],
+    "complement_chance": 0.45  # ← Added: only 45% chance to add complement (was 68%)
 }
 
 # ========================= LOAD PRODUCTS & ADD POPULARITY =========================
@@ -107,26 +108,26 @@ regular_holidays = set(holidays_df[holidays_df["Type"].str.lower() == "regular"]
 # ========================= HELPER FUNCTIONS =========================
 def get_hour_with_peak():
     """Realistic bimodal distribution: lunch 11-13 & dinner 17-20"""
-    hour = random.randint(8, 21)
     roll = random.random()
     if roll < 0.28:      # 28% lunch peak
-        hour = random.choices([11,12,13], weights=[0.3,0.4,0.3])[0]
+        return random.choices([11,12,13], weights=[0.3,0.4,0.3])[0]
     elif roll < 0.58:    # 30% dinner peak
-        hour = random.choices([17,18,19,20], weights=[0.2,0.3,0.35,0.15])[0]
-    return hour
+        return random.choices([17,18,19,20], weights=[0.2,0.3,0.35,0.15])[0]
+    else:
+        return random.randint(8, 21)   # off-peak hours
+
 
 def maybe_add_complement(basket_items, products_df):
     """If a trigger item is bought, high chance to add complement"""
+    # FIXED: basket_items now contain dict with "row", so we check row["Product_Name"]
     for trigger, complements in CONFIG["complements"]:
-        if any(trigger in item["Product_Name"] for item in basket_items):
-            if random.random() < 0.68:
-                complement_names = [c for c in complements if any(c in p["Product_Name"] for p in products_df.itertuples())]
-                if complement_names:
-                    comp_name = random.choice(complement_names)
-                    candidates = products_df[products_df["Product_Name"].str.contains(comp_name, case=False)]
-                    if not candidates.empty:
-                        item = candidates.sample(1, weights=candidates["Popularity_Weight"]).iloc[0]
-                        basket_items.append({"row": item, "qty": 1})
+        if any(trigger in item["row"]["Product_Name"] for item in basket_items):
+            if random.random() < CONFIG.get("complement_chance", 0.68):  # ← use lower chance
+                pattern = "|".join(complements)
+                candidates = products_df[products_df["Product_Name"].str.contains(pattern, case=False, na=False)]
+                if not candidates.empty and len(basket_items) < 4:  # prevent overflow
+                    comp_item = candidates.sample(1, weights=candidates["Popularity_Weight"]).iloc[0]
+                    basket_items.append({"row": comp_item, "qty": 1})
 
 # ========================= MAIN GENERATOR =========================
 def generate_sales_data_1week(config):
@@ -168,9 +169,22 @@ def generate_sales_data_1week(config):
                     # Pick 1–3 items from this category (more if cheap)
                     items_in_cat = random.randint(1, 3 if group["Unit_Price"].mean() < 150 else 1)
                     selected = group.sample(items_in_cat, replace=False, weights=group["Popularity_Weight"])
+                    
+                    # FIXED: Iterate through the selected rows and add to basket
                     for _, row in selected.iterrows():
-                        max_qty = 1 if row["Unit_Price"] > 500 else (6 if row["Unit_Price"] < 80 else 3)
-                        qty = random.randint(1, min(config["max_quantity"], max_qty))
+                        # Quantity logic based on price
+                        if row["Unit_Price"] > 400:
+                            max_qty = 1
+                        elif row["Unit_Price"] > 250:
+                            max_qty = 1 if random.random() < 0.7 else 2
+                        elif row["Unit_Price"] > 120:
+                            max_qty = 2
+                        elif row["Unit_Price"] > 70:
+                            max_qty = 3
+                        else:
+                            max_qty = 5
+                        
+                        qty = random.randint(1, max_qty)
                         basket.append({"row": row, "qty": qty})
 
             # Add complements
@@ -216,7 +230,7 @@ if __name__ == "__main__":
     print(f"Generating realistic 1-week sales data starting {CONFIG['start_date']}...")
 
     df = generate_sales_data_1week(CONFIG)
-    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_Week_{CONFIG['start_date']}_REALISTIC.csv")
+    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_Week_{CONFIG['start_date']}.csv")
     df.to_csv(output_file, index=False)
 
     print(f"✅ Done → {output_file}")
