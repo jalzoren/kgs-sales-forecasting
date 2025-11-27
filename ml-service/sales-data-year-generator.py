@@ -7,22 +7,22 @@ import os
 
 # ============================= CONFIGURATION =============================
 CONFIG = {
-    "year": 2025,                        # Change to 2025 or any year
-    "base_tx_per_day": 495,              # Realistic average for medium Korean mart
-    "tx_variation": 0.20,                # ±20% daily random noise
+    "year": 2022,                        # Change to 2025 or any year
+    "base_tx_per_day": 100,              # Realistic average for medium Korean mart
+    "tx_variation": 0.15,                # ±20% daily random noise
 
     "min_items_per_tx": 1,
-    "max_items_per_tx": 9,
+    "max_items_per_tx": 5,
 
     "open_hour": 8,
     "close_hour": 22,
     "output_dir": "sales_data",
 
-    # Realistic monthly traffic growth (Dec/Jan peak, Feb low)
+    # Monthly growth (Dec & Jan peak, Feb low)
     "monthly_growth": {
-        1: 1.08, 2: 0.88, 3: 0.96, 4: 0.98,
-        5: 1.02, 6: 1.05, 7: 1.03, 8: 1.04,
-        9: 1.00, 10: 1.02, 11: 1.12, 12: 1.18   # Nov-Dec boom!
+        1: 1.15, 2: 0.88, 3: 0.94, 4: 0.96,
+        5: 1.00, 6: 1.04, 7: 1.02, 8: 1.03,
+        9: 0.98, 10: 1.00, 11: 1.10, 12: 1.20   # Christmas boom!
     },
 
     # Weekday pattern (Saturday highest)
@@ -32,7 +32,7 @@ CONFIG = {
         2: 0.98,  # Wed
         3: 1.05,  # Thu
         4: 1.18,  # Fri
-        5: 1.35,  # Sat ← peak
+        5: 1.30,  # Sat ← peak
         6: 1.08   # Sun
     },
 
@@ -41,31 +41,30 @@ CONFIG = {
     "discount_chance_holiday_major": 0.20,
     "discount_values": [0.05, 0.10, 0.15],
 
-    "major_holiday_boost": 1.60,
+    "major_holiday_boost": 1.50,
     "regular_holiday_drop": 0.62,
 
-    # === CATEGORY APPEARANCE IN BASKET (very realistic) ===
-    "category_in_basket_prob": {
-        "Liquor/Beverage":          0.89,
-        "Snacks":                   0.84,
-        "Noodles":                  0.70,
-        "Food Frozen":              0.44,
-        "Dry Food":                 0.40,
-        "Seasoned/Sauce/Powder":    0.34,
-        "Condiments":               0.29,
-        "Food Fresh/Meat/Sidedish": 0.23
-    },
+    # Realistic category probability (same as week version)
+        "category_in_basket_prob": {
+            "Liquor/Beverage":          0.62,
+            "Snacks":                   0.68,
+            "Noodles":                  0.55,
+            "Dry Food":                 0.28,
+            "Condiments":               0.18,
+            "Seasoned/Sauce/Powder":    0.15,
+            "Food Frozen":              0.12,
+            "Food Fresh/Meat/Sidedish": 0.08
+        },
 
     # === COMPLEMENTARY BUNDLES (real customer behavior) ===
     "complements": [
-        ("Chamisul Original Soju",          ["Pepero", "Honey Butter Almond", "Choco Pie", "Buldak", "Cass", "Terra"]),
-        ("Jinro Fresh Soju",                ["Pepero", "Choco Pie", "Samyang Buldak", "Honey Butter"]),
-        ("Cass Cold Brewed Beer 500mL",     ["Pepero", "Honey Butter Almond", "Buldak", "Choco Boy"]),
-        ("Terra Lager Beer 500mL",          ["Pepero", "Honey Butter", "Orion"]),
-        ("Yopokki Sweet & Spicy",           ["Cheese", "Mandu", "Rice Cake"]),
-        ("Bibigo Mul Mandu",                ["Jin Ramen", "Soy Sauce", "Kimchi"]),
-        ("Beef Dasida",                     ["Shin Ramyun", "Jin Ramen"]),
-    ]
+        ("Jinro Fresh Soju",                 ["Pepero", "Choco Pie", "Samyang Buldak"]),
+        ("Chamisul Original Soju",           ["Pepero", "Honey Butter Almond", "Buldak"]),
+        ("Yopokki Sweet & Spicy 280g",       ["Ottogi Cheese Bokki", "Bibigo Mandu"]),
+        ("Bibigo Mul Mandu",                 ["Ottogi Jin Ramen", "Sempio Soy Sauce", "Kimchi"]),
+        ("Beef Dasida",                      ["Ottogi Jin Ramen", "Nongshim Shin"]),
+    ],
+    "complement_chance": 0.45
 }
 
 # ========================= LOAD PRODUCTS & POPULARITY =========================
@@ -117,9 +116,9 @@ def get_peak_hour():
 def add_complements(basket, all_products):
     for trigger, keywords in CONFIG["complements"]:
         if any(trigger in item["row"]["Product_Name"] for item in basket):
-            if random.random() < 0.70:
+            if random.random() < CONFIG["complement_chance"]:   # ← use CONFIG value
                 candidates = all_products[
-                    all_products["Product_Name"].str.contains("|".join(keywords), case=False)
+                    all_products["Product_Name"].str.contains("|".join(keywords), case=False, na=False)
                 ]
                 if not candidates.empty and len(basket) < CONFIG["max_items_per_tx"]:
                     comp = candidates.sample(1, weights=candidates["Popularity_Weight"]).iloc[0]
@@ -212,7 +211,7 @@ if __name__ == "__main__":
     print(f"Generating full year {CONFIG['year']} sales data...")
 
     df = generate_sales_data(CONFIG)
-    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_{CONFIG['year']}_REALISTIC.csv")
+    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_{CONFIG['year']}.csv")
     df.to_csv(output_file, index=False)
 
     print(f"\nDone! → {output_file}")

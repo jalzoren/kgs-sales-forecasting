@@ -7,7 +7,7 @@ import os
 
 # ============================= CONFIGURATION =============================
 CONFIG = {
-    "start_date": "2025-11-10",          # Monday
+    "start_date": "2025-11-24",          # Monday
     "min_quantity": 1,
     "max_quantity": 5,
 
