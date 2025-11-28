@@ -7,53 +7,53 @@ import os
 
 # ============================= CONFIGURATION =============================
 CONFIG = {
-    "year": 2022,                        # Change to 2025 if you want
-    "base_tx_per_day": 92,               # ↓ Reduced heavily (was 248) → ~90–130 tx/day
-    "tx_variation": 0.20,                # ±20% daily random noise (slightly higher variation)
+    "year": 2025,                        # Updated to 2025
+    "base_tx_per_day": 75,               # ↓ Further reduced (~60–90 tx/day)
+    "tx_variation": 0.18,                # Slightly lower variation
 
     "min_items_per_tx": 1,
-    "max_items_per_tx": 5,               # Slightly lower max basket
+    "max_items_per_tx": 4,               # Slightly smaller basket
 
     "open_hour": 8,
     "close_hour": 22,
     "output_dir": "sales_data",
 
-    # Monthly growth (Dec & Jan peak, Feb low)
+    # Monthly growth (peaks and drops reduced)
     "monthly_growth": {
-        1: 1.12, 2: 0.85, 3: 0.92, 4: 0.94,
-        5: 1.00, 6: 1.05, 7: 1.03, 8: 1.02,
-        9: 0.97, 10: 0.99, 11: 1.08, 12: 1.18   # Christmas still strong but toned down
+        1: 1.08, 2: 0.78, 3: 0.88, 4: 0.90,
+        5: 0.95, 6: 1.00, 7: 0.98, 8: 0.97,
+        9: 0.92, 10: 0.95, 11: 1.05, 12: 1.12
     },
 
-    # Weekday pattern (Saturday highest)
+    # Weekday pattern (lower multipliers)
     "weekday_multiplier": {
-        0: 0.80,  # Mon
-        1: 0.90,  # Tue
-        2: 0.96,  # Wed
-        3: 1.04,  # Thu
-        4: 1.15,  # Fri
-        5: 1.28,  # Sat ← peak
-        6: 1.06   # Sun
+        0: 0.75,  # Mon
+        1: 0.85,  # Tue
+        2: 0.90,  # Wed
+        3: 1.00,  # Thu
+        4: 1.08,  # Fri
+        5: 1.18,  # Sat ← peak
+        6: 0.98   # Sun
     },
 
     "promo_months": [1, 6, 11, 12],
-    "discount_chance_promo": 0.12,           # Slightly lower
-    "discount_chance_holiday_major": 0.18,
+    "discount_chance_promo": 0.10,           # Slightly lower
+    "discount_chance_holiday_major": 0.15,
     "discount_values": [0.05, 0.10, 0.15],
 
-    "major_holiday_boost": 1.40,             # Was 1.50
-    "regular_holiday_drop": 0.65,            # Was 0.62
+    "major_holiday_boost": 1.30,             # Slightly lower
+    "regular_holiday_drop": 0.70,            # Slightly higher
 
     # Realistic category probability (slightly reduced high-margin items)
     "category_in_basket_prob": {
-        "Liquor/Beverage":          0.58,    # ↓ from 0.62
-        "Snacks":                   0.65,    # ↓ from 0.68
-        "Noodles":                  0.53,
-        "Dry Food":                 0.26,
-        "Condiments":               0.17,
-        "Seasoned/Sauce/Powder":    0.14,
-        "Food Frozen":              0.11,
-        "Food Fresh/Meat/Sidedish": 0.07
+        "Liquor/Beverage":          0.52,    
+        "Snacks":                   0.60,    
+        "Noodles":                  0.50,
+        "Dry Food":                 0.24,
+        "Condiments":               0.15,
+        "Seasoned/Sauce/Powder":    0.12,
+        "Food Frozen":              0.09,
+        "Food Fresh/Meat/Sidedish": 0.06
     },
 
     # === COMPLEMENTARY BUNDLES (real customer behavior) ===
@@ -64,7 +64,7 @@ CONFIG = {
         ("Bibigo Mul Mandu",                 ["Ottogi Jin Ramen", "Sempio Soy Sauce", "Kimchi"]),
         ("Beef Dasida",                      ["Ottogi Jin Ramen", "Nongshim Shin"]),
     ],
-    "complement_chance": 0.42                # ↓ from 0.50 → less aggressive bundling
+    "complement_chance": 0.35                # ↓ Less aggressive bundling
 }
 
 # ========================= LOAD PRODUCTS & POPULARITY =========================
@@ -85,13 +85,13 @@ top_sellers = [
 def get_popularity_weight(row):
     name = row["Product_Name"]
     if any(top in name for top in top_sellers):
-        return random.uniform(50, 140)   # ↓ Slightly reduced top-seller dominance
+        return random.uniform(40, 120)   # ↓ Further reduced top-seller dominance
     elif row["Unit_Price"] < 80:
-        return random.uniform(10, 32)
+        return random.uniform(8, 28)
     elif row["Unit_Price"] < 200:
-        return random.uniform(4, 14)
+        return random.uniform(3, 12)
     else:
-        return random.uniform(0.7, 4.5)
+        return random.uniform(0.5, 3.5)
 
 products["Popularity_Weight"] = products.apply(get_popularity_weight, axis=1)
 category_groups = {cat: group for cat, group in products.groupby("Category")}
@@ -154,7 +154,7 @@ def generate_sales_data(config):
 
         total_mult = growth_mult * weekday_mult * day_mult
         daily_tx = int(config["base_tx_per_day"] * total_mult * random.uniform(0.80, 1.20))
-        daily_tx = max(60, daily_tx)   # Lower floor than before
+        daily_tx = max(50, daily_tx)   # Lower floor than before
 
         for _ in range(daily_tx):
             basket = []
@@ -208,10 +208,10 @@ def generate_sales_data(config):
 # ============================= RUN =============================
 if __name__ == "__main__":
     os.makedirs(CONFIG["output_dir"], exist_ok=True)
-    print(f"Generating full year {CONFIG['year']} sales data — LOWER REVENUE VERSION")
+    print(f"Generating full year {CONFIG['year']} sales data")
 
     df = generate_sales_data(CONFIG)
-    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_{CONFIG['year']}_LowerRevenue.csv")
+    output_file = os.path.join(CONFIG["output_dir"], f"Sales_Data_{CONFIG['year']}.csv")
     df.to_csv(output_file, index=False)
 
     print(f"\nDone! → {output_file}")
