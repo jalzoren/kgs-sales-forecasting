@@ -13,6 +13,7 @@ import {
   Legend,
   BarChart,
   Bar,
+  ResponsiveContainer
 } from "recharts";
 
 export default function Home() {
@@ -23,6 +24,8 @@ export default function Home() {
     forecastFile: '',
     futureFile: ''
   });
+
+  const [chartType, setChartType] = useState("line");
 
   useEffect(() => {
     setLoading(true);
@@ -139,9 +142,9 @@ export default function Home() {
 
               </div>
               <div className="dropdowns">
-                <select>
-                  <option>Line Chart</option>
-                  <option>Bar Chart</option>
+                <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
+                  <option value="line">Line Chart</option>
+                  <option value="bar">Bar Chart</option>
                 </select>
                 <select>
                   <option>All Weeks</option>
@@ -168,76 +171,89 @@ export default function Home() {
             )}
 
             <div className="chart-area">
-              {loading ? (
-                <div style={{ textAlign: 'center', padding: '50px' }}>
-                  <p>Loading dashboard data...</p>
-                </div>
-              ) : salesData.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '50px' }}>
-                  <p>No sales data available. Please upload sales data and generate forecasts.</p>
-                </div>
-              ) : (
-                <LineChart width={970} height={400} data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
-                  <XAxis 
-                    dataKey="name" 
-                    angle={-45} 
-                    textAnchor="end" 
-                    height={100} 
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis 
-                    tickFormatter={v => `₱${(v / 1000).toFixed(0)}k`} 
-                    tick={{ fontSize: 12 }}
-                  />
-                  <Tooltip 
-                    formatter={(v, name) => {
-                      if (v === null || v === undefined) return ['No data', name];
-                      return [`₱${v.toLocaleString()}`, name];
-                    }}
-                    labelFormatter={l => `Date: ${l}`} 
-                  />
-                  <Legend 
-                    wrapperStyle={{ paddingTop: '20px' }}
-                  />
-                  
-                  {/* Actual Sales - Green (solid line) */}
-                  <Line 
-                    type="monotone" 
-                    dataKey="actual" 
-                    stroke="#52c41a" 
-                    strokeWidth={3} 
-                    dot={{ r: 5, fill: "#52c41a", strokeWidth: 2, stroke: "#fff" }} 
-                    name="Actual Sales (Week 2)" 
-                    connectNulls={false}
-                  />
-                  
-                  {/* Forecasted Sales - Blue (dashed) - Week 1 predicting Week 2 */}
-                  <Line 
-                    type="monotone" 
-                    dataKey="forecasted" 
-                    stroke="#1890ff" 
-                    strokeWidth={3} 
-                    dot={{ r: 5, fill: "#1890ff", strokeWidth: 2, stroke: "#fff" }} 
-                    name="Forecasted (Week 1 → 2)" 
-                    connectNulls={false} 
-                    strokeDasharray="8 4" 
-                  />
-                  
-                  {/* Future Forecast - Dark Blue (dashed) - Week 2 predicting Week 3 */}
-                  <Line 
-                    type="monotone" 
-                    dataKey="future" 
-                    stroke="#003a8c" 
-                    strokeWidth={3} 
-                    dot={{ r: 5, fill: "#003a8c", strokeWidth: 2, stroke: "#fff" }} 
-                    name="Future Forecast (Week 2 → 3)" 
-                    connectNulls={false} 
-                    strokeDasharray="3 3" 
-                  />
-                </LineChart>
-              )}
-            </div>
+  {loading ? (
+    <div style={{ textAlign: 'center', padding: '80px' }}>Loading dashboard data...</div>
+  ) : salesData.length === 0 ? (
+    <div style={{ textAlign: 'center', padding: '80px' }}>
+      No sales data available. Please upload data and generate forecasts.
+    </div>
+  ) : (
+    <>
+      {/* Add this state at the top with your other useState */}
+      {/* const [chartType, setChartType] = useState("line"); */}
+
+      {/* Add onChange to your first dropdown */}
+      {/* <select value={chartType} onChange={(e) => setChartType(e.target.value)}> */}
+
+      <ResponsiveContainer width="100%" height={420}>
+        {chartType === "line" ? (
+          <LineChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+            <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
+            <XAxis
+              dataKey="name"
+              angle={-45}
+              textAnchor="end"
+              height={90}
+              tick={{ fontSize: 12, fill: '#64748b' }}
+            />
+            <YAxis
+              tickFormatter={(value) =>
+                value >= 1000000
+                  ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
+                  : value >= 1000
+                  ? `₱${Math.round(value / 1000)}K`
+                  : `₱${value.toLocaleString()}`
+              }
+              tick={{ fontSize: 12, fill: '#64748b' }}
+              axisLine={false}
+              tickLine={false}
+              domain={[0, 'dataMax + 500000']}
+            />
+            <Tooltip
+              formatter={(value) => value == null ? 'No data' : `₱${Number(value).toLocaleString('en-PH')}`}
+              labelFormatter={(label) => `Date: ${label}`}
+              contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+            />
+            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+
+            <Line type="monotone" dataKey="actual" stroke="#16a34a" strokeWidth={4} dot={{ r: 6 }} name="Actual Sales" />
+            <Line type="monotone" dataKey="forecasted" stroke="#3b82f6" strokeWidth={4} strokeDasharray="10 5" dot={{ r: 6 }} name="Forecasted" />
+            <Line type="monotone" dataKey="future" stroke="#1e40af" strokeWidth={4} strokeDasharray="5 5" dot={{ r: 6 }} name="Future Forecast" />
+          </LineChart>
+        ) : (
+          <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+            <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
+            <XAxis
+              dataKey="name"
+              angle={-45}
+              textAnchor="end"
+              height={90}
+              tick={{ fontSize: 12, fill: '#64748b' }}
+            />
+            <YAxis
+              tickFormatter={(value) =>
+                value >= 1000000
+                  ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
+                  : value >= 1000
+                  ? `₱${Math.round(value / 1000)}K`
+                  : `₱${value.toLocaleString()}`
+              }
+              tick={{ fontSize: 12, fill: '#64748b' }}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip formatter={(value) => `₱${Number(value).toLocaleString('en-PH')}`} />
+            <Legend />
+
+            <Bar dataKey="actual" fill="#16a34a" radius={[8, 8, 0, 0]} name="Actual Sales" />
+            <Bar dataKey="forecasted" fill="#60a5fa" radius={[8, 8, 0, 0]} name="Forecasted" />
+            <Bar dataKey="future" fill="#1e40af" radius={[8, 8, 0, 0]} name="Future Forecast" />
+          </BarChart>
+        )}
+      </ResponsiveContainer>
+    </>
+  )}
+</div>
 
             {/* Debug info - remove this in production */}
             {!loading && salesData.length > 0 && (

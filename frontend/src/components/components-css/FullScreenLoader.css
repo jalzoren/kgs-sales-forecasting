@@ -1,7 +1,7 @@
 .loader-wrapper {
   height: 100vh;
   width: 100%;
-  background: #001d39;
+  background: #ffffff;
   color: white;
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@
   width: 80px;
   height: 80px;
   border: 8px solid #ffffff33;
-  border-top-color: #fff;
+  border-top-color: var(--accent);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }

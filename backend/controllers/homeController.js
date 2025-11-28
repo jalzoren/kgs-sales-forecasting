@@ -1,31 +1,18 @@
 const homeService = require("../services/homeService");
 
 class HomeController {
-  /**
-   * Get dashboard data for home page
-   * Combines actual sales, past forecasts, and future forecasts
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
   async getDashboard(req, res) {
     try {
-      console.log("📊 Dashboard route hit!");
+      console.log("Dashboard route hit!");
 
-      // Extract user ID from session
       const userId = req.session.user?.id;
-      
       if (!userId) {
-        return res.status(401).json({ 
-          success: false, 
-          error: "Unauthorized" 
-        });
+        return res.status(401).json({ success: false, error: "Unauthorized" });
       }
 
-      // Get directory paths
       const salesFolder = homeService.getSalesDirectory(userId);
       const forecastFolder = homeService.getForecastDirectory(userId);
 
-      // Validate that directories exist
       if (!homeService.validateDirectories(salesFolder, forecastFolder)) {
         return res.json(
           homeService.buildEmptyResponse(
@@ -34,65 +21,92 @@ class HomeController {
         );
       }
 
-      // Get files from both directories
+      // Get files (newest first)
       const salesFiles = homeService.getFiles(salesFolder);
       const forecastFiles = homeService.getFiles(forecastFolder, ['.xlsx']);
 
-      // Check if files exist
       if (!salesFiles.length || !forecastFiles.length) {
         return res.json(
-          homeService.buildEmptyResponse(
-            "Please upload sales data and generate forecasts."
-          )
+          homeService.buildEmptyResponse("Please upload sales data and generate forecasts.")
         );
       }
 
-      // Read actual sales data (most recent file)
-      console.log(`📈 Reading sales data from: ${salesFiles[0].fileName}`);
+      // 1. Read actual sales (most recent file)
+      console.log(`Reading sales data from: ${salesFiles[0].fileName}`);
       const salesData = homeService.readSalesData(salesFiles[0]);
-
-      // Read forecasted revenue (previous week predicting this week's sales)
-      console.log(`🔍 Searching for matching forecast...`);
-      const forecastData = homeService.findMatchingForecast(salesData, forecastFiles);
-      
-      if (forecastData.length > 0) {
-        console.log(`✅ Found matching forecast with ${forecastData.length} data points`);
-      } else {
-        console.log(`⚠️ No matching forecast found for sales period`);
+      if (salesData.length === 0) {
+        return res.json(homeService.buildEmptyResponse("No valid sales data found."));
       }
 
-      // Read future forecast (next week) - most recent forecast file
-      console.log(`🔮 Reading future forecast from: ${forecastFiles[0].fileName}`);
-      const futureData = homeService.readForecastData(forecastFiles[0], '7d_forecast');
+      const lastSalesDate = new Date(salesData[salesData.length - 1].date);
+      const firstSalesDate = new Date(salesData[0].date);
 
-      // Combine all data by date
-      console.log(`🔗 Combining data...`);
+      // 2. Find HISTORICAL forecast that predicted the CURRENT sales week
+      console.log("Searching for historical forecast that matches sales week...");
+      let forecastData = homeService.findMatchingForecast(salesData, forecastFiles);
+
+      console.log(
+        forecastData.length > 0
+          ? `Found historical forecast: ${forecastData.length} days`
+          : "No historical forecast found for this sales period"
+      );
+
+      // 3. Future forecast: always from the forecast file with the MOST FUTURE date range
+      const latestForecastFile = [...forecastFiles]
+        .sort((a, b) => {
+          const rangeA = homeService.extractDateRangeFromFilename(a.fileName);
+          const rangeB = homeService.extractDateRangeFromFilename(b.fileName);
+          if (!rangeA) return 1;
+          if (!rangeB) return -1;
+          return rangeB.start - rangeA.start; // newest week first
+        })[0];
+
+      console.log(`Reading future forecast from latest file: ${latestForecastFile.fileName}`);
+
+      const allFutureForecast = homeService.readForecastData(latestForecastFile, '7d_forecast');
+      
+
+      const futureData = allFutureForecast
+        .filter(d => new Date(d.date) > lastSalesDate)
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(0, 7);
+
+      console.log(`Future forecast: ${futureData.length} days prepared`);
+
+      // 4. Combine everything
       const combinedData = homeService.combineDataByDate(salesData, forecastData, futureData);
 
-      // Build response
-      const response = homeService.buildDashboardResponse({
-        salesFiles,
-        forecastFiles,
+      // 5. Build response
+      const response = {
+        success: true,
+        salesFile: salesFiles[0].fileName,
+        // Use the file that actually provided the historical forecast (if any)
+        forecastFile: forecastData.length > 0
+          ? forecastFiles.find(f => {
+              const range = homeService.extractDateRangeFromFilename(f.fileName);
+              return range && range.start <= lastSalesDate && range.end >= firstSalesDate;
+            })?.fileName || "N/A"
+          : "No matching forecast",
+        futureFile: latestForecastFile.fileName,
         salesData,
         forecastData,
         futureData,
         combinedData
-      });
+      };
 
-      console.log(`✅ Dashboard data prepared:`);
-      console.log(`   - Sales records: ${salesData.length}`);
-      console.log(`   - Forecast records: ${forecastData.length}`);
-      console.log(`   - Future records: ${futureData.length}`);
-      console.log(`   - Combined records: ${combinedData.length}`);
+      console.log(`Dashboard ready!`);
+      console.log(`   • Sales: ${salesData.length} days`);
+      console.log(`   • Historical Forecast: ${forecastData.length} days`);
+      console.log(`   • Future Forecast: ${futureData.length} days`);
+      console.log(`   • Total Combined: ${combinedData.length} points`);
 
       res.json(response);
-
     } catch (err) {
-      console.error("❌ Dashboard error:", err);
-      res.status(500).json({ 
-        success: false, 
-        error: "Server error", 
-        details: err.message 
+      console.error("Dashboard error:", err);
+      res.status(500).json({
+        success: false,
+        error: "Server error",
+        details: err.message
       });
     }
   }
