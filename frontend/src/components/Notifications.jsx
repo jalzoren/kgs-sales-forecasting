@@ -1,3 +1,4 @@
+// frontend/src/components/Notifications.jsx
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 const NotificationContext = createContext();
