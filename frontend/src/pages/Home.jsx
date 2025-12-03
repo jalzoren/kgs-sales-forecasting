@@ -14,7 +14,9 @@ import {
   Legend,
   BarChart,
   Bar,
-  ResponsiveContainer
+  ResponsiveContainer,
+  AreaChart,
+  Area
 } from "recharts";
 
 export default function Home() {
@@ -160,6 +162,7 @@ export default function Home() {
                 <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
                   <option value="line">Line Chart</option>
                   <option value="bar">Bar Chart</option>
+                  <option value="area">Area Chart</option>
                 </select>
                 {/* Updated dropdown for day ranges */}
                 <select value={dayRange} onChange={(e) => setDayRange(parseInt(e.target.value))}>
@@ -225,40 +228,16 @@ export default function Home() {
                         domain={[0, 'dataMax + 500000']}
                       />
                       <Tooltip
-                        formatter={(value) => value == null ? 'No data' : `₱${Number(value).toLocaleString('en-PH')}`}
+                        formatter={(value) => (value == null ? 'No data' : `₱${Number(value).toLocaleString('en-PH')}`)}
                         labelFormatter={(label) => `Date: ${label}`}
                         contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                       />
                       <Legend wrapperStyle={{ paddingTop: '20px' }} />
-
-                      <Line 
-                        type="monotone" 
-                        dataKey="actual" 
-                        stroke="#16a34a" 
-                        strokeWidth={3} 
-                        dot={{ r: 6 }} 
-                        name="Actual Sales (Last 7 Days)" 
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="forecasted" 
-                        stroke="#3b82f6" 
-                        strokeWidth={3} 
-                        strokeDasharray="10 5" 
-                        dot={{ r: 6 }} 
-                        name="Forecasted (7 Days)"  // Changed from {dayRange}
-                      />
-                      <Line 
-                        type="monotone" 
-                        dataKey="future" 
-                        stroke="#1e40af" 
-                        strokeWidth={3} 
-                        strokeDasharray="5 5" 
-                        dot={{ r: dayRange === 7 ? 6 : dayRange === 30 ? 4 : 2 }} 
-                        name={`Future Forecast (${dayRange} Days)`}
-                      />
+                      <Line type="monotone" dataKey="actual" stroke="#16a34a" strokeWidth={3} dot={{ r: 6 }} name="Actual Sales (Last 7 Days)" />
+                      <Line type="monotone" dataKey="forecasted" stroke="#3b82f6" strokeWidth={3} strokeDasharray="10 5" dot={{ r: 6 }} name="Forecasted (7 Days)" />
+                      <Line type="monotone" dataKey="future" stroke="#1e40af" strokeWidth={3} strokeDasharray="5 5" dot={{ r: dayRange === 7 ? 6 : dayRange === 30 ? 4 : 2 }} name={`Future Forecast (${dayRange} Days)`} />
                     </LineChart>
-                  ) : (
+                  ) : chartType === "bar" ? (
                     <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
                       <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
                       <XAxis
@@ -283,13 +262,38 @@ export default function Home() {
                       />
                       <Tooltip formatter={(value) => `₱${Number(value).toLocaleString('en-PH')}`} />
                       <Legend />
-
                       <Bar dataKey="actual" fill="#16a34a" radius={[8, 8, 0, 0]} name="Actual Sales (7 Days)" />
                       <Bar dataKey="forecasted" fill="#60a5fa" radius={[8, 8, 0, 0]} name="Forecasted (7 Days)" />
                       <Bar dataKey="future" fill="#1e40af" radius={[8, 8, 0, 0]} name={`Future (${dayRange} Days)`} />
-
                     </BarChart>
-                  )}
+                  ) : chartType === "area" ? (
+                    <AreaChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                      <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
+                      <XAxis
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={90}
+                        tick={{ fontSize: 11, fill: '#64748b' }}
+                        interval={dayRange === 90 ? 6 : dayRange === 30 ? 2 : 0}
+                      />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          value >= 1000000
+                            ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
+                            : value >= 1000
+                            ? `₱${Math.round(value / 1000)}K`
+                            : `₱${value.toLocaleString()}`
+                        }
+                        tick={{ fontSize: 12, fill: '#64748b' }}
+                      />
+                      <Tooltip formatter={(value) => `₱${Number(value).toLocaleString('en-PH')}`} />
+                      <Legend />
+                      <Area type="monotone" dataKey="actual" stroke="#16a34a" fill="#bbf7d0" name="Actual Sales" />
+                      <Area type="monotone" dataKey="forecasted" stroke="#3b82f6" fill="#bfdbfe" name="Forecasted" />
+                      <Area type="monotone" dataKey="future" stroke="#1e40af" fill="#93c5fd" name={`Future (${dayRange} Days)`} />
+                    </AreaChart>
+                  ) : null}
                 </ResponsiveContainer>
               )}
             </div>
