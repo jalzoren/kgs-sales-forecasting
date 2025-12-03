@@ -1,4 +1,4 @@
-// config/db.js, this is the database connection module
+// backend/config/db.js, this is the database connection module
 const mysql = require("mysql");
 
 const db = mysql.createConnection({

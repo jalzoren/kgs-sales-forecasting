@@ -1,3 +1,4 @@
+// frontend/src/components/NotificationBell.jsx
 import { useState, useRef, useEffect } from "react";
 import {
   FaBell,
@@ -87,11 +88,11 @@ export default function NotificationBell() {
   return (
     <div className="notification-wrapper" ref={dropdownRef}>
       <button
-        className="icon-btn"
+        className="icon-btn-circle glass"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
         <FaBell />
-        {unreadCount > 0 && <span className="notif-badge">{unreadCount}</span>}
+        {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
       </button>
 
       {dropdownOpen && (
@@ -104,17 +105,16 @@ export default function NotificationBell() {
                 {unreadCount === 1 ? "notification" : "notifications"}
               </p>
             </div>
-         <span className="tooltip-mark-read">
-  <i
-    className="btn-mark-read"
-    onClick={markAllAsRead}
-    disabled={unreadCount === 0}
-  >
-    <MdOutlineMarkAsUnread />
-  </i>
-  <span className="tooltip-text-mark-read">Mark all as read</span>
-</span>
-
+            <span className="tooltip-mark-read">
+              <i
+                className="btn-mark-read"
+                onClick={markAllAsRead}
+                disabled={unreadCount === 0}
+              >
+                <MdOutlineMarkAsUnread />
+              </i>
+              <span className="tooltip-text-mark-read">Mark all as read</span>
+            </span>
           </div>
 
           {notifications.length === 0 ? (

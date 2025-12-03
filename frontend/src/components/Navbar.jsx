@@ -1,39 +1,16 @@
-import { NavLink, useNavigate } from "react-router-dom";
+// frontend/src/components/Navbar.jsx
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import { FaBullseye } from "react-icons/fa";
-import { LiaUserCircle } from "react-icons/lia";
-import Swal from "sweetalert2";
+import { IoSettingsOutline } from "react-icons/io5";
 import Clock from "./Clock";
 import NotificationBell from "./NotificationBell";
-import "../components/components-css/Navbar.css";
+import SettingsModal from "./SettingsModal";
+import UserMenu from "./UserMenu";
+import "./components-css/Navbar.css";
 
 function Navbar() {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "You will be logged out!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#0A4174",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, log out!",
-      toast: true,
-      position: "top",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          toast: true,
-          position: "top",
-          icon: "success",
-          title: "Logged out successfully!",
-          showConfirmButton: false,
-          timer: 500,
-          timerProgressBar: true,
-        }).then(() => navigate("/"));
-      }
-    });
-  };
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
     <nav className="navbar">
@@ -47,16 +24,20 @@ function Navbar() {
           <li><NavLink to="/home">Home</NavLink></li>
           <li><NavLink to="/data">Data</NavLink></li>
           <li><NavLink to="/forecast">Forecast</NavLink></li>
-          {/* 
-          <li><NavLink to="/reports">Reports</NavLink></li>*/}
           <li><NavLink to="/analytics">Analytics</NavLink></li>
         </ul>
 
         <div className="navbar-right">
           <NotificationBell />
-          <button className="logout-btn" onClick={handleLogout}>
-            <LiaUserCircle />
+          
+          <button 
+            className="icon-btn-circle glass" 
+            onClick={() => setIsSettingsOpen(true)}
+          >
+            <IoSettingsOutline />
           </button>
+
+          <UserMenu />
         </div>
       </div>
 
@@ -90,6 +71,11 @@ function Navbar() {
           <span>items need action</span>
         </div>
       </div>
+
+      <SettingsModal 
+        isOpen={isSettingsOpen} 
+        onClose={() => setIsSettingsOpen(false)} 
+      />
     </nav>
   );
 }

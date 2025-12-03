@@ -1,3 +1,5 @@
+/* frontend/src/components/components-css/NotificationBell.css */
+
 /* Wrapper */
 .notification-wrapper {
   position: relative;
@@ -5,30 +7,68 @@
   font-family: "Poppins", sans-serif;
 }
 
-/* Notification badge */
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
+/* Circular glassmorphic button */
+.icon-btn-circle {
   position: relative;
-  font-size: 1.5rem;
+  width: 42px;
+  height: 42px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
 
-.notif-badge {
+.icon-btn-circle.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icon-btn-circle:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+/* Notification badge */
+.notification-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
-  background: red;
+  top: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  background: #EF480B;
   color: white;
-  font-size: 0.75rem;
+  font-size: 10px;
+  font-weight: 600;
   border-radius: 50%;
-  padding: 2px 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: pulse 2s infinite;
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
 /* Dropdown */
 .notifications-dropdown {
   position: absolute;
-  top: 2.5rem;
+  top: 3rem;
   right: 0;
   width: 400px;
   max-height: 450px;
@@ -127,10 +167,6 @@
   margin: 10px;
 }
 
-.notif{
-    border-bottom: 1px solid #000000; 
-}
-
 .notif-icon-wrapper {
   font-size: 24px;
   display: flex;
@@ -176,12 +212,10 @@
   color: #073661;
 }
 
-/* Optional disabled state */
 .close-icon:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
-/* -------------------------------------------------------------- */
 
 /* Spin animation */
 .spin {
@@ -210,20 +244,20 @@
   transition: width 0.4s ease;
 }
 
-.title-head{
+.title-head {
   color: #000;
   font-weight: 200;
-  border-bottom: #000 1px solid ;
+  border-bottom: #000 1px solid;
   align-items: flex-start;
 }
 
-.title-notif{
+.title-notif {
   color: #000;
   margin-left: 10px;
   font-weight: 200;
 }
 
-.notif-numbers{
+.notif-numbers {
   color: #000;
   margin-left: 10px;
   font-size: 14px;
@@ -249,17 +283,13 @@
   opacity: 0.7;
 }
 
-.close-icon{
-  color: #000;
-}
-
 .notif-header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 10px;
-    flex-direction: column;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-direction: column;
 }
 
 /* Button styling */
@@ -300,11 +330,9 @@
   font-size: 14px;
   position: absolute;
   z-index: 10000;
-
   top: 50%;
   left: 125%;
   transform: translateY(-50%);
-
   opacity: 0;
   transition: opacity 0.3s;
 }

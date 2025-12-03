@@ -150,8 +150,8 @@ body{
   color: #fff;
   font-size: 20px;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,4 +234,20 @@ body{
   width: 1px;
   height: 50px;
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* glass */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.icon-btn.glass {
+  transition: all 0.3s ease;
+}
+
+.icon-btn.glass:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
 }
