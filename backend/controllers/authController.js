@@ -192,13 +192,18 @@ class AuthController {
   }
 
   // LOGOUT
-  logout(req, res) {
+async logout(req, res) {
+  try {
     req.session.destroy((err) => {
       if (err) return res.status(500).json({ message: "Logout failed" });
       res.clearCookie("connect.sid");
       res.json({ message: "Logged out successfully" });
     });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Server error during logout" });
   }
+}
 
   // SEND RESET CODE
   async forgotPassword(req, res) {

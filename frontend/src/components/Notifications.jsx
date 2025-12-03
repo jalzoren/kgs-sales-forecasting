@@ -1,3 +1,4 @@
+// frontend/src/components/Notifications.jsx
 import { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 const NotificationContext = createContext();
@@ -10,7 +11,8 @@ export const useNotifications = () => {
   return context;
 };
 
-// Format relative time (1m ago, etc.)
+const API_URL = "http://localhost:5000/api/notifications";
+
 const formatTime = (date) => {
   const now = new Date();
   const diff = now - date;
@@ -26,37 +28,38 @@ const formatTime = (date) => {
 };
 
 export const NotificationProvider = ({ children }) => {
-  const reviveItems = (raw) => {
+  const [notifications, setNotifications] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch notifications from backend
+  const fetchNotifications = useCallback(async () => {
     try {
-      const parsed = JSON.parse(raw || "[]");
-      return Array.isArray(parsed)
-        ? parsed.map((n) => {
-            const ts = n.timestamp ? new Date(n.timestamp) : new Date();
-            return {
-              ...n,
-              timestamp: ts,
-              time: formatTime(ts),
-            };
-          })
-        : [];
-    } catch {
-      return [];
+      const response = await fetch(API_URL, {
+        credentials: "include",
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const formatted = data.map((n) => ({
+          ...n,
+          timestamp: new Date(n.timestamp),
+          time: formatTime(new Date(n.timestamp)),
+        }));
+        setNotifications(formatted);
+        setHistory(formatted);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, []);
 
-  const [notifications, setNotifications] = useState(() => {
-    const saved = localStorage.getItem("notifications");
-    return reviveItems(saved);
-  });
-
-  const [history, setHistory] = useState(() => {
-    const saved = localStorage.getItem("notificationHistory");
-    return reviveItems(saved);
-  });
-
-  const saveState = (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value));
-  };
+  // Load notifications on mount
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   const typeToTitle = {
     success: "Success",
@@ -66,27 +69,34 @@ export const NotificationProvider = ({ children }) => {
     processing: "Processing",
   };
 
-  const addNotification = useCallback((type, message, title) => {
-    const newNotif = {
-      id: Date.now() + Math.random(),
-      type,
-      title: title || typeToTitle[type] || "Notification",
-      message,
-      timestamp: new Date(),
-      time: formatTime(new Date()),
-      read: false,
-    };
-    setNotifications((prev) => {
-      const updated = [newNotif, ...prev];
-      saveState("notifications", updated);
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = [newNotif, ...prev];
-      saveState("notificationHistory", updatedHistory);
-      return updatedHistory;
-    });
-    return newNotif.id;
+  const addNotification = useCallback(async (type, message, title) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          type,
+          title: title || typeToTitle[type] || "Notification",
+          message,
+        }),
+      });
+
+      if (response.ok) {
+        const newNotif = await response.json();
+        const formatted = {
+          ...newNotif,
+          timestamp: new Date(newNotif.timestamp),
+          time: formatTime(new Date(newNotif.timestamp)),
+        };
+        
+        setNotifications((prev) => [formatted, ...prev]);
+        setHistory((prev) => [formatted, ...prev]);
+        return formatted.id;
+      }
+    } catch (error) {
+      console.error("Error adding notification:", error);
+    }
   }, []);
 
   const showSuccess = useCallback((msg, title) => addNotification("success", msg, title), [addNotification]);
@@ -94,174 +104,96 @@ export const NotificationProvider = ({ children }) => {
   const showWarning = useCallback((msg, title) => addNotification("warning", msg, title), [addNotification]);
   const showError = useCallback((msg, title) => addNotification("error", msg, title), [addNotification]);
 
-  // 🌀 Show processing notification that auto-completes after delay
   const showProcessing = useCallback((msg, title, duration = 5000) => {
-    const id = Date.now() + Math.random();
-    const notif = {
-      id,
-      type: "processing",
-      title: title || typeToTitle.processing,
-      message: msg,
-      timestamp: new Date(),
-      time: formatTime(new Date()),
-      read: false,
-      progress: 0,
-    };
-
-    // Add it to notifications
-    setNotifications((prev) => {
-      const updated = [notif, ...prev];
-      localStorage.setItem("notifications", JSON.stringify(updated));
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = [notif, ...prev];
-      localStorage.setItem("notificationHistory", JSON.stringify(updatedHistory));
-      return updatedHistory;
-    });
-
-    // ✅ Auto-complete after duration (default 5 seconds)
-    setTimeout(() => {
-      updateNotification(id, {
-        type: "success",
-        message: "Done Processed",
-        time: formatTime(new Date()),
-      });
+    const id = addNotification("processing", msg, title);
+    
+    setTimeout(async () => {
+      try {
+        await fetch(`${API_URL}/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ message: "Done Processed", type: "success" }),
+        });
+        fetchNotifications();
+      } catch (error) {
+        console.error("Error updating notification:", error);
+      }
     }, duration);
 
     return id;
-  }, []);
+  }, [addNotification, fetchNotifications]);
 
-  // Progress-based processing notification
-  const showProgress = useCallback((message, initialProgress = 0, title) => {
-    const id = Date.now() + Math.random();
-    const notif = {
-      id,
-      type: "processing",
-      title: title || typeToTitle.processing,
-      message,
-      timestamp: new Date(),
-      time: formatTime(new Date()),
-      read: false,
-      progress: initialProgress,
-    };
-    setNotifications((prev) => {
-      const updated = [notif, ...prev];
-      saveState("notifications", updated);
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = [notif, ...prev];
-      saveState("notificationHistory", updatedHistory);
-      return updatedHistory;
-    });
-    return id;
-  }, []);
-
-  // 🔁 Update notification content
-  const updateNotification = useCallback((id, updates) => {
-    setNotifications((prev) => {
-      const updated = prev.map((n) => (n.id === id ? { ...n, ...updates } : n));
-      saveState("notifications", updated);
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = prev.map((n) => (n.id === id ? { ...n, ...updates } : n));
-      saveState("notificationHistory", updatedHistory);
-      return updatedHistory;
-    });
-  }, []);
-
-  const markAsRead = useCallback((id) => {
-    setNotifications((prev) => {
-      const updated = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
-      saveState("notifications", updated);
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = prev.map((n) => (n.id === id ? { ...n, read: true } : n));
-      saveState("notificationHistory", updatedHistory);
-      return updatedHistory;
-    });
-  }, []);
-
-  const markAllAsRead = useCallback(() => {
-    setNotifications((prev) => {
-      const updated = prev.map((n) => ({ ...n, read: true }));
-      saveState("notifications", updated);
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = prev.map((n) => ({ ...n, read: true }));
-      saveState("notificationHistory", updatedHistory);
-      return updatedHistory;
-    });
-  }, []);
-
-  const removeNotification = useCallback((id) => {
-    setNotifications((prev) => {
-      const updated = prev.filter((n) => n.id !== id);
-      saveState("notifications", updated);
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = prev.filter((n) => n.id !== id);
-      saveState("notificationHistory", updatedHistory);
-      return updatedHistory;
-    });
-  }, []);
-
-  const clearAll = useCallback(() => {
-    setNotifications([]);
-    setHistory([]);
-    localStorage.removeItem("notifications");
-    localStorage.removeItem("notificationHistory");
-  }, []);
-
-  // 🕒 Keep relative time updated
-  const updateNotificationTimes = useCallback(() => {
-    setNotifications((prev) => {
-      const updated = prev.map((n) => {
-        const ts = n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
-        return { ...n, timestamp: ts, time: formatTime(ts) };
+  const markAsRead = useCallback(async (id) => {
+    try {
+      await fetch(`${API_URL}/${id}/read`, {
+        method: "PATCH",
+        credentials: "include",
       });
-      saveState("notifications", updated);
-      return updated;
-    });
-    setHistory((prev) => {
-      const updatedHistory = prev.map((n) => {
-        const ts = n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
-        return { ...n, timestamp: ts, time: formatTime(ts) };
-      });
-      saveState("notificationHistory", updatedHistory);
-      return updatedHistory;
-    });
+      
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+      setHistory((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+    } catch (error) {
+      console.error("Error marking as read:", error);
+    }
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(updateNotificationTimes, 60000);
-    return () => clearInterval(interval);
-  }, [updateNotificationTimes]);
+  const markAllAsRead = useCallback(async () => {
+    try {
+      await fetch(`${API_URL}/read-all`, {
+        method: "PATCH",
+        credentials: "include",
+      });
+      
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+      setHistory((prev) => prev.map((n) => ({ ...n, read: true })));
+    } catch (error) {
+      console.error("Error marking all as read:", error);
+    }
+  }, []);
 
-  // ✅ Auto-convert processing notifications with progress=100 → Done Processed
+  const removeNotification = useCallback(async (id) => {
+    try {
+      await fetch(`${API_URL}/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      
+      setNotifications((prev) => prev.filter((n) => n.id !== id));
+      setHistory((prev) => prev.filter((n) => n.id !== id));
+    } catch (error) {
+      console.error("Error removing notification:", error);
+    }
+  }, []);
+
+  const clearAll = useCallback(async () => {
+    try {
+      await fetch(API_URL, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      
+      setNotifications([]);
+      setHistory([]);
+    } catch (error) {
+      console.error("Error clearing notifications:", error);
+    }
+  }, []);
+
+  // Update times every minute
   useEffect(() => {
     const interval = setInterval(() => {
-      setNotifications((prev) => {
-        const updated = prev.map((n) => {
-          if (n.type === "processing" && n.progress >= 100) {
-            return {
-              ...n,
-              type: "success",
-              message: "Done Processed",
-              time: formatTime(new Date()),
-            };
-          }
-          return n;
-        });
-        saveState("notifications", updated);
-        return updated;
-      });
-    }, 1000);
+      setNotifications((prev) =>
+        prev.map((n) => ({
+          ...n,
+          time: formatTime(n.timestamp),
+        }))
+      );
+    }, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -270,13 +202,12 @@ export const NotificationProvider = ({ children }) => {
       value={{
         notifications,
         history,
+        loading,
         addNotification,
         showSuccess,
         showInfo,
         showWarning,
         showError,
-        showProgress,
-        updateNotification,
         showProcessing,
         markAsRead,
         markAllAsRead,
