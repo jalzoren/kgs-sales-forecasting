@@ -40,7 +40,7 @@ function App() {
 
       <div className={`page-container ${noNavbarPaths.includes(path) ? "no-navbar" : ""}`}>
         <Routes>
-          {/* Public Routes */}
+          {/* Public Roautes */}
           <Route path="/" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
