@@ -284,12 +284,14 @@
 }
 
 .notif-header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
-  flex-direction: column;
+display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: stretch;
+    align-items: center;
 }
 
 /* Button styling */
@@ -302,6 +304,8 @@
   cursor: pointer;
   font-size: 26px;
   background-color: #fff;
+  display: flex;
+  justify-content: center;
 }
 
 .btn-mark-read:hover {
