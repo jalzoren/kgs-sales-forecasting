@@ -430,7 +430,7 @@ export default function Forecast() {
 
   return (
     <div className="table-wrapper">
-      <h2 className="titled">Forecasts</h2>
+      <h2 className="titled">Forecasts & Reports</h2>
 
       {loading && (
         <div
