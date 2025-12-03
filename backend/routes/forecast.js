@@ -8,6 +8,35 @@ const { requireAuth } = require("../middleware/authMiddleware.js");
 const PythonService = require("../services/pythonService");
 const PDFService = require("../services/pdfService");
 
+
+router.get("/api/forecast/download/:fileName", requireAuth, async (req, res) => {
+  try {
+    const user = req.session.user;
+    console.log("Session user:", user);
+
+    if (!user?.id) return res.status(401).json({ message: "Unauthorized" });
+
+    const { fileName } = req.params;
+    const safeName = path.basename(fileName);
+    const absPath = path.resolve(path.join(__dirname, "../files/forecastData", `user_${user.id}`, safeName));
+
+    console.log("Requested file:", safeName);
+    console.log("Resolved path:", absPath);
+    console.log("Exists?", fs.existsSync(absPath));
+
+    if (!fs.existsSync(absPath)) {
+      return res.status(404).json({ message: "File not found" });
+    }
+
+    res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    res.setHeader("Content-Disposition", `attachment; filename="${safeName}"`);
+    res.download(absPath, safeName);
+  } catch (err) {
+    console.error("Download error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // Helper function to ensure directory exists
 function ensureDirectoryExists(dirPath) {
   if (!fs.existsSync(dirPath)) {
