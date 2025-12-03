@@ -53,7 +53,6 @@ export default function ProtectedRoute({ children }) {
       <div className="fixed inset-0 bg-gradient-to-br from-blue-900 to-black flex items-center justify-center z-50">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-gray-600 border-t-cyan-400 rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-white text-lg">Loading your forecast...</p>
         </div>
       </div>
     );

@@ -1,4 +1,4 @@
-// frontend/src/pages/Home.jsx
+// Update your Home.jsx component
 
 import React, { useState, useEffect } from "react";
 import "../css/Home.css";
@@ -14,7 +14,9 @@ import {
   Legend,
   BarChart,
   Bar,
-  ResponsiveContainer
+  ResponsiveContainer,
+  AreaChart,
+  Area
 } from "recharts";
 
 export default function Home() {
@@ -28,22 +30,24 @@ export default function Home() {
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
   const [categoryAccuracy, setCategoryAccuracy] = useState([]);
   const [chartType, setChartType] = useState("line");
+  const [dayRange, setDayRange] = useState(7); // New state for day range
 
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+  }, [dayRange]); // Re-fetch when dayRange changes
 
   const fetchDashboardData = () => {
     setLoading(true);
 
     Swal.fire({
       title: 'Loading Dashboard...',
-      html: 'Fetching your sales data and forecasts',
+      html: `Fetching ${dayRange}-day forecast data`,
       allowOutsideClick: false,
       didOpen: () => Swal.showLoading()
     });
 
-    fetch("http://localhost:5000/api/home/dashboard", { 
+    // Add days parameter to URL
+    fetch(`http://localhost:5000/api/home/dashboard?days=${dayRange}`, { 
       credentials: "include" 
     })
       .then(res => {
@@ -56,6 +60,7 @@ export default function Home() {
       })
       .then(response => {
         console.log("📊 Full Dashboard Response:", response);
+        console.log(`📅 Loaded ${response.days}-day view`);
         
         if (!response.success) {
           throw new Error(response.error || "Failed to load dashboard data");
@@ -99,8 +104,7 @@ export default function Home() {
           return {
             name: dateObj.toLocaleDateString('en-US', { 
               month: 'short', 
-              day: 'numeric',
-              year: 'numeric'
+              day: 'numeric'
             }),
             date: item.date,
             actual: item.actual_revenue,
@@ -135,9 +139,9 @@ export default function Home() {
 
   // Helper function for inventory alert colors
   const getAlertColor = (avgDailySales) => {
-    if (avgDailySales > 50) return "#ff4d4f"; // Red - HIGH
-    if (avgDailySales > 20) return "#ffa940"; // Orange - MEDIUM
-    return "#52c41a"; // Green - LOW
+    if (avgDailySales > 50) return "#ff4d4f";
+    if (avgDailySales > 20) return "#ffa940";
+    return "#52c41a";
   };
 
   const getAlertPercentage = (avgDailySales) => {
@@ -151,19 +155,22 @@ export default function Home() {
           <div className="box sales-overview">
             <div className="box-header">
               <div className="title-header">
-                <h3 className="title-home">Sales Overview</h3>
+                <h3 className="title-home">Sales Overview (Future: {dayRange} Days)</h3>
                 <i><GoScreenFull /></i>
               </div>
               <div className="dropdowns">
                 <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
                   <option value="line">Line Chart</option>
                   <option value="bar">Bar Chart</option>
+                  <option value="area">Area Chart</option>
                 </select>
-                <select>
-                  <option>All Weeks</option>
-                  <option>Last 4 Weeks</option>
-                  <option>Last 2 Weeks</option>
+                {/* Updated dropdown for day ranges */}
+                <select value={dayRange} onChange={(e) => setDayRange(parseInt(e.target.value))}>
+                  <option value={7}>7 Days</option>
+                  <option value={30}>30 Days</option>
+                  <option value={90}>90 Days</option>
                 </select>
+
                 <a href="/analytics" className="arrow-link">↗</a>
               </div>
             </div>
@@ -177,16 +184,19 @@ export default function Home() {
                 borderBottom: '1px solid #e8e8e8'
               }}>
                 <div><strong>📁 Data Sources:</strong></div>
-                <div>• Actual Sales: {fileInfo.salesFile}</div>
-                <div>• Forecasted: {fileInfo.forecastFile}</div>
-                <div>• Future Forecast: {fileInfo.futureFile}</div>
+                <div>• Actual Sales: Last 7 days from {fileInfo.salesFile}</div>
+                <div>• Forecasted: 7 days from {fileInfo.forecastFile}</div>
+                <div>• Future Forecast: Next {dayRange} days from {fileInfo.futureFile}</div>
               </div>
             )}
+
 
             {/* Chart Area */}
             <div className="chart-area">
               {loading ? (
-                <div style={{ textAlign: 'center', padding: '80px' }}>Loading dashboard data...</div>
+                <div style={{ textAlign: 'center', padding: '80px' }}>
+                  Loading {dayRange}-day dashboard data...
+                </div>
               ) : salesData.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '80px' }}>
                   No sales data available. Please upload data and generate forecasts.
@@ -201,7 +211,8 @@ export default function Home() {
                         angle={-45}
                         textAnchor="end"
                         height={90}
-                        tick={{ fontSize: 12, fill: '#64748b' }}
+                        tick={{ fontSize: 11, fill: '#64748b' }}
+                        interval={dayRange === 90 ? 6 : dayRange === 30 ? 2 : 0}
                       />
                       <YAxis
                         tickFormatter={(value) =>
@@ -217,17 +228,16 @@ export default function Home() {
                         domain={[0, 'dataMax + 500000']}
                       />
                       <Tooltip
-                        formatter={(value) => value == null ? 'No data' : `₱${Number(value).toLocaleString('en-PH')}`}
+                        formatter={(value) => (value == null ? 'No data' : `₱${Number(value).toLocaleString('en-PH')}`)}
                         labelFormatter={(label) => `Date: ${label}`}
                         contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
                       />
                       <Legend wrapperStyle={{ paddingTop: '20px' }} />
-
-                      <Line type="monotone" dataKey="actual" stroke="#16a34a" strokeWidth={4} dot={{ r: 6 }} name="Actual Sales" />
-                      <Line type="monotone" dataKey="forecasted" stroke="#3b82f6" strokeWidth={4} strokeDasharray="10 5" dot={{ r: 6 }} name="Forecasted" />
-                      <Line type="monotone" dataKey="future" stroke="#1e40af" strokeWidth={4} strokeDasharray="5 5" dot={{ r: 6 }} name="Future Forecast" />
+                      <Line type="monotone" dataKey="actual" stroke="#16a34a" strokeWidth={3} dot={{ r: 6 }} name="Actual Sales (Last 7 Days)" />
+                      <Line type="monotone" dataKey="forecasted" stroke="#3b82f6" strokeWidth={3} strokeDasharray="10 5" dot={{ r: 6 }} name="Forecasted (7 Days)" />
+                      <Line type="monotone" dataKey="future" stroke="#1e40af" strokeWidth={3} strokeDasharray="5 5" dot={{ r: dayRange === 7 ? 6 : dayRange === 30 ? 4 : 2 }} name={`Future Forecast (${dayRange} Days)`} />
                     </LineChart>
-                  ) : (
+                  ) : chartType === "bar" ? (
                     <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
                       <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
                       <XAxis
@@ -235,7 +245,8 @@ export default function Home() {
                         angle={-45}
                         textAnchor="end"
                         height={90}
-                        tick={{ fontSize: 12, fill: '#64748b' }}
+                        tick={{ fontSize: 11, fill: '#64748b' }}
+                        interval={dayRange === 90 ? 6 : dayRange === 30 ? 2 : 0}
                       />
                       <YAxis
                         tickFormatter={(value) =>
@@ -251,12 +262,38 @@ export default function Home() {
                       />
                       <Tooltip formatter={(value) => `₱${Number(value).toLocaleString('en-PH')}`} />
                       <Legend />
-
-                      <Bar dataKey="actual" fill="#16a34a" radius={[8, 8, 0, 0]} name="Actual Sales" />
-                      <Bar dataKey="forecasted" fill="#60a5fa" radius={[8, 8, 0, 0]} name="Forecasted" />
-                      <Bar dataKey="future" fill="#1e40af" radius={[8, 8, 0, 0]} name="Future Forecast" />
+                      <Bar dataKey="actual" fill="#16a34a" radius={[8, 8, 0, 0]} name="Actual Sales (7 Days)" />
+                      <Bar dataKey="forecasted" fill="#60a5fa" radius={[8, 8, 0, 0]} name="Forecasted (7 Days)" />
+                      <Bar dataKey="future" fill="#1e40af" radius={[8, 8, 0, 0]} name={`Future (${dayRange} Days)`} />
                     </BarChart>
-                  )}
+                  ) : chartType === "area" ? (
+                    <AreaChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                      <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
+                      <XAxis
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={90}
+                        tick={{ fontSize: 11, fill: '#64748b' }}
+                        interval={dayRange === 90 ? 6 : dayRange === 30 ? 2 : 0}
+                      />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          value >= 1000000
+                            ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
+                            : value >= 1000
+                            ? `₱${Math.round(value / 1000)}K`
+                            : `₱${value.toLocaleString()}`
+                        }
+                        tick={{ fontSize: 12, fill: '#64748b' }}
+                      />
+                      <Tooltip formatter={(value) => `₱${Number(value).toLocaleString('en-PH')}`} />
+                      <Legend />
+                      <Area type="monotone" dataKey="actual" stroke="#16a34a" fill="#bbf7d0" name="Actual Sales" />
+                      <Area type="monotone" dataKey="forecasted" stroke="#3b82f6" fill="#bfdbfe" name="Forecasted" />
+                      <Area type="monotone" dataKey="future" stroke="#1e40af" fill="#93c5fd" name={`Future (${dayRange} Days)`} />
+                    </AreaChart>
+                  ) : null}
                 </ResponsiveContainer>
               )}
             </div>
@@ -271,9 +308,9 @@ export default function Home() {
               }}>
                 <strong>📊 Data Summary:</strong>
                 <div>Total points: {salesData.length}</div>
-                <div>Actual data points: {salesData.filter(d => d.actual !== null).length}</div>
-                <div>Forecasted data points: {salesData.filter(d => d.forecasted !== null).length}</div>
-                <div>Future data points: {salesData.filter(d => d.future !== null).length}</div>
+                <div>Actual data points: {salesData.filter(d => d.actual !== null).length} (always 7 days)</div>
+                <div>Forecasted data points: {salesData.filter(d => d.forecasted !== null).length} (always 7 days)</div>
+                <div>Future data points: {salesData.filter(d => d.future !== null).length} ({dayRange} days)</div>
               </div>
             )}
           </div>

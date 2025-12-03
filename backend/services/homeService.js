@@ -470,6 +470,143 @@ class HomeService {
     };
   }
 
+/**
+ * Get historical forecast for a specific number of days
+ * @param {Array} forecastFiles - Array of forecast file objects
+ * @param {Date} lastSalesDate - Last date from actual sales
+ * @param {number} days - Number of days to retrieve (7, 30, or 90)
+ * @returns {Array} Forecast data for the specified period
+ */
+getHistoricalForecastByDays(forecastFiles, lastSalesDate, days = 7) {
+  if (forecastFiles.length === 0) return [];
+  
+  // Determine which sheet to read based on days
+  let sheetName;
+  switch(days) {
+    case 7:
+      sheetName = "7d_forecast";
+      break;
+    case 30:
+      sheetName = "30d_forecast";
+      break;
+    case 90:
+      sheetName = "90d_forecast";
+      break;
+    default:
+      sheetName = "7d_forecast";
+  }
+  
+  console.log(`📅 Looking for ${days}-day historical forecast from sheet: ${sheetName}`);
+  
+  const endDate = new Date(lastSalesDate);
+  const startDate = new Date(lastSalesDate);
+  startDate.setDate(startDate.getDate() - days + 1);
+  
+  console.log(`   Date range: ${startDate.toISOString().split('T')[0]} to ${endDate.toISOString().split('T')[0]}`);
+  
+  // Find all forecast files that overlap with our date range
+  const matchingData = [];
+  
+  for (const file of forecastFiles) {
+    const fullData = this.readForecastData(file, sheetName);
+    
+    const relevantData = fullData.filter((d) => {
+      const dDate = new Date(d.date);
+      return dDate >= startDate && dDate <= endDate;
+    });
+    
+    matchingData.push(...relevantData);
+  }
+  
+  // Remove duplicates (keep most recent forecast for each date)
+  const uniqueData = new Map();
+  matchingData.forEach(d => {
+    if (!uniqueData.has(d.date) || d.revenue > 0) {
+      uniqueData.set(d.date, d);
+    }
+  });
+  
+  const result = Array.from(uniqueData.values())
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  console.log(`   ✅ Found ${result.length} historical forecast data points`);
+  return result;
+}
+
+/**
+ * Get future forecast for a specific number of days
+ * @param {Object} latestForecastFile - The most recent forecast file object
+ * @param {Date} lastSalesDate - Last date from actual sales
+ * @param {number} days - Number of future days to retrieve (7, 30, or 90)
+ * @returns {Array} Future forecast data
+ */
+getFutureForecastByDays(latestForecastFile, lastSalesDate, days = 7) {
+  // Determine which sheet to read based on days
+  let sheetName;
+  switch(days) {
+    case 7:
+      sheetName = "7d_forecast";
+      break;
+    case 30:
+      sheetName = "30d_forecast";
+      break;
+    case 90:
+      sheetName = "90d_forecast";
+      break;
+    default:
+      sheetName = "7d_forecast";
+  }
+  
+  console.log(`📈 Reading ${days}-day future forecast from sheet: ${sheetName}`);
+  
+  // Read the appropriate sheet
+  const allForecastData = this.readForecastData(latestForecastFile, sheetName);
+  
+  const futureData = allForecastData
+    .filter((d) => new Date(d.date) > lastSalesDate)
+    .sort((a, b) => new Date(a.date) - new Date(b.date))
+    .slice(0, days);
+  
+  console.log(`   ✅ Found ${futureData.length} future forecast data points`);
+  return futureData;
+}
+
+/**
+ * Prepare dashboard data with flexible day ranges
+ * - Actual Sales: Always last 7 days
+ * - Forecasted: Always 7 days (matching actual sales period)
+ * - Future: Flexible (7, 30, or 90 days based on user selection)
+ * 
+ * @param {Array} salesData - Actual sales data (last 7 days)
+ * @param {Array} forecastFiles - All forecast files
+ * @param {Object} latestForecastFile - The most recent forecast file
+ * @param {number} days - Number of days for FUTURE forecast only (7, 30, or 90)
+ * @returns {Object} Combined data with actual, forecasted, and future
+ */
+prepareDashboardByDays(salesData, forecastFiles, latestForecastFile, days = 7) {
+  console.log(`\n🔧 Preparing dashboard view...`);
+  console.log(`   - Actual Sales: Last 7 days`);
+  console.log(`   - Forecasted: 7 days (matching actual sales)`);
+  console.log(`   - Future Forecast: ${days} days`);
+  
+  // Always use last 7 days of actual sales
+  const salesLast7 = salesData.slice(-7);
+  const lastSalesDate = new Date(salesLast7[salesLast7.length - 1].date);
+  
+  // Get historical forecast for FIXED 7 days (always from 7d_forecast sheet)
+  const forecastData = this.getHistoricalForecastByDays(forecastFiles, lastSalesDate, 7);
+  
+  // Get future forecast for VARIABLE days (from appropriate sheet: 7d, 30d, or 90d)
+  const futureData = this.getFutureForecastByDays(latestForecastFile, lastSalesDate, days);
+  
+  console.log(`   ✅ Sales: ${salesLast7.length} days`);
+  console.log(`   ✅ Historical Forecast: ${forecastData.length} days (always 7)`);
+  console.log(`   ✅ Future Forecast: ${futureData.length} days (${days} requested)`);
+  
+  // Combine all data
+  return this.combineDataByDate(salesLast7, forecastData, futureData);
+}
+
   // METHOD 15: Build empty dashboard response
   buildEmptyResponse(message) {
     return {

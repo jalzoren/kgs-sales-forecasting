@@ -201,11 +201,18 @@ hr {
 
 /* Status Indicators */
 .status {
-  font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  display: inline-block;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+
+
 }
 
 .status.success {
