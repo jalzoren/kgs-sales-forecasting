@@ -355,12 +355,12 @@
 
 /* Action button POss */
 .actions {
-  display: flex;
-  justify-content: space-around;
-  gap: 6px;
-  flex-wrap: wrap;
-  align-content: space-around;
-  flex-direction: column;
+display: flex;
+    justify-content: space-around;
+    gap: 6px;
+    flex-wrap: nowrap;
+    align-content: space-around;
+    flex-direction: row;
 }
 
 .btn-view,
