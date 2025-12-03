@@ -156,28 +156,50 @@ def validate_data_span(user_id):
 
 def merge_multi_year_data(user_id):
     print(f" Merging multi-year processed files for user {user_id}...")
-    
-    # ✅ Check if merge already exists from last 5 minutes
+
+    # Check for recent merges
     merged_dir = ensure_user_folder(CLEAN_DIR, user_id)
-    existing_merged = [f for f in os.listdir(merged_dir) 
-                    if f.startswith("merged_3yr_sales") and f.endswith(".xlsx")]
-    
+    existing_merged = [
+        f for f in os.listdir(merged_dir)
+        if f.startswith("merged_3yr_sales") and f.endswith(".xlsx")
+    ]
+
     if existing_merged:
-        latest_merged = max(existing_merged, 
-                        key=lambda f: os.path.getctime(os.path.join(merged_dir, f)))
+        latest_merged = max(
+            existing_merged,
+            key=lambda f: os.path.getctime(os.path.join(merged_dir, f))
+        )
         latest_time = os.path.getctime(os.path.join(merged_dir, latest_merged))
-        
-        # If merged file created within last 5 minutes, skip
+
         if (datetime.now().timestamp() - latest_time) < 300:
             print(f" ℹ️  Recent merge found ({latest_merged}), skipping duplicate merge.")
             return os.path.join(merged_dir, latest_merged)
-    
-    validated_df = validate_data_span(user_id)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    merged_path = os.path.join(merged_dir, f"merged_3yr_sales_{timestamp}.xlsx")
 
+    # Load and validate
+    validated_df = validate_data_span(user_id)
+
+    # === NEW: Extract filenames used for merging ===
+    processed_files = [
+        f for f in os.listdir(merged_dir)
+        if "_processed_" in f and f.endswith(".xlsx")
+    ]
+
+    # Extract only base file names without extension
+    merged_sources = "_".join([os.path.splitext(f)[0] for f in processed_files])
+
+    # Safe truncate filename if too long
+    if len(merged_sources) > 150:
+        merged_sources = merged_sources[:150]
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    merged_filename = f"merged_3yr_sales_{merged_sources}_{timestamp}.xlsx"
+    merged_path = os.path.join(merged_dir, merged_filename)
+
+    # Save merged file
     validated_df.to_excel(merged_path, index=False)
     print(f" Multi-year merged dataset saved to: {merged_path}")
+
     return merged_path
 
 
