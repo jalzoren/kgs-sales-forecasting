@@ -11,6 +11,7 @@ const dataRoutes = require("./routes/dataRoutes");
 const forecastRoutes = require("./routes/forecast"); 
 const analyticsRoutes = require("./routes/analyticsRoutes"); 
 const homeRoutes = require("./routes/homeRoutes"); 
+const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 const PORT = 5000;
@@ -21,9 +22,10 @@ const PORT = 5000;
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // ✅ Added PATCH
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 
 // =====================================================
 // Sessions
@@ -51,6 +53,7 @@ app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
 app.use("/", analyticsRoutes); 
 app.use("/", homeRoutes); 
+app.use("/api/notifications", notificationRoutes);
 
 // =====================================================
 // Default route
@@ -68,6 +71,24 @@ app.get("/api/check-session", (req, res) => {
   } else {
     res.status(401).json({ loggedIn: false });
   }
+});
+
+app.get("/api/debug-session", (req, res) => {
+  res.json({
+    hasSession: !!req.session,
+    hasUser: !!(req.session && req.session.user),
+    userId: req.session?.user?.id,
+    userEmail: req.session?.user?.email
+  });
+});
+
+app.post("/test-notification", (req, res) => {
+  console.log("Test notification - Session:", req.session);
+  console.log("Test notification - User:", req.session?.user);
+  res.json({
+    hasSession: !!req.session,
+    user: req.session?.user || null
+  });
 });
 
 // =====================================================
