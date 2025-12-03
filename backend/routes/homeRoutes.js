@@ -1,3 +1,4 @@
+// backend/routes/homeRoutes.js
 const express = require("express");
 const router = express.Router();
 const { requireAuth } = require("../middleware/authMiddleware.js");

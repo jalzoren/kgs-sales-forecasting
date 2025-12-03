@@ -1,3 +1,4 @@
+// backend/controllers/analyticsController.js
 const analyticsService = require("../services/analyticsService");
 
 class AnalyticsController {

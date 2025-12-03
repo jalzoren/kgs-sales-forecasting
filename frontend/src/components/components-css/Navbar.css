@@ -230,6 +230,15 @@ body{
   color: #ff4d4d;
 }
 
+.stat-item .yellow {
+  color: #ffa940; /* Orange/Yellow for medium accuracy (60-79%) */
+}
+
+/* Optional: Add loading animation */
+.navbar-stats .value {
+  transition: all 0.3s ease;
+}
+
 .divider {
   width: 1px;
   height: 50px;
