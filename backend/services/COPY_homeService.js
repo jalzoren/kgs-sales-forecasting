@@ -1,4 +1,34 @@
 // backend/services/homeService.js
+/**
+ * ═══════════════════════════════════════════════════════════════
+ * HOME SERVICE - Dashboard Data Processing
+ * ═══════════════════════════════════════════════════════════════
+ *
+ * PURPOSE:
+ *   Handles all file reading, data processing, and calculations
+ *   for the dashboard feature
+ *
+ * USED BY:
+ *   - controllers/homeController.js → getDashboard()
+ *
+ * WORKS WITH:
+ *   - files/salesData/user_X/*.xlsx|csv → actual sales data
+ *   - files/forecastData/user_X/*.xlsx → predicted sales
+ *
+ * KEY METHODS (in order of typical usage):
+ *   1. getSalesDirectory(userId) → get path to sales folder
+ *   2. getForecastDirectory(userId) → get path to forecast folder
+ *   3. validateDirectories() → check both folders exist
+ *   4. getFiles() → list files in a folder, sorted by date
+ *   5. readSalesData() → parse Excel/CSV, aggregate by date
+ *   6. readForecastData() → parse forecast Excel, aggregate
+ *   7. findMatchingForecast() → find forecast that matches sales dates
+ *   8. combineDataByDate() → merge sales + forecast + future
+ *   9. calculateDashboardStats() → compute predicted/actual/accuracy
+ *   10. getInventoryAlerts() → read demand_alerts sheet
+ *   11. getCategoryAccuracy() → calculate accuracy by category
+ * ═══════════════════════════════════════════════════════════════
+ */
 
 const fs = require("fs");
 const path = require("path");
@@ -14,13 +44,20 @@ class HomeService {
     return path.join(__dirname, "../files/forecastData", `user_${userId}`);
   }
 
-  // METHOD 3: Check if both required directories exist
-
+  /**
+   * METHOD 3: Check if both required directories exist
+   * Called by: homeController.getDashboard()
+   */
   validateDirectories(salesFolder, forecastFolder) {
     return fs.existsSync(salesFolder) && fs.existsSync(forecastFolder);
   }
 
-  // METHOD 4: Get files from directory
+  /**
+   * METHOD 4: Get files from directory
+   * Returns: Array of {fileName, filePath, mtime}, sorted newest first
+   * Called by: homeController (to get sales and forecast files)
+   */
+
   getFiles(folder, exts = [".xlsx", ".csv"]) {
     return fs
       .readdirSync(folder)
@@ -33,7 +70,11 @@ class HomeService {
       .sort((a, b) => b.mtime - a.mtime);
   }
 
-  // METHOD 5: Parse various date formats to YYYY-MM-DD string
+  /**
+   * METHOD 5: Parse various date formats to YYYY-MM-DD string
+   * Returns: "2025-01-15" or null if invalid
+   * Called by: readSalesData(), readForecastData()
+   */
   parseDate(val) {
     if (!val) return null;
 
@@ -56,7 +97,22 @@ class HomeService {
     return null;
   }
 
-  //METHOD 6: Read sales data from Excel or CSV file
+  /**
+   * METHOD 6: Read sales data from Excel or CSV file
+   * Returns: Array of {date, revenue}, sorted by date
+   *
+   * Process:
+   *   1. Read Excel/CSV file
+   *   2. Extract Date and Total_Amount columns
+   *   3. Group by date and SUM revenue
+   *   4. Sort chronologically
+   *
+   * Example output:
+   *   [
+   *     { date: "2025-01-01", revenue: 15000 },
+   *     { date: "2025-01-02", revenue: 18000 }
+   *   ]
+   */
   readSalesData(fileInfo) {
     try {
       let data = [];
@@ -110,7 +166,12 @@ class HomeService {
     }
   }
 
-  // METHOD 7: Read forecast data from Excel file
+  /**
+   * METHOD 7: Read forecast data from Excel file
+   * Returns: Array of {date, revenue}
+   *
+   * This method reads ONE sheet and aggregates all products by date
+   */
   readForecastData(fileInfo, sheetName = "7d_forecast") {
     try {
       const workbook = XLSX.readFile(fileInfo.filePath);
@@ -146,7 +207,15 @@ class HomeService {
     }
   }
 
-  // METHOD 8: Extract date range from forecast filename
+  /**
+   * METHOD 8: Extract date range from forecast filename
+   * Returns: {start: Date, end: Date} or null if no match
+   * Called by: findMatchingForecast()
+   *
+   * Expected format: forecast_week_20250101_to_20250107.xlsx
+   *
+   * Why needed: Match which forecast corresponds to which sales week
+   */
   extractDateRangeFromFilename(fileName) {
     const match = fileName.match(/forecast_week_(\d{8})_to_(\d{8})/);
     if (!match) return null;
@@ -164,7 +233,21 @@ class HomeService {
     return { start, end };
   }
 
-  //METHOD 9: Find historical forecast that matches current sales week
+  /**
+   * METHOD 9: Find historical forecast that matches current sales week
+   * Returns: Matched forecast data or empty array
+   *
+   * Logic:
+   *   1. Get date range of current sales (first to last day)
+   *   2. Loop through forecast files
+   *   3. Check if forecast's date range OVERLAPS with sales range
+   *   4. Return the forecast data for those dates
+   *
+   * Example:
+   *   Sales data: Jan 1-7, 2025
+   *   Forecast file: forecast_week_20250101_to_20250107.xlsx
+   *   → MATCH! Return this forecast's 7-day predictions
+   */
 
   findMatchingForecast(salesData, forecastFiles) {
     if (salesData.length === 0 || forecastFiles.length === 0) return [];
@@ -194,7 +277,10 @@ class HomeService {
     return [];
   }
 
-  // METHOD 10: Get future forecast (7 days ahead)
+  /**
+   * METHOD 10: Get future forecast (7 days ahead)
+   * Returns: Next 7 days of forecast data
+   */
   getFutureForecast(forecastData, lastSalesDate) {
     return forecastData
       .filter((d) => new Date(d.date) > lastSalesDate)
@@ -202,7 +288,27 @@ class HomeService {
       .slice(0, 7);
   }
 
-  // METHOD 11: Combine sales, forecast, and future data by date
+  /**
+   * METHOD 11: Combine sales, forecast, and future data by date
+   * Returns: Combined array for chart visualization
+   * 
+   * Output structure:
+   *   [
+   *     {
+   *       date: "2025-01-01",
+   *       actual_revenue: 15000,      // Real sales
+   *       forecasted_revenue: 14500,  // Past prediction
+   *       future_revenue: null        // N/A (date is in past)
+   *     },
+   *     {
+   *       date: "2025-01-08",
+   *       actual_revenue: null,       // No sales yet
+   *       forecasted_revenue: null,   // N/A
+   *       future_revenue: 16000       // Future prediction
+   *     }
+   *   ]
+   * 
+   */
   combineDataByDate(salesData, forecastData, futureData) {
     const dataMap = new Map();
 
@@ -253,9 +359,19 @@ class HomeService {
 
   // SECTION 6: STATISTICS & METRICS CALCULATIONS ═══════════
   
-  // METHOD 12: Calculate dashboard statistics
-  // Used in: Navbar stats display
-
+  /**
+   * METHOD 12: Calculate dashboard statistics
+   * Returns: { predictedSales, actualSales, forecastAccuracy, variance }
+   * Called by: homeController.getDashboard()
+   * 
+   * Metrics calculated:
+   *   - predictedSales: Sum of next 7 days future revenue
+   *   - actualSales: Sum of last 7 days actual revenue
+   *   - forecastAccuracy: 100% - MAPE (match dates between forecast & actual)
+   *   - variance: Percentage difference predicted vs actual
+   * 
+   * Used in: Navbar stats display
+   */
   calculateDashboardStats(salesData, forecastData, futureData) {
     console.log("📊 Calculating dashboard statistics...");
     
@@ -309,8 +425,31 @@ class HomeService {
     return stats;
   }
 
+    // ═══════════════════════════════════════════════════════════════
   // SECTION 7: INVENTORY ALERTS & CATEGORY ACCURACY
-  // METHOD 13: Get inventory alerts (high-demand products)
+  
+  /**
+   * METHOD 13: Get inventory alerts (high-demand products)
+   * Returns: Array of top 3 high-demand products
+   * Called by: homeController.getDashboard()
+   * 
+   * Process:
+   *   1. Find latest forecast Excel file
+   *   2. Read "demand_alerts" sheet
+   *   3. Filter for "HIGH DEMAND" items
+   *   4. Return top 3 products
+   * 
+   * Output structure:
+   *   [
+   *     {
+   *       productName: "Shin Ramyun",
+   *       category: "Noodles",
+   *       demandLevel: "HIGH DEMAND",
+   *       avgDailySales: 85.5,
+   *       recommendation: "Monitor stock levels"
+   *     }
+   *   ]
+   */
   getInventoryAlerts(userId) {
     try {
       const forecastFolder = this.getForecastDirectory(userId);
@@ -353,7 +492,18 @@ class HomeService {
     }
   }
 
-  // METHOD 14: Calculate forecast accuracy by category
+  /**
+   * METHOD 14: Calculate forecast accuracy by category
+   * Returns: Array of { name, accuracy }
+   * Called by: homeController.getDashboard()
+   * 
+   * Logic:
+   *   - Group products by category
+   *   - Calculate average forecast quantity per category
+   *   - Convert to accuracy percentage (70-95% range)
+   * 
+   * Output: Top 4 categories with accuracy scores
+   */
   getCategoryAccuracy(userId) {
     try {
       const forecastFolder = this.getForecastDirectory(userId);
@@ -470,7 +620,13 @@ class HomeService {
     };
   }
 
-  // METHOD 15: Build empty dashboard response
+  /**
+   * METHOD 15: Build empty dashboard response
+   * Returns: Empty response with message
+   * Called by: homeController.getDashboard()
+   * 
+   * Used when: User hasn't uploaded data yet
+   */
   buildEmptyResponse(message) {
     return {
       success: true,

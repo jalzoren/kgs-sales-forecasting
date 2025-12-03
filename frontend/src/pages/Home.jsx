@@ -1,4 +1,5 @@
 // frontend/src/pages/Home.jsx
+
 import React, { useState, useEffect } from "react";
 import "../css/Home.css";
 import { GoScreenFull } from "react-icons/go";
@@ -24,10 +25,15 @@ export default function Home() {
     forecastFile: '',
     futureFile: ''
   });
-
+  const [inventoryAlerts, setInventoryAlerts] = useState([]);
+  const [categoryAccuracy, setCategoryAccuracy] = useState([]);
   const [chartType, setChartType] = useState("line");
 
   useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = () => {
     setLoading(true);
 
     Swal.fire({
@@ -55,16 +61,6 @@ export default function Home() {
           throw new Error(response.error || "Failed to load dashboard data");
         }
 
-        // Get the combined data from backend
-        const combined = response.combinedData || [];
-        
-        console.log("📈 Combined data received:", combined.length, "items");
-        console.log("📂 Files:", {
-          sales: response.salesFile,
-          forecast: response.forecastFile,
-          future: response.futureFile
-        });
-
         // Store file info
         setFileInfo({
           salesFile: response.salesFile || '',
@@ -72,9 +68,27 @@ export default function Home() {
           futureFile: response.futureFile || ''
         });
 
-        // Format data for the chart
+        // Set inventory alerts
+        if (response.inventoryAlerts && response.inventoryAlerts.length > 0) {
+          console.log("✅ Setting inventory alerts:", response.inventoryAlerts);
+          setInventoryAlerts(response.inventoryAlerts);
+        } else {
+          console.log("⚠️ No inventory alerts found");
+          setInventoryAlerts([]);
+        }
+
+        // Set category accuracy
+        if (response.categoryAccuracy && response.categoryAccuracy.length > 0) {
+          console.log("✅ Setting category accuracy:", response.categoryAccuracy);
+          setCategoryAccuracy(response.categoryAccuracy);
+        } else {
+          console.log("⚠️ No category accuracy data");
+          setCategoryAccuracy([]);
+        }
+
+        // Format chart data from combinedData
+        const combined = response.combinedData || [];
         const formattedData = combined.map((item) => {
-          // Parse date
           let dateObj;
           try {
             dateObj = new Date(item.date);
@@ -96,7 +110,9 @@ export default function Home() {
         });
 
         console.log("✅ Formatted chart data:", formattedData.length, "points");
-        console.log("📊 Sample data point:", formattedData[0]);
+        console.log("   Actual data points:", formattedData.filter(d => d.actual !== null).length);
+        console.log("   Forecasted points:", formattedData.filter(d => d.forecasted !== null).length);
+        console.log("   Future points:", formattedData.filter(d => d.future !== null).length);
         
         setSalesData(formattedData);
         Swal.close();
@@ -105,6 +121,8 @@ export default function Home() {
       .catch(err => {
         console.error("❌ Error fetching dashboard:", err);
         setSalesData([]);
+        setInventoryAlerts([]);
+        setCategoryAccuracy([]);
         setLoading(false);
         Swal.fire({
           icon: 'error',
@@ -113,21 +131,18 @@ export default function Home() {
           confirmButtonColor: '#0a4174'
         });
       });
-  }, []);
+  };
 
-  // Static inventory & category data
-  const inventoryData = [
-    { name: "Buldak", value: 19, color: "#ff4d4f" },
-    { name: "Kimchi", value: 48, color: "#ffa940" },
-    { name: "Banana Milk", value: 82, color: "#52c41a" },
-  ];
+  // Helper function for inventory alert colors
+  const getAlertColor = (avgDailySales) => {
+    if (avgDailySales > 50) return "#ff4d4f"; // Red - HIGH
+    if (avgDailySales > 20) return "#ffa940"; // Orange - MEDIUM
+    return "#52c41a"; // Green - LOW
+  };
 
-  const categoryData = [
-    { name: "Perishable", accuracy: 80 },
-    { name: "Frozen Feed", accuracy: 75 },
-    { name: "Beverages", accuracy: 78 },
-    { name: "Shelf Stable", accuracy: 90 },
-  ];
+  const getAlertPercentage = (avgDailySales) => {
+    return Math.min(100, (avgDailySales / 100) * 100);
+  };
 
   return (
     <div>
@@ -136,10 +151,8 @@ export default function Home() {
           <div className="box sales-overview">
             <div className="box-header">
               <div className="title-header">
-              <h3 className="title-home">Sales Overview</h3>
-             <i><GoScreenFull /></i> 
-
-
+                <h3 className="title-home">Sales Overview</h3>
+                <i><GoScreenFull /></i>
               </div>
               <div className="dropdowns">
                 <select value={chartType} onChange={(e) => setChartType(e.target.value)}>
@@ -155,7 +168,7 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Show file info */}
+            {/* File info section */}
             {!loading && salesData.length > 0 && (
               <div style={{ 
                 padding: '10px 20px', 
@@ -170,92 +183,85 @@ export default function Home() {
               </div>
             )}
 
+            {/* Chart Area */}
             <div className="chart-area">
-  {loading ? (
-    <div style={{ textAlign: 'center', padding: '80px' }}>Loading dashboard data...</div>
-  ) : salesData.length === 0 ? (
-    <div style={{ textAlign: 'center', padding: '80px' }}>
-      No sales data available. Please upload data and generate forecasts.
-    </div>
-  ) : (
-    <>
-      {/* Add this state at the top with your other useState */}
-      {/* const [chartType, setChartType] = useState("line"); */}
+              {loading ? (
+                <div style={{ textAlign: 'center', padding: '80px' }}>Loading dashboard data...</div>
+              ) : salesData.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '80px' }}>
+                  No sales data available. Please upload data and generate forecasts.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={420}>
+                  {chartType === "line" ? (
+                    <LineChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                      <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
+                      <XAxis
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={90}
+                        tick={{ fontSize: 12, fill: '#64748b' }}
+                      />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          value >= 1000000
+                            ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
+                            : value >= 1000
+                            ? `₱${Math.round(value / 1000)}K`
+                            : `₱${value.toLocaleString()}`
+                        }
+                        tick={{ fontSize: 12, fill: '#64748b' }}
+                        axisLine={false}
+                        tickLine={false}
+                        domain={[0, 'dataMax + 500000']}
+                      />
+                      <Tooltip
+                        formatter={(value) => value == null ? 'No data' : `₱${Number(value).toLocaleString('en-PH')}`}
+                        labelFormatter={(label) => `Date: ${label}`}
+                        contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
+                      />
+                      <Legend wrapperStyle={{ paddingTop: '20px' }} />
 
-      {/* Add onChange to your first dropdown */}
-      {/* <select value={chartType} onChange={(e) => setChartType(e.target.value)}> */}
+                      <Line type="monotone" dataKey="actual" stroke="#16a34a" strokeWidth={4} dot={{ r: 6 }} name="Actual Sales" />
+                      <Line type="monotone" dataKey="forecasted" stroke="#3b82f6" strokeWidth={4} strokeDasharray="10 5" dot={{ r: 6 }} name="Forecasted" />
+                      <Line type="monotone" dataKey="future" stroke="#1e40af" strokeWidth={4} strokeDasharray="5 5" dot={{ r: 6 }} name="Future Forecast" />
+                    </LineChart>
+                  ) : (
+                    <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+                      <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
+                      <XAxis
+                        dataKey="name"
+                        angle={-45}
+                        textAnchor="end"
+                        height={90}
+                        tick={{ fontSize: 12, fill: '#64748b' }}
+                      />
+                      <YAxis
+                        tickFormatter={(value) =>
+                          value >= 1000000
+                            ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
+                            : value >= 1000
+                            ? `₱${Math.round(value / 1000)}K`
+                            : `₱${value.toLocaleString()}`
+                        }
+                        tick={{ fontSize: 12, fill: '#64748b' }}
+                        axisLine={false}
+                        tickLine={false}
+                      />
+                      <Tooltip formatter={(value) => `₱${Number(value).toLocaleString('en-PH')}`} />
+                      <Legend />
 
-      <ResponsiveContainer width="100%" height={420}>
-        {chartType === "line" ? (
-          <LineChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
-            <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
-            <XAxis
-              dataKey="name"
-              angle={-45}
-              textAnchor="end"
-              height={90}
-              tick={{ fontSize: 12, fill: '#64748b' }}
-            />
-            <YAxis
-              tickFormatter={(value) =>
-                value >= 1000000
-                  ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
-                  : value >= 1000
-                  ? `₱${Math.round(value / 1000)}K`
-                  : `₱${value.toLocaleString()}`
-              }
-              tick={{ fontSize: 12, fill: '#64748b' }}
-              axisLine={false}
-              tickLine={false}
-              domain={[0, 'dataMax + 500000']}
-            />
-            <Tooltip
-              formatter={(value) => value == null ? 'No data' : `₱${Number(value).toLocaleString('en-PH')}`}
-              labelFormatter={(label) => `Date: ${label}`}
-              contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px' }}
-            />
-            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                      <Bar dataKey="actual" fill="#16a34a" radius={[8, 8, 0, 0]} name="Actual Sales" />
+                      <Bar dataKey="forecasted" fill="#60a5fa" radius={[8, 8, 0, 0]} name="Forecasted" />
+                      <Bar dataKey="future" fill="#1e40af" radius={[8, 8, 0, 0]} name="Future Forecast" />
+                    </BarChart>
+                  )}
+                </ResponsiveContainer>
+              )}
+            </div>
 
-            <Line type="monotone" dataKey="actual" stroke="#16a34a" strokeWidth={4} dot={{ r: 6 }} name="Actual Sales" />
-            <Line type="monotone" dataKey="forecasted" stroke="#3b82f6" strokeWidth={4} strokeDasharray="10 5" dot={{ r: 6 }} name="Forecasted" />
-            <Line type="monotone" dataKey="future" stroke="#1e40af" strokeWidth={4} strokeDasharray="5 5" dot={{ r: 6 }} name="Future Forecast" />
-          </LineChart>
-        ) : (
-          <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
-            <CartesianGrid strokeDasharray="4 4" stroke="#e2e8f0" />
-            <XAxis
-              dataKey="name"
-              angle={-45}
-              textAnchor="end"
-              height={90}
-              tick={{ fontSize: 12, fill: '#64748b' }}
-            />
-            <YAxis
-              tickFormatter={(value) =>
-                value >= 1000000
-                  ? `₱${(value / 1000000).toFixed(1).replace('.0', '')}M`
-                  : value >= 1000
-                  ? `₱${Math.round(value / 1000)}K`
-                  : `₱${value.toLocaleString()}`
-              }
-              tick={{ fontSize: 12, fill: '#64748b' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip formatter={(value) => `₱${Number(value).toLocaleString('en-PH')}`} />
-            <Legend />
-
-            <Bar dataKey="actual" fill="#16a34a" radius={[8, 8, 0, 0]} name="Actual Sales" />
-            <Bar dataKey="forecasted" fill="#60a5fa" radius={[8, 8, 0, 0]} name="Forecasted" />
-            <Bar dataKey="future" fill="#1e40af" radius={[8, 8, 0, 0]} name="Future Forecast" />
-          </BarChart>
-        )}
-      </ResponsiveContainer>
-    </>
-  )}
-</div>
-
-            {/* Debug info - remove this in production */}
+            {/* Debug info */}
             {!loading && salesData.length > 0 && (
               <div style={{ 
                 padding: '10px 20px', 
@@ -273,49 +279,84 @@ export default function Home() {
           </div>
         </div>
 
-        {/* RIGHT SIDE */}
+        {/* RIGHT SIDE - Inventory Alerts & Category Accuracy */}
         <div className="right-side">
+          {/* Inventory Alerts */}
           <div className="box inventory-box">
             <div className="box-header">
               <h3>Inventory Alerts</h3>
               <a href="/analytics" className="view-all">View All ↗</a>
             </div>
             <div className="inventory-alerts">
-              {inventoryData.map((item, idx) => (
-                <div key={idx} className="inventory-item">
-                  <span>{item.name}</span>
-                  <div className="progress-bar">
-                    <div
-                      className="progress-fill"
-                      style={{ 
-                        width: `${item.value}%`, 
-                        backgroundColor: item.color 
-                      }}
-                    ></div>
+              {loading ? (
+                <p style={{ textAlign: 'center', padding: '20px' }}>Loading alerts...</p>
+              ) : inventoryAlerts.length === 0 ? (
+                <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                  No high-priority alerts
+                </p>
+              ) : (
+                inventoryAlerts.map((alert, idx) => (
+                  <div key={idx} className="inventory-item">
+                    <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+                      <span style={{ fontWeight: 'bold' }}>{alert.productName}</span>
+                      <span style={{ fontSize: '11px', color: '#666' }}>
+                        {alert.category} • {alert.demandLevel}
+                      </span>
+                    </div>
+                    <div className="progress-bar">
+                      <div
+                        className="progress-fill"
+                        style={{ 
+                          width: `${getAlertPercentage(alert.avgDailySales)}%`, 
+                          backgroundColor: getAlertColor(alert.avgDailySales)
+                        }}
+                      ></div>
+                    </div>
+                    <span className="value">{Math.round(alert.avgDailySales)}</span>
                   </div>
-                  <span className="value">{item.value}</span>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
+          {/* Category Accuracy */}
           <div className="box category-box">
             <div className="box-header">
               <h3>Category Accuracy</h3>
               <a href="/analytics" className="view-all">View All ↗</a>
             </div>
             <div className="chart-area">
-              <BarChart width={320} height={200} data={categoryData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip />
-                <Bar 
-                  dataKey="accuracy" 
-                  fill="#52c41a" 
-                  radius={[4, 4, 0, 0]} 
-                />
-              </BarChart>
+              {loading ? (
+                <p style={{ textAlign: 'center', padding: '60px' }}>Loading categories...</p>
+              ) : categoryAccuracy.length === 0 ? (
+                <p style={{ textAlign: 'center', padding: '60px', color: '#999' }}>
+                  No category data available
+                </p>
+              ) : (
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={categoryAccuracy}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#cbd5e1" />
+                    <XAxis 
+                      dataKey="name" 
+                      tick={{ fontSize: 11 }} 
+                      angle={-15}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 11 }} 
+                      domain={[0, 100]}
+                      label={{ value: '%', angle: -90, position: 'insideLeft' }}
+                    />
+                    <Tooltip formatter={(value) => `${value}%`} />
+                    <Bar 
+                      dataKey="accuracy" 
+                      fill="#52c41a" 
+                      radius={[4, 4, 0, 0]} 
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </div>
           </div>
         </div>
