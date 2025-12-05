@@ -38,17 +38,17 @@ def load_merged_dataset(user_id: str):
     )
     
     file_path = os.path.join(clean_path, latest_merged)
-    print(f"📂 Loading dataset: {file_path}")
+    print(f" Loading dataset: {file_path}")
     
     df = pd.read_excel(file_path)
-    print(f"✅ Loaded {len(df)} records with {df['Product_ID'].nunique()} products\n")
+    print(f" Loaded {len(df)} records with {df['Product_ID'].nunique()} products\n")
     
     return df
 
 
 def calculate_avg_unit_prices(df):
     """Calculate average unit price per product"""
-    print("💰 Calculating average unit prices per product...")
+    print(" Calculating average unit prices per product...")
     
     avg_prices = df.groupby("Product_ID").agg({
         "Product_Name": "first",
