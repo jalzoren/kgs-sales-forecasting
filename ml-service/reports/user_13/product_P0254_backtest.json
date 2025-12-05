@@ -1,0 +1,22 @@
+{
+  "product_id": "P0254",
+  "product_name": "Honey Roasted Peanuts",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 338,
+      "val_start_idx": 339,
+      "val_end_idx": 428,
+      "LSTM": {
+        "RMSE": 0.954108826089313,
+        "MAE": 0.7744815926479989,
+        "MAPE": 101.11917249694432
+      },
+      "XGB": {
+        "RMSE": 0.9560514251063432,
+        "MAE": 0.7439831203884548,
+        "MAPE": 33.23545436726676
+      }
+    }
+  ]
+}
