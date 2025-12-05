@@ -1,0 +1,22 @@
+{
+  "product_id": "P0161",
+  "product_name": "Paldo Wang Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 193,
+      "val_start_idx": 194,
+      "val_end_idx": 283,
+      "LSTM": {
+        "RMSE": 0.9672927232486159,
+        "MAE": 0.7813274914694887,
+        "MAPE": 98.5485148566412
+      },
+      "XGB": {
+        "RMSE": 1.1057516569182828,
+        "MAE": 0.8884271317058139,
+        "MAPE": 51.32886592988615
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0103",
+  "product_name": "Daerim  Chaw Stick 100g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 197,
+      "val_start_idx": 198,
+      "val_end_idx": 287,
+      "LSTM": {
+        "RMSE": 0.8393806586594763,
+        "MAE": 0.6807726841958035,
+        "MAPE": 230.97039207146165
+      },
+      "XGB": {
+        "RMSE": 1.7718768031112977,
+        "MAE": 1.3979412184821234,
+        "MAPE": 57.08580357057077
+      }
+    }
+  ]
+}
