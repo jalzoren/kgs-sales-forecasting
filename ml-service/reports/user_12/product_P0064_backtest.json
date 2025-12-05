@@ -1,0 +1,22 @@
+{
+  "product_id": "P0064",
+  "product_name": "Kimbab Radish 400g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 170,
+      "val_start_idx": 171,
+      "val_end_idx": 260,
+      "LSTM": {
+        "RMSE": 1.191682177574911,
+        "MAE": 0.9180097677693209,
+        "MAPE": 146.9816508729744
+      },
+      "XGB": {
+        "RMSE": 1.3039397128831558,
+        "MAE": 0.9869260682000054,
+        "MAPE": 57.30687972035988
+      }
+    }
+  ]
+}

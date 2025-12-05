@@ -1,0 +1,22 @@
+{
+  "product_id": "P0065",
+  "product_name": "Sempio Spicy Stir-Fried Dried Squid",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 177,
+      "val_start_idx": 178,
+      "val_end_idx": 267,
+      "LSTM": {
+        "RMSE": 1.2111705197917477,
+        "MAE": 0.9314646737401132,
+        "MAPE": 105.52780187627742
+      },
+      "XGB": {
+        "RMSE": 1.1061244324366948,
+        "MAE": 0.880663146575292,
+        "MAPE": 53.56724036402173
+      }
+    }
+  ]
+}

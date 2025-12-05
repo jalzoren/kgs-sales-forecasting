@@ -1,0 +1,22 @@
+{
+  "product_id": "P0094",
+  "product_name": "MWC Frank Sausage 5Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 134,
+      "val_start_idx": 135,
+      "val_end_idx": 224,
+      "LSTM": {
+        "RMSE": 1.0089193947392356,
+        "MAE": 0.7902616203431292,
+        "MAPE": 90.44028721457789
+      },
+      "XGB": {
+        "RMSE": 1.018758697962793,
+        "MAE": 0.8082041574849023,
+        "MAPE": 42.93959281621156
+      }
+    }
+  ]
+}

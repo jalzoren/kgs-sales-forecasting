@@ -1,4 +1,4 @@
-// controllers/dataController.js (FIXED MODEL DETECTION)
+// controllers/dataController.js (FIXED WEEKLY vs TRAINING DETECTION)
 const db = require("../config/db.js");
 const fs = require("fs");
 const path = require("path");
@@ -7,7 +7,10 @@ const PythonService = require("../services/pythonService");
 
 class DataController {
   async handleUpload(req, res) {
-    console.log("📤 Received upload request...");
+    console.log("\n" + "="*70);
+    console.log("📤 NEW UPLOAD REQUEST");
+    console.log("="*70);
+    
     const startTime = Date.now();
 
     if (!req.file) return res.status(400).json({ message: "No file uploaded" });
@@ -20,35 +23,32 @@ class DataController {
     const originalFile = req.file;
     let filePath = originalFile.path;
     let fileName = originalFile.originalname;
-    let salesID = null; 
+    let salesID = null;
 
-    console.log(`📦 File uploaded: ${fileName}`);
-    console.log(`📍 Path: ${filePath}`);
-    console.log(`👤 Uploaded by User ID: ${userId}`);
+    console.log(`📦 File: ${fileName}`);
+    console.log(`👤 User: ${userId}`);
 
     try {
-      // STEP 1️⃣: Detect & Convert if Excel
+      // STEP 1: Convert Excel to CSV if needed
       if (fileName.endsWith(".xlsx")) {
-        console.log("📘 Detected Excel file — converting to CSV...");
+        console.log("📘 Converting Excel to CSV...");
         try {
           const convertedPath = await PythonService.convertToCsv(filePath);
-
           if (!convertedPath || !fs.existsSync(convertedPath)) {
-            throw new Error("Conversion failed — cannot process Excel file");
+            throw new Error("Excel conversion failed");
           }
-
           filePath = convertedPath;
           fileName = path.basename(convertedPath);
-          console.log("✅ Conversion successful, using converted CSV for next steps");
+          console.log("✅ Converted successfully");
         } catch (convertErr) {
           console.error("❌ Excel conversion error:", convertErr);
           throw new Error(`Excel conversion failed: ${convertErr.message}`);
         }
       } else if (!fileName.endsWith(".csv")) {
-        throw new Error("Unsupported file type. Please upload CSV or XLSX only.");
+        throw new Error("Unsupported file type. Upload CSV or XLSX only.");
       }
 
-      // STEP 2️⃣: Validate file headers
+      // STEP 2: Validate headers
       try {
         SalesFileValidator.validate(filePath, fileName);
       } catch (validateErr) {
@@ -56,20 +56,20 @@ class DataController {
         throw new Error(`File validation failed: ${validateErr.message}`);
       }
 
-      // STEP 3️⃣: Count rows
+      // STEP 3: Count rows
       let rowCount;
       try {
         rowCount = await PythonService.countRows(filePath);
         if (!rowCount || rowCount === 0) {
           throw new Error("File appears to be empty or could not count rows");
         }
-        console.log(`📊 Row count: ${rowCount}`);
+        console.log(`📊 Rows: ${rowCount.toLocaleString()}`);
       } catch (countErr) {
         console.error("❌ Row counting error:", countErr);
-        throw new Error(`Failed to count rows: ${countErr.message}`);
+        throw new Error(`Row counting failed: ${countErr.message}`);
       }
 
-      // STEP 4️⃣: Check if this user already uploaded the same file
+      // STEP 4: Check if this user already uploaded the same file
       try {
         const checkSql = `SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?`;
         const existing = await new Promise((resolve, reject) => {
@@ -80,7 +80,7 @@ class DataController {
         });
 
         if (existing.length > 0) {
-          throw new Error(`A file named "${fileName}" already exists for your account.`);
+          throw new Error(`File "${fileName}" already exists for your account.`);
         }
 
         // Insert new record with "Uploaded" status (will be updated as processing progresses)
@@ -91,27 +91,27 @@ class DataController {
             resolve(results);
           });
         });
-        salesID = insertResult.insertId;  // ✅ Now properly assigned
-        console.log(`✅ Database record created with salesID: ${salesID}`);
+        salesID = insertResult.insertId;
+        console.log(`✅ Database record created (ID: ${salesID})`);
       } catch (dbErr) {
-        console.error("❌ Database error:", dbErr);
-        throw new Error(`Database operation failed: ${dbErr.message}`);
+        throw new Error(`Database error: ${dbErr.message}`);
       }
 
-      // STEP 5️⃣: Move final file to salesData folder
+      // STEP 5: Move file to salesData folder
       const finalSalesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
       if (!fs.existsSync(finalSalesDir)) fs.mkdirSync(finalSalesDir, { recursive: true });
 
       const finalFilePath = path.join(finalSalesDir, path.basename(filePath));
       if (filePath !== finalFilePath) {
         fs.renameSync(filePath, finalFilePath);
-        console.log(`📂 File moved to: ${finalFilePath}`);
+        console.log(`📂 Moved to: ${finalFilePath}`);
       }
 
       const duration = ((Date.now() - startTime) / 1000).toFixed(2);
       console.log(`🎉 Upload complete for ${fileName}`);
       console.log(`📊 Total records: ${rowCount.toLocaleString()}`);
       console.log(`⏰ Processing time: ${duration}s`);
+      console.log("="*70 + "\n");
 
       res.json({
         message: `File uploaded successfully (${rowCount.toLocaleString()} records)`,
@@ -119,15 +119,52 @@ class DataController {
         salesID: salesID,
       });
 
-      // STEP 6️⃣: Launch preprocessing asynchronously
-      // Update status to "Preprocessing"
-      this.updateUploadStatus(salesID, "Preprocessing")
-        .catch(err => console.error("Failed to update status to Preprocessing:", err));
+      // STEP 6: CRITICAL DECISION - Is this training data or weekly data?
+      const modelDir = path.resolve(__dirname, "../../ml-service/models", `user_${userId}`);
+      const modelExists = this.checkProductModelsExist(modelDir);
 
-      PythonService.preprocessData(userId)
+      console.log("\n" + "="*70);
+      console.log("🤔 UPLOAD TYPE DETECTION");
+      console.log("="*70);
+      console.log(`   Model exists: ${modelExists}`);
+      console.log(`   Row count: ${rowCount}`);
+
+      let isWeeklyUpload = false;
+
+      // Logic: If models exist AND file is small (< 5000 rows), treat as weekly
+      if (modelExists && rowCount < 5000) {
+        isWeeklyUpload = true;
+        console.log("✅ DETECTED: Weekly forecast upload");
+        console.log("   Reason: Models exist + small file size");
+      } else {
+        console.log("✅ DETECTED: Training data upload");
+        console.log("   Reason: No models yet OR large file");
+      }
+      console.log("="*70 + "\n");
+
+      // STEP 7: Launch preprocessing
+      this.updateUploadStatus(salesID, "Preprocessing")
+        .catch(err => console.error("Failed to update status:", err));
+
+      PythonService.preprocessData(userId, isWeeklyUpload)
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
 
+          // If weekly upload → generate forecast immediately
+          if (isWeeklyUpload) {
+            console.log("\n📅 Weekly upload → Generating forecast...");
+            try {
+              await PythonService.generateForecast(userId);
+              console.log("✅ Forecast generation complete!");
+              this.updateUploadStatus(salesID, "Completed");
+            } catch (forecastErr) {
+              console.error(`⚠️ Forecast failed: ${forecastErr.message}`);
+              this.updateUploadStatus(salesID, "Failed");
+            }
+            return;
+          }
+
+          // If training upload → check if we can train
           const cleanDir = path.resolve(__dirname, "../files/cleanData", `user_${userId}`);
           const processedFiles = fs
             .readdirSync(cleanDir)
@@ -137,110 +174,63 @@ class DataController {
             .readdirSync(cleanDir)
             .filter((f) => f.startsWith("merged_3yr_sales") && f.endsWith(".xlsx"));
 
-          const modelDir = path.resolve(__dirname, "../../ml-service/models", `user_${userId}`);
-          
-          // Check for product-level models
-          const modelExists = this.checkProductModelsExist(modelDir);
+          console.log(`\n📂 Training files: ${processedFiles.length}`);
+          console.log(`📂 Merged files: ${mergedFiles.length}`);
 
-          console.log(
-            `📂 Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`
-          );
-
-          // 🧩 Case 1: No model yet, but 3+ years available
+          // Train if we have 3+ years and no model yet
           if (processedFiles.length >= 3 && mergedFiles.length > 0 && !modelExists) {
             console.log(`🚀 Starting initial model training for user ${userId}...`);
-            // Update status to "Training"
-            this.updateUploadStatus(salesID, "Training")
-              .catch(err => console.error("Failed to update status to Training:", err));
+            this.updateUploadStatus(salesID, "Training");
             
             try {
               await PythonService.trainModel(userId);
-              console.log(`🎯 Model training completed successfully for user ${userId}!`);
-
-              // ✅ FIXED: Mark as completed WITHOUT generating forecast
-              // User must upload weekly sales data to trigger forecast generation
-              console.log(`✅ Models are ready! Upload weekly sales data to generate forecasts.`);
-              
-              // Update status to "Completed"
-              this.updateUploadStatus(salesID, "Completed")
-                .catch(err => console.error("Failed to update status to Completed:", err));
+              console.log("🎯 Training completed!");
+              console.log("✅ Models ready! Upload weekly sales to generate forecasts.");
+              this.updateUploadStatus(salesID, "Completed");
             } catch (trainErr) {
-              console.error(`⚠️ Training failed for user ${userId}:`, trainErr.message);
-              // Update status to "Failed"
-              this.updateUploadStatus(salesID, "Failed")
-                .catch(err => console.error("Failed to update status to Failed:", err));
+              console.error(`⚠️ Training failed: ${trainErr.message}`);
+              this.updateUploadStatus(salesID, "Failed");
             }
-            return;
+          } else {
+            this.updateUploadStatus(salesID, "Completed");
           }
-
-          // 🧩 Case 2: Model already exists — use weekly upload for new forecast
-          if (modelExists) {
-            console.log(`📅 Weekly data upload detected — generating forecast using existing model...`);
-            try {
-              await PythonService.generateForecast(userId);
-              console.log(`✅ Weekly forecast generation completed for user ${userId}!`);
-              
-              // Update status to "Completed"
-              this.updateUploadStatus(salesID, "Completed")
-                .catch(err => console.error("Failed to update status to Completed:", err));
-            } catch (forecastErr) {
-              console.error(`⚠️ Forecast generation failed for user ${userId}:`, forecastErr.message);
-              // Update status to "Failed"
-              this.updateUploadStatus(salesID, "Failed")
-                .catch(err => console.error("Failed to update status to Failed:", err));
-            }
-            return;
-          }
-
-          // If no model training needed, just mark as completed
-          this.updateUploadStatus(salesID, "Completed")
-            .catch(err => console.error("Failed to update status to Completed:", err));
-
-          console.log(`⚠️ No valid case matched for user ${userId}.`);
-          console.log(`   Processed files: ${processedFiles.length}, Merged files: ${mergedFiles.length}, Model exists: ${modelExists}`);
         })
         .catch((err) => {
-          console.error(`⚠️ Python preprocessing error: ${err.message}`);
-          // Update status to "Failed"
-          this.updateUploadStatus(salesID, "Failed")
-            .catch(updateErr => console.error("Failed to update status to Failed:", updateErr));
+          console.error(`⚠️ Preprocessing error: ${err.message}`);
+          this.updateUploadStatus(salesID, "Failed");
         });
+
     } catch (err) {
-      console.error("❌ Upload failed:", err.message);
-      console.error("   Stack:", err.stack);
-      return res.status(400).json({ 
+      console.error("\n❌ UPLOAD FAILED:");
+      console.error("   " + err.message);
+      console.error("="*70 + "\n");
+      return res.status(400).json({
         message: err.message || "Upload failed",
         error: process.env.NODE_ENV === "development" ? err.stack : undefined
       });
     }
   }
 
-  /** ✅ NEW METHOD: Update upload status in database */
   async updateUploadStatus(salesID, status) {
     if (!salesID) {
       console.warn("⚠️ Cannot update status: salesID is null/undefined");
       return;
     }
-    
+  
     try {
       const sql = `UPDATE salesdata SET status = ? WHERE salesID = ?`;
       await new Promise((resolve, reject) => {
-        db.query(sql, [status, salesID], (err, results) => {
+        db.query(sql, [status, salesID], (err) => {
           if (err) return reject(err);
-          resolve(results);
+          resolve();
         });
       });
-      console.log(`✅ Updated salesID ${salesID} status to: ${status}`);
+      console.log(`✅ Status updated: ${status}`);
     } catch (err) {
-      console.error(`❌ Failed to update status for salesID ${salesID}:`, err.message);
-      throw err;
+      console.error(`❌ Status update failed:`, err.message);
     }
   }
 
-  /**
-   * ✅ NEW METHOD: Check if product-level models exist
-   * Returns true if at least one product model directory contains both LSTM and XGBoost models
-   */
   checkProductModelsExist(modelDir) {
     try {
       if (!fs.existsSync(modelDir)) {
@@ -258,7 +248,6 @@ class DataController {
         return false;
       }
 
-      // Check if at least one product has both models
       const hasValidModels = productDirs.some((productDir) => {
         const productPath = path.join(modelDir, productDir);
         const lstmPath = path.join(productPath, "lstm_model.keras");
@@ -271,39 +260,39 @@ class DataController {
 
       return hasValidModels;
     } catch (err) {
-      console.error(`   ❌ Error checking models: ${err.message}`);
       return false;
     }
   }
 
-  async getUploads(req, res) {
-    const userId = req.session.user?.id;
+async getUploads(req, res) {
+  const userId = req.session.user?.id;
+  if (!userId) {
+    return res.status(401).json({ message: "Unauthorized: User not logged in" });
+  }
 
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized: User not logged in" });
+  const sql = "SELECT * FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC";
+
+  db.query(sql, [userId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ message: "Database error", error: err });
     }
 
-    const sql = "SELECT * FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC";
-    db.query(sql, [userId], (err, results) => {
-      if (err) {
-        console.error("❌ Database fetch error:", err);
-        return res.status(500).json({ message: "Database error", error: err });
-      }
-      
-      // ✅ Only log if explicitly requested (not during polling)
-      const isPolling = req.query.polling === "true";
-      if (!isPolling) {
-        console.log(`📡 Fetching uploaded data records...`);
-        console.log(`✅ Fetched ${results.length} upload records for user ${userId}`);
-      }
-      
-      res.json(results);
-    });
-  }
+    // Log only when not polling
+    const isPolling = req.query.polling === "true";
+    if (!isPolling) {
+      console.log(`📡 Fetching uploaded data records...`);
+      console.log(`✅ Fetched ${results.length} upload records for user ${userId}`);
+    }
+
+    // Send response ONCE
+    return res.json(results);
+  });
+}
 
   async deleteUpload(req, res) {
     const { id } = req.params;
     console.log(`🗑️ Deleting upload record ID: ${id}`);
+    
     try {
       const [record] = await new Promise((resolve, reject) => {
         db.query("SELECT userId, fileName FROM salesdata WHERE salesID = ?", [id], (err, results) => {
@@ -316,9 +305,6 @@ class DataController {
         return res.status(404).json({ message: "Record not found" });
       }
 
-      const userId = record.userId;
-      const fileName = record.fileName;
-
       await new Promise((resolve, reject) => {
         db.query("DELETE FROM salesdata WHERE salesID = ?", [id], (err) => {
           if (err) return reject(err);
@@ -326,38 +312,22 @@ class DataController {
         });
       });
 
-      const salesDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
-      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${userId}`);
+      // Delete files
+      const salesDir = path.join(__dirname, "../files/salesData", `user_${record.userId}`);
+      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${record.userId}`);
+      const weeklyDir = path.join(__dirname, "../files/weeklyData", `user_${record.userId}`);
 
-      const salesFilePath = path.join(salesDir, fileName);
-      try {
-        if (fs.existsSync(salesFilePath)) fs.unlinkSync(salesFilePath);
-      } catch (e) {
-        console.warn("⚠️ Could not delete salesData file:", salesFilePath, e.message);
-      }
-
-      const base = fileName.split(".")[0];
-      try {
-        if (fs.existsSync(cleanDir)) {
-          const files = fs.readdirSync(cleanDir);
-          files
-            .filter((f) => f.startsWith(`${base}_processed_`))
-            .forEach((f) => {
-              try {
-                fs.unlinkSync(path.join(cleanDir, f));
-              } catch (e) {
-                console.warn("⚠️ Could not delete cleanData file:", f, e.message);
-              }
-            });
+      [salesDir, cleanDir, weeklyDir].forEach(dir => {
+        try {
+          const filePath = path.join(dir, record.fileName);
+          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        } catch (e) {
+          console.warn("Could not delete file:", e.message);
         }
-      } catch (e) {
-        console.warn("⚠️ Error while deleting cleanData files:", e.message);
-      }
+      });
 
-      console.log("✅ Record and files deleted successfully!");
-      res.json({ message: "Upload and related files deleted successfully" });
+      res.json({ message: "Upload deleted successfully" });
     } catch (err) {
-      console.error("❌ Deletion error:", err);
       return res.status(500).json({ message: "Deletion failed", error: err });
     }
   }
@@ -366,7 +336,7 @@ class DataController {
     try {
       const userId = req.session.user?.id;
       if (!userId) {
-        return res.status(401).json({ message: "Unauthorized: User not logged in" });
+        return res.status(401).json({ message: "Unauthorized" });
       }
       const status = PythonService.getPreprocessStatus(userId);
       return res.json(status);
@@ -376,18 +346,14 @@ class DataController {
     }
   }
 
-  /**
-   * ✅ NEW METHOD: Get training status for frontend polling
-   * Returns the status of the most recent upload for the user
-   */
   async getTrainingStatus(req, res) {
     try {
       const userId = req.session.user?.id;
       if (!userId) {
-        return res.status(401).json({ message: "Unauthorized: User not logged in" });
+        console.error("❌ Status error:", err);
+        return res.status(401).json({ message: "Unauthorized" });
       }
 
-      // Get the most recent upload record
       const sql = `SELECT salesID, fileName, status, uploadDate 
                    FROM salesdata 
                    WHERE userId = ? 
@@ -396,20 +362,14 @@ class DataController {
       
       db.query(sql, [userId], (err, results) => {
         if (err) {
-          console.error("❌ Training status fetch error:", err);
           return res.status(500).json({ message: "Database error", error: err });
         }
 
         if (results.length === 0) {
-          return res.json({
-            status: "idle",
-            message: "No uploads found"
-          });
+          return res.json({ status: "idle", message: "No uploads found" });
         }
 
         const record = results[0];
-        
-        // Map database status to frontend-friendly response
         const statusMap = {
           "Uploaded": { status: "preprocessing", message: "Preparing data..." },
           "Preprocessing": { status: "preprocessing", message: "Processing data..." },
@@ -435,14 +395,12 @@ class DataController {
       return res.status(500).json({ message: "Failed to get training status" });
     }
   }
-  
 
-  // Add this method to DataController class (fix the SQL and logic)
   async getUserDataStatus(req, res) {
-    const userId = req.session.user?.id; // ✅ Fixed: was req.session.userId
+    const userId = req.session.user?.id;
     
     if (!userId) {
-      return res.status(401).json({ message: "Unauthorized: User not logged in" });
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
     try {
@@ -450,7 +408,6 @@ class DataController {
       
       db.query(sql, [userId], (err, uploads) => {
         if (err) {
-          console.error("❌ getUserDataStatus error:", err);
           return res.status(500).json({ message: "Database error", error: err });
         }
         
@@ -468,7 +425,6 @@ class DataController {
         });
       });
     } catch (error) {
-      console.error("❌ Error checking user data status:", error);
       res.status(500).json({ message: "Failed to check data status" });
     }
   }

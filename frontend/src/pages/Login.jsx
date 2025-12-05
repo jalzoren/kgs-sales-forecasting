@@ -2,23 +2,20 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
 
-const FORECAST_API = "http://localhost:5000/api/forecast/history";
 const LOGIN_API = "http://localhost:5000/login";
 
 const Login = () => {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
 
-  // --------------------------------------------------------
   // Countdown effect for lockout
-  // --------------------------------------------------------
   useEffect(() => {
     if (!isLocked || remainingTime <= 0) return;
 
@@ -41,9 +38,6 @@ const Login = () => {
     return `${m}:${s}`;
   };
 
-  // --------------------------------------------------------
-  // Handle login attempt
-  // --------------------------------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,6 +51,14 @@ const Login = () => {
       return;
     }
 
+    // Show loading indicator
+    Swal.fire({
+      title: "Logging in...",
+      html: "Preparing your dashboard",
+      allowOutsideClick: false,
+      didOpen: () => Swal.showLoading(),
+    });
+
     try {
       const res = await fetch(LOGIN_API, {
         method: "POST",
@@ -67,39 +69,44 @@ const Login = () => {
 
       const data = await res.json();
 
-      // ----------------------------------------------------
-      // SUCCESS
-      // ----------------------------------------------------
+      // ============================================
+      // SUCCESS - Initialize session with parallel requests
+      // ============================================
       if (res.ok) {
-        sessionStorage.setItem(
-          "forecastHistory",
-          JSON.stringify({
-            hasForecast: data.hasForecast || false,
-            time: Date.now(),
-          })
-        );
-
-        Swal.fire({
+        console.log("🔓 Login successful, initializing session...");
+        
+        // ✅ Fetch user info + forecast status in PARALLEL
+        // This takes ~500ms instead of 2-3 seconds!
+        const { forecastStatus } = await SessionManager.initializeSession();
+        
+        Swal.close();
+        
+        // Show success message
+        await Swal.fire({
           icon: "success",
           title: "Login Successful",
           text: "Welcome back!",
-          confirmButtonColor: "#001D39",
-        }).then(() => navigate("/loading-check"));
+          timer: 1500,
+          showConfirmButton: false,
+        });
 
+        // Navigate based on forecast status (instant decision - already cached!)
+        const destination = forecastStatus.hasForecast ? "/home" : "/welcome";
+        console.log(`✅ Navigating to ${destination}`);
+        navigate(destination, { replace: true });
+        
         return;
       }
 
-      // ----------------------------------------------------
+      // ============================================
       // ACCOUNT LOCKED (423)
-      // ----------------------------------------------------
+      // ============================================
       if (res.status === 423) {
         const lockSeconds = data.remainingTime || 60;
-
         setIsLocked(true);
         setRemainingTime(lockSeconds);
 
         let timerInterval;
-
         Swal.fire({
           icon: "warning",
           title: "Account Locked",
@@ -120,9 +127,9 @@ const Login = () => {
         return;
       }
 
-      // ----------------------------------------------------
+      // ============================================
       // WRONG CREDENTIALS
-      // ----------------------------------------------------
+      // ============================================
       Swal.fire({
         icon: "error",
         title: "Login Failed",
@@ -130,8 +137,7 @@ const Login = () => {
         confirmButtonColor: "#001D39",
       });
     } catch (err) {
-      console.error("Login error:", err);
-
+      console.error("❌ Login error:", err);
       Swal.fire({
         icon: "error",
         title: "Connection Error",

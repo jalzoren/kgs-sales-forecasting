@@ -1,0 +1,22 @@
+{
+  "product_id": "P0227",
+  "product_name": "CJ Beksul Beef Bulgogi Sauce 290g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 189,
+      "val_start_idx": 190,
+      "val_end_idx": 279,
+      "LSTM": {
+        "RMSE": 0.841815635070803,
+        "MAE": 0.7322500803989254,
+        "MAPE": 104.59794849959599
+      },
+      "XGB": {
+        "RMSE": 1.0174527598204621,
+        "MAE": 0.8580621123313904,
+        "MAPE": 65.61548253783474
+      }
+    }
+  ]
+}

@@ -546,4 +546,59 @@ router.get("/files/:userId", (req, res) => {
   }
 });
 
+router.get("/api/forecast/status", requireAuth, async (req, res) => {
+  try {
+    const userId = req.session.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const forecastDir = path.join(__dirname, "../files/forecastData", `user_${userId}`);
+    
+    // Quick check: does directory exist and has files?
+    if (!fs.existsSync(forecastDir)) {
+      return res.status(404).json({ 
+        forecastCount: 0,
+        hasForecast: false 
+      });
+    }
+
+    // Count valid forecast files (excluding temp files)
+    const files = fs.readdirSync(forecastDir)
+      .filter(f => f.endsWith(".xlsx") && !f.startsWith("~$"));
+    
+    if (files.length === 0) {
+      return res.status(404).json({ 
+        forecastCount: 0,
+        hasForecast: false 
+      });
+    }
+
+    // Get latest forecast info
+    const latestFile = files
+      .map(f => ({
+        name: f,
+        mtime: fs.statSync(path.join(forecastDir, f)).mtime
+      }))
+      .sort((a, b) => b.mtime - a.mtime)[0];
+
+    res.json({
+      forecastCount: files.length,
+      hasForecast: true,
+      latestForecast: {
+        fileName: latestFile.name,
+        date: latestFile.mtime
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Forecast status error:", err);
+    res.status(500).json({ 
+      message: "Failed to check forecast status",
+      error: err.message 
+    });
+  }
+});
+
 module.exports = router;

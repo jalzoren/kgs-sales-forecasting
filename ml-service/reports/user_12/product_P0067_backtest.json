@@ -1,0 +1,22 @@
+{
+  "product_id": "P0067",
+  "product_name": "Wasabi Radish Wrapper 340g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 140,
+      "val_start_idx": 141,
+      "val_end_idx": 230,
+      "LSTM": {
+        "RMSE": 1.3231701438415386,
+        "MAE": 1.0646488147372524,
+        "MAPE": 100.336836117059
+      },
+      "XGB": {
+        "RMSE": 0.9967642815988876,
+        "MAE": 0.8064923412270016,
+        "MAPE": 48.98542379670673
+      }
+    }
+  ]
+}
