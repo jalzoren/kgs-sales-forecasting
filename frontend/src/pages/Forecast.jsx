@@ -985,7 +985,7 @@ export default function Forecast() {
             />
           )}
 
-          {/* Archive Tab */}
+          {/* Archiqve Tab */}
           {activeTab === "archive" && (
             <ArchiveTab
               files={archivedFiles}
