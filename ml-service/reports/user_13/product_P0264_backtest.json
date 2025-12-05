@@ -1,0 +1,22 @@
+{
+  "product_id": "P0264",
+  "product_name": "Lotte Ghana Dark Chocolate",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 364,
+      "val_start_idx": 365,
+      "val_end_idx": 454,
+      "LSTM": {
+        "RMSE": 0.7150139550906043,
+        "MAE": 0.5945129088499926,
+        "MAPE": 107.1455840946928
+      },
+      "XGB": {
+        "RMSE": 0.8520881437453065,
+        "MAE": 0.7047491484218174,
+        "MAPE": 38.868300044978106
+      }
+    }
+  ]
+}

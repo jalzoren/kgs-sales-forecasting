@@ -1,0 +1,22 @@
+{
+  "product_id": "P0262",
+  "product_name": "Orion Custard Pineapple",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 460,
+      "val_start_idx": 461,
+      "val_end_idx": 550,
+      "LSTM": {
+        "RMSE": 0.8308055198897274,
+        "MAE": 0.6429641946288156,
+        "MAPE": 97.97607755615557
+      },
+      "XGB": {
+        "RMSE": 0.8631018971677047,
+        "MAE": 0.7064206547207302,
+        "MAPE": 33.51372259886807
+      }
+    }
+  ]
+}

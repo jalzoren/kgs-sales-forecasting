@@ -1,0 +1,22 @@
+{
+  "product_id": "P0258",
+  "product_name": "Orion Custard Choco Cake",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 389,
+      "val_start_idx": 390,
+      "val_end_idx": 479,
+      "LSTM": {
+        "RMSE": 0.8966269801109625,
+        "MAE": 0.7014900917579956,
+        "MAPE": 99.36274147782879
+      },
+      "XGB": {
+        "RMSE": 1.0949651045968702,
+        "MAE": 0.8450177881452773,
+        "MAPE": 38.72690081659449
+      }
+    }
+  ]
+}
