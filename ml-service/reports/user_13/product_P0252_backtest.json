@@ -1,0 +1,22 @@
+{
+  "product_id": "P0252",
+  "product_name": "Lotte Banana Choco Pie 12Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 997,
+      "val_start_idx": 998,
+      "val_end_idx": 1087,
+      "LSTM": {
+        "RMSE": 0.8609576448321552,
+        "MAE": 0.710406254112902,
+        "MAPE": 131.71480868582597
+      },
+      "XGB": {
+        "RMSE": 4.075855583307283,
+        "MAE": 3.3788683043585883,
+        "MAPE": 41.857528810685075
+      }
+    }
+  ]
+}
