@@ -94,7 +94,7 @@ function Navbar() {
           <NotificationBell />
           
           <button 
-            className="icon-btn-circle glass" 
+            className="settings" 
             onClick={() => setIsSettingsOpen(true)}
           >
             <IoSettingsOutline />

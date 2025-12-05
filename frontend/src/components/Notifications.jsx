@@ -1,18 +1,25 @@
-// frontend/src/components/Notifications.jsx
-import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 
 const NotificationContext = createContext();
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
   if (!context) {
-    throw new Error("useNotifications must be used within a NotificationProvider");
+    throw new Error(
+      "useNotifications must be used within a NotificationProvider"
+    );
   }
   return context;
 };
 
-const API_URL = "http://localhost:5000/api/notifications";
-
+// Format relative time (1m ago, etc.)
 const formatTime = (date) => {
   const now = new Date();
   const diff = now - date;
@@ -27,39 +34,67 @@ const formatTime = (date) => {
   return `${days}d ago`;
 };
 
-export const NotificationProvider = ({ children }) => {
-  const [notifications, setNotifications] = useState([]);
-  const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // Fetch notifications from backend
-  const fetchNotifications = useCallback(async () => {
+// Safe localStorage operations with error handling
+const safeLocalStorage = {
+  getItem: (key) => {
     try {
-      const response = await fetch(API_URL, {
-        credentials: "include",
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        const formatted = data.map((n) => ({
-          ...n,
-          timestamp: new Date(n.timestamp),
-          time: formatTime(new Date(n.timestamp)),
-        }));
-        setNotifications(formatted);
-        setHistory(formatted);
-      }
+      return localStorage.getItem(key);
     } catch (error) {
-      console.error("Error fetching notifications:", error);
-    } finally {
-      setLoading(false);
+      console.error(`Error reading from localStorage (${key}):`, error);
+      return null;
     }
-  }, []);
+  },
+  setItem: (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      console.error(`Error writing to localStorage (${key}):`, error);
+    }
+  },
+  removeItem: (key) => {
+    try {
+      localStorage.removeItem(key);
+    } catch (error) {
+      console.error(`Error removing from localStorage (${key}):`, error);
+    }
+  },
+};
 
-  // Load notifications on mount
-  useEffect(() => {
-    fetchNotifications();
-  }, [fetchNotifications]);
+export const NotificationProvider = ({ children }) => {
+  const timeoutRefs = useRef(new Map());
+
+  const reviveItems = (raw) => {
+    try {
+      const parsed = JSON.parse(raw || "[]");
+      return Array.isArray(parsed)
+        ? parsed.map((n) => {
+            const ts = n.timestamp ? new Date(n.timestamp) : new Date();
+            return {
+              ...n,
+              timestamp: ts,
+              time: formatTime(ts),
+            };
+          })
+        : [];
+    } catch (error) {
+      console.error("Error parsing notifications:", error);
+      return [];
+    }
+  };
+
+  const [notifications, setNotifications] = useState(() => {
+    const saved = safeLocalStorage.getItem("notifications");
+    return reviveItems(saved);
+  });
+
+  const [history, setHistory] = useState(() => {
+    const saved = safeLocalStorage.getItem("notificationHistory");
+    return reviveItems(saved);
+  });
+
+  const saveState = useCallback((key, value) => {
+    safeLocalStorage.setItem(key, JSON.stringify(value));
+  }, []);
 
   const typeToTitle = {
     success: "Success",
@@ -69,153 +104,316 @@ export const NotificationProvider = ({ children }) => {
     processing: "Processing",
   };
 
-  const addNotification = useCallback(async (type, message, title) => {
-    try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          type,
-          title: title || typeToTitle[type] || "Notification",
-          message,
-        }),
+  // Base function to add any notification
+  const addNotification = useCallback(
+    (type, message, title, extraProps = {}) => {
+      const newNotif = {
+        id: Date.now() + Math.random(),
+        type,
+        title: title || typeToTitle[type] || "Notification",
+        message,
+        timestamp: new Date(),
+        time: formatTime(new Date()),
+        read: false,
+        ...extraProps,
+      };
+
+      setNotifications((prev) => {
+        const updated = [newNotif, ...prev];
+        saveState("notifications", updated);
+        return updated;
       });
 
-      if (response.ok) {
-        const newNotif = await response.json();
-        const formatted = {
-          ...newNotif,
-          timestamp: new Date(newNotif.timestamp),
-          time: formatTime(new Date(newNotif.timestamp)),
-        };
-        
-        setNotifications((prev) => [formatted, ...prev]);
-        setHistory((prev) => [formatted, ...prev]);
-        return formatted.id;
+      setHistory((prev) => {
+        const updatedHistory = [newNotif, ...prev];
+        saveState("notificationHistory", updatedHistory);
+        return updatedHistory;
+      });
+
+      return newNotif.id;
+    },
+    [saveState]
+  );
+
+  // Convenience methods for different notification types
+  const showSuccess = useCallback(
+    (msg, title) => addNotification("success", msg, title),
+    [addNotification]
+  );
+
+  const showInfo = useCallback(
+    (msg, title) => addNotification("info", msg, title),
+    [addNotification]
+  );
+
+  const showWarning = useCallback(
+    (msg, title) => addNotification("warning", msg, title),
+    [addNotification]
+  );
+
+  const showError = useCallback(
+    (msg, title) => addNotification("error", msg, title),
+    [addNotification]
+  );
+
+  // Processing notification with auto-completion
+  const showProcessing = useCallback(
+    (msg, title, duration = 5000) => {
+      const id = addNotification("processing", msg, title, { progress: 0 });
+
+      // Clear any existing timeout for this ID
+      if (timeoutRefs.current.has(id)) {
+        clearTimeout(timeoutRefs.current.get(id));
       }
-    } catch (error) {
-      console.error("Error adding notification:", error);
-    }
-  }, []);
 
-  const showSuccess = useCallback((msg, title) => addNotification("success", msg, title), [addNotification]);
-  const showInfo = useCallback((msg, title) => addNotification("info", msg, title), [addNotification]);
-  const showWarning = useCallback((msg, title) => addNotification("warning", msg, title), [addNotification]);
-  const showError = useCallback((msg, title) => addNotification("error", msg, title), [addNotification]);
-
-  const showProcessing = useCallback((msg, title, duration = 5000) => {
-    const id = addNotification("processing", msg, title);
-    
-    setTimeout(async () => {
-      try {
-        await fetch(`${API_URL}/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ message: "Done Processed", type: "success" }),
+      // Set timeout to auto-complete
+      const timeoutId = setTimeout(() => {
+        updateNotification(id, {
+          type: "success",
+          message: "Processing completed",
+          time: formatTime(new Date()),
         });
-        fetchNotifications();
-      } catch (error) {
-        console.error("Error updating notification:", error);
+        timeoutRefs.current.delete(id);
+      }, duration);
+
+      timeoutRefs.current.set(id, timeoutId);
+
+      return id;
+    },
+    [addNotification]
+  );
+
+  // Progress-based processing notification
+  const showProgress = useCallback(
+    (message, initialProgress = 0, title) => {
+      return addNotification("processing", message, title, {
+        progress: initialProgress,
+      });
+    },
+    [addNotification]
+  );
+
+  // Update notification content
+  const updateNotification = useCallback(
+    (id, updates) => {
+      setNotifications((prev) => {
+        const updated = prev.map((n) =>
+          n.id === id
+            ? {
+                ...n,
+                ...updates,
+                timestamp: updates.timestamp || n.timestamp,
+                time: updates.time || formatTime(n.timestamp),
+              }
+            : n
+        );
+        saveState("notifications", updated);
+        return updated;
+      });
+
+      setHistory((prev) => {
+        const updatedHistory = prev.map((n) =>
+          n.id === id
+            ? {
+                ...n,
+                ...updates,
+                timestamp: updates.timestamp || n.timestamp,
+                time: updates.time || formatTime(n.timestamp),
+              }
+            : n
+        );
+        saveState("notificationHistory", updatedHistory);
+        return updatedHistory;
+      });
+
+      // Clear timeout if converting from processing
+      if (updates.type && updates.type !== "processing") {
+        if (timeoutRefs.current.has(id)) {
+          clearTimeout(timeoutRefs.current.get(id));
+          timeoutRefs.current.delete(id);
+        }
       }
-    }, duration);
+    },
+    [saveState]
+  );
 
-    return id;
-  }, [addNotification, fetchNotifications]);
+  // Update progress for a notification
+  const updateProgress = useCallback(
+    (id, progress) => {
+      updateNotification(id, { progress: Math.min(Math.max(progress, 0), 100) });
+    },
+    [updateNotification]
+  );
 
-  const markAsRead = useCallback(async (id) => {
-    try {
-      await fetch(`${API_URL}/${id}/read`, {
-        method: "PATCH",
-        credentials: "include",
+  // Mark single notification as read
+  const markAsRead = useCallback(
+    (id) => {
+      setNotifications((prev) => {
+        const updated = prev.map((n) =>
+          n.id === id ? { ...n, read: true } : n
+        );
+        saveState("notifications", updated);
+        return updated;
       });
-      
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-      );
-      setHistory((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-      );
-    } catch (error) {
-      console.error("Error marking as read:", error);
-    }
+
+      setHistory((prev) => {
+        const updatedHistory = prev.map((n) =>
+          n.id === id ? { ...n, read: true } : n
+        );
+        saveState("notificationHistory", updatedHistory);
+        return updatedHistory;
+      });
+    },
+    [saveState]
+  );
+
+  // Mark all notifications as read
+  const markAllAsRead = useCallback(() => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => ({ ...n, read: true }));
+      saveState("notifications", updated);
+      return updated;
+    });
+
+    setHistory((prev) => {
+      const updatedHistory = prev.map((n) => ({ ...n, read: true }));
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
+  }, [saveState]);
+
+  // Remove a notification
+  const removeNotification = useCallback(
+    (id) => {
+      // Clear any timeout associated with this notification
+      if (timeoutRefs.current.has(id)) {
+        clearTimeout(timeoutRefs.current.get(id));
+        timeoutRefs.current.delete(id);
+      }
+
+      setNotifications((prev) => {
+        const updated = prev.filter((n) => n.id !== id);
+        saveState("notifications", updated);
+        return updated;
+      });
+
+      // Keep in history
+      // If you want to remove from history too, uncomment below:
+      // setHistory((prev) => {
+      //   const updatedHistory = prev.filter((n) => n.id !== id);
+      //   saveState("notificationHistory", updatedHistory);
+      //   return updatedHistory;
+      // });
+    },
+    [saveState]
+  );
+
+  // Clear all notifications
+  const clearAll = useCallback(() => {
+    // Clear all timeouts
+    timeoutRefs.current.forEach((timeoutId) => clearTimeout(timeoutId));
+    timeoutRefs.current.clear();
+
+    setNotifications([]);
+    safeLocalStorage.removeItem("notifications");
   }, []);
 
-  const markAllAsRead = useCallback(async () => {
-    try {
-      await fetch(`${API_URL}/read-all`, {
-        method: "PATCH",
-        credentials: "include",
-      });
-      
-      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-      setHistory((prev) => prev.map((n) => ({ ...n, read: true })));
-    } catch (error) {
-      console.error("Error marking all as read:", error);
-    }
+  // Clear all history
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+    safeLocalStorage.removeItem("notificationHistory");
   }, []);
 
-  const removeNotification = useCallback(async (id) => {
-    try {
-      await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-        credentials: "include",
+  // Keep relative time updated every minute
+  const updateNotificationTimes = useCallback(() => {
+    setNotifications((prev) => {
+      const updated = prev.map((n) => {
+        const ts =
+          n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
+        return { ...n, timestamp: ts, time: formatTime(ts) };
       });
-      
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-      setHistory((prev) => prev.filter((n) => n.id !== id));
-    } catch (error) {
-      console.error("Error removing notification:", error);
-    }
-  }, []);
+      saveState("notifications", updated);
+      return updated;
+    });
 
-  const clearAll = useCallback(async () => {
-    try {
-      await fetch(API_URL, {
-        method: "DELETE",
-        credentials: "include",
+    setHistory((prev) => {
+      const updatedHistory = prev.map((n) => {
+        const ts =
+          n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp);
+        return { ...n, timestamp: ts, time: formatTime(ts) };
       });
-      
-      setNotifications([]);
-      setHistory([]);
-    } catch (error) {
-      console.error("Error clearing notifications:", error);
-    }
-  }, []);
+      saveState("notificationHistory", updatedHistory);
+      return updatedHistory;
+    });
+  }, [saveState]);
 
-  // Update times every minute
+  useEffect(() => {
+    const interval = setInterval(updateNotificationTimes, 60000);
+    return () => clearInterval(interval);
+  }, [updateNotificationTimes]);
+
+  // Auto-convert processing notifications with progress >= 100 to success
   useEffect(() => {
     const interval = setInterval(() => {
-      setNotifications((prev) =>
-        prev.map((n) => ({
-          ...n,
-          time: formatTime(n.timestamp),
-        }))
-      );
-    }, 60000);
+      setNotifications((prev) => {
+        let hasChanges = false;
+        const updated = prev.map((n) => {
+          if (
+            n.type === "processing" &&
+            typeof n.progress === "number" &&
+            n.progress >= 100
+          ) {
+            hasChanges = true;
+            return {
+              ...n,
+              type: "success",
+              message: "Processing completed",
+              time: formatTime(new Date()),
+            };
+          }
+          return n;
+        });
+
+        if (hasChanges) {
+          saveState("notifications", updated);
+        }
+        return updated;
+      });
+    }, 1000);
+
     return () => clearInterval(interval);
+  }, [saveState]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutRefs.current.forEach((timeoutId) => clearTimeout(timeoutId));
+      timeoutRefs.current.clear();
+    };
   }, []);
 
+  const contextValue = {
+    notifications,
+    history,
+    addNotification,
+    showSuccess,
+    showInfo,
+    showWarning,
+    showError,
+    showProgress,
+    showProcessing,
+    updateNotification,
+    updateProgress,
+    markAsRead,
+    markAllAsRead,
+    removeNotification,
+    clearAll,
+    clearHistory,
+    unreadCount: notifications.filter((n) => !n.read).length,
+  };
+
   return (
-    <NotificationContext.Provider
-      value={{
-        notifications,
-        history,
-        loading,
-        addNotification,
-        showSuccess,
-        showInfo,
-        showWarning,
-        showError,
-        showProcessing,
-        markAsRead,
-        markAllAsRead,
-        removeNotification,
-        clearAll,
-        unreadCount: notifications.filter((n) => !n.read).length,
-      }}
-    >
+    <NotificationContext.Provider value={contextValue}>
       {children}
     </NotificationContext.Provider>
   );

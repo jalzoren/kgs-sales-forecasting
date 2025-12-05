@@ -215,6 +215,7 @@ body{
   font-weight: 700;
   margin: 4px 0;
   color: rgba(255, 255, 255);
+  display: flex;
 }
 
 .stat-item span {
@@ -237,6 +238,7 @@ body{
 /* Optional: Add loading animation */
 .navbar-stats .value {
   transition: all 0.3s ease;
+  justify-content: center;
 }
 
 .divider {
@@ -245,18 +247,38 @@ body{
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* glass */
-.glass {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+
+/* Settings Button - matches other navbar buttons */
+.settings {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
-.icon-btn.glass {
-  transition: all 0.3s ease;
-}
-
-.icon-btn.glass:hover {
+.settings:hover {
   background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.1);
+}
+
+.settings:active {
+  transform: scale(0.95);
+}
+
+/* Optional: glass effect variant */
+.settings.glass {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.settings.glass:hover {
+  background: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);
 }

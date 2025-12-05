@@ -27,11 +27,11 @@ function Navbar2() {
           <li><NavLink to="/analytics">Analytics</NavLink></li>
         </ul>
 
-        <div className="navbar2-right">
+         <div className="navbar2-right">
           <NotificationBell />
           
           <button 
-            className="icon-btn-circle glass" 
+            className="settings" 
             onClick={() => setIsSettingsOpen(true)}
           >
             <IoSettingsOutline />
