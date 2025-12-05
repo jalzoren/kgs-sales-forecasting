@@ -1,0 +1,22 @@
+{
+  "product_id": "P0206",
+  "product_name": "Nongshim Chapagetti",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 376,
+      "val_start_idx": 377,
+      "val_end_idx": 466,
+      "LSTM": {
+        "RMSE": 1.2615625298168371,
+        "MAE": 0.9342525102509684,
+        "MAPE": 89.72749696777446
+      },
+      "XGB": {
+        "RMSE": 2.822722995294084,
+        "MAE": 2.114122003979153,
+        "MAPE": 66.0571408298835
+      }
+    }
+  ]
+}

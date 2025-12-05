@@ -1,0 +1,22 @@
+{
+  "product_id": "P0185",
+  "product_name": "Nongshim Shin Non-Frying Ramen 97g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 378,
+      "val_start_idx": 379,
+      "val_end_idx": 468,
+      "LSTM": {
+        "RMSE": 0.8965554740419288,
+        "MAE": 0.7470211318982029,
+        "MAPE": 100.64260468855682
+      },
+      "XGB": {
+        "RMSE": 1.8178793621515523,
+        "MAE": 1.4440218117502002,
+        "MAPE": 60.127054803690996
+      }
+    }
+  ]
+}

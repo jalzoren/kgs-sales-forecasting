@@ -1,0 +1,22 @@
+{
+  "product_id": "P0272",
+  "product_name": "Haitai  Sunkist Candy 125g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 343,
+      "val_start_idx": 344,
+      "val_end_idx": 433,
+      "LSTM": {
+        "RMSE": 0.7267847731368668,
+        "MAE": 0.5955439879079776,
+        "MAPE": 93.4112659102618
+      },
+      "XGB": {
+        "RMSE": 0.8483573242078382,
+        "MAE": 0.6999879638353984,
+        "MAPE": 50.446166276931756
+      }
+    }
+  ]
+}

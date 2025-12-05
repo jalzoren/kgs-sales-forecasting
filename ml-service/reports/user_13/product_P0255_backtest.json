@@ -1,0 +1,22 @@
+{
+  "product_id": "P0255",
+  "product_name": "Bibigo Crispy Seaweed Snack",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 430,
+      "val_start_idx": 431,
+      "val_end_idx": 520,
+      "LSTM": {
+        "RMSE": 1.153345097468384,
+        "MAE": 0.8233768488508219,
+        "MAPE": 101.95450450894378
+      },
+      "XGB": {
+        "RMSE": 1.3706636585783234,
+        "MAE": 1.0413463883929783,
+        "MAPE": 60.85908988354698
+      }
+    }
+  ]
+}

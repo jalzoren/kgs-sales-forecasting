@@ -1,0 +1,22 @@
+{
+  "product_id": "P0104",
+  "product_name": "Pepero Original",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 683,
+      "val_start_idx": 684,
+      "val_end_idx": 773,
+      "LSTM": {
+        "RMSE": 0.7361832061711292,
+        "MAE": 0.5507786388260592,
+        "MAPE": 185.83818942572753
+      },
+      "XGB": {
+        "RMSE": 2.246470032816226,
+        "MAE": 1.7679420365227594,
+        "MAPE": 61.20826409651902
+      }
+    }
+  ]
+}

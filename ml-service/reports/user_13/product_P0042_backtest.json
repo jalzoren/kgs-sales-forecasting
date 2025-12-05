@@ -1,0 +1,22 @@
+{
+  "product_id": "P0042",
+  "product_name": "CJ Hetbahn Brown Rice",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 203,
+      "val_start_idx": 204,
+      "val_end_idx": 293,
+      "LSTM": {
+        "RMSE": 1.6050034096786248,
+        "MAE": 1.0537044095185757,
+        "MAPE": 102.93862024128424
+      },
+      "XGB": {
+        "RMSE": 1.9701368159703518,
+        "MAE": 1.2903287914064197,
+        "MAPE": 53.1558002987236
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0126",
+  "product_name": "Woongjin Yogurt Pineapple 1.5L",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 148,
+      "val_start_idx": 149,
+      "val_end_idx": 238,
+      "LSTM": {
+        "RMSE": 1.6276833977635372,
+        "MAE": 1.1925194046708076,
+        "MAPE": 106.35760320036425
+      },
+      "XGB": {
+        "RMSE": 1.65698552671016,
+        "MAE": 1.2834348691834343,
+        "MAPE": 70.5686405411473
+      }
+    }
+  ]
+}

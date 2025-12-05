@@ -1,0 +1,22 @@
+{
+  "product_id": "P0253",
+  "product_name": "Orion Market O Brownie",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 338,
+      "val_start_idx": 339,
+      "val_end_idx": 428,
+      "LSTM": {
+        "RMSE": 0.95883494961882,
+        "MAE": 0.7410961934440208,
+        "MAPE": 99.91213955234363
+      },
+      "XGB": {
+        "RMSE": 1.148958127825187,
+        "MAE": 0.9097153822580973,
+        "MAPE": 52.550024920039704
+      }
+    }
+  ]
+}

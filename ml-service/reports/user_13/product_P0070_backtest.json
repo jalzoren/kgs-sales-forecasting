@@ -1,0 +1,22 @@
+{
+  "product_id": "P0070",
+  "product_name": "Skinless Garlic 150G",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 254,
+      "val_start_idx": 255,
+      "val_end_idx": 344,
+      "LSTM": {
+        "RMSE": 0.8811216319596277,
+        "MAE": 0.7061154801298107,
+        "MAPE": 100.11848361341168
+      },
+      "XGB": {
+        "RMSE": 1.8233172674731708,
+        "MAE": 1.3944757368829515,
+        "MAPE": 60.124551401251836
+      }
+    }
+  ]
+}

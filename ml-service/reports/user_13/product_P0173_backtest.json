@@ -1,0 +1,22 @@
+{
+  "product_id": "P0173",
+  "product_name": "Nongshim Jjapageti",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 448,
+      "val_start_idx": 449,
+      "val_end_idx": 538,
+      "LSTM": {
+        "RMSE": 0.9510302876011205,
+        "MAE": 0.767650500087365,
+        "MAPE": 96.91492984872505
+      },
+      "XGB": {
+        "RMSE": 1.875738820784917,
+        "MAE": 1.5191835681597392,
+        "MAPE": 53.87900002197289
+      }
+    }
+  ]
+}

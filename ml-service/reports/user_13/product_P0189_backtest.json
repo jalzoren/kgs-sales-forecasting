@@ -1,0 +1,22 @@
+{
+  "product_id": "P0189",
+  "product_name": "Ottogi Bodle Cheese Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 386,
+      "val_start_idx": 387,
+      "val_end_idx": 476,
+      "LSTM": {
+        "RMSE": 0.9523441343662479,
+        "MAE": 0.7291528446878912,
+        "MAPE": 98.05693806390032
+      },
+      "XGB": {
+        "RMSE": 1.9293590491516455,
+        "MAE": 1.5176257093747456,
+        "MAPE": 66.52658567203817
+      }
+    }
+  ]
+}

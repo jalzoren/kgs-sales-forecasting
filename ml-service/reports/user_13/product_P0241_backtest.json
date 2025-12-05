@@ -1,0 +1,22 @@
+{
+  "product_id": "P0241",
+  "product_name": "CJ Anchovy Sauce 500g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 275,
+      "val_start_idx": 276,
+      "val_end_idx": 365,
+      "LSTM": {
+        "RMSE": 0.7937036842619624,
+        "MAE": 0.6361677052660663,
+        "MAPE": 99.50379947317839
+      },
+      "XGB": {
+        "RMSE": 1.0447382566648573,
+        "MAE": 0.8379731138547262,
+        "MAPE": 41.402694057535236
+      }
+    }
+  ]
+}

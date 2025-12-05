@@ -1,0 +1,22 @@
+{
+  "product_id": "P0153",
+  "product_name": "Samyang Buldak Cheese Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 944,
+      "val_start_idx": 945,
+      "val_end_idx": 1034,
+      "LSTM": {
+        "RMSE": 0.988906767655282,
+        "MAE": 0.8079061915994816,
+        "MAPE": 109.61390924929593
+      },
+      "XGB": {
+        "RMSE": 2.7555047666224577,
+        "MAE": 2.2666138463550145,
+        "MAPE": 45.91309347262049
+      }
+    }
+  ]
+}

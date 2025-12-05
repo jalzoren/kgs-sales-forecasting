@@ -1,0 +1,22 @@
+{
+  "product_id": "P0261",
+  "product_name": "Lotte Choco Heim",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 346,
+      "val_start_idx": 347,
+      "val_end_idx": 436,
+      "LSTM": {
+        "RMSE": 0.9055888579154481,
+        "MAE": 0.7535094218001241,
+        "MAPE": 99.81939657863278
+      },
+      "XGB": {
+        "RMSE": 1.0264022796517402,
+        "MAE": 0.8296261615223355,
+        "MAPE": 44.89399920569526
+      }
+    }
+  ]
+}

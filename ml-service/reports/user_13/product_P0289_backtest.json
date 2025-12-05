@@ -1,0 +1,22 @@
+{
+  "product_id": "P0289",
+  "product_name": "Crown Corn Chips",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 289,
+      "val_start_idx": 290,
+      "val_end_idx": 379,
+      "LSTM": {
+        "RMSE": 1.2441093447372864,
+        "MAE": 0.9484756311047277,
+        "MAPE": 101.54626373678168
+      },
+      "XGB": {
+        "RMSE": 2.4683381108619575,
+        "MAE": 1.9781511770354376,
+        "MAPE": 67.37140345076482
+      }
+    }
+  ]
+}

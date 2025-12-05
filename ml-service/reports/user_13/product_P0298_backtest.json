@@ -1,0 +1,22 @@
+{
+  "product_id": "P0298",
+  "product_name": "Pepero White Cookie",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 627,
+      "val_start_idx": 628,
+      "val_end_idx": 717,
+      "LSTM": {
+        "RMSE": 1.0940792857350319,
+        "MAE": 0.8656744793996595,
+        "MAPE": 124.7904879866802
+      },
+      "XGB": {
+        "RMSE": 3.7024578655947984,
+        "MAE": 2.9230263339148626,
+        "MAPE": 71.36908582748507
+      }
+    }
+  ]
+}

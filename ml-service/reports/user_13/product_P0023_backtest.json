@@ -1,0 +1,22 @@
+{
+  "product_id": "P0023",
+  "product_name": "Dongwon  Luncheon Meat 340g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 258,
+      "val_start_idx": 259,
+      "val_end_idx": 348,
+      "LSTM": {
+        "RMSE": 0.9252693099271827,
+        "MAE": 0.7835880046807939,
+        "MAPE": 100.02854294395758
+      },
+      "XGB": {
+        "RMSE": 1.3802935101631433,
+        "MAE": 1.1281697889169058,
+        "MAPE": 74.0418613884184
+      }
+    }
+  ]
+}

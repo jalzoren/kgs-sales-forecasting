@@ -1,0 +1,22 @@
+{
+  "product_id": "P0163",
+  "product_name": "Samyang Buldak Rose 140g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 964,
+      "val_start_idx": 965,
+      "val_end_idx": 1054,
+      "LSTM": {
+        "RMSE": 1.0198079099441364,
+        "MAE": 0.8089099108327049,
+        "MAPE": 100.30238070386564
+      },
+      "XGB": {
+        "RMSE": 5.083562423650559,
+        "MAE": 4.091250801086426,
+        "MAPE": 45.360075460621175
+      }
+    }
+  ]
+}

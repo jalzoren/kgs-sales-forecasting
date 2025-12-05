@@ -1,0 +1,22 @@
+{
+  "product_id": "P0260",
+  "product_name": "Binch Biscuit",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 331,
+      "val_start_idx": 332,
+      "val_end_idx": 421,
+      "LSTM": {
+        "RMSE": 1.1556200193723072,
+        "MAE": 0.8489063848685283,
+        "MAPE": 100.23657261000287
+      },
+      "XGB": {
+        "RMSE": 1.218395063972934,
+        "MAE": 0.9781689173645444,
+        "MAPE": 55.6787249965222
+      }
+    }
+  ]
+}

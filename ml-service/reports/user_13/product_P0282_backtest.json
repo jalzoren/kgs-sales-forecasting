@@ -1,0 +1,22 @@
+{
+  "product_id": "P0282",
+  "product_name": "Orion Choco Boy",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 320,
+      "val_start_idx": 321,
+      "val_end_idx": 410,
+      "LSTM": {
+        "RMSE": 0.9057654840355183,
+        "MAE": 0.6958925027275664,
+        "MAPE": 102.80636826391023
+      },
+      "XGB": {
+        "RMSE": 2.053160636323836,
+        "MAE": 1.6948553760846456,
+        "MAPE": 49.83546072991017
+      }
+    }
+  ]
+}

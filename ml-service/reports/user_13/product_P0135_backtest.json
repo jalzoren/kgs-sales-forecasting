@@ -1,0 +1,22 @@
+{
+  "product_id": "P0135",
+  "product_name": "KSD Peach Rice Wine 750mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 220,
+      "val_start_idx": 221,
+      "val_end_idx": 310,
+      "LSTM": {
+        "RMSE": 1.2548184562649016,
+        "MAE": 0.9952264606885489,
+        "MAPE": 106.38902316547674
+      },
+      "XGB": {
+        "RMSE": 1.3224243888210496,
+        "MAE": 0.9778801712724897,
+        "MAPE": 52.48005844707841
+      }
+    }
+  ]
+}

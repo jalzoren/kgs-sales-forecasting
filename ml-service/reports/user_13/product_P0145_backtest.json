@@ -1,0 +1,22 @@
+{
+  "product_id": "P0145",
+  "product_name": "Binggrae Melon Soda",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 459,
+      "val_start_idx": 460,
+      "val_end_idx": 549,
+      "LSTM": {
+        "RMSE": 0.808275862966967,
+        "MAE": 0.6467081752749921,
+        "MAPE": 102.12672401615477
+      },
+      "XGB": {
+        "RMSE": 2.166945539409728,
+        "MAE": 1.7497628609339395,
+        "MAPE": 61.238749674178095
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0122",
+  "product_name": "Chamisul Original Soju",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 944,
+      "val_start_idx": 945,
+      "val_end_idx": 1034,
+      "LSTM": {
+        "RMSE": 1.1023904708699694,
+        "MAE": 0.8710522004939921,
+        "MAPE": 4684.390625820298
+      },
+      "XGB": {
+        "RMSE": 3.086130377748691,
+        "MAE": 2.475777692264981,
+        "MAPE": 50.32970274412607
+      }
+    }
+  ]
+}

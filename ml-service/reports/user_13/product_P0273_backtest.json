@@ -1,0 +1,22 @@
+{
+  "product_id": "P0273",
+  "product_name": "Haitai  Plumcandy 130g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 311,
+      "val_start_idx": 312,
+      "val_end_idx": 401,
+      "LSTM": {
+        "RMSE": 0.9594260822157346,
+        "MAE": 0.7200662125887458,
+        "MAPE": 99.80213470598318
+      },
+      "XGB": {
+        "RMSE": 1.0983311670601374,
+        "MAE": 0.8975575168927511,
+        "MAPE": 50.47749662683123
+      }
+    }
+  ]
+}

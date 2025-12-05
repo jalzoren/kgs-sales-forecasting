@@ -1,0 +1,22 @@
+{
+  "product_id": "P0270",
+  "product_name": "Samlip Custard Cream Cake",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 321,
+      "val_start_idx": 322,
+      "val_end_idx": 411,
+      "LSTM": {
+        "RMSE": 0.6820506576301416,
+        "MAE": 0.5825146498195624,
+        "MAPE": 101.97320640556495
+      },
+      "XGB": {
+        "RMSE": 0.9107291859380423,
+        "MAE": 0.7629941463470459,
+        "MAPE": 44.750532808127225
+      }
+    }
+  ]
+}

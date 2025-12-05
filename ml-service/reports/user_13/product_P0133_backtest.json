@@ -1,0 +1,22 @@
+{
+  "product_id": "P0133",
+  "product_name": "Sunhari Blueberry 360mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 179,
+      "val_start_idx": 180,
+      "val_end_idx": 269,
+      "LSTM": {
+        "RMSE": 0.9283194257293295,
+        "MAE": 0.7581966405973479,
+        "MAPE": 100.76825641939251
+      },
+      "XGB": {
+        "RMSE": 0.827361789600052,
+        "MAE": 0.6642767230669657,
+        "MAPE": 42.262486029554296
+      }
+    }
+  ]
+}

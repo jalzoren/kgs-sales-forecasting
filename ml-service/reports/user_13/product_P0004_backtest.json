@@ -1,0 +1,22 @@
+{
+  "product_id": "P0004",
+  "product_name": "O'Food Korean Chili Oil",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 654,
+      "val_start_idx": 655,
+      "val_end_idx": 744,
+      "LSTM": {
+        "RMSE": 0.6467419924768849,
+        "MAE": 0.5482497765136526,
+        "MAPE": 94.06983679237811
+      },
+      "XGB": {
+        "RMSE": 1.394108343761663,
+        "MAE": 1.1450492554240757,
+        "MAPE": 72.57573748517919
+      }
+    }
+  ]
+}

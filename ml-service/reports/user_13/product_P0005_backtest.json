@@ -1,0 +1,22 @@
+{
+  "product_id": "P0005",
+  "product_name": "Ottogi Gold Mayonnaise 300g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 689,
+      "val_start_idx": 690,
+      "val_end_idx": 779,
+      "LSTM": {
+        "RMSE": 0.6862641701046245,
+        "MAE": 0.5623619087092178,
+        "MAPE": 110.34275582707265
+      },
+      "XGB": {
+        "RMSE": 1.45685820851913,
+        "MAE": 1.2138548254966737,
+        "MAPE": 71.791255235672
+      }
+    }
+  ]
+}

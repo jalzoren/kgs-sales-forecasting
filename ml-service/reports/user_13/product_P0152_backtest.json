@@ -1,0 +1,22 @@
+{
+  "product_id": "P0152",
+  "product_name": "Samyang Buldak Original Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 868,
+      "val_start_idx": 869,
+      "val_end_idx": 958,
+      "LSTM": {
+        "RMSE": 1.1047756771410182,
+        "MAE": 0.8576700105800833,
+        "MAPE": 110.10787731487268
+      },
+      "XGB": {
+        "RMSE": 2.7362373615277624,
+        "MAE": 2.1326966749297247,
+        "MAPE": 67.84243139085125
+      }
+    }
+  ]
+}

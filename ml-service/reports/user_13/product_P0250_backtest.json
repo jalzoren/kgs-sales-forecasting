@@ -1,0 +1,22 @@
+{
+  "product_id": "P0250",
+  "product_name": "Haitai Honey Butter Almonds",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 321,
+      "val_start_idx": 322,
+      "val_end_idx": 411,
+      "LSTM": {
+        "RMSE": 1.1624859963663405,
+        "MAE": 0.8516606491838641,
+        "MAPE": 98.029727714168
+      },
+      "XGB": {
+        "RMSE": 1.3275873500125084,
+        "MAE": 0.9935136636098226,
+        "MAPE": 42.444831397798325
+      }
+    }
+  ]
+}

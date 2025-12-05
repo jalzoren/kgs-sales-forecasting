@@ -1,0 +1,22 @@
+{
+  "product_id": "P0169",
+  "product_name": "Samyang Buldak Stew Type 145g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 913,
+      "val_start_idx": 914,
+      "val_end_idx": 1003,
+      "LSTM": {
+        "RMSE": 1.2974580365744648,
+        "MAE": 0.9366441273571228,
+        "MAPE": 184.6852742023722
+      },
+      "XGB": {
+        "RMSE": 5.481709999935576,
+        "MAE": 4.268026060528225,
+        "MAPE": 79.90272922891197
+      }
+    }
+  ]
+}

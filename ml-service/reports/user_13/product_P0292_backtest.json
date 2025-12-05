@@ -1,0 +1,22 @@
+{
+  "product_id": "P0292",
+  "product_name": "Orion Goraebab Crackers",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 604,
+      "val_start_idx": 605,
+      "val_end_idx": 694,
+      "LSTM": {
+        "RMSE": 1.0183790644335495,
+        "MAE": 0.7293557614672009,
+        "MAPE": 101.96686743984185
+      },
+      "XGB": {
+        "RMSE": 2.66072803190994,
+        "MAE": 2.0968073593245613,
+        "MAPE": 58.99502202153879
+      }
+    }
+  ]
+}

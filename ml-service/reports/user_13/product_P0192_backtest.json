@@ -1,0 +1,22 @@
+{
+  "product_id": "P0192",
+  "product_name": "Nongshim Soon Veggie Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 361,
+      "val_start_idx": 362,
+      "val_end_idx": 451,
+      "LSTM": {
+        "RMSE": 1.210344315320663,
+        "MAE": 0.9848383394990458,
+        "MAPE": 107.80465085928728
+      },
+      "XGB": {
+        "RMSE": 3.013402424948746,
+        "MAE": 2.3896169583002727,
+        "MAPE": 64.02185609529565
+      }
+    }
+  ]
+}

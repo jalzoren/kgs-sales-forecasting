@@ -1,0 +1,22 @@
+{
+  "product_id": "P0199",
+  "product_name": "Paldo Koreno Shrimp Noodle",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 492,
+      "val_start_idx": 493,
+      "val_end_idx": 582,
+      "LSTM": {
+        "RMSE": 0.940574106634262,
+        "MAE": 0.6981413473039276,
+        "MAPE": 115.57889334227525
+      },
+      "XGB": {
+        "RMSE": 2.1813134346343794,
+        "MAE": 1.7164612823062473,
+        "MAPE": 54.788234032119966
+      }
+    }
+  ]
+}

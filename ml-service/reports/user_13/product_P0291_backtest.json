@@ -1,0 +1,22 @@
+{
+  "product_id": "P0291",
+  "product_name": "Crown Sando Biscuit",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 711,
+      "val_start_idx": 712,
+      "val_end_idx": 801,
+      "LSTM": {
+        "RMSE": 0.7025951377520768,
+        "MAE": 0.5296664185673724,
+        "MAPE": 2707.3480892587504
+      },
+      "XGB": {
+        "RMSE": 2.812815374481837,
+        "MAE": 2.2073301368289524,
+        "MAPE": 94.62703071877955
+      }
+    }
+  ]
+}

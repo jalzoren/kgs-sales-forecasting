@@ -1,0 +1,22 @@
+{
+  "product_id": "P0296",
+  "product_name": "Lotte Cereal Choco",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 756,
+      "val_start_idx": 757,
+      "val_end_idx": 846,
+      "LSTM": {
+        "RMSE": 1.0250799477812607,
+        "MAE": 0.7991556651613178,
+        "MAPE": 101.29400954296388
+      },
+      "XGB": {
+        "RMSE": 3.2022231229342313,
+        "MAE": 2.5850806792577106,
+        "MAPE": 87.5784115198178
+      }
+    }
+  ]
+}

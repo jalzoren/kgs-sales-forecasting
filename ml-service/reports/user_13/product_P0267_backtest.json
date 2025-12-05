@@ -1,0 +1,22 @@
+{
+  "product_id": "P0267",
+  "product_name": "Lotte Pepero White Cookie",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 395,
+      "val_start_idx": 396,
+      "val_end_idx": 485,
+      "LSTM": {
+        "RMSE": 1.041307882084815,
+        "MAE": 0.7943840317233811,
+        "MAPE": 96.05140276310466
+      },
+      "XGB": {
+        "RMSE": 1.1825418701683226,
+        "MAE": 1.0076541198624505,
+        "MAPE": 51.955803589530724
+      }
+    }
+  ]
+}

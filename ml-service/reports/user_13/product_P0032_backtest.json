@@ -1,0 +1,22 @@
+{
+  "product_id": "P0032",
+  "product_name": "Samlip Mini Kimbap",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 383,
+      "val_start_idx": 384,
+      "val_end_idx": 473,
+      "LSTM": {
+        "RMSE": 0.7712062400371764,
+        "MAE": 0.6584077354021135,
+        "MAPE": 100.91612193966559
+      },
+      "XGB": {
+        "RMSE": 0.9600662638099686,
+        "MAE": 0.770553273624844,
+        "MAPE": 56.18630401734953
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0148",
+  "product_name": "Binggrae Strawberry Milk",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 375,
+      "val_start_idx": 376,
+      "val_end_idx": 465,
+      "LSTM": {
+        "RMSE": 0.7399815840446818,
+        "MAE": 0.6181995782970907,
+        "MAPE": 123.68236054534813
+      },
+      "XGB": {
+        "RMSE": 1.965645971926348,
+        "MAE": 1.6443767759535048,
+        "MAPE": 75.16068095378775
+      }
+    }
+  ]
+}

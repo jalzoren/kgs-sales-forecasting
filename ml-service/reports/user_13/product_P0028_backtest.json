@@ -1,0 +1,22 @@
+{
+  "product_id": "P0028",
+  "product_name": "CJ Bibigo Seaweed Soup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 393,
+      "val_start_idx": 394,
+      "val_end_idx": 483,
+      "LSTM": {
+        "RMSE": 0.8971034184743039,
+        "MAE": 0.687659681993824,
+        "MAPE": 102.2738645016084
+      },
+      "XGB": {
+        "RMSE": 0.9868261719877592,
+        "MAE": 0.800914818710751,
+        "MAPE": 43.11214929219907
+      }
+    }
+  ]
+}

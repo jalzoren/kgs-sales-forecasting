@@ -1,0 +1,22 @@
+{
+  "product_id": "P0027",
+  "product_name": "Yopokki Cheese 240g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 959,
+      "val_start_idx": 960,
+      "val_end_idx": 1049,
+      "LSTM": {
+        "RMSE": 0.8693824916913793,
+        "MAE": 0.7000578077707313,
+        "MAPE": 96.30332157902883
+      },
+      "XGB": {
+        "RMSE": 2.647173526104351,
+        "MAE": 2.0746742645899454,
+        "MAPE": 53.860201164604625
+      }
+    }
+  ]
+}

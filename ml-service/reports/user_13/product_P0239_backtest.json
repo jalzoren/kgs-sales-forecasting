@@ -1,0 +1,22 @@
+{
+  "product_id": "P0239",
+  "product_name": "Ottogi Curry Hot",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 195,
+      "val_start_idx": 196,
+      "val_end_idx": 285,
+      "LSTM": {
+        "RMSE": 0.9124374851242342,
+        "MAE": 0.7356985778203164,
+        "MAPE": 100.19417085634379
+      },
+      "XGB": {
+        "RMSE": 0.8948877855799303,
+        "MAE": 0.7281796779897478,
+        "MAPE": 47.787589819343005
+      }
+    }
+  ]
+}

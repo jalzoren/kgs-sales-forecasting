@@ -1,0 +1,22 @@
+{
+  "product_id": "P0001",
+  "product_name": "Ottogi Sesame Oil 500mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 324,
+      "val_start_idx": 325,
+      "val_end_idx": 414,
+      "LSTM": {
+        "RMSE": 1.0446806426076822,
+        "MAE": 0.7426580483915962,
+        "MAPE": 86.69075120957366
+      },
+      "XGB": {
+        "RMSE": 0.40427131644784275,
+        "MAE": 0.27948138382699755,
+        "MAPE": 20.918927038157427
+      }
+    }
+  ]
+}

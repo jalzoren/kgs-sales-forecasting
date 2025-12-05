@@ -1,0 +1,22 @@
+{
+  "product_id": "P0284",
+  "product_name": "Kkokal Sweet Corn Snack",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 360,
+      "val_start_idx": 361,
+      "val_end_idx": 450,
+      "LSTM": {
+        "RMSE": 1.052589197489989,
+        "MAE": 0.8536372506431631,
+        "MAPE": 100.82905006458205
+      },
+      "XGB": {
+        "RMSE": 2.321365889358193,
+        "MAE": 1.8292069991429647,
+        "MAPE": 68.00358175643652
+      }
+    }
+  ]
+}

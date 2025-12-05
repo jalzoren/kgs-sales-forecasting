@@ -1,0 +1,22 @@
+{
+  "product_id": "P0043",
+  "product_name": "CJ Hetbahn Cooked Barley",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 209,
+      "val_start_idx": 210,
+      "val_end_idx": 299,
+      "LSTM": {
+        "RMSE": 0.970945641424331,
+        "MAE": 0.7619858080576887,
+        "MAPE": 95.94501067885402
+      },
+      "XGB": {
+        "RMSE": 1.1386018327721816,
+        "MAE": 0.8238159113460117,
+        "MAPE": 48.33268656333288
+      }
+    }
+  ]
+}

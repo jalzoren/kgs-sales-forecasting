@@ -1,0 +1,22 @@
+{
+  "product_id": "P0150",
+  "product_name": "Samyang Buldak Ros\u00e3 Ramen 105g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 823,
+      "val_start_idx": 824,
+      "val_end_idx": 913,
+      "LSTM": {
+        "RMSE": 0.9604370199069056,
+        "MAE": 0.7835551039593278,
+        "MAPE": 103.98493654681766
+      },
+      "XGB": {
+        "RMSE": 1.9085536437132076,
+        "MAE": 1.5089118825064765,
+        "MAPE": 49.97801392003873
+      }
+    }
+  ]
+}

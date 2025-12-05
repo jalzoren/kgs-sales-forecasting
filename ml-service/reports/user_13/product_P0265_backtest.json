@@ -1,0 +1,22 @@
+{
+  "product_id": "P0265",
+  "product_name": "Orion Almond Candy",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 365,
+      "val_start_idx": 366,
+      "val_end_idx": 455,
+      "LSTM": {
+        "RMSE": 0.7027155428521284,
+        "MAE": 0.5903490647169344,
+        "MAPE": 109.70773785572467
+      },
+      "XGB": {
+        "RMSE": 1.1289570623028076,
+        "MAE": 0.9295850767029656,
+        "MAPE": 61.53414613670773
+      }
+    }
+  ]
+}

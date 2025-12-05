@@ -1,0 +1,22 @@
+{
+  "product_id": "P0024",
+  "product_name": "O'Food Kimchi Soup Mix",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 325,
+      "val_start_idx": 326,
+      "val_end_idx": 415,
+      "LSTM": {
+        "RMSE": 1.011341356540905,
+        "MAE": 0.7894497639364904,
+        "MAPE": 98.61512111795675
+      },
+      "XGB": {
+        "RMSE": 1.0351733456659027,
+        "MAE": 0.7949442631668515,
+        "MAPE": 43.723370043058246
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0146",
+  "product_name": "Binggrae Yogurt Drink",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 449,
+      "val_start_idx": 450,
+      "val_end_idx": 539,
+      "LSTM": {
+        "RMSE": 1.1885606650089817,
+        "MAE": 0.9079252809265742,
+        "MAPE": 106.95312419580682
+      },
+      "XGB": {
+        "RMSE": 2.4557883113287846,
+        "MAE": 1.8497661696539984,
+        "MAPE": 59.45855165334548
+      }
+    }
+  ]
+}

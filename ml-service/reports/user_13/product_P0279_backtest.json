@@ -1,0 +1,22 @@
+{
+  "product_id": "P0279",
+  "product_name": "Orion O! Karto Sweet Corn",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 362,
+      "val_start_idx": 363,
+      "val_end_idx": 452,
+      "LSTM": {
+        "RMSE": 0.8052184834716927,
+        "MAE": 0.628817573137178,
+        "MAPE": 99.82684593483492
+      },
+      "XGB": {
+        "RMSE": 1.868526583503075,
+        "MAE": 1.4506090349621243,
+        "MAPE": 47.00993292477337
+      }
+    }
+  ]
+}

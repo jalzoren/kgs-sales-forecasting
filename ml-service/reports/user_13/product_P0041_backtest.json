@@ -1,0 +1,22 @@
+{
+  "product_id": "P0041",
+  "product_name": "CJ Hetbahn Multi-Grain Rice",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 254,
+      "val_start_idx": 255,
+      "val_end_idx": 344,
+      "LSTM": {
+        "RMSE": 1.037625405322921,
+        "MAE": 0.7745562298538673,
+        "MAPE": 100.23178961260413
+      },
+      "XGB": {
+        "RMSE": 1.0360724774687715,
+        "MAE": 0.8389540321297115,
+        "MAPE": 50.97486460797581
+      }
+    }
+  ]
+}

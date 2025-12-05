@@ -1,0 +1,22 @@
+{
+  "product_id": "P0200",
+  "product_name": "Paldo Koreno Kimchi Noodle",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 480,
+      "val_start_idx": 481,
+      "val_end_idx": 570,
+      "LSTM": {
+        "RMSE": 0.8185455660443715,
+        "MAE": 0.6529891740880434,
+        "MAPE": 92.51185906318364
+      },
+      "XGB": {
+        "RMSE": 1.6607951107432555,
+        "MAE": 1.300227117538452,
+        "MAPE": 54.49167435951334
+      }
+    }
+  ]
+}

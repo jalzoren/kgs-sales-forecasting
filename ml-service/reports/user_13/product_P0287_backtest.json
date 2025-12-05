@@ -1,0 +1,22 @@
+{
+  "product_id": "P0287",
+  "product_name": "Nongshim Banana Kick 75g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 440,
+      "val_start_idx": 441,
+      "val_end_idx": 530,
+      "LSTM": {
+        "RMSE": 1.0032195159979715,
+        "MAE": 0.7592049702434256,
+        "MAPE": 100.38544779024157
+      },
+      "XGB": {
+        "RMSE": 2.363944623681105,
+        "MAE": 1.94466266102261,
+        "MAPE": 63.111684072729815
+      }
+    }
+  ]
+}

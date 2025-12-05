@@ -1,0 +1,22 @@
+{
+  "product_id": "P0237",
+  "product_name": "O'Food Tteokbokki Sauce",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 140,
+      "val_start_idx": 141,
+      "val_end_idx": 230,
+      "LSTM": {
+        "RMSE": 1.117546383482695,
+        "MAE": 0.8731654291350334,
+        "MAPE": 100.62805878345014
+      },
+      "XGB": {
+        "RMSE": 1.3196253139860818,
+        "MAE": 1.0662695308526358,
+        "MAPE": 66.1015519698461
+      }
+    }
+  ]
+}

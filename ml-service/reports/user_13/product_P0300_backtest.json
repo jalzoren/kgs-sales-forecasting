@@ -1,0 +1,22 @@
+{
+  "product_id": "P0300",
+  "product_name": "Can Choco Balls",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 636,
+      "val_start_idx": 637,
+      "val_end_idx": 726,
+      "LSTM": {
+        "RMSE": 1.0367386131310723,
+        "MAE": 0.7131299860429626,
+        "MAPE": 102.65115016593775
+      },
+      "XGB": {
+        "RMSE": 2.6851227653529652,
+        "MAE": 1.9697960456212362,
+        "MAPE": 40.56242983261358
+      }
+    }
+  ]
+}

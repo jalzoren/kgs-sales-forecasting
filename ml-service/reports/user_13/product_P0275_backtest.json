@@ -1,0 +1,22 @@
+{
+  "product_id": "P0275",
+  "product_name": "Haitai Sweet Potato Snack",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 376,
+      "val_start_idx": 377,
+      "val_end_idx": 466,
+      "LSTM": {
+        "RMSE": 0.8091993198975072,
+        "MAE": 0.6692089372490263,
+        "MAPE": 110.70982286953198
+      },
+      "XGB": {
+        "RMSE": 1.0140059111995896,
+        "MAE": 0.8353349328041076,
+        "MAPE": 47.976507451799186
+      }
+    }
+  ]
+}

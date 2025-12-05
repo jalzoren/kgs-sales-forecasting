@@ -1,0 +1,22 @@
+{
+  "product_id": "P0128",
+  "product_name": "Chamiseul Fresh 360mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 161,
+      "val_start_idx": 162,
+      "val_end_idx": 251,
+      "LSTM": {
+        "RMSE": 1.0266470697130077,
+        "MAE": 0.831825830263557,
+        "MAPE": 97.99950302662229
+      },
+      "XGB": {
+        "RMSE": 1.0866170519851444,
+        "MAE": 0.8703236076566908,
+        "MAPE": 43.706259191036224
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0020",
+  "product_name": "CJ Beksul Hotteok Mix",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 250,
+      "val_start_idx": 251,
+      "val_end_idx": 340,
+      "LSTM": {
+        "RMSE": 0.9456194787849636,
+        "MAE": 0.7544710873205269,
+        "MAPE": 100.70473830729128
+      },
+      "XGB": {
+        "RMSE": 0.950085830929263,
+        "MAE": 0.7344115058581034,
+        "MAPE": 42.67583421424583
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0178",
+  "product_name": "Samyang Mala Buldak",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 444,
+      "val_start_idx": 445,
+      "val_end_idx": 534,
+      "LSTM": {
+        "RMSE": 0.9115021771510009,
+        "MAE": 0.6923477683159667,
+        "MAPE": 110.77445270333943
+      },
+      "XGB": {
+        "RMSE": 2.290124309680846,
+        "MAE": 1.841035278638204,
+        "MAPE": 68.96853958887608
+      }
+    }
+  ]
+}

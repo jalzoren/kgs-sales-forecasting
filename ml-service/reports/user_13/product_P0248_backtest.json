@@ -1,0 +1,22 @@
+{
+  "product_id": "P0248",
+  "product_name": "Choco Pie Black Sugar 12Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 991,
+      "val_start_idx": 992,
+      "val_end_idx": 1081,
+      "LSTM": {
+        "RMSE": 1.1506162272640263,
+        "MAE": 0.9535699073394976,
+        "MAPE": 177.22263537504028
+      },
+      "XGB": {
+        "RMSE": 5.524983913827989,
+        "MAE": 4.297994666629368,
+        "MAPE": 39.126879107378834
+      }
+    }
+  ]
+}

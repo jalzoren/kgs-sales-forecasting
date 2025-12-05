@@ -1,0 +1,22 @@
+{
+  "product_id": "P0003",
+  "product_name": "Sempio Sesame Oil",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 577,
+      "val_start_idx": 578,
+      "val_end_idx": 667,
+      "LSTM": {
+        "RMSE": 0.9246181120710915,
+        "MAE": 0.7182947709030261,
+        "MAPE": 102.11389917941982
+      },
+      "XGB": {
+        "RMSE": 1.371919872678518,
+        "MAE": 1.0456034872266982,
+        "MAPE": 41.824424317904885
+      }
+    }
+  ]
+}

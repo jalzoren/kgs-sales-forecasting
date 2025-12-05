@@ -1,0 +1,22 @@
+{
+  "product_id": "P0268",
+  "product_name": "Samlip Walnut Pie",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 326,
+      "val_start_idx": 327,
+      "val_end_idx": 416,
+      "LSTM": {
+        "RMSE": 1.3069767901938765,
+        "MAE": 0.9314455410100508,
+        "MAPE": 96.41206385389472
+      },
+      "XGB": {
+        "RMSE": 1.3935581965839186,
+        "MAE": 1.0174503988689847,
+        "MAPE": 43.6535467178523
+      }
+    }
+  ]
+}

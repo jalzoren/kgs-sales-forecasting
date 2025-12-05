@@ -1,0 +1,22 @@
+{
+  "product_id": "P0286",
+  "product_name": "Crown Caramel Maple Corn",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 343,
+      "val_start_idx": 344,
+      "val_end_idx": 433,
+      "LSTM": {
+        "RMSE": 1.217027716922699,
+        "MAE": 0.9775174031528805,
+        "MAPE": 102.35414405702845
+      },
+      "XGB": {
+        "RMSE": 2.5865336298956274,
+        "MAE": 2.0820386701160007,
+        "MAPE": 78.6474697807574
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0238",
+  "product_name": "Ottogi Curry Mild",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 146,
+      "val_start_idx": 147,
+      "val_end_idx": 236,
+      "LSTM": {
+        "RMSE": 1.110227450905988,
+        "MAE": 0.8822396325798831,
+        "MAPE": 99.69363195453084
+      },
+      "XGB": {
+        "RMSE": 1.2928074155517852,
+        "MAE": 1.0313346889283923,
+        "MAPE": 57.895295487509834
+      }
+    }
+  ]
+}

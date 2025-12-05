@@ -1,0 +1,22 @@
+{
+  "product_id": "P0151",
+  "product_name": "Samyang Buldak 4 Cheese Ramen 110g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 885,
+      "val_start_idx": 886,
+      "val_end_idx": 975,
+      "LSTM": {
+        "RMSE": 0.6975964567004962,
+        "MAE": 0.5525928417224404,
+        "MAPE": 122.03699203233577
+      },
+      "XGB": {
+        "RMSE": 2.0053133949516764,
+        "MAE": 1.5935485164324443,
+        "MAPE": 41.45081882628183
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0211",
+  "product_name": "Ottogi Jin Ramen Hot",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 901,
+      "val_start_idx": 902,
+      "val_end_idx": 991,
+      "LSTM": {
+        "RMSE": 1.1480077021319033,
+        "MAE": 0.923602723748482,
+        "MAPE": 118.06058784424684
+      },
+      "XGB": {
+        "RMSE": 4.288847569668886,
+        "MAE": 3.5229916095733644,
+        "MAPE": 58.00345679429147
+      }
+    }
+  ]
+}

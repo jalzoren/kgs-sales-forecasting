@@ -1,0 +1,22 @@
+{
+  "product_id": "P0259",
+  "product_name": "Nongshim Sengseng U-Dong",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 401,
+      "val_start_idx": 402,
+      "val_end_idx": 491,
+      "LSTM": {
+        "RMSE": 1.1135970718897352,
+        "MAE": 0.765376644554219,
+        "MAPE": 99.8426044745607
+      },
+      "XGB": {
+        "RMSE": 1.4092964282004021,
+        "MAE": 0.9484770860936906,
+        "MAPE": 44.749442591383826
+      }
+    }
+  ]
+}

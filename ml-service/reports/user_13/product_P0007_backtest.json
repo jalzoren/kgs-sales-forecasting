@@ -1,0 +1,22 @@
+{
+  "product_id": "P0007",
+  "product_name": "Samyang Spicy Mayo",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 637,
+      "val_start_idx": 638,
+      "val_end_idx": 727,
+      "LSTM": {
+        "RMSE": 1.1492406506781125,
+        "MAE": 0.9301729813504058,
+        "MAPE": 113.57479499432013
+      },
+      "XGB": {
+        "RMSE": 2.1417337394353617,
+        "MAE": 1.5530047880278692,
+        "MAPE": 43.94692291774982
+      }
+    }
+  ]
+}

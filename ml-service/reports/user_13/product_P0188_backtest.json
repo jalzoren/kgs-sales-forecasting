@@ -1,0 +1,22 @@
+{
+  "product_id": "P0188",
+  "product_name": "Nagasaki Jjampong",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 343,
+      "val_start_idx": 344,
+      "val_end_idx": 433,
+      "LSTM": {
+        "RMSE": 0.9657328574574761,
+        "MAE": 0.7653633256088412,
+        "MAPE": 100.31037586712657
+      },
+      "XGB": {
+        "RMSE": 1.9209384509369372,
+        "MAE": 1.5311600340737237,
+        "MAPE": 59.930195043326684
+      }
+    }
+  ]
+}

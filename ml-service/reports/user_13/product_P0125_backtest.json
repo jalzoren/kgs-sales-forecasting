@@ -1,0 +1,22 @@
+{
+  "product_id": "P0125",
+  "product_name": "Jinro Fresh Soju",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 888,
+      "val_start_idx": 889,
+      "val_end_idx": 978,
+      "LSTM": {
+        "RMSE": 1.173835011409736,
+        "MAE": 0.9666740061898997,
+        "MAPE": 126.5547605427966
+      },
+      "XGB": {
+        "RMSE": 2.3349554066694993,
+        "MAE": 1.8421478231747945,
+        "MAPE": 51.18566017802435
+      }
+    }
+  ]
+}

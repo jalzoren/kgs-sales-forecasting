@@ -1,0 +1,22 @@
+{
+  "product_id": "P0175",
+  "product_name": "Samyang Jjajang Hot Chicken",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 508,
+      "val_start_idx": 509,
+      "val_end_idx": 598,
+      "LSTM": {
+        "RMSE": 1.1288444470723302,
+        "MAE": 0.8219985924296356,
+        "MAPE": 114.5225051435294
+      },
+      "XGB": {
+        "RMSE": 2.423551653437183,
+        "MAE": 1.9292173226674398,
+        "MAPE": 59.890395346068445
+      }
+    }
+  ]
+}

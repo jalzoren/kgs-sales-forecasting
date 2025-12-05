@@ -1,0 +1,22 @@
+{
+  "product_id": "P0037",
+  "product_name": "Ottogi Cup Spaghetti",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 277,
+      "val_start_idx": 278,
+      "val_end_idx": 367,
+      "LSTM": {
+        "RMSE": 1.0860424775023496,
+        "MAE": 0.8815610744981673,
+        "MAPE": 97.80928620269572
+      },
+      "XGB": {
+        "RMSE": 1.0416202354815538,
+        "MAE": 0.8381804744402568,
+        "MAPE": 45.854164807884786
+      }
+    }
+  ]
+}

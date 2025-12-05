@@ -1,0 +1,22 @@
+{
+  "product_id": "P0280",
+  "product_name": "Nongshim Potato Sticks",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 515,
+      "val_start_idx": 516,
+      "val_end_idx": 605,
+      "LSTM": {
+        "RMSE": 0.9710705677564242,
+        "MAE": 0.7275106225157982,
+        "MAPE": 112.69009639515527
+      },
+      "XGB": {
+        "RMSE": 2.1938507383381243,
+        "MAE": 1.7208452290958829,
+        "MAPE": 69.66078205357908
+      }
+    }
+  ]
+}

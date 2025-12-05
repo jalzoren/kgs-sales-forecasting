@@ -1,0 +1,22 @@
+{
+  "product_id": "P0181",
+  "product_name": "Paldo Bibim Cold Noodles",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 371,
+      "val_start_idx": 372,
+      "val_end_idx": 461,
+      "LSTM": {
+        "RMSE": 1.0392741555540899,
+        "MAE": 0.7411180378803882,
+        "MAPE": 202.50446146052283
+      },
+      "XGB": {
+        "RMSE": 2.5853247388897613,
+        "MAE": 1.9178901222017077,
+        "MAPE": 62.52264124375889
+      }
+    }
+  ]
+}

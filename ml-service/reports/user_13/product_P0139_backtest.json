@@ -1,0 +1,22 @@
+{
+  "product_id": "P0139",
+  "product_name": "Paldo Pororo Juice",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 516,
+      "val_start_idx": 517,
+      "val_end_idx": 606,
+      "LSTM": {
+        "RMSE": 0.7983708442576783,
+        "MAE": 0.6084423963050759,
+        "MAPE": 119.1574367079725
+      },
+      "XGB": {
+        "RMSE": 1.9340849585356616,
+        "MAE": 1.5292493065198263,
+        "MAPE": 47.82226584965557
+      }
+    }
+  ]
+}

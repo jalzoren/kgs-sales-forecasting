@@ -1,0 +1,22 @@
+{
+  "product_id": "P0031",
+  "product_name": "Yopokki Cheese Cup 120g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 945,
+      "val_start_idx": 946,
+      "val_end_idx": 1035,
+      "LSTM": {
+        "RMSE": 1.280178498522287,
+        "MAE": 0.9931870126108282,
+        "MAPE": 126.22199990200716
+      },
+      "XGB": {
+        "RMSE": 4.798648124382437,
+        "MAE": 3.4828003194597033,
+        "MAPE": 38.596282299130564
+      }
+    }
+  ]
+}

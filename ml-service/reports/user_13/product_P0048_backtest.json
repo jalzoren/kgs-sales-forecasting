@@ -1,0 +1,22 @@
+{
+  "product_id": "P0048",
+  "product_name": "Dongwon Light Tuna",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 623,
+      "val_start_idx": 624,
+      "val_end_idx": 713,
+      "LSTM": {
+        "RMSE": 1.1498942803873158,
+        "MAE": 0.7636006309767541,
+        "MAPE": 89.73917297192598
+      },
+      "XGB": {
+        "RMSE": 3.046759756445789,
+        "MAE": 2.2485914760165744,
+        "MAPE": 60.09162380579366
+      }
+    }
+  ]
+}

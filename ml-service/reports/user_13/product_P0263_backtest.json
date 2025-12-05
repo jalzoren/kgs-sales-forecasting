@@ -1,0 +1,22 @@
+{
+  "product_id": "P0263",
+  "product_name": "Samlip Honey Castella",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 397,
+      "val_start_idx": 398,
+      "val_end_idx": 487,
+      "LSTM": {
+        "RMSE": 0.7192908067232454,
+        "MAE": 0.5865879542735802,
+        "MAPE": 100.94650675140697
+      },
+      "XGB": {
+        "RMSE": 0.9370409379322358,
+        "MAE": 0.7491298933823903,
+        "MAPE": 46.48799815001311
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0176",
+  "product_name": "Ottogi Cheese Bokki Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 487,
+      "val_start_idx": 488,
+      "val_end_idx": 577,
+      "LSTM": {
+        "RMSE": 0.7424350978900925,
+        "MAE": 0.6131059104515958,
+        "MAPE": 113.98657899853248
+      },
+      "XGB": {
+        "RMSE": 1.734781323526614,
+        "MAE": 1.3412454975975885,
+        "MAPE": 61.06838100418847
+      }
+    }
+  ]
+}

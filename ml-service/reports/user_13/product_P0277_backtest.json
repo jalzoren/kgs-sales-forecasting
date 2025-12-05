@@ -1,0 +1,22 @@
+{
+  "product_id": "P0277",
+  "product_name": "Orion Turtle Chips Sweet Corn",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 293,
+      "val_start_idx": 294,
+      "val_end_idx": 383,
+      "LSTM": {
+        "RMSE": 0.9152606416480955,
+        "MAE": 0.7025716741584471,
+        "MAPE": 101.03464896237753
+      },
+      "XGB": {
+        "RMSE": 1.8332512149809368,
+        "MAE": 1.4056698269314236,
+        "MAPE": 49.31075156646717
+      }
+    }
+  ]
+}

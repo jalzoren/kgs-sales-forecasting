@@ -1,0 +1,22 @@
+{
+  "product_id": "P0142",
+  "product_name": "Nongshim Welchs White Grape 355mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 386,
+      "val_start_idx": 387,
+      "val_end_idx": 476,
+      "LSTM": {
+        "RMSE": 1.352195609145534,
+        "MAE": 0.9785925798187743,
+        "MAPE": 96.30400890077672
+      },
+      "XGB": {
+        "RMSE": 3.244646427139497,
+        "MAE": 2.4355426682366264,
+        "MAPE": 75.45365462505923
+      }
+    }
+  ]
+}

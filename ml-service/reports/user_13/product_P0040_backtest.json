@@ -1,0 +1,22 @@
+{
+  "product_id": "P0040",
+  "product_name": "Ottogi Sweet Corn 340g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 323,
+      "val_start_idx": 324,
+      "val_end_idx": 413,
+      "LSTM": {
+        "RMSE": 1.1177022303924806,
+        "MAE": 0.8517616462545848,
+        "MAPE": 101.48507582082142
+      },
+      "XGB": {
+        "RMSE": 1.0973208925267983,
+        "MAE": 0.8568414118554857,
+        "MAPE": 43.3943374566931
+      }
+    }
+  ]
+}

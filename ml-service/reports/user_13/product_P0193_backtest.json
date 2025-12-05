@@ -1,0 +1,22 @@
+{
+  "product_id": "P0193",
+  "product_name": "Paldo Gomtang Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 390,
+      "val_start_idx": 391,
+      "val_end_idx": 480,
+      "LSTM": {
+        "RMSE": 0.8003540927869089,
+        "MAE": 0.5741518933403557,
+        "MAPE": 110.46686646512687
+      },
+      "XGB": {
+        "RMSE": 2.150062144949098,
+        "MAE": 1.5732367873191833,
+        "MAPE": 57.71957287021478
+      }
+    }
+  ]
+}

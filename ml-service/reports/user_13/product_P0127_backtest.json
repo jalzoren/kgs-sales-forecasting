@@ -1,0 +1,22 @@
+{
+  "product_id": "P0127",
+  "product_name": "Lets Be Mild Coffee Can 4Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 149,
+      "val_start_idx": 150,
+      "val_end_idx": 239,
+      "LSTM": {
+        "RMSE": 0.9260882311860505,
+        "MAE": 0.7524598952034479,
+        "MAPE": 95.50242484794309
+      },
+      "XGB": {
+        "RMSE": 1.1701466421381417,
+        "MAE": 0.9236938820944892,
+        "MAPE": 60.419710022431836
+      }
+    }
+  ]
+}

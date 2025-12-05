@@ -1,0 +1,22 @@
+{
+  "product_id": "P0072",
+  "product_name": "Kongsarang Soft Tofu",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 286,
+      "val_start_idx": 287,
+      "val_end_idx": 376,
+      "LSTM": {
+        "RMSE": 0.728231459400477,
+        "MAE": 0.6112846842203762,
+        "MAPE": 98.89048381014679
+      },
+      "XGB": {
+        "RMSE": 1.5373017595855902,
+        "MAE": 1.2181865519947477,
+        "MAPE": 55.406406774407344
+      }
+    }
+  ]
+}

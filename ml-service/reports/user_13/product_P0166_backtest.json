@@ -1,0 +1,22 @@
+{
+  "product_id": "P0166",
+  "product_name": "Samyang Buldak Original",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 938,
+      "val_start_idx": 939,
+      "val_end_idx": 1028,
+      "LSTM": {
+        "RMSE": 0.5700715521191535,
+        "MAE": 0.465787482075529,
+        "MAPE": 158.60452668455366
+      },
+      "XGB": {
+        "RMSE": 3.441020869097625,
+        "MAE": 2.8104692459106446,
+        "MAPE": 94.58452873233472
+      }
+    }
+  ]
+}

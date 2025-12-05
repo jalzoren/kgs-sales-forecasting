@@ -1,0 +1,22 @@
+{
+  "product_id": "P0196",
+  "product_name": "Paldo Cheese Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 383,
+      "val_start_idx": 384,
+      "val_end_idx": 473,
+      "LSTM": {
+        "RMSE": 1.1688901435410282,
+        "MAE": 0.8076817494705125,
+        "MAPE": 102.46172685111299
+      },
+      "XGB": {
+        "RMSE": 2.8268249421131815,
+        "MAE": 2.1110973768764074,
+        "MAPE": 72.94204631728336
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0114",
+  "product_name": "Banana Milk 200mL 6Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 937,
+      "val_start_idx": 938,
+      "val_end_idx": 1027,
+      "LSTM": {
+        "RMSE": 0.6961904113085976,
+        "MAE": 0.5779274042711625,
+        "MAPE": 127.07616881704618
+      },
+      "XGB": {
+        "RMSE": 2.1737867874356276,
+        "MAE": 1.7769903103510538,
+        "MAPE": 76.34946015012251
+      }
+    }
+  ]
+}

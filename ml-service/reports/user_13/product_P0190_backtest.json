@@ -1,0 +1,22 @@
+{
+  "product_id": "P0190",
+  "product_name": "Nongshim Tempura Udon Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 541,
+      "val_start_idx": 542,
+      "val_end_idx": 631,
+      "LSTM": {
+        "RMSE": 1.1710253925278065,
+        "MAE": 0.8185205354383608,
+        "MAPE": 97.83342290053753
+      },
+      "XGB": {
+        "RMSE": 2.6605647182613903,
+        "MAE": 1.9577655288908216,
+        "MAPE": 47.6543031705005
+      }
+    }
+  ]
+}

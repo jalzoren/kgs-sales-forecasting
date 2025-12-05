@@ -1,0 +1,22 @@
+{
+  "product_id": "P0278",
+  "product_name": "Haitai O! Karto Chips",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 330,
+      "val_start_idx": 331,
+      "val_end_idx": 420,
+      "LSTM": {
+        "RMSE": 0.750457930403538,
+        "MAE": 0.6124225272076499,
+        "MAPE": 102.12947632100109
+      },
+      "XGB": {
+        "RMSE": 1.5804707542567193,
+        "MAE": 1.2745949678950839,
+        "MAPE": 56.9535293926007
+      }
+    }
+  ]
+}

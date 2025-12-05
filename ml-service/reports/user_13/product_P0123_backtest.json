@@ -1,0 +1,22 @@
+{
+  "product_id": "P0123",
+  "product_name": "Cass Cold Brewed Beer 500mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 860,
+      "val_start_idx": 861,
+      "val_end_idx": 950,
+      "LSTM": {
+        "RMSE": 0.7250554314316424,
+        "MAE": 0.5904329888786044,
+        "MAPE": 841.9082914753344
+      },
+      "XGB": {
+        "RMSE": 2.0921760089643153,
+        "MAE": 1.6851206594043309,
+        "MAPE": 47.632699683445885
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0047",
+  "product_name": "Dongwon Spicy Tuna",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 288,
+      "val_start_idx": 289,
+      "val_end_idx": 378,
+      "LSTM": {
+        "RMSE": 0.9120822300095255,
+        "MAE": 0.6868634965886168,
+        "MAPE": 96.70654145526017
+      },
+      "XGB": {
+        "RMSE": 2.20789087662709,
+        "MAE": 1.7352462731301785,
+        "MAPE": 70.5801578490053
+      }
+    }
+  ]
+}

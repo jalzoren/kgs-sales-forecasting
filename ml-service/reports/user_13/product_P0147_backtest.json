@@ -1,0 +1,22 @@
+{
+  "product_id": "P0147",
+  "product_name": "Binggrae Coffee Milk",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 329,
+      "val_start_idx": 330,
+      "val_end_idx": 419,
+      "LSTM": {
+        "RMSE": 1.118921629984328,
+        "MAE": 0.8202452063830032,
+        "MAPE": 98.9607477596003
+      },
+      "XGB": {
+        "RMSE": 2.3892093053588477,
+        "MAE": 1.8011836926142375,
+        "MAPE": 68.2649280276953
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0256",
+  "product_name": "Orion Custard Cake",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 317,
+      "val_start_idx": 318,
+      "val_end_idx": 407,
+      "LSTM": {
+        "RMSE": 0.8449707816045549,
+        "MAE": 0.6563929652505516,
+        "MAPE": 115.99811159780282
+      },
+      "XGB": {
+        "RMSE": 1.1231537258226296,
+        "MAE": 0.8070573038525052,
+        "MAPE": 36.82929529210247
+      }
+    }
+  ]
+}

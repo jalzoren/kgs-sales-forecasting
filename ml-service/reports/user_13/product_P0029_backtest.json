@@ -1,0 +1,22 @@
+{
+  "product_id": "P0029",
+  "product_name": "CJ Beksul Pancake Flour",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 355,
+      "val_start_idx": 356,
+      "val_end_idx": 445,
+      "LSTM": {
+        "RMSE": 1.199280071075053,
+        "MAE": 0.8348504817901314,
+        "MAPE": 100.20208131274406
+      },
+      "XGB": {
+        "RMSE": 1.2108602837727886,
+        "MAE": 0.8260951134893629,
+        "MAPE": 39.659535423157706
+      }
+    }
+  ]
+}

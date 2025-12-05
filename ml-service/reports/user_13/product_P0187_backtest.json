@@ -1,0 +1,22 @@
+{
+  "product_id": "P0187",
+  "product_name": "Paldo Bibim Men",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 387,
+      "val_start_idx": 388,
+      "val_end_idx": 477,
+      "LSTM": {
+        "RMSE": 0.7990064837935021,
+        "MAE": 0.6540187142314136,
+        "MAPE": 99.80602939484824
+      },
+      "XGB": {
+        "RMSE": 2.175879399312989,
+        "MAE": 1.6760794851515028,
+        "MAPE": 64.25251941360189
+      }
+    }
+  ]
+}

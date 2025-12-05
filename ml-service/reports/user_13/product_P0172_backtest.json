@@ -1,0 +1,22 @@
+{
+  "product_id": "P0172",
+  "product_name": "Ottogi Jin Hot Big Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 374,
+      "val_start_idx": 375,
+      "val_end_idx": 464,
+      "LSTM": {
+        "RMSE": 0.9294949509145004,
+        "MAE": 0.7696681818747221,
+        "MAPE": 95.71281714146062
+      },
+      "XGB": {
+        "RMSE": 1.987181814900972,
+        "MAE": 1.6264683458540174,
+        "MAPE": 67.26396179522233
+      }
+    }
+  ]
+}

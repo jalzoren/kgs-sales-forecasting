@@ -1,0 +1,22 @@
+{
+  "product_id": "P0233",
+  "product_name": "O'Food Korean Fried Chicken Sauce",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 146,
+      "val_start_idx": 147,
+      "val_end_idx": 236,
+      "LSTM": {
+        "RMSE": 1.0317790051209423,
+        "MAE": 0.8143024895052953,
+        "MAPE": 94.6158902066294
+      },
+      "XGB": {
+        "RMSE": 1.009669159280448,
+        "MAE": 0.7777312854925792,
+        "MAPE": 47.9234229127566
+      }
+    }
+  ]
+}

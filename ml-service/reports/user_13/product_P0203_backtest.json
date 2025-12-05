@@ -1,0 +1,22 @@
+{
+  "product_id": "P0203",
+  "product_name": "Jin Ramen Spicy Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 897,
+      "val_start_idx": 898,
+      "val_end_idx": 987,
+      "LSTM": {
+        "RMSE": 1.0046354876750199,
+        "MAE": 0.7805014249827467,
+        "MAPE": 140.66913894765514
+      },
+      "XGB": {
+        "RMSE": 4.582279038495435,
+        "MAE": 3.548326688342624,
+        "MAPE": 49.76753245180314
+      }
+    }
+  ]
+}

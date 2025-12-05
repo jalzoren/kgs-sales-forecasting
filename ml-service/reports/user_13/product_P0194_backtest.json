@@ -1,0 +1,22 @@
+{
+  "product_id": "P0194",
+  "product_name": "Shin Ramen Kimchi",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 302,
+      "val_start_idx": 303,
+      "val_end_idx": 392,
+      "LSTM": {
+        "RMSE": 1.185545109298779,
+        "MAE": 0.9296913411121835,
+        "MAPE": 98.71332191003465
+      },
+      "XGB": {
+        "RMSE": 2.2797807007009325,
+        "MAE": 1.8120531625217862,
+        "MAPE": 66.71743360052359
+      }
+    }
+  ]
+}

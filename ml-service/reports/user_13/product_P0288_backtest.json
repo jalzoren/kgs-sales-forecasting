@@ -1,0 +1,22 @@
+{
+  "product_id": "P0288",
+  "product_name": "Nongshim Honey Rice Snack",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 219,
+      "val_start_idx": 220,
+      "val_end_idx": 309,
+      "LSTM": {
+        "RMSE": 1.0682002034293707,
+        "MAE": 0.8548119047657655,
+        "MAPE": 101.24468349187221
+      },
+      "XGB": {
+        "RMSE": 1.8291679898723028,
+        "MAE": 1.3892512785063849,
+        "MAPE": 53.69225699820922
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0198",
+  "product_name": "Paldo Koreno Beef Noodle 100g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 357,
+      "val_start_idx": 358,
+      "val_end_idx": 447,
+      "LSTM": {
+        "RMSE": 1.160017364126699,
+        "MAE": 0.8713176321153366,
+        "MAPE": 99.09457598941438
+      },
+      "XGB": {
+        "RMSE": 2.601282956057455,
+        "MAE": 2.065962837802039,
+        "MAPE": 53.80831255060154
+      }
+    }
+  ]
+}

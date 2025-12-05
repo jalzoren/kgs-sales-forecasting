@@ -1,0 +1,22 @@
+{
+  "product_id": "P0149",
+  "product_name": "Binggrae Mango Milk",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 417,
+      "val_start_idx": 418,
+      "val_end_idx": 507,
+      "LSTM": {
+        "RMSE": 0.8790043295672862,
+        "MAE": 0.7116288710349316,
+        "MAPE": 217.79707725632812
+      },
+      "XGB": {
+        "RMSE": 2.2582769695493283,
+        "MAE": 1.8377380741967095,
+        "MAPE": 71.48090715531224
+      }
+    }
+  ]
+}

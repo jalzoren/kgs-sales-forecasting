@@ -1,0 +1,22 @@
+{
+  "product_id": "P0179",
+  "product_name": "Ottogi Ramen Bokki Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 498,
+      "val_start_idx": 499,
+      "val_end_idx": 588,
+      "LSTM": {
+        "RMSE": 1.0988055881588106,
+        "MAE": 0.7819765683289089,
+        "MAPE": 108.97245202538845
+      },
+      "XGB": {
+        "RMSE": 2.737612834941838,
+        "MAE": 2.022497488392724,
+        "MAPE": 49.134388623146634
+      }
+    }
+  ]
+}

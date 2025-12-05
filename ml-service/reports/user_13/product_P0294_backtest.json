@@ -1,0 +1,22 @@
+{
+  "product_id": "P0294",
+  "product_name": "Pepero Strawberry",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 735,
+      "val_start_idx": 736,
+      "val_end_idx": 825,
+      "LSTM": {
+        "RMSE": 0.8557709624541935,
+        "MAE": 0.6914977968557324,
+        "MAPE": 96.70185853056792
+      },
+      "XGB": {
+        "RMSE": 2.8317384220080073,
+        "MAE": 2.3055439564916824,
+        "MAPE": 78.0312606440559
+      }
+    }
+  ]
+}

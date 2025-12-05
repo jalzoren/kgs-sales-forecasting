@@ -1,0 +1,22 @@
+{
+  "product_id": "P0197",
+  "product_name": "Nongshim Seafood Ramyun",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 368,
+      "val_start_idx": 369,
+      "val_end_idx": 458,
+      "LSTM": {
+        "RMSE": 1.4770108179589179,
+        "MAE": 0.9664804204040058,
+        "MAPE": 96.39751533349316
+      },
+      "XGB": {
+        "RMSE": 3.610369852362326,
+        "MAE": 2.5799381163385178,
+        "MAPE": 67.58290795708467
+      }
+    }
+  ]
+}

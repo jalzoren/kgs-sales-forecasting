@@ -1,0 +1,22 @@
+{
+  "product_id": "P0183",
+  "product_name": "Samyang Kimchi Ramen Bowl",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 435,
+      "val_start_idx": 436,
+      "val_end_idx": 525,
+      "LSTM": {
+        "RMSE": 1.127456247129137,
+        "MAE": 0.8750140589430534,
+        "MAPE": 103.14790098451807
+      },
+      "XGB": {
+        "RMSE": 2.440356722430792,
+        "MAE": 1.914723163180881,
+        "MAPE": 46.39262400935186
+      }
+    }
+  ]
+}

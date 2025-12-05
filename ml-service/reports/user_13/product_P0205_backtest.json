@@ -1,0 +1,22 @@
+{
+  "product_id": "P0205",
+  "product_name": "Ottogi Yeul Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 504,
+      "val_start_idx": 505,
+      "val_end_idx": 594,
+      "LSTM": {
+        "RMSE": 1.2078799037946681,
+        "MAE": 0.8596056823763633,
+        "MAPE": 120.53546790380318
+      },
+      "XGB": {
+        "RMSE": 2.543885369629495,
+        "MAE": 1.9905056211683485,
+        "MAPE": 51.47792970274245
+      }
+    }
+  ]
+}

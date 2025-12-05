@@ -1,0 +1,22 @@
+{
+  "product_id": "P0131",
+  "product_name": "Sunhari Yogurt 360mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 210,
+      "val_start_idx": 211,
+      "val_end_idx": 300,
+      "LSTM": {
+        "RMSE": 1.262495443506179,
+        "MAE": 0.8635787395236848,
+        "MAPE": 95.96227207942279
+      },
+      "XGB": {
+        "RMSE": 1.3101741270506062,
+        "MAE": 0.9159352699915568,
+        "MAPE": 49.092925185707685
+      }
+    }
+  ]
+}

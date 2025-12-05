@@ -1,0 +1,22 @@
+{
+  "product_id": "P0130",
+  "product_name": "Sunhari Apple 360mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 238,
+      "val_start_idx": 239,
+      "val_end_idx": 328,
+      "LSTM": {
+        "RMSE": 0.9698079185714577,
+        "MAE": 0.7393559518930879,
+        "MAPE": 101.73386259724147
+      },
+      "XGB": {
+        "RMSE": 0.905336625295746,
+        "MAE": 0.6765189422501459,
+        "MAPE": 36.204844304808866
+      }
+    }
+  ]
+}

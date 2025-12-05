@@ -1,0 +1,22 @@
+{
+  "product_id": "P0257",
+  "product_name": "Lotte Almond Chocolate",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 372,
+      "val_start_idx": 373,
+      "val_end_idx": 462,
+      "LSTM": {
+        "RMSE": 0.876004243421408,
+        "MAE": 0.7272807695739504,
+        "MAPE": 99.87505507636355
+      },
+      "XGB": {
+        "RMSE": 0.9075321270309865,
+        "MAE": 0.7439189778433906,
+        "MAPE": 41.58789049475282
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0202",
+  "product_name": "Nongshim Ansung Tangmen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 457,
+      "val_start_idx": 458,
+      "val_end_idx": 547,
+      "LSTM": {
+        "RMSE": 0.8907258590737863,
+        "MAE": 0.6719087806948788,
+        "MAPE": 97.53535846756213
+      },
+      "XGB": {
+        "RMSE": 1.9170950402037463,
+        "MAE": 1.5225870105955335,
+        "MAPE": 51.43365834402277
+      }
+    }
+  ]
+}

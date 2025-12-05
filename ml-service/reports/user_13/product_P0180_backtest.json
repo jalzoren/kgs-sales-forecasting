@@ -1,0 +1,22 @@
+{
+  "product_id": "P0180",
+  "product_name": "Samyang Curry Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 463,
+      "val_start_idx": 464,
+      "val_end_idx": 553,
+      "LSTM": {
+        "RMSE": 1.043755732790625,
+        "MAE": 0.7631723755394004,
+        "MAPE": 157.8315659542954
+      },
+      "XGB": {
+        "RMSE": 2.0902565494097183,
+        "MAE": 1.6448003994094,
+        "MAPE": 49.314155238732056
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0204",
+  "product_name": "Ottogi Cup Ramen Kimchi",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 311,
+      "val_start_idx": 312,
+      "val_end_idx": 401,
+      "LSTM": {
+        "RMSE": 0.7570388602156288,
+        "MAE": 0.6132497265624217,
+        "MAPE": 107.39708628709883
+      },
+      "XGB": {
+        "RMSE": 1.7164569183582978,
+        "MAE": 1.399398257997301,
+        "MAPE": 58.177126186865344
+      }
+    }
+  ]
+}

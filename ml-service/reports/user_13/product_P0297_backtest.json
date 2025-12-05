@@ -1,0 +1,22 @@
+{
+  "product_id": "P0297",
+  "product_name": "Pepero Choco Filled",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 761,
+      "val_start_idx": 762,
+      "val_end_idx": 851,
+      "LSTM": {
+        "RMSE": 1.0013490281046677,
+        "MAE": 0.7495372469010613,
+        "MAPE": 100.77849510154292
+      },
+      "XGB": {
+        "RMSE": 2.945358932289347,
+        "MAE": 2.239263594150543,
+        "MAPE": 56.732638072709626
+      }
+    }
+  ]
+}

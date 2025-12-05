@@ -1,0 +1,22 @@
+{
+  "product_id": "P0281",
+  "product_name": "Haitai Ace Crackers",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 309,
+      "val_start_idx": 310,
+      "val_end_idx": 399,
+      "LSTM": {
+        "RMSE": 0.8536233935894163,
+        "MAE": 0.6752414687327711,
+        "MAPE": 103.31776902788836
+      },
+      "XGB": {
+        "RMSE": 2.145508745403111,
+        "MAE": 1.6439969082673391,
+        "MAPE": 61.25112159152396
+      }
+    }
+  ]
+}

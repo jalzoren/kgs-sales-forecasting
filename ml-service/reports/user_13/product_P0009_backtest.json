@@ -1,0 +1,22 @@
+{
+  "product_id": "P0009",
+  "product_name": "CJ Beksul Corn Syrup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 736,
+      "val_start_idx": 737,
+      "val_end_idx": 826,
+      "LSTM": {
+        "RMSE": 1.1331549082285428,
+        "MAE": 0.9416593944356707,
+        "MAPE": 115.53286577730036
+      },
+      "XGB": {
+        "RMSE": 2.194545829204194,
+        "MAE": 1.7738694959216648,
+        "MAPE": 48.729899834283025
+      }
+    }
+  ]
+}

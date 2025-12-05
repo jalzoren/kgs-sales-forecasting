@@ -1,0 +1,22 @@
+{
+  "product_id": "P0242",
+  "product_name": "CJ  Gochujang 200g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 217,
+      "val_start_idx": 218,
+      "val_end_idx": 307,
+      "LSTM": {
+        "RMSE": 1.1210798440320375,
+        "MAE": 0.8870173672872523,
+        "MAPE": 103.76664694626747
+      },
+      "XGB": {
+        "RMSE": 1.1401658396476686,
+        "MAE": 0.914563967121972,
+        "MAPE": 47.99867227342394
+      }
+    }
+  ]
+}

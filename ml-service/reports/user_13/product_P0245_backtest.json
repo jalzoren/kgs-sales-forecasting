@@ -1,0 +1,22 @@
+{
+  "product_id": "P0245",
+  "product_name": "Honey Butter Almond 190g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 1001,
+      "val_start_idx": 1002,
+      "val_end_idx": 1091,
+      "LSTM": {
+        "RMSE": 0.8211343974508467,
+        "MAE": 0.627111606447802,
+        "MAPE": 131.7838782924058
+      },
+      "XGB": {
+        "RMSE": 3.169097830663454,
+        "MAE": 2.5282448556688095,
+        "MAPE": 42.1305509589751
+      }
+    }
+  ]
+}

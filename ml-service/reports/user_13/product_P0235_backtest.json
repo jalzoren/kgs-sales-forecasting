@@ -1,0 +1,22 @@
+{
+  "product_id": "P0235",
+  "product_name": "O'Food Kimchi Base Sauce",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 254,
+      "val_start_idx": 255,
+      "val_end_idx": 344,
+      "LSTM": {
+        "RMSE": 0.8714498876768493,
+        "MAE": 0.7105717956940187,
+        "MAPE": 99.56202700735471
+      },
+      "XGB": {
+        "RMSE": 1.1381120593827758,
+        "MAE": 0.918751613299052,
+        "MAPE": 56.628366134784834
+      }
+    }
+  ]
+}

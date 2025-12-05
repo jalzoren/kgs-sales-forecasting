@@ -1,0 +1,22 @@
+{
+  "product_id": "P0022",
+  "product_name": "Ottogi Tteokbokki Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 296,
+      "val_start_idx": 297,
+      "val_end_idx": 386,
+      "LSTM": {
+        "RMSE": 0.9323805229101902,
+        "MAE": 0.7345201933550584,
+        "MAPE": 99.19087033654746
+      },
+      "XGB": {
+        "RMSE": 1.0205870685691176,
+        "MAE": 0.8002907911936442,
+        "MAPE": 40.044528197359156
+      }
+    }
+  ]
+}

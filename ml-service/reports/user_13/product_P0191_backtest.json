@@ -1,0 +1,22 @@
+{
+  "product_id": "P0191",
+  "product_name": "Paldo Teumsae Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 379,
+      "val_start_idx": 380,
+      "val_end_idx": 469,
+      "LSTM": {
+        "RMSE": 0.9257705874775344,
+        "MAE": 0.7152398598897076,
+        "MAPE": 101.48629688172939
+      },
+      "XGB": {
+        "RMSE": 2.283028067485526,
+        "MAE": 1.7696223828527662,
+        "MAPE": 68.17668384440687
+      }
+    }
+  ]
+}

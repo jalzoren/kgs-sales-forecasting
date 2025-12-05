@@ -1,0 +1,22 @@
+{
+  "product_id": "P0120",
+  "product_name": "Aloe Vera Juice 1.5L",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 143,
+      "val_start_idx": 144,
+      "val_end_idx": 233,
+      "LSTM": {
+        "RMSE": 1.1349703803426372,
+        "MAE": 0.8806499310293554,
+        "MAPE": 98.55948984786926
+      },
+      "XGB": {
+        "RMSE": 1.1376820413891366,
+        "MAE": 0.9336156924565633,
+        "MAPE": 59.65598472653243
+      }
+    }
+  ]
+}

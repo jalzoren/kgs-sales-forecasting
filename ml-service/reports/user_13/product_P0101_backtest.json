@@ -1,0 +1,22 @@
+{
+  "product_id": "P0101",
+  "product_name": "Daerim  Fish Cake Stick",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 185,
+      "val_start_idx": 186,
+      "val_end_idx": 275,
+      "LSTM": {
+        "RMSE": 0.9631403193252399,
+        "MAE": 0.7169684969319727,
+        "MAPE": 92.5584564547265
+      },
+      "XGB": {
+        "RMSE": 2.081341826897128,
+        "MAE": 1.6380792869461906,
+        "MAPE": 61.95628003136018
+      }
+    }
+  ]
+}

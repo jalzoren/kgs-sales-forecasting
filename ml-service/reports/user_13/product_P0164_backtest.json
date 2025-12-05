@@ -1,0 +1,22 @@
+{
+  "product_id": "P0164",
+  "product_name": "Samyang Buldak 4 Cheese 145g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 917,
+      "val_start_idx": 918,
+      "val_end_idx": 1007,
+      "LSTM": {
+        "RMSE": 0.8572018178943768,
+        "MAE": 0.6518059309336762,
+        "MAPE": 126.51338744074904
+      },
+      "XGB": {
+        "RMSE": 4.53967169878511,
+        "MAE": 3.6359743489159477,
+        "MAPE": 58.857819418320766
+      }
+    }
+  ]
+}

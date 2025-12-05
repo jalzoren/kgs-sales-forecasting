@@ -1,0 +1,22 @@
+{
+  "product_id": "P0210",
+  "product_name": "2Mins Snack Men",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 347,
+      "val_start_idx": 348,
+      "val_end_idx": 437,
+      "LSTM": {
+        "RMSE": 0.8313619637226102,
+        "MAE": 0.640985953082452,
+        "MAPE": 98.40886722371143
+      },
+      "XGB": {
+        "RMSE": 1.8036608412935151,
+        "MAE": 1.4666882740126717,
+        "MAPE": 57.349074507104845
+      }
+    }
+  ]
+}

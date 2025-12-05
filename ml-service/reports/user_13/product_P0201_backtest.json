@@ -1,0 +1,22 @@
+{
+  "product_id": "P0201",
+  "product_name": "Sewoo Tang Small Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 373,
+      "val_start_idx": 374,
+      "val_end_idx": 463,
+      "LSTM": {
+        "RMSE": 0.9109823391085148,
+        "MAE": 0.6776211188776032,
+        "MAPE": 97.16788169488999
+      },
+      "XGB": {
+        "RMSE": 2.3053833235192003,
+        "MAE": 1.8179456869761148,
+        "MAPE": 90.71491642219286
+      }
+    }
+  ]
+}

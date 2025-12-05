@@ -1,0 +1,22 @@
+{
+  "product_id": "P0244",
+  "product_name": "Wasabi Almond 190g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 978,
+      "val_start_idx": 979,
+      "val_end_idx": 1068,
+      "LSTM": {
+        "RMSE": 0.8926662772792119,
+        "MAE": 0.6861861993179781,
+        "MAPE": 125.34924076989691
+      },
+      "XGB": {
+        "RMSE": 3.6958317103457907,
+        "MAE": 2.8606154600779217,
+        "MAPE": 47.58747692403379
+      }
+    }
+  ]
+}

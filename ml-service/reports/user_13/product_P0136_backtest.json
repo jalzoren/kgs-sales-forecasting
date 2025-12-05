@@ -1,0 +1,22 @@
+{
+  "product_id": "P0136",
+  "product_name": "Cass Fresh Beer",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 132,
+      "val_start_idx": 133,
+      "val_end_idx": 222,
+      "LSTM": {
+        "RMSE": 0.6122099685218169,
+        "MAE": 0.5145259342843984,
+        "MAPE": 97.87798854095755
+      },
+      "XGB": {
+        "RMSE": 1.8258851736922852,
+        "MAE": 1.3896017260021634,
+        "MAPE": 60.751842733413454
+      }
+    }
+  ]
+}

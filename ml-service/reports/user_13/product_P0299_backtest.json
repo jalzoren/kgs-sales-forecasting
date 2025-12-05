@@ -1,0 +1,22 @@
+{
+  "product_id": "P0299",
+  "product_name": "Lotte Xylitol Green Gum",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 513,
+      "val_start_idx": 514,
+      "val_end_idx": 603,
+      "LSTM": {
+        "RMSE": 1.0010779899672928,
+        "MAE": 0.7377098881133551,
+        "MAPE": 97.79626499244418
+      },
+      "XGB": {
+        "RMSE": 2.8336134771599752,
+        "MAE": 1.9708378897772896,
+        "MAPE": 68.62047480531508
+      }
+    }
+  ]
+}

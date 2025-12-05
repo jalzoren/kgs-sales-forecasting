@@ -1,0 +1,22 @@
+{
+  "product_id": "P0251",
+  "product_name": "Oil Fried & Salted Peanuts",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 359,
+      "val_start_idx": 360,
+      "val_end_idx": 449,
+      "LSTM": {
+        "RMSE": 1.247513023549616,
+        "MAE": 0.923285523005558,
+        "MAPE": 97.64041903974126
+      },
+      "XGB": {
+        "RMSE": 1.4987375492034483,
+        "MAE": 1.1096913986735875,
+        "MAPE": 48.72391408566235
+      }
+    }
+  ]
+}

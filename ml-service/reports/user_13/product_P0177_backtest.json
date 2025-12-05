@@ -1,0 +1,22 @@
+{
+  "product_id": "P0177",
+  "product_name": "Ottogi Beef Seaweed Soup Ramen",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 478,
+      "val_start_idx": 479,
+      "val_end_idx": 568,
+      "LSTM": {
+        "RMSE": 0.8868589592425118,
+        "MAE": 0.6477205336012379,
+        "MAPE": 86.60856394150449
+      },
+      "XGB": {
+        "RMSE": 2.4096893026388133,
+        "MAE": 1.875545699066586,
+        "MAPE": 83.54003078331485
+      }
+    }
+  ]
+}

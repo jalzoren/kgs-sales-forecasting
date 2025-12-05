@@ -1,0 +1,22 @@
+{
+  "product_id": "P0102",
+  "product_name": "MWC Tteok Galbi Bar",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 246,
+      "val_start_idx": 247,
+      "val_end_idx": 336,
+      "LSTM": {
+        "RMSE": 0.9988946686104306,
+        "MAE": 0.8200014402926448,
+        "MAPE": 100.98179820291071
+      },
+      "XGB": {
+        "RMSE": 1.9459851685107186,
+        "MAE": 1.6017239477899339,
+        "MAPE": 76.35449220631699
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0006",
+  "product_name": "Chung Jung One Soy Sauce",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 516,
+      "val_start_idx": 517,
+      "val_end_idx": 606,
+      "LSTM": {
+        "RMSE": 1.2365342347201214,
+        "MAE": 0.9976472658687879,
+        "MAPE": 131.81719795562657
+      },
+      "XGB": {
+        "RMSE": 1.526822276586377,
+        "MAE": 1.237911683983273,
+        "MAPE": 52.44982370721314
+      }
+    }
+  ]
+}

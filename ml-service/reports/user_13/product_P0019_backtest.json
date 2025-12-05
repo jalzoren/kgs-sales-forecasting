@@ -1,0 +1,22 @@
+{
+  "product_id": "P0019",
+  "product_name": "Haepyo Crispy Seaweed 9Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 351,
+      "val_start_idx": 352,
+      "val_end_idx": 441,
+      "LSTM": {
+        "RMSE": 0.9086909673836578,
+        "MAE": 0.6644388471788557,
+        "MAPE": 96.0637368854874
+      },
+      "XGB": {
+        "RMSE": 1.1973264943408926,
+        "MAE": 0.9024686614672343,
+        "MAPE": 54.072013817556744
+      }
+    }
+  ]
+}

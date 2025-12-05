@@ -1,0 +1,22 @@
+{
+  "product_id": "P0230",
+  "product_name": "CJ Beksul Pancake Sauce",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 248,
+      "val_start_idx": 249,
+      "val_end_idx": 338,
+      "LSTM": {
+        "RMSE": 0.9301612017677365,
+        "MAE": 0.7147861563155817,
+        "MAPE": 99.17890899761139
+      },
+      "XGB": {
+        "RMSE": 0.9228800734125885,
+        "MAE": 0.7153897960980733,
+        "MAPE": 39.59224699540113
+      }
+    }
+  ]
+}

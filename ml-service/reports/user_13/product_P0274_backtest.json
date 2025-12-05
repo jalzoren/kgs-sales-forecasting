@@ -1,0 +1,22 @@
+{
+  "product_id": "P0274",
+  "product_name": "Haitai Matdongsan",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 414,
+      "val_start_idx": 415,
+      "val_end_idx": 504,
+      "LSTM": {
+        "RMSE": 1.049932641553261,
+        "MAE": 0.8224549126955247,
+        "MAPE": 104.49343561515553
+      },
+      "XGB": {
+        "RMSE": 1.142391612289733,
+        "MAE": 0.9434698012140063,
+        "MAPE": 49.866195429569835
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0134",
+  "product_name": "KSD Green Grape Rice Wine 750mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 223,
+      "val_start_idx": 224,
+      "val_end_idx": 313,
+      "LSTM": {
+        "RMSE": 1.5405326559693056,
+        "MAE": 1.135137719135848,
+        "MAPE": 97.70797957478875
+      },
+      "XGB": {
+        "RMSE": 1.412330822274931,
+        "MAE": 1.0537582317988077,
+        "MAPE": 50.93659243171598
+      }
+    }
+  ]
+}

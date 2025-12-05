@@ -1,0 +1,22 @@
+{
+  "product_id": "P0236",
+  "product_name": "CJ  Soybean Paste 500g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 219,
+      "val_start_idx": 220,
+      "val_end_idx": 309,
+      "LSTM": {
+        "RMSE": 0.8760034751456065,
+        "MAE": 0.7129243859609433,
+        "MAPE": 96.19006065985647
+      },
+      "XGB": {
+        "RMSE": 0.94176462002639,
+        "MAE": 0.7892138262589773,
+        "MAPE": 50.6345780160692
+      }
+    }
+  ]
+}

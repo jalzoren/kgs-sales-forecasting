@@ -1,0 +1,22 @@
+{
+  "product_id": "P0115",
+  "product_name": "Strawberry Milk 200mL 6Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 979,
+      "val_start_idx": 980,
+      "val_end_idx": 1069,
+      "LSTM": {
+        "RMSE": 1.115961656217238,
+        "MAE": 0.8335753910499833,
+        "MAPE": 97.91272004720273
+      },
+      "XGB": {
+        "RMSE": 3.5868147247434297,
+        "MAE": 2.7165050639046564,
+        "MAPE": 48.173805666996735
+      }
+    }
+  ]
+}

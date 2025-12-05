@@ -1,0 +1,22 @@
+{
+  "product_id": "P0140",
+  "product_name": "Woongjin Yogurt Peach 340mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 535,
+      "val_start_idx": 536,
+      "val_end_idx": 625,
+      "LSTM": {
+        "RMSE": 1.1381966497445597,
+        "MAE": 0.8862545186044383,
+        "MAPE": 107.26295342811396
+      },
+      "XGB": {
+        "RMSE": 2.782423204017874,
+        "MAE": 2.229685299926334,
+        "MAPE": 76.70744701262413
+      }
+    }
+  ]
+}

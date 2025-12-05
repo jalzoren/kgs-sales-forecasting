@@ -1,0 +1,22 @@
+{
+  "product_id": "P0025",
+  "product_name": "Sempio Yellow Peach In Can 400g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 267,
+      "val_start_idx": 268,
+      "val_end_idx": 357,
+      "LSTM": {
+        "RMSE": 1.1007765996541972,
+        "MAE": 0.8284601189514654,
+        "MAPE": 103.12959031522719
+      },
+      "XGB": {
+        "RMSE": 1.1738876738032515,
+        "MAE": 0.881955451435513,
+        "MAPE": 45.54988166989473
+      }
+    }
+  ]
+}

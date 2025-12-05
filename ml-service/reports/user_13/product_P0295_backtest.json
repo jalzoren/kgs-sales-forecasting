@@ -1,0 +1,22 @@
+{
+  "product_id": "P0295",
+  "product_name": "Pepero Almond",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 1000,
+      "val_start_idx": 1001,
+      "val_end_idx": 1090,
+      "LSTM": {
+        "RMSE": 1.0493385511196305,
+        "MAE": 0.823163689221258,
+        "MAPE": 131.98492783832293
+      },
+      "XGB": {
+        "RMSE": 7.719149251948568,
+        "MAE": 6.113678974575467,
+        "MAPE": 38.96161753520083
+      }
+    }
+  ]
+}

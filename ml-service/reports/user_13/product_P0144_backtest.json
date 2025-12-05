@@ -1,0 +1,22 @@
+{
+  "product_id": "P0144",
+  "product_name": "Nongshim Welchs Strawberry 355mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 367,
+      "val_start_idx": 368,
+      "val_end_idx": 457,
+      "LSTM": {
+        "RMSE": 0.7822575779000015,
+        "MAE": 0.6124168935817049,
+        "MAPE": 100.95388143428146
+      },
+      "XGB": {
+        "RMSE": 1.7754805803346407,
+        "MAE": 1.4696890910466511,
+        "MAPE": 54.43721626758461
+      }
+    }
+  ]
+}

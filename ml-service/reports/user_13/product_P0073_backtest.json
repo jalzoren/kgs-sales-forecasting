@@ -1,0 +1,22 @@
+{
+  "product_id": "P0073",
+  "product_name": "Perilla Leaves 2Packs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 256,
+      "val_start_idx": 257,
+      "val_end_idx": 346,
+      "LSTM": {
+        "RMSE": 0.8243115387436691,
+        "MAE": 0.6651283071172545,
+        "MAPE": 97.9757985309527
+      },
+      "XGB": {
+        "RMSE": 1.7271296966799061,
+        "MAE": 1.3265424754884507,
+        "MAPE": 57.15600050964549
+      }
+    }
+  ]
+}

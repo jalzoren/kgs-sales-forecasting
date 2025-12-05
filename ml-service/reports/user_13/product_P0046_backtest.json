@@ -1,0 +1,22 @@
+{
+  "product_id": "P0046",
+  "product_name": "CJ Beksul Potato Starch",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 229,
+      "val_start_idx": 230,
+      "val_end_idx": 319,
+      "LSTM": {
+        "RMSE": 1.0682485829315767,
+        "MAE": 0.8163802772003648,
+        "MAPE": 101.54559258038984
+      },
+      "XGB": {
+        "RMSE": 2.342060585223076,
+        "MAE": 1.8024520291222466,
+        "MAPE": 70.43362007248912
+      }
+    }
+  ]
+}

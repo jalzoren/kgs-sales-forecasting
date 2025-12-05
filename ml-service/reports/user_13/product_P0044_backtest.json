@@ -1,0 +1,22 @@
+{
+  "product_id": "P0044",
+  "product_name": "Ottogi Vegetable Soup 80g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 334,
+      "val_start_idx": 335,
+      "val_end_idx": 424,
+      "LSTM": {
+        "RMSE": 0.8687080672466396,
+        "MAE": 0.6691007059917887,
+        "MAPE": 99.85539606418465
+      },
+      "XGB": {
+        "RMSE": 1.040011795219113,
+        "MAE": 0.7979424489869011,
+        "MAPE": 35.0949343751978
+      }
+    }
+  ]
+}

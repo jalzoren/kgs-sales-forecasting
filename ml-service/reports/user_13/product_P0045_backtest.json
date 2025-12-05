@@ -1,0 +1,22 @@
+{
+  "product_id": "P0045",
+  "product_name": "CJ Beksul Wheat Flour",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 279,
+      "val_start_idx": 280,
+      "val_end_idx": 369,
+      "LSTM": {
+        "RMSE": 1.4258694557227223,
+        "MAE": 0.9805129750460033,
+        "MAPE": 97.81240448341877
+      },
+      "XGB": {
+        "RMSE": 1.6021220509294183,
+        "MAE": 1.139748744169871,
+        "MAPE": 43.6813888519319
+      }
+    }
+  ]
+}

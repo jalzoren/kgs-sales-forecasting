@@ -1,0 +1,22 @@
+{
+  "product_id": "P0266",
+  "product_name": "Bibigo Seaweed Crisps",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 216,
+      "val_start_idx": 217,
+      "val_end_idx": 306,
+      "LSTM": {
+        "RMSE": 0.9619619498223149,
+        "MAE": 0.788349318136409,
+        "MAPE": 99.13228346876915
+      },
+      "XGB": {
+        "RMSE": 1.0433620453234247,
+        "MAE": 0.8258772015571594,
+        "MAPE": 49.11399262922781
+      }
+    }
+  ]
+}

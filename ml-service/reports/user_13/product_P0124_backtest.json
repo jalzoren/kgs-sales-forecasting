@@ -1,0 +1,22 @@
+{
+  "product_id": "P0124",
+  "product_name": "Terra Lager Beer 500mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 932,
+      "val_start_idx": 933,
+      "val_end_idx": 1022,
+      "LSTM": {
+        "RMSE": 0.5588851082377528,
+        "MAE": 0.4596953114920769,
+        "MAPE": 239.1795649466086
+      },
+      "XGB": {
+        "RMSE": 1.9039341173702857,
+        "MAE": 1.562783530023363,
+        "MAPE": 58.73355455163084
+      }
+    }
+  ]
+}

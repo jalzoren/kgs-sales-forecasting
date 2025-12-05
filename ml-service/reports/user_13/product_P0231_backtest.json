@@ -1,0 +1,22 @@
+{
+  "product_id": "P0231",
+  "product_name": "O'Food Bulgogi Marinade",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 267,
+      "val_start_idx": 268,
+      "val_end_idx": 357,
+      "LSTM": {
+        "RMSE": 0.9416768625174424,
+        "MAE": 0.7186185606976737,
+        "MAPE": 99.34480292781114
+      },
+      "XGB": {
+        "RMSE": 1.1538708561314448,
+        "MAE": 0.7900926470756531,
+        "MAPE": 37.073735482162895
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0026",
+  "product_name": "Yopokki Sweet & Spicy 280g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 993,
+      "val_start_idx": 994,
+      "val_end_idx": 1083,
+      "LSTM": {
+        "RMSE": 1.156402078493694,
+        "MAE": 0.8813417272394234,
+        "MAPE": 108.24622993399271
+      },
+      "XGB": {
+        "RMSE": 3.6636547120820087,
+        "MAE": 2.766655611991882,
+        "MAPE": 38.8459553102251
+      }
+    }
+  ]
+}

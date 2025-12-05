@@ -1,0 +1,22 @@
+{
+  "product_id": "P0186",
+  "product_name": "Ottogi Chachelin Blackbean 145g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 455,
+      "val_start_idx": 456,
+      "val_end_idx": 545,
+      "LSTM": {
+        "RMSE": 0.7244811693650713,
+        "MAE": 0.5522257046003757,
+        "MAPE": 149.4762127659815
+      },
+      "XGB": {
+        "RMSE": 1.7289885205696112,
+        "MAE": 1.4203703549173143,
+        "MAPE": 45.477814917421426
+      }
+    }
+  ]
+}

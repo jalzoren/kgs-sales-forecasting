@@ -1,0 +1,22 @@
+{
+  "product_id": "P0195",
+  "product_name": "Ottogi Jin Mild Small Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 374,
+      "val_start_idx": 375,
+      "val_end_idx": 464,
+      "LSTM": {
+        "RMSE": 0.9904169786348258,
+        "MAE": 0.8107934941548128,
+        "MAPE": 98.7144508461575
+      },
+      "XGB": {
+        "RMSE": 2.1666378139491482,
+        "MAE": 1.7418953326013353,
+        "MAPE": 58.799773019132694
+      }
+    }
+  ]
+}

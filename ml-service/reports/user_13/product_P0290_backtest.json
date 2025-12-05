@@ -1,0 +1,22 @@
+{
+  "product_id": "P0290",
+  "product_name": "Doritos Galbi Chicken",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 606,
+      "val_start_idx": 607,
+      "val_end_idx": 696,
+      "LSTM": {
+        "RMSE": 0.9301858788993036,
+        "MAE": 0.7158872135523558,
+        "MAPE": 85.59350631747192
+      },
+      "XGB": {
+        "RMSE": 2.8779504887830853,
+        "MAE": 2.3531844192081026,
+        "MAPE": 96.78663574490251
+      }
+    }
+  ]
+}

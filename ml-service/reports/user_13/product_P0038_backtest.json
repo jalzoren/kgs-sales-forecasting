@@ -1,0 +1,22 @@
+{
+  "product_id": "P0038",
+  "product_name": "(Kaya) Korean Rice 1Kg",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 399,
+      "val_start_idx": 400,
+      "val_end_idx": 489,
+      "LSTM": {
+        "RMSE": 0.9140589143185898,
+        "MAE": 0.7522507028941353,
+        "MAPE": 100.60619328692655
+      },
+      "XGB": {
+        "RMSE": 0.9675456608344346,
+        "MAE": 0.7810019161966112,
+        "MAPE": 46.07117968135409
+      }
+    }
+  ]
+}

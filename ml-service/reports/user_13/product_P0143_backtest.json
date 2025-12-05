@@ -1,0 +1,22 @@
+{
+  "product_id": "P0143",
+  "product_name": "Nongshim Welchs Grape 355mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 523,
+      "val_start_idx": 524,
+      "val_end_idx": 613,
+      "LSTM": {
+        "RMSE": 1.1591803714939082,
+        "MAE": 0.8660730516685163,
+        "MAPE": 123.95489646965258
+      },
+      "XGB": {
+        "RMSE": 2.874184087749212,
+        "MAE": 2.1909314341015285,
+        "MAPE": 60.660816058397685
+      }
+    }
+  ]
+}

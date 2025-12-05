@@ -1,0 +1,22 @@
+{
+  "product_id": "P0276",
+  "product_name": "Orion Sun Chips Korean BBQ",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 265,
+      "val_start_idx": 266,
+      "val_end_idx": 355,
+      "LSTM": {
+        "RMSE": 0.759804460286528,
+        "MAE": 0.6231525085025336,
+        "MAPE": 100.81574883301133
+      },
+      "XGB": {
+        "RMSE": 1.0639551046113682,
+        "MAE": 0.8385119020938874,
+        "MAPE": 44.75133796974464
+      }
+    }
+  ]
+}

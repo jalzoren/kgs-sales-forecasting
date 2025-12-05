@@ -1,0 +1,22 @@
+{
+  "product_id": "P0283",
+  "product_name": "Orion Ogingo Ttangkong",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 372,
+      "val_start_idx": 373,
+      "val_end_idx": 462,
+      "LSTM": {
+        "RMSE": 1.1706982244491408,
+        "MAE": 0.8689924822091656,
+        "MAPE": 98.83866882737176
+      },
+      "XGB": {
+        "RMSE": 2.5236191323728714,
+        "MAE": 1.9740227010515001,
+        "MAPE": 79.91760158256015
+      }
+    }
+  ]
+}

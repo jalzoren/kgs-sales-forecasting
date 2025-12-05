@@ -1,0 +1,22 @@
+{
+  "product_id": "P0021",
+  "product_name": "Bibigo Kimbab Kim 10Sheets",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 278,
+      "val_start_idx": 279,
+      "val_end_idx": 368,
+      "LSTM": {
+        "RMSE": 1.068733223164099,
+        "MAE": 0.8253526754675298,
+        "MAPE": 99.30569186401432
+      },
+      "XGB": {
+        "RMSE": 1.1150815589143197,
+        "MAE": 0.894329129325019,
+        "MAPE": 49.73620919281422
+      }
+    }
+  ]
+}

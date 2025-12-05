@@ -1,0 +1,22 @@
+{
+  "product_id": "P0071",
+  "product_name": "Kongsarang Firm Tofu",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 229,
+      "val_start_idx": 230,
+      "val_end_idx": 319,
+      "LSTM": {
+        "RMSE": 0.8950299420966025,
+        "MAE": 0.7201094070830003,
+        "MAPE": 101.29163568203587
+      },
+      "XGB": {
+        "RMSE": 2.00660850292094,
+        "MAE": 1.6007806208398607,
+        "MAPE": 71.6484911235762
+      }
+    }
+  ]
+}

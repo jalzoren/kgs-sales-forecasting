@@ -1,0 +1,22 @@
+{
+  "product_id": "P0039",
+  "product_name": "Ottogi 3Mins Curry",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 303,
+      "val_start_idx": 304,
+      "val_end_idx": 393,
+      "LSTM": {
+        "RMSE": 1.0519925526769476,
+        "MAE": 0.7518645489228195,
+        "MAPE": 91.56383999628468
+      },
+      "XGB": {
+        "RMSE": 1.4015045938523296,
+        "MAE": 1.0429725368817648,
+        "MAPE": 66.34706354559815
+      }
+    }
+  ]
+}

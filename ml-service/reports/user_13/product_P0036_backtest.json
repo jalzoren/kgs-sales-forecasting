@@ -1,0 +1,22 @@
+{
+  "product_id": "P0036",
+  "product_name": "Dongwon  Tuna Light Can 150g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 141,
+      "val_start_idx": 142,
+      "val_end_idx": 231,
+      "LSTM": {
+        "RMSE": 0.7953205148190788,
+        "MAE": 0.6561432157803045,
+        "MAPE": 94.85692913667066
+      },
+      "XGB": {
+        "RMSE": 0.8653949241644351,
+        "MAE": 0.6914965371290843,
+        "MAPE": 41.53012785646651
+      }
+    }
+  ]
+}

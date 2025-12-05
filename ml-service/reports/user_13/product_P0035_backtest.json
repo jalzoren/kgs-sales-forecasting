@@ -1,0 +1,22 @@
+{
+  "product_id": "P0035",
+  "product_name": "CJ  Multi-Grains Cooked Rice 210g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 251,
+      "val_start_idx": 252,
+      "val_end_idx": 341,
+      "LSTM": {
+        "RMSE": 0.9913588509455793,
+        "MAE": 0.7550764015788234,
+        "MAPE": 100.26764228412799
+      },
+      "XGB": {
+        "RMSE": 1.0168108554306006,
+        "MAE": 0.7658273829354181,
+        "MAPE": 39.93993725084964
+      }
+    }
+  ]
+}

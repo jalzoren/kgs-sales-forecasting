@@ -1,0 +1,22 @@
+{
+  "product_id": "P0162",
+  "product_name": "Ottogi Jin Jjampong",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 145,
+      "val_start_idx": 146,
+      "val_end_idx": 235,
+      "LSTM": {
+        "RMSE": 0.8647289640172695,
+        "MAE": 0.6648569131149864,
+        "MAPE": 96.51705721001251
+      },
+      "XGB": {
+        "RMSE": 1.0353616148118574,
+        "MAE": 0.8357079697979821,
+        "MAPE": 54.50832163688367
+      }
+    }
+  ]
+}
