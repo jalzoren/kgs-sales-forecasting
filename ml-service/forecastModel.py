@@ -360,6 +360,51 @@ def evaluate_forecasts_against_actuals(forecast_df: pd.DataFrame, actuals_df: pd
 # -------------------------
 # Main pipeline
 # -------------------------
+def calculate_demand_levels(forecast_df):
+    """
+        Percentile-based demand classification.
+        Automatically adapts to dataset scale.
+    """
+    product_avg = (
+        forecast_df.groupby("Product_ID")["Forecast_Qty"]
+        .mean()
+        .reset_index()
+        .rename(columns={"Forecast_Qty": "Avg_Daily_Sales"})
+    )
+
+    meta = forecast_df.groupby("Product_ID").agg({
+        "Product_Name": "first",
+        "Category": "first"
+    }).reset_index()
+
+    product_avg = product_avg.merge(meta, on="Product_ID", how="left")
+
+    p40 = np.percentile(product_avg["Avg_Daily_Sales"], 40)
+    p80 = np.percentile(product_avg["Avg_Daily_Sales"], 80)
+
+    def classify(avg):
+        if avg >= p80:
+            return "HIGH DEMAND"
+        elif avg >= p40:
+            return "MEDIUM DEMAND"
+        else:
+            return "LOW DEMAND"
+
+    product_avg["Demand_Level"] = product_avg["Avg_Daily_Sales"].apply(classify)
+
+    def recommendation(level):
+        if level == "HIGH DEMAND":
+            return "Fast-moving product. Monitor stock frequently."
+        elif level == "MEDIUM DEMAND":
+            return "Moderate demand. Review weekly."
+        else:
+            return "Slow-moving product. Stock minimal quantities."
+
+    product_avg["Recommendation"] = product_avg["Demand_Level"].apply(recommendation)
+    return product_avg.sort_values("Avg_Daily_Sales", ascending=False)
+
+
+
 def forecast_for_user(user_id: str):
     print("\n" + "="*70)
     print(f" Starting Product-Level Forecasting for User {user_id}")
@@ -446,6 +491,7 @@ def forecast_for_user(user_id: str):
 
     print(f"\n Saving forecast to: {out_path}")
     print(f" Forecast period: {forecast_start_date.strftime('%Y-%m-%d')} to {forecast_end_date_90d.strftime('%Y-%m-%d')}\n")
+
 
     # Write to Excel: forecasts + demand_alerts + training_metrics + evaluation (if any)
     with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
