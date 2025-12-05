@@ -1,0 +1,22 @@
+{
+  "product_id": "P0158",
+  "product_name": "Nongshim Shin Ramen Black",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 171,
+      "val_start_idx": 172,
+      "val_end_idx": 261,
+      "LSTM": {
+        "RMSE": 0.8427795536697016,
+        "MAE": 0.6950434289153307,
+        "MAPE": 99.09550644847607
+      },
+      "XGB": {
+        "RMSE": 1.0977925229137588,
+        "MAE": 0.8646861784987979,
+        "MAPE": 53.52400233127453
+      }
+    }
+  ]
+}
