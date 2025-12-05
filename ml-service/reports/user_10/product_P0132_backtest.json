@@ -1,0 +1,22 @@
+{
+  "product_id": "P0132",
+  "product_name": "Sunhari Strawberry 360mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 145,
+      "val_start_idx": 146,
+      "val_end_idx": 235,
+      "LSTM": {
+        "RMSE": 1.2583529934372053,
+        "MAE": 0.9206010940394884,
+        "MAPE": 102.25180265264694
+      },
+      "XGB": {
+        "RMSE": 1.2067331725548036,
+        "MAE": 0.892445112599267,
+        "MAPE": 41.629340488759304
+      }
+    }
+  ]
+}

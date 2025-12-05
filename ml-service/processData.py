@@ -23,7 +23,7 @@ def ensure_user_folder(base_dir: str, user_id: str) -> str:
 # ==========================================
 # MAIN PREPROCESS FUNCTION
 # ==========================================
-def preprocess_sales_data(file_path: str, output_path: str):
+def preprocess_training_data(file_path: str, output_path: str):
     """
     Cleans and preprocesses transactional sales data for LSTM + XGBoost forecasting.
     """
@@ -118,6 +118,64 @@ def preprocess_sales_data(file_path: str, output_path: str):
     return output_path
 
 
+def preprocess_weekly_data(file_path: str, output_path: str):
+    """
+    Lightweight preprocessing for WEEKLY uploaded sales data.
+    Used ONLY for forecasting, NOT for model training.
+    """
+    print(f"Reading weekly sales data from: {file_path}")
+
+    # Load CSV/Excel
+    if file_path.endswith(".csv"):
+        df = pd.read_csv(file_path, encoding="utf-8", on_bad_lines="skip", sep=",", quotechar='"', engine="python")
+    else:
+        df = pd.read_excel(file_path)
+
+    # Basic cleaning
+    print("Cleaning weekly data...")
+    df.columns = df.columns.str.strip()
+    df = df.drop_duplicates()
+
+    # Required columns check
+    required = ["Date", "Product_ID", "Product_Name", "Total_Amount", "Quantity"]
+    missing = [col for col in required if col not in df.columns]
+    if missing:
+        raise ValueError(f"Missing required columns in weekly dataset: {missing}")
+
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    df = df.dropna(subset=["Date"])
+
+    # Safe numeric conversion
+    numeric_cols = ["Quantity", "Unit_Price", "Discount", "Total_Amount"]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+            df.loc[df[col] < 0, col] = np.nan
+
+    df = df.dropna(subset=["Quantity", "Total_Amount"])
+
+    # DAILY aggregation (NO lags, NO rolling, NO trends)
+    print("Aggregating weekly daily sales...")
+    agg = (
+        df.groupby(["Date", "Product_ID", "Product_Name", "Category"])
+        .agg(
+            Total_Transactions=("Transaction_Id", "nunique"),
+            Units_Sold=("Quantity", "sum"),
+            Avg_Unit_Price=("Unit_Price", "mean"),
+            Avg_Discount=("Discount", "mean"),
+            Total_Sales=("Total_Amount", "sum"),
+        )
+        .reset_index()
+    )
+
+    # Save weekly output — separate folder
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    agg.to_excel(output_path, index=False)
+
+    print(f"Weekly processed data saved to: {output_path}")
+    return output_path
+
+
 # ==========================================
 # POST-PROCESS VALIDATION & MERGING
 # ==========================================
@@ -206,8 +264,9 @@ def merge_multi_year_data(user_id):
 # ==========================================
 # MAIN PROCESS WRAPPER
 # ==========================================
-def process_latest_upload(user_id=None):
+def process_latest_upload(user_id=None, is_weekly = False):
     base_path = UPLOAD_DIR if user_id is None else os.path.join(UPLOAD_DIR, f"user_{user_id}")
+
     if not os.path.exists(base_path):
         print(f"No directory for user {user_id}")
         return None
@@ -226,11 +285,26 @@ def process_latest_upload(user_id=None):
         user_clean_dir, f"{latest_file.split('.')[0]}_processed_{timestamp}.xlsx"
     )
 
-    print(f"Processing latest file for user {user_id}: {latest_file}")
-    preprocess_sales_data(input_path, output_path)
-    print("File processed successfully.")
+    # WEEKLY UPLOAD → SIMPLE PREPROCESS + EXIT
 
-    processed_files = [f for f in os.listdir(user_clean_dir) if "_processed_" in f and f.endswith(".xlsx")]
+    if is_weekly:
+        print("Weekly upload detected — skipping merging and training.")
+        preprocess_weekly_data(input_path, output_path)
+        return output_path
+
+    # YEARLY UPLOAD → FULL PREPROCESSING
+    print(f"Processing yearly/training file for user {user_id}: {latest_file}")
+    preprocess_training_data(input_path, output_path)
+    print("Training file processed successfully.")
+
+    # After training preprocessing → check files for merging
+    processed_files = [
+        f for f in os.listdir(user_clean_dir)
+        if "_processed_" in f and f.endswith(".xlsx")
+    ]
+
+    print(f"User {user_id} currently has {len(processed_files)} processed training file(s).")
+
     if len(processed_files) >= 3:
         print(f"Detected {len(processed_files)} processed files — validating data span...")
         try:

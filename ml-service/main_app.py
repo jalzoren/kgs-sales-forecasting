@@ -55,3 +55,44 @@ async def start_training(request: TrainRequest, background_tasks: BackgroundTask
 async def get_status(user_id: str):
     status = training_status.get(user_id, {"status": "none"})
     return status
+
+@app.get("/api/metrics/{user_id}")
+async def get_all_metrics(user_id: str):
+    """
+    Returns the full training evaluation metrics for a given user.
+    Metrics come from the consolidated report CSV.
+    """
+    report_path = os.path.join("reports", f"user_{user_id}_training_report.csv")
+
+    if not os.path.exists(report_path):
+        raise HTTPException(404, detail="No evaluation report found. Train the model first.")
+
+    df = pd.read_csv(report_path)
+
+    return {
+        "user_id": user_id,
+        "total_products": len(df),
+        "metrics": df.to_dict(orient="records")
+    }
+
+
+@app.get("/api/metrics/{user_id}/{product_id}")
+async def get_metrics_by_product(user_id: str, product_id: str):
+    """
+    Returns metrics only for the specified product ID.
+    """
+    report_path = os.path.join("reports", f"user_{user_id}_training_report.csv")
+
+    if not os.path.exists(report_path):
+        raise HTTPException(404, detail="No evaluation report found. Train the model first.")
+
+    df = pd.read_csv(report_path)
+
+    # Convert product_id to match type in CSV (may be int or str)
+    df["Product_ID"] = df["Product_ID"].astype(str)
+    matching = df[df["Product_ID"] == str(product_id)]
+
+    if matching.empty:
+        raise HTTPException(404, detail=f"No metrics found for Product_ID {product_id}")
+
+    return matching.to_dict(orient="records")[0]
