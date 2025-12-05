@@ -23,14 +23,28 @@
 
 const API_BASE = "http://localhost:5000";
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const DASHBOARD_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dashboard
 
 class SessionManager {
   constructor() {
     this.cache = {
+      // Session data
       user: null,
       forecastStatus: null,
       userTimestamp: null,
-      forecastTimestamp: null
+      forecastTimestamp: null,
+      
+      // Dashboard data cache (by day range)
+      dashboard: {
+        7: null,
+        30: null,
+        90: null
+      },
+      dashboardTimestamp: {
+        7: null,
+        30: null,
+        90: null
+      }
     };
   }
 
@@ -113,13 +127,73 @@ class SessionManager {
   }
 
   /**
+   * ═══════════════════════════════════════════════════════════════
+   * NEW: DASHBOARD DATA CACHE
+   * ═══════════════════════════════════════════════════════════════
+   */
+
+  /**
+   * Get dashboard data (uses cache if fresh)
+   * 
+   * @param {number} days - Day range (7, 30, or 90)
+   * @param {boolean} forceRefresh - Force fetch from API
+   * @returns {Object} Dashboard data
+   * Performance: <10ms (cached) or ~1500ms (first load)
+   */
+  async getDashboardData(days = 7, forceRefresh = false) {
+    // Validate day range
+    const validDays = [7, 30, 90];
+    if (!validDays.includes(days)) {
+      days = 7;
+    }
+
+    // Check cache
+    if (!forceRefresh && this.isDashboardCacheFresh(days)) {
+      console.log(`✅ Using cached dashboard data (${days} days)`);
+      return this.cache.dashboard[days];
+    }
+
+    // Fetch fresh data
+    console.log(`🔄 Fetching fresh dashboard data (${days} days)...`);
+    const data = await this.fetchDashboardData(days);
+    
+    // Cache the result
+    this.cache.dashboard[days] = data;
+    this.cache.dashboardTimestamp[days] = Date.now();
+    
+    return data;
+  }
+
+  /**
+   * Invalidate dashboard cache (call after data upload or forecast generation)
+   * Clears all day ranges
+   */
+  invalidateDashboardCache() {
+    console.log("🔄 Invalidating dashboard cache (all ranges)...");
+    this.cache.dashboard = {
+      7: null,
+      30: null,
+      90: null
+    };
+    this.cache.dashboardTimestamp = {
+      7: null,
+      30: null,
+      90: null
+    };
+  }
+
+  /**
    * Invalidate forecast cache (call after generating new forecast)
    * Forces next getForecastStatus() to fetch fresh data
+   * Also invalidates dashboard cache since forecast affects it
    */
   invalidateForecastCache() {
     console.log("🔄 Invalidating forecast cache...");
     this.cache.forecastStatus = null;
     this.cache.forecastTimestamp = null;
+    
+    // Also invalidate dashboard cache
+    this.invalidateDashboardCache();
   }
 
   /**
@@ -131,12 +205,22 @@ class SessionManager {
       user: null,
       forecastStatus: null,
       userTimestamp: null,
-      forecastTimestamp: null
+      forecastTimestamp: null,
+      dashboard: {
+        7: null,
+        30: null,
+        90: null
+      },
+      dashboardTimestamp: {
+        7: null,
+        30: null,
+        90: null
+      }
     };
   }
 
   /**
-   * Check if cache is still fresh
+   * Check if user/forecast cache is still fresh
    * Private helper method
    */
   isCacheFresh(type) {
@@ -149,6 +233,19 @@ class SessionManager {
 
     const age = Date.now() - this.cache[timestampKey];
     return age < CACHE_DURATION;
+  }
+
+  /**
+   * Check if dashboard cache is fresh for a specific day range
+   * Private helper method
+   */
+  isDashboardCacheFresh(days) {
+    if (!this.cache.dashboard[days] || !this.cache.dashboardTimestamp[days]) {
+      return false;
+    }
+
+    const age = Date.now() - this.cache.dashboardTimestamp[days];
+    return age < DASHBOARD_CACHE_DURATION;
   }
 
   /**
@@ -212,6 +309,74 @@ class SessionManager {
         latestForecast: null
       };
     }
+  }
+
+  /**
+   * Fetch dashboard data from API
+   * Private helper method
+   */
+  async fetchDashboardData(days) {
+    try {
+      const response = await fetch(
+        `${API_BASE}/api/home/dashboard?days=${days}`,
+        { credentials: "include" }
+      );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Not authenticated");
+        }
+        throw new Error("Failed to fetch dashboard data");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error("❌ Failed to fetch dashboard data:", err);
+      throw err;
+    }
+  }
+
+  /**
+   * Get cache statistics (for debugging)
+   */
+  getCacheStats() {
+    const now = Date.now();
+    
+    return {
+      user: {
+        cached: !!this.cache.user,
+        age: this.cache.userTimestamp 
+          ? Math.round((now - this.cache.userTimestamp) / 1000) + 's'
+          : 'N/A'
+      },
+      forecastStatus: {
+        cached: !!this.cache.forecastStatus,
+        age: this.cache.forecastTimestamp
+          ? Math.round((now - this.cache.forecastTimestamp) / 1000) + 's'
+          : 'N/A'
+      },
+      dashboard: {
+        '7d': {
+          cached: !!this.cache.dashboard[7],
+          age: this.cache.dashboardTimestamp[7]
+            ? Math.round((now - this.cache.dashboardTimestamp[7]) / 1000) + 's'
+            : 'N/A'
+        },
+        '30d': {
+          cached: !!this.cache.dashboard[30],
+          age: this.cache.dashboardTimestamp[30]
+            ? Math.round((now - this.cache.dashboardTimestamp[30]) / 1000) + 's'
+            : 'N/A'
+        },
+        '90d': {
+          cached: !!this.cache.dashboard[90],
+          age: this.cache.dashboardTimestamp[90]
+            ? Math.round((now - this.cache.dashboardTimestamp[90]) / 1000) + 's'
+            : 'N/A'
+        }
+      }
+    };
   }
 }
 
