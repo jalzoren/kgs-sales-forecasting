@@ -1,0 +1,22 @@
+{
+  "product_id": "P0249",
+  "product_name": "Lotte Chocopie 12Pcs",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 169,
+      "val_start_idx": 170,
+      "val_end_idx": 259,
+      "LSTM": {
+        "RMSE": 0.695722830255165,
+        "MAE": 0.5991792444392734,
+        "MAPE": 96.39705606157888
+      },
+      "XGB": {
+        "RMSE": 0.9915436555205209,
+        "MAE": 0.831913028160731,
+        "MAPE": 45.942309070516515
+      }
+    }
+  ]
+}

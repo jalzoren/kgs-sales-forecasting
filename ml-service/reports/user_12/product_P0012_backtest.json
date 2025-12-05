@@ -1,0 +1,22 @@
+{
+  "product_id": "P0012",
+  "product_name": "Ottogi Glass Noodle 1Kg",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 133,
+      "val_start_idx": 134,
+      "val_end_idx": 223,
+      "LSTM": {
+        "RMSE": 0.8059476424095973,
+        "MAE": 0.5970714243850708,
+        "MAPE": 76.5473694464096
+      },
+      "XGB": {
+        "RMSE": 0.6866932664527877,
+        "MAE": 0.5474412381649018,
+        "MAPE": 40.566202545607524
+      }
+    }
+  ]
+}

@@ -207,7 +207,7 @@ class PythonService {
 
   // =====================================================
   // ✅ Check if model exists
-  // =====================================================
+  // ====================================================No forecast directory found=
   checkIfModelExists(userId) {
     const modelDir = path.join(__dirname, "../../ml-service/models", `user_${userId}`);
     const lstmPath = path.join(modelDir, "lstm_model.keras");
@@ -218,10 +218,15 @@ class PythonService {
   // =====================================================
   // ✅ Preprocess Data
   // =====================================================
-  async preprocessData(userId) {
+  // Preprocess Data
+  // @param {string} userId - User ID
+  // @param {boolean} isWeekly - True if weekly upload, false if training data
+  // 
+
+  async preprocessData(userId, isWeekly = false) {
     console.log(`🔄 Starting preprocessing for User ID: ${userId}...`);
+    console.log(`   Type: ${isWeekly ? 'WEEKLY' : 'TRAINING'}`);
     
-    // Update status
     this.preprocessStatusByUserId.set(String(userId), {
       state: "running",
       progress: 0,
@@ -229,7 +234,7 @@ class PythonService {
     });
 
     const script = path.join(__dirname, "../../ml-service/processData.py");
-    const args = [userId.toString()];
+    const args = [userId.toString(), isWeekly.toString()];  // ✅ Pass is_weekly flag
 
     try {
       const output = await this.runScript(script, args);

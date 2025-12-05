@@ -5,6 +5,7 @@ import { LiaUserCircle } from "react-icons/lia";
 import { FiUser, FiLogOut } from "react-icons/fi";
 import { IoChevronDown } from "react-icons/io5";
 import Swal from "sweetalert2";
+import SessionManager from "../services/sessionManager";
 import "./components-css/UserMenu.css";
 
 function UserMenu() {
@@ -28,27 +29,21 @@ function UserMenu() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isOpen]);
 
-  // Fetch user info from session
+  // Fetch user info using cached session manager (INSTANT!)
   useEffect(() => {
     const fetchUserInfo = async () => {
       try {
-        const response = await fetch("http://localhost:5000/check-session", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        const data = await response.json();
+        // ✅ Uses cache - NO API call if data is fresh (from login)
+        const user = await SessionManager.getUserInfo();
         
-        console.log("User session data:", data); // Debug log
-
-        if (data.loggedIn && data.user) {
-          const fullName = `${data.user.firstName} ${data.user.lastName}`;
+        if (user) {
+          const fullName = `${user.firstName} ${user.lastName}`;
           setUserName(fullName);
         } else {
           setUserName("User Name");
         }
       } catch (error) {
-        console.error("Failed to fetch user info:", error);
+        console.error("❌ Failed to fetch user info:", error);
         setUserName("User Name");
       }
     };
@@ -72,6 +67,9 @@ function UserMenu() {
           credentials: "include",
         })
           .then(() => {
+            // ✅ Clear all cached session data
+            SessionManager.clearCache();
+            
             Swal.fire({
               icon: "success",
               title: "Logged out successfully!",
@@ -79,7 +77,12 @@ function UserMenu() {
               timer: 1000,
             }).then(() => navigate("/"));
           })
-          .catch((err) => console.error("Logout failed:", err));
+          .catch((err) => {
+            console.error("❌ Logout failed:", err);
+            // Clear cache anyway
+            SessionManager.clearCache();
+            navigate("/");
+          });
       }
     });
   };

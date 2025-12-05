@@ -1,0 +1,10 @@
+{
+  "mean": 2.706329113924051,
+  "std": 1.6414576486177779,
+  "lookback": 90,
+  "product_id": "P0260",
+  "product_name": "Binch Biscuit",
+  "category": "Snacks",
+  "avg_unit_price": 120.0,
+  "total_samples": 790
+}
