@@ -1,0 +1,22 @@
+{
+  "product_id": "P0121",
+  "product_name": "Lotte Chum Churum Soju",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 191,
+      "val_start_idx": 192,
+      "val_end_idx": 281,
+      "LSTM": {
+        "RMSE": 1.2155414557160589,
+        "MAE": 0.8550580659868146,
+        "MAPE": 89.8054168005451
+      },
+      "XGB": {
+        "RMSE": 1.1971514659495968,
+        "MAE": 0.8757686263985104,
+        "MAPE": 50.23242031792064
+      }
+    }
+  ]
+}

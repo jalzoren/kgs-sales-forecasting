@@ -3,6 +3,7 @@ import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Navbar2 from "./components/Navbar2";
 import { NotificationProvider } from "./components/Notifications";
+import { StatsProvider } from "./pages/statsContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AuthRoute from "./components/AuthRoute";
 import LoadingCheck from "./pages/LoadingCheck";
@@ -35,84 +36,86 @@ function App() {
   };
 
   return (
-    <NotificationProvider>
-      {showNavbar()}
+    // ✅ Wrap entire app with StatsProvider for global stats sharing
+    <StatsProvider>
+      <NotificationProvider>
+        {showNavbar()}
 
-      <div className={`page-container ${noNavbarPaths.includes(path) ? "no-navbar" : ""}`}>
-        <Routes>
-          {/* Public Roautes */}
-          <Route path="/" element={<Login />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot" element={<Forgot />} />
+        <div className={`page-container ${noNavbarPaths.includes(path) ? "no-navbar" : ""}`}>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot" element={<Forgot />} />
 
-          {/* === THIS IS THE MAGIC LINE === */}
-          {/* Every authenticated user MUST go through LoadingCheck first */}
-          <Route 
-            path="/loading-check" 
-            element={
+            {/* Loading Check - Every authenticated user goes through here first */}
+            <Route 
+              path="/loading-check" 
+              element={
+                <AuthRoute>
+                  <LoadingCheck />
+                </AuthRoute>
+              } 
+            />
+
+            {/* After login → always redirect here first */}
+            <Route 
+              path="/dashboard" 
+              element={
+                <AuthRoute>
+                  <Navigate to="/loading-check" replace />
+                </AuthRoute>
+              } 
+            />
+
+            {/* Protected Pages */}
+            <Route path="/welcome" element={
               <AuthRoute>
-                <LoadingCheck />
+                <Welcome />
               </AuthRoute>
-            } 
-          />
+            } />
 
-          {/* After login → always redirect here first */}
-          <Route 
-            path="/dashboard" 
-            element={
+            <Route path="/home" element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/data" element={
+              <AuthRoute>
+                <Data />
+              </AuthRoute>
+            } />
+
+            <Route path="/forecast" element={
+              <ProtectedRoute>
+                <Forecast />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/analytics" element={
+              <ProtectedRoute>
+                <Analytics />
+              </ProtectedRoute>
+            } />
+
+            {/* Catch-all: redirect to loading check if authenticated */}
+            <Route path="*" element={
               <AuthRoute>
                 <Navigate to="/loading-check" replace />
               </AuthRoute>
-            } 
-          />
-
-          {/* Protected Pages — now safe because LoadingCheck already ran */}
-          <Route path="/welcome" element={
-            <AuthRoute>
-              <Welcome />
-            </AuthRoute>
-          } />
-
-          <Route path="/home" element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/data" element={
-            <AuthRoute>
-              <Data />
-            </AuthRoute>
-          } />
-
-          <Route path="/forecast" element={
-            <ProtectedRoute>
-              <Forecast />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/reports" element={
-            <ProtectedRoute>
-              <Reports />
-            </ProtectedRoute>
-          } />
-
-          <Route path="/analytics" element={
-            <ProtectedRoute>
-              <Analytics />
-            </ProtectedRoute>
-          } />
-
-          {/* Catch-all: redirect to loading check if authenticated */}
-          <Route path="*" element={
-            <AuthRoute>
-              <Navigate to="/loading-check" replace />
-            </AuthRoute>
-          } />
-        </Routes>
-      </div>
-    </NotificationProvider>
+            } />
+          </Routes>
+        </div>
+      </NotificationProvider>
+    </StatsProvider>
   );
 }
 

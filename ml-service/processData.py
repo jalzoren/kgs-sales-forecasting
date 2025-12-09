@@ -173,7 +173,7 @@ def preprocess_weekly_data(file_path: str, output_path: str):
     # Save to WEEKLY folder (NOT cleanData)
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     agg.to_excel(output_path, index=False)
-    print(f"✅ Weekly data saved to: {output_path}")
+    print(f" Weekly data saved to: {output_path}")
     return output_path
 
 

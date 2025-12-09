@@ -470,7 +470,7 @@ def forecast_for_user(user_id: str):
             print(f"[Evaluation] Failed to read weekly processed file: {str(e)}")
             actuals_df = None
     else:
-        print("[Evaluation] No weekly processed (_processed_) file found for user — skipping forecast evaluation.")
+        print("[Evaluation] No weekly processed (_processed_) file found for user skipping forecast evaluation.")
 
     # Build output path (week-based)
     latest_date = df["Date"].max()
@@ -486,7 +486,7 @@ def forecast_for_user(user_id: str):
 
     # remove existing file to replace with new forecast
     if os.path.exists(out_path):
-        print(f"⚠️  Existing forecast file found for week {week_start_str} to {week_end_str}. Updating...")
+        print(f"  Existing forecast file found for week {week_start_str} to {week_end_str}. Updating...")
         os.remove(out_path)
 
     print(f"\n Saving forecast to: {out_path}")
@@ -546,15 +546,15 @@ def forecast_for_user(user_id: str):
 
     print("\n" + "=" * 70)
     print(" Forecasting Completed Successfully!")
-    print(f"    Output file: {out_path}")
+    print(f" Output file: {out_path}")
     sheet_list = list(combined_forecasts.keys()) + (["demand_alerts"] if "90d_forecast" in combined_forecasts else [])
-    print(f"    Forecast sheets: {sheet_list}")
+    print(f" Forecast sheets: {sheet_list}")
     if training_metrics_df is not None:
-        print("    Training metrics included in sheet: training_metrics")
+        print(" Training metrics included in sheet: training_metrics")
     if actuals_df is not None:
-        print("    Evaluation sheets added (per-horizon) and summary: forecast_evaluation_summary")
+        print(" Evaluation sheets added (per-horizon) and summary: forecast_evaluation_summary")
     else:
-        print("    No evaluation performed (no weekly actuals found).")
+        print(" No evaluation performed (no weekly actuals found).")
 
     return out_path
 

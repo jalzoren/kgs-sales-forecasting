@@ -7,6 +7,7 @@ import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import Swal from "sweetalert2";
 import { useNotifications } from "../components/Notifications";
+import SessionManager from "../services/sessionManager";
 import {
   FaBell,
   FaCog,
@@ -14,6 +15,7 @@ import {
   FaExclamationTriangle,
   FaInfoCircle,
 } from "react-icons/fa";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
@@ -34,12 +36,10 @@ export default function UploadBox() {
   const [sortOrder, setSortOrder] = useState("Newest First");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const [uploadStatusMap, setUploadStatusMap] = useState({}); // Track status by salesID
-
+  const [uploadStatusMap, setUploadStatusMap] = useState({});
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const fetchUploads = async (showLoading = false) => {
-    // Only show loading indicator on initial load
     if (showLoading && isInitialLoad) {
       Swal.fire({
         title: "Loading...",
@@ -52,14 +52,13 @@ export default function UploadBox() {
     }
 
     try {
-      // ✅ Add ?polling=true for background refreshes
-    const url = showLoading 
-      ? "http://localhost:5000/api/data"  // Initial load - logs
-      : "http://localhost:5000/api/data?polling=true";  // Background refresh - silent
-    
-    const res = await fetch(url, {
-      credentials: "include",
-    });
+      const url = showLoading 
+        ? "http://localhost:5000/api/data"
+        : "http://localhost:5000/api/data?polling=true";
+      
+      const res = await fetch(url, {
+        credentials: "include",
+      });
       
       if (res.status === 401) {
         if (showLoading && isInitialLoad) {
@@ -115,13 +114,11 @@ export default function UploadBox() {
   };
 
   useEffect(() => {
-    // Initial load with loading indicator
     fetchUploads(true);
     
-    // Periodically refresh uploads silently (without SWAL) to get status updates
     const refreshInterval = setInterval(() => {
-      fetchUploads(false); // Silent refresh
-    }, 5000); // Refresh every 5 seconds (reduced frequency)
+      fetchUploads(false);
+    }, 5000);
     
     return () => clearInterval(refreshInterval);
   }, []);
@@ -146,7 +143,6 @@ export default function UploadBox() {
     const formData = new FormData();
     formData.append("file", file);
 
-    // 1) Show uploading info
     const uploadingId = showInfo("Uploading sales data...");
     Swal.fire({
       title: "Uploading...",
@@ -165,11 +161,9 @@ export default function UploadBox() {
       const result = await res.json();
 
       if (!res.ok) {
-        // Close loading
         Swal.close();
         removeNotification(uploadingId);
         
-        // Show error with details
         Swal.fire({
           icon: "error",
           title: "Upload Failed",
@@ -180,25 +174,24 @@ export default function UploadBox() {
       }
 
       if (res.ok) {
-        // Close loader and switch to notifications-only UX
         Swal.close();
 
-        // 2) Remove 'Uploading...' and show 'Uploaded successfully'
+        // ✅ CACHE INVALIDATION - Dashboard needs fresh data
+        console.log("🔄 Data uploaded - invalidating dashboard cache...");
+        SessionManager.invalidateDashboardCache();
+
         removeNotification(uploadingId);
         showSuccess(`Sales data uploaded successfully: ${file.name}`);
 
-        // Get salesID from response
         const salesID = result.salesID;
         
-        // Update local status to "Uploaded"
         if (salesID) {
           setUploadStatusMap(prev => ({ ...prev, [salesID]: "Uploaded" }));
         }
 
-        // Refresh uploads to get the new record
         await fetchUploads();
 
-        // 3) Start preprocessing progress polling
+        // Start preprocessing progress polling
         let progressNotifId = null;
         const poll = async () => {
           try {
@@ -209,10 +202,9 @@ export default function UploadBox() {
               }
             );
             if (!statusRes.ok) return;
-            const status = await statusRes.json(); // { state, progress, message }
+            const status = await statusRes.json();
 
             if (status.state === "running") {
-              // Update status to "Preprocessing"
               if (salesID) {
                 setUploadStatusMap(prev => ({ ...prev, [salesID]: "Preprocessing" }));
                 setUploads(prev => prev.map(u => 
@@ -245,13 +237,13 @@ export default function UploadBox() {
               });
               clearInterval(pollInterval);
               
-              // Refresh uploads to get updated status from backend
-              fetchUploads();
+              // ✅ Preprocessing done - invalidate cache again
+              console.log("🔄 Preprocessing done - invalidating cache...");
+              SessionManager.invalidateDashboardCache();
               
-              // Start training status polling if needed
+              fetchUploads();
               startTrainingStatusPolling(salesID);
             } else if (status.state === "error") {
-              // Update status to "Failed"
               if (salesID) {
                 setUploadStatusMap(prev => ({ ...prev, [salesID]: "Failed" }));
                 setUploads(prev => prev.map(u => 
@@ -270,8 +262,6 @@ export default function UploadBox() {
                 });
               }
               clearInterval(pollInterval);
-              
-              // Refresh uploads to get updated status from backend
               fetchUploads();
             }
           } catch (e) {
@@ -279,7 +269,7 @@ export default function UploadBox() {
           }
         };
         const pollInterval = setInterval(poll, 1500);
-        poll(); // fire immediately
+        poll();
 
         // Function to poll training status
         const startTrainingStatusPolling = (fileSalesID) => {
@@ -296,7 +286,6 @@ export default function UploadBox() {
               const trainingStatus = await trainingStatusRes.json();
 
               if (trainingStatus.state === "running") {
-                // Update status to "Training"
                 if (fileSalesID) {
                   setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Training" }));
                   setUploads(prev => prev.map(u => 
@@ -319,7 +308,6 @@ export default function UploadBox() {
                   });
                 }
               } else if (trainingStatus.state === "done") {
-                // Update status to "Completed"
                 if (fileSalesID) {
                   setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Completed" }));
                   setUploads(prev => prev.map(u => 
@@ -337,10 +325,12 @@ export default function UploadBox() {
                 });
                 clearInterval(trainingPollInterval);
                 
-                // Refresh uploads to get updated status from backend
+                // ✅ Training complete - invalidate cache (models are ready!)
+                console.log("🔄 Training complete - invalidating cache...");
+                SessionManager.invalidateDashboardCache();
+                
                 fetchUploads();
               } else if (trainingStatus.state === "error") {
-                // Update status to "Failed"
                 if (fileSalesID) {
                   setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Failed" }));
                   setUploads(prev => prev.map(u => 
@@ -359,11 +349,8 @@ export default function UploadBox() {
                   });
                 }
                 clearInterval(trainingPollInterval);
-                
-                // Refresh uploads to get updated status from backend
                 fetchUploads();
               } else if (trainingStatus.state === "idle") {
-                // Training not started yet, but preprocessing is done - mark as completed
                 if (fileSalesID) {
                   setUploadStatusMap(prev => ({ ...prev, [fileSalesID]: "Completed" }));
                   setUploads(prev => prev.map(u => 
@@ -371,8 +358,6 @@ export default function UploadBox() {
                   ));
                 }
                 clearInterval(trainingPollInterval);
-                
-                // Refresh uploads to get updated status from backend
                 fetchUploads();
               }
             } catch (e) {
@@ -380,7 +365,7 @@ export default function UploadBox() {
             }
           };
           const trainingPollInterval = setInterval(pollTraining, 1500);
-          pollTraining(); // fire immediately
+          pollTraining();
         };
 
         setCurrentPage(1);
@@ -432,6 +417,11 @@ export default function UploadBox() {
 
       if (res.ok) {
         setUploads((prev) => prev.filter((u) => u.salesID !== id));
+        
+        // ✅ Data deleted - invalidate cache
+        console.log("🔄 Data deleted - invalidating dashboard cache...");
+        SessionManager.invalidateDashboardCache();
+        
         showSuccess("Sales data file deleted successfully");
         Swal.fire({
           icon: "success",
@@ -497,7 +487,6 @@ export default function UploadBox() {
     }
   };
 
-  // ✅ Filter + Sort + Search + Pagination logic
   const filteredUploads = uploads.filter((item) => {
     const matchesSearch =
       item.fileName?.toLowerCase().includes(search.toLowerCase()) || false;
@@ -511,7 +500,6 @@ export default function UploadBox() {
     return matchesSearch && matchesStatus;
   });
 
-  // ✅ Sorting by upload date
   const sortedUploads = [...filteredUploads].sort((a, b) => {
     const dateA = new Date(a.uploadDate).getTime();
     const dateB = new Date(b.uploadDate).getTime();
@@ -584,7 +572,7 @@ export default function UploadBox() {
           <ul class="manual-status-list">
             <li><span class="manual-status manual-status-uploaded">Uploaded</span> - File successfully received</li>
             <li><span class="manual-status manual-status-processing">Preprocessing</span> - Data is being cleaned and validated</li>
-            <li><span class="manual-status manual-status-processing">Training</span> - Machine Learning are being trained</li>
+            <li><span class="manual-status manual-status-processing">Training</span> - Machine Learning models are being trained</li>
             <li><span class="manual-status manual-status-completed">Completed</span> - Processing finished successfully</li>
             <li><span class="manual-status manual-status-failed">Failed</span> - An error occurred (check file format)</li>
           </ul>
@@ -635,15 +623,14 @@ export default function UploadBox() {
       }
     });
   };
+
   return (
     <div>
       <h2 className="titled">Data Management</h2>
 
-      {/* Upload Box */}
       <div className="upload-data-container">
         <div className="upload-box">
           <div className="upload-header">
-            {" "}
             <h3 className="title">Upload New Data</h3>
             <i
               className="btn-custom-swal"
@@ -683,7 +670,6 @@ export default function UploadBox() {
 
       <hr />
 
-      {/* Table */}
       <div className="table-wrapper">
         <div className="table-toolbar">
           <div className="search-box">
@@ -726,68 +712,66 @@ export default function UploadBox() {
           </select>
         </div>
 
-      <div className="data-table-container">
-  <table className="data-table">
-    <thead>
-      <tr>
-        <th>Upload Date</th>
-        <th>File Name</th>
-        <th>Records</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentData.length > 0 ? (
-        currentData.map((item) => (
-          <tr key={item.salesID}>
-            <td>
-              {item.uploadDate
-                ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A")
-                : "—"}
-            </td>
-            <td>{item.fileName}</td>
-            <td>{item.records?.toLocaleString() || 0}</td>
-            <td>
-              <span
-                className={`status ${
-                  item.status === "Completed"
-                    ? "success"
-                    : item.status === "Failed" || item.status === "Error"
-                    ? "failed"
-                    : item.status === "Preprocessing" || item.status === "Training"
-                    ? "processing"
-                    : item.status === "Uploaded"
-                    ? "uploaded"
-                    : "pending"
-                }`}
-              >
-                {uploadStatusMap[item.salesID] || item.status}
-              </span>
-            </td>
-            <td className="actions">
-              <button
-                className="btn-delete"
-                onClick={() => handleDelete(item.salesID)}
-              >
-                Delete
-              </button>
-            </td>
-          </tr>
-        ))
-      ) : (
-        <tr>
-          <td colSpan="5" style={{ textAlign: "center", padding: "1rem" }}>
-            No data available
-          </td>
-        </tr>
-      )}
-    </tbody>
-  </table>
-</div>
+        <div className="data-table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Upload Date</th>
+                <th>File Name</th>
+                <th>Records</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentData.length > 0 ? (
+                currentData.map((item) => (
+                  <tr key={item.salesID}>
+                    <td>
+                      {item.uploadDate
+                        ? dayjs(item.uploadDate).tz().format("MMMM D, YYYY • h:mm A")
+                        : "—"}
+                    </td>
+                    <td>{item.fileName}</td>
+                    <td>{item.records?.toLocaleString() || 0}</td>
+                    <td>
+                      <span
+                        className={`status ${
+                          item.status === "Completed"
+                            ? "success"
+                            : item.status === "Failed" || item.status === "Error"
+                            ? "failed"
+                            : item.status === "Preprocessing" || item.status === "Training"
+                            ? "processing"
+                            : item.status === "Uploaded"
+                            ? "uploaded"
+                            : "pending"
+                        }`}
+                      >
+                        {uploadStatusMap[item.salesID] || item.status}
+                      </span>
+                    </td>
+                    <td className="actions">
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(item.salesID)}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: "center", padding: "1rem" }}>
+                    No data available
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-
-        {/* Pagination  AA*/}
         <div className="pagination">
           <button
             onClick={() => goToPage(currentPage - 1)}

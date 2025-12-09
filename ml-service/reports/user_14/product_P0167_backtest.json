@@ -1,0 +1,22 @@
+{
+  "product_id": "P0167",
+  "product_name": "Samyang Cheese Buldak",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 181,
+      "val_start_idx": 182,
+      "val_end_idx": 271,
+      "LSTM": {
+        "RMSE": 0.7599187574437362,
+        "MAE": 0.6059090804446551,
+        "MAPE": 207.14178453755227
+      },
+      "XGB": {
+        "RMSE": 1.8476491205501302,
+        "MAE": 1.5150635202725729,
+        "MAPE": 66.71590338150659
+      }
+    }
+  ]
+}

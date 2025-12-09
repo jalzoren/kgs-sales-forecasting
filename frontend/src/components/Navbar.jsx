@@ -9,38 +9,23 @@ import SettingsModal from "./SettingsModal";
 import UserMenu from "./UserMenu";
 import "./components-css/Navbar.css";
 import SessionManager from "../services/sessionManager";
+import { useStats } from "./../pages/statsContext";
 
 function Navbar() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-
-  const [stats, setStats] = useState({
-    predictedSales: 0,
-    actualSales: 0,
-    forecastAccuracy: 0,
-    inventoryAlertsCount: 0,
-    variance: 0,
-  });
-
+  const { stats, setStats } = useStats();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDashboardStats();
+    fetchNavbarStats();
   }, []);
 
-  const fetchDashboardStats = async () => {
+  const fetchNavbarStats = async () => {
     try {
-      console.log("🔄 Fetching navbar stats...");
+      console.log("🔄 Navbar: Fetching stats (cached)...");
 
-      const response = await fetch("http://localhost:5000/api/home/dashboard", {
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch dashboard stats");
-      }
-
-      const data = await response.json();
-      console.log("📊 Navbar received data:", data);
+      // ✅ Use SessionManager cache - instant if already loaded!
+      const data = await SessionManager.getDashboardData(7, false);
 
       if (data.success) {
         const newStats = {
@@ -51,13 +36,8 @@ function Navbar() {
           variance: data.stats?.variance || 0,
         };
 
-        console.log("✅ Setting navbar stats:", newStats);
+        console.log("✅ Navbar stats updated:", newStats);
         setStats(newStats);
-
-        // ✅ If we have forecast data, invalidate cache so next check gets fresh data
-        if (data.forecastFile !== "N/A") {
-          SessionManager.invalidateForecastCache();
-        }
       } else {
         console.log("⚠️ Response not successful, using default stats");
       }

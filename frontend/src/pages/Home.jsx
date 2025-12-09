@@ -1,5 +1,4 @@
-// Update your Home.jsx component
-
+// frontend/src/pages/Home.jsx
 import React, { useState, useEffect } from "react";
 import "../css/Home.css";
 import { GoScreenFull } from "react-icons/go";
@@ -18,8 +17,8 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-
-
+import SessionManager from "../services/sessionManager";
+import { useStats } from "./statsContext";
 
 export default function Home() {
   const [salesData, setSalesData] = useState([]);
@@ -32,13 +31,14 @@ export default function Home() {
   const [inventoryAlerts, setInventoryAlerts] = useState([]);
   const [categoryAccuracy, setCategoryAccuracy] = useState([]);
   const [chartType, setChartType] = useState("line");
-  const [dayRange, setDayRange] = useState(7); // New state for day range
+  const [dayRange, setDayRange] = useState(7);
+  const { setStats } = useStats();
 
   useEffect(() => {
     fetchDashboardData();
-  }, [dayRange]); // Re-fetch when dayRange changes
+  }, [dayRange]);
 
-  const fetchDashboardData = () => {
+  const fetchDashboardData = async () => {
     setLoading(true);
 
     Swal.fire({
@@ -48,108 +48,89 @@ export default function Home() {
       didOpen: () => Swal.showLoading(),
     });
 
-    // Add days parameter to URL
-    fetch(`http://localhost:5000/api/home/dashboard?days=${dayRange}`, {
-      credentials: "include",
-    })
-      .then((res) => {
-        console.log("📡 Response status:", res.status);
-        if (!res.ok) {
-          if (res.status === 401)
-            throw new Error("Please log in to view dashboard");
-          throw new Error("Failed to fetch dashboard data");
-        }
-        return res.json();
-      })
-      .then((response) => {
-        console.log("📊 Full Dashboard Response:", response);
-        console.log(`📅 Loaded ${response.days}-day view`);
+    try {
+      console.log(`📊 Home: Fetching ${dayRange}-day data (cached)...`);
 
-        if (!response.success) {
-          throw new Error(response.error || "Failed to load dashboard data");
-        }
+      // ✅ Use SessionManager cache - instant if Navbar already loaded it!
+      const response = await SessionManager.getDashboardData(dayRange, false);
 
-        // Store file info
-        setFileInfo({
-          salesFile: response.salesFile || "",
-          forecastFile: response.forecastFile || "",
-          futureFile: response.futureFile || "",
-        });
+      if (!response.success) {
+        throw new Error(response.error || "Failed to load dashboard data");
+      }
 
-        // Set inventory alerts
-        if (response.inventoryAlerts && response.inventoryAlerts.length > 0) {
-          console.log("✅ Setting inventory alerts:", response.inventoryAlerts);
-          setInventoryAlerts(response.inventoryAlerts);
-        } else {
-          console.log("⚠️ No inventory alerts found");
-          setInventoryAlerts([]);
-        }
-
-        // Set category accuracy
-        if (response.categoryAccuracy && response.categoryAccuracy.length > 0) {
-          console.log(
-            "✅ Setting category accuracy:",
-            response.categoryAccuracy
-          );
-          setCategoryAccuracy(response.categoryAccuracy);
-        } else {
-          console.log("⚠️ No category accuracy data");
-          setCategoryAccuracy([]);
-        }
-
-        // Format chart data from combinedData
-        const combined = response.combinedData || [];
-        const formattedData = combined.map((item) => {
-          let dateObj;
-          try {
-            dateObj = new Date(item.date);
-          } catch {
-            dateObj = new Date();
-          }
-
-          return {
-            name: dateObj.toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            }),
-            date: item.date,
-            actual: item.actual_revenue,
-            forecasted: item.forecasted_revenue,
-            future: item.future_revenue,
-          };
-        });
-
-        console.log("✅ Formatted chart data:", formattedData.length, "points");
-        console.log(
-          "   Actual data points:",
-          formattedData.filter((d) => d.actual !== null).length
-        );
-        console.log(
-          "   Forecasted points:",
-          formattedData.filter((d) => d.forecasted !== null).length
-        );
-        console.log(
-          "   Future points:",
-          formattedData.filter((d) => d.future !== null).length
-        );
-
-        setSalesData(formattedData);
-        Swal.close();
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("❌ Error fetching dashboard:", err);
-        setSalesData([]);
-        setInventoryAlerts([]);
-        setCategoryAccuracy([]);
-        setLoading(false);
-        Swal.fire({
-          icon: "error",
-          title: "Error Loading Dashboard",
-          text: err.message || "Failed to load dashboard data",
-          confirmButtonColor: "#0a4174",
-        });
+      // Store file info
+      setFileInfo({
+        salesFile: response.salesFile || "",
+        forecastFile: response.forecastFile || "",
+        futureFile: response.futureFile || "",
       });
+
+      // Update global stats (for Navbar)
+      if (response.stats) {
+        setStats({
+          predictedSales: response.stats.predictedSales || 0,
+          actualSales: response.stats.actualSales || 0,
+          forecastAccuracy: response.stats.forecastAccuracy || 0,
+          inventoryAlertsCount: response.inventoryAlerts?.length || 0,
+          variance: response.stats.variance || 0,
+        });
+      }
+
+      // Set inventory alerts
+      if (response.inventoryAlerts && response.inventoryAlerts.length > 0) {
+        console.log("✅ Setting inventory alerts:", response.inventoryAlerts);
+        setInventoryAlerts(response.inventoryAlerts);
+      } else {
+        setInventoryAlerts([]);
+      }
+
+      // Set category accuracy
+      if (response.categoryAccuracy && response.categoryAccuracy.length > 0) {
+        console.log("✅ Setting category accuracy:", response.categoryAccuracy);
+        setCategoryAccuracy(response.categoryAccuracy);
+      } else {
+        setCategoryAccuracy([]);
+      }
+
+      // Format chart data
+      const combined = response.combinedData || [];
+      const formattedData = combined.map((item) => {
+        let dateObj;
+        try {
+          dateObj = new Date(item.date);
+        } catch {
+          dateObj = new Date();
+        }
+
+        return {
+          name: dateObj.toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+          }),
+          date: item.date,
+          actual: item.actual_revenue,
+          forecasted: item.forecasted_revenue,
+          future: item.future_revenue,
+        };
+      });
+
+      console.log("✅ Formatted chart data:", formattedData.length, "points");
+      setSalesData(formattedData);
+      Swal.close();
+      setLoading(false);
+    } catch (err) {
+      console.error("❌ Error fetching dashboard:", err);
+      setSalesData([]);
+      setInventoryAlerts([]);
+      setCategoryAccuracy([]);
+      setLoading(false);
+      Swal.fire({
+        icon: "error",
+        title: "Error Loading Dashboard",
+        text: err.message || "Failed to load dashboard data",
+        confirmButtonColor: "#0a4174",
+      });
+    }
   };
 
   // Helper function for inventory alert colors
@@ -183,7 +164,6 @@ export default function Home() {
                   <option value="bar">Bar Chart</option>
                   <option value="area">Area Chart</option>
                 </select>
-                {/* Updated dropdown for day ranges */}
                 <select
                   value={dayRange}
                   onChange={(e) => setDayRange(parseInt(e.target.value))}
@@ -453,99 +433,96 @@ export default function Home() {
         {/* RIGHT SIDE - Inventory Alerts & Category Accuracy */}
         <div className="right-side">
           {/* Inventory Alerts */}
-       {/* Inventory Alerts */}
-<div className="box inventory-box">
-  <div className="inv-header">
-    <h3 className="inv-title">Inventory Alerts</h3>
-    <a href="/analytics" className="inv-link">
-      <GoScreenFull />
-    </a>
-  </div>
+          <div className="box inventory-box">
+            <div className="inv-header">
+              <h3 className="inv-title">Inventory Alerts</h3>
+              <a href="/analytics" className="inv-link">
+                <GoScreenFull />
+              </a>
+            </div>
 
-  <div className="inventory-alerts">
-    {loading ? (
-      <p className="inventory-empty">Loading alerts...</p>
-    ) : inventoryAlerts.length === 0 ? (
-      <p className="inventory-empty">No high-priority alerts</p>
-    ) : (
-      inventoryAlerts.map((alert, idx) => (
-        <div key={idx} className="inventory-item">
-          <div className="product-info">
-            <span className="product-name">{alert.productName}</span>
-            <span className="product-category">
-              {alert.category} • {alert.demandLevel}
-            </span>
+            <div className="inventory-alerts">
+              {loading ? (
+                <p className="inventory-empty">Loading alerts...</p>
+              ) : inventoryAlerts.length === 0 ? (
+                <p className="inventory-empty">No high-priority alerts</p>
+              ) : (
+                inventoryAlerts.map((alert, idx) => (
+                  <div key={idx} className="inventory-item">
+                    <div className="product-info">
+                      <span className="product-name">{alert.productName}</span>
+                      <span className="product-category">
+                        {alert.category} • {alert.demandLevel}
+                      </span>
 
-            {/* Progress bar under text */}
-            <div
-              className={`progress-bar ${
-                alert.demandLevel === "High" ? "high-demand" : ""
-              }`}
-            >
-              <div
-                className="progress-fill"
-                style={{
-                  width: `${getAlertPercentage(alert.avgDailySales)}%`,
-                  backgroundColor: getAlertColor(alert.avgDailySales),
-                }}
-              ></div>
+                      {/* Progress bar under text */}
+                      <div
+                        className={`progress-bar ${
+                          alert.demandLevel === "High" ? "high-demand" : ""
+                        }`}
+                      >
+                        <div
+                          className="progress-fill"
+                          style={{
+                            width: `${getAlertPercentage(alert.avgDailySales)}%`,
+                            backgroundColor: getAlertColor(alert.avgDailySales),
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <span className="value">{Math.round(alert.avgDailySales)}</span>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
-          <span className="value">{Math.round(alert.avgDailySales)}</span>
-        </div>
-      ))
-    )}
-  </div>
-</div>
+          {/* Category Accuracy Chart */}
+          <div className="category-box">
+            <div className="category-header">
+              <h3 className="category-title">Category Accuracy</h3>
+              <a href="/analytics" className="inv-link">
+                <GoScreenFull />
+              </a>
+            </div>
 
-{/* Category Accuracy Chart */}
-<div className="category-box">
-  <div className="category-header">
-    <h3 className="category-title">Category Accuracy</h3>
-    <a href="/analytics" className="inv-link">
-      <GoScreenFull />
-    </a>
-  </div>
-
-  <div className="category-chart-area">
-    {loading ? (
-      <p className="category-empty">Loading categories...</p>
-    ) : categoryAccuracy.length === 0 ? (
-      <p className="category-empty">No category data available</p>
-    ) : (
-      <ResponsiveContainer width="100%" height={250}>
-        <BarChart data={categoryAccuracy} margin={{ top: 20, right: 20, left: -10, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-          <XAxis
-            dataKey="name"
-            tick={{ fontSize: 12, fill: "#555" }}
-            angle={-20}
-            textAnchor="end"
-            height={60}
-          />
-          <YAxis
-            tick={{ fontSize: 12, fill: "#555" }}
-            domain={[0, 100]}
-            label={{ value: "%", angle: -90, position: "insideLeft", fill: "#555", fontSize: 12 }}
-          />
-          <Tooltip
-            formatter={(value) => `${value}%`}
-            contentStyle={{ borderRadius: "8px", border: "1px solid #ddd" }}
-          />
-          <Bar
-            dataKey="accuracy"
-            fill="#52c41a"
-            radius={[6, 6, 0, 0]}
-            barSize={20}
-          />
-        </BarChart>
-      </ResponsiveContainer>
-    )}
-  </div>
-</div>
-
-
+            <div className="category-chart-area">
+              {loading ? (
+                <p className="category-empty">Loading categories...</p>
+              ) : categoryAccuracy.length === 0 ? (
+                <p className="category-empty">No category data available</p>
+              ) : (
+                <ResponsiveContainer width="100%" height={250}>
+                  <BarChart data={categoryAccuracy} margin={{ top: 20, right: 20, left: -10, bottom: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 12, fill: "#555" }}
+                      angle={-20}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 12, fill: "#555" }}
+                      domain={[0, 100]}
+                      label={{ value: "%", angle: -90, position: "insideLeft", fill: "#555", fontSize: 12 }}
+                    />
+                    <Tooltip
+                      formatter={(value) => `${value}%`}
+                      contentStyle={{ borderRadius: "8px", border: "1px solid #ddd" }}
+                    />
+                    <Bar
+                      dataKey="accuracy"
+                      fill="#52c41a"
+                      radius={[6, 6, 0, 0]}
+                      barSize={20}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
         </div>
       </div>
       <br />

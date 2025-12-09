@@ -40,8 +40,8 @@ os.makedirs(REPORT_DIR, exist_ok=True)
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 # Minimum dataset / lookback
-MIN_SAMPLES_REQUIRED = 180    # ~6 months daily
 LOOKBACK = 90                # LSTM lookback window
+MIN_SAMPLES_REQUIRED = LOOKBACK + 30
 
 # BACKTEST CONFIG
 BACKTEST_CONFIG = {
@@ -429,6 +429,11 @@ class ProductForecasterPipeline:
                 print(" Running backtest ...")
                 backtester = Backtester(lookback=self.lookback, test_window=BACKTEST_CONFIG["test_window_days"], max_folds=BACKTEST_CONFIG["max_folds"])
                 fold_metrics = backtester.run_backtest_for_product(product_df, product_id)
+                if not fold_metrics:
+                    report["Backtest_Status"] = "NO_BACKTEST"
+                else:
+                    report["Backtest_Status"] = "BACKTEST_OK"
+
                 # save backtest details
                 backtest_path = os.path.join(self.user_report_dir, f"product_{product_id}_backtest.json")
                 with open(backtest_path, "w", encoding="utf-8") as f:
@@ -516,6 +521,16 @@ class ProductForecasterPipeline:
                 "XGB_MAPE": xgb_metrics["MAPE"],
             })
 
+            if n_samples < BACKTEST_CONFIG["min_train_samples"]:
+                report["Backtest_Note"] = "No backtest due to insufficient sales history (<210 rows)"
+            else:
+                report["Backtest_Note"] = "Backtest completed"
+
+            if n_samples < MIN_SAMPLES_REQUIRED:
+                report["Training_Note"] = "NOT TRAINED — insufficient data (<120 rows)"
+            else:
+                report["Training_Note"] = "Fully trained"
+
             print(f" Saved models for product {product_id} -> {product_model_dir}")
             return report
 
@@ -528,10 +543,13 @@ class ProductForecasterPipeline:
         df = self.data_loader.load_data()
         product_groups = df.groupby("Product_ID")
         product_counts = product_groups.size()
+        products_missing_training = product_counts[product_counts < MIN_SAMPLES_REQUIRED].index.tolist()
         valid_products = product_counts[product_counts >= MIN_SAMPLES_REQUIRED].index.tolist()
 
         print(f"\nProducts with sufficient data: {len(valid_products)} (required >= {MIN_SAMPLES_REQUIRED})")
         all_reports = []
+        products_without_backtest = []
+        products_with_backtest = []
 
         # Prepare tasks
         tasks = []
@@ -544,12 +562,39 @@ class ProductForecasterPipeline:
             for fut in as_completed(futures):
                 res = fut.result()
                 all_reports.append(res)
+            
+            for rep in all_reports:
+                if "error" in rep:
+                    continue
+                if rep.get("Backtest_Status") == "NO_BACKTEST":
+                    products_without_backtest.append(rep["Product_ID"])
+                else:
+                    products_with_backtest.append(rep["Product_ID"])
+
 
         # Save consolidated CSV report
         if all_reports:
             report_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_report.csv")
             pd.DataFrame(all_reports).to_csv(report_path, index=False)
             print(f"\nTraining completed for {len(all_reports)} products. Report saved: {report_path}")
+
+            summary = {
+                "total_products": len(product_counts),
+                "trained_products": len(valid_products),
+                "excluded_products_due_to_insufficient_data": products_missing_training,
+                "products_without_backtest": products_without_backtest,
+                "products_with_backtest": products_with_backtest,
+                "notes": {
+                    "insufficient_data": "Products with <120 days of data cannot be trained and will NOT appear in forecasting.",
+                    "no_backtest": "Products trained but without backtest metrics should NOT be fully trusted due to lack of validation.",
+                }
+            }
+
+            summary_path = os.path.join(REPORT_DIR, f"user_{self.user_id}_training_summary.json")
+            with open(summary_path, "w", encoding="utf-8") as f:
+                json.dump(summary, f, indent=2)
+            print(f"Summary saved: {summary_path}")
+
         else:
             print("\nNo products were successfully trained.")
 
