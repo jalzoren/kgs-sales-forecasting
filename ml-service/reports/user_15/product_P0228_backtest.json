@@ -1,0 +1,22 @@
+{
+  "product_id": "P0228",
+  "product_name": "Sempio Gochujang (500g)",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 191,
+      "val_start_idx": 192,
+      "val_end_idx": 281,
+      "LSTM": {
+        "RMSE": 1.0939140807311283,
+        "MAE": 0.8890478347026938,
+        "MAPE": 102.57739112514747
+      },
+      "XGB": {
+        "RMSE": 1.1824883190717654,
+        "MAE": 0.9513288180033366,
+        "MAPE": 48.275510540714976
+      }
+    }
+  ]
+}

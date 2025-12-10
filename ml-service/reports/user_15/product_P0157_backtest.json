@@ -1,0 +1,22 @@
+{
+  "product_id": "P0157",
+  "product_name": "Nongshim Yachae Ramyeon 100g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 120,
+      "val_start_idx": 121,
+      "val_end_idx": 210,
+      "LSTM": {
+        "RMSE": 1.1402073582343324,
+        "MAE": 0.7952457829125623,
+        "MAPE": 95.2513893755425
+      },
+      "XGB": {
+        "RMSE": 1.1494087119145275,
+        "MAE": 0.8254372835159302,
+        "MAPE": 38.704809917343994
+      }
+    }
+  ]
+}

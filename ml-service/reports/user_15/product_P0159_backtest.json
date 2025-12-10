@@ -1,0 +1,22 @@
+{
+  "product_id": "P0159",
+  "product_name": "Nongshim Neuguri Cup 111g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 145,
+      "val_start_idx": 146,
+      "val_end_idx": 235,
+      "LSTM": {
+        "RMSE": 0.8506542502305089,
+        "MAE": 0.7188770194430797,
+        "MAPE": 100.15820454138873
+      },
+      "XGB": {
+        "RMSE": 0.8959662551585552,
+        "MAE": 0.6907561593585544,
+        "MAPE": 38.85099074575636
+      }
+    }
+  ]
+}
