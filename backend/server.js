@@ -14,7 +14,7 @@ const homeRoutes = require("./routes/homeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000; // REQUIRED in Render
 
 // =====================================================
 // Enable CORS
