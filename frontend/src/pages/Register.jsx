@@ -101,93 +101,94 @@ const Register = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Mark fields as touched
-    setTouched({
-      password: true,
-      confirmPassword: true,
-    });
-
-    // Basic validation
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.confirmPassword
-    ) {
-      Swal.fire("Warning", "Please fill in all required fields.", "warning");
-      return;
-    }
-
-    if (!isPasswordValid) {
-      Swal.fire("Error", "Please fix password validation errors.", "error");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      Swal.fire("Error", "Passwords do not match.", "error");
-      return;
-    }
-
-    // Show loading alert
-    Swal.fire({
-      title: "Creating Account...",
-      text: "Please wait while we create your account",
-      allowOutsideClick: false,
-      didOpen: () => {
-        Swal.showLoading();
-      },
-    });
-
-   try {
-  const response = await fetch(`${API}/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(formData),
+  // Mark fields as touched
+  setTouched({
+    password: true,
+    confirmPassword: true,
   });
 
-  let data = {};
-  try {
-    data = await response.json();
-  } catch {
-    console.warn("⚠ Server returned no JSON body.");
+  // Basic validation
+  if (
+    !formData.firstName ||
+    !formData.lastName ||
+    !formData.email ||
+    !formData.password ||
+    !formData.confirmPassword
+  ) {
+    Swal.fire("Warning", "Please fill in all required fields.", "warning");
+    return;
   }
 
-  Swal.close();
+  if (!isPasswordValid) {
+    Swal.fire("Error", "Please fix password validation errors.", "error");
+    return;
+  }
 
-  if (response.ok) {
-    Swal.fire({
-      icon: "success",
-      title: "Registration Successful!",
-      text: "Welcome! Let's get started with setting up your forecasting system.",
-      confirmButtonColor: "#001D39",
-    }).then(() => {
-      navigate("/welcome");
+  if (formData.password !== formData.confirmPassword) {
+    Swal.fire("Error", "Passwords do not match.", "error");
+    return;
+  }
+
+  // Show loading alert
+  Swal.fire({
+    title: "Creating Account...",
+    text: "Please wait while we create your account",
+    allowOutsideClick: false,
+    didOpen: () => {
+      Swal.showLoading();
+    },
+  });
+
+  try {
+    const response = await fetch(`${API}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(formData),
     });
-  } else {
+
+    // Safely parse JSON
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {
+      console.warn("⚠ Server returned no JSON body.");
+    }
+
+    // Close loading alert
+    Swal.close();
+
+    if (response.ok) {
+      Swal.fire({
+        icon: "success",
+        title: "Registration Successful!",
+        text: "Welcome! Let's get started with setting up your forecasting system.",
+        confirmButtonColor: "#001D39",
+      }).then(() => {
+        navigate("/welcome"); // ✅ Redirect after registration
+      });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: data.message || "Failed to create account",
+        confirmButtonColor: "#001D39",
+      });
+    }
+  } catch (error) {
+    // Close loading alert on network/error
+    Swal.close();
+    console.error("Error:", error);
     Swal.fire({
       icon: "error",
-      title: "Registration Failed",
-      text: data.message || "Failed to create account",
+      title: "Connection Error",
+      text: "Cannot connect to the server. Please try again.",
       confirmButtonColor: "#001D39",
     });
   }
-} catch (error) {
-  Swal.close();
-  console.error("Error:", error);
-
-  Swal.fire({
-    icon: "error",
-    title: "Connection Error",
-    text: "Cannot connect to the server. Please try again.",
-    confirmButtonColor: "#001D39",
-  });
-}
+};
 
 
   // PRIVACY & TERMS MODALS
