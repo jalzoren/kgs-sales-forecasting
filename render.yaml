@@ -22,15 +22,24 @@ services:
           name: react-frontend
           type: static_site
           property: url
-      # DB Variables (edit manually later)
+      # DB Variables for Supabase
       - key: DB_HOST
         value: db.ismmhblktrfumijtynxx.supabase.co
+      - key: DB_PORT
+        value: 5432
       - key: DB_USER
         value: postgres
       - key: DB_PASS
         value: BCFsalesPCym6D9NDKJR3MHs
       - key: DB_NAME
         value: postgres
+      # Session & Email
+      - key: SESSION_SECRET
+        value: superSecretKey123!
+      - key: EMAIL_USER
+        value: salesforecastingbcf@gmail.com
+      - key: EMAIL_PASS
+        value: aaiz ckgx rtqc buck
 
     disk:
       name: backend-storage
