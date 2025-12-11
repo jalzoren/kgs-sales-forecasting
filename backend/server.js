@@ -97,8 +97,9 @@ app.post("/test-notification", (req, res) => {
 // =====================================================
 async function startServer() {
   try {
-    await db.query("SELECT 1"); // Test DB connection
-    console.log("✅ Connected to MySQL Database");
+    // Test connection
+    const res = await db.query("SELECT 1"); 
+    console.log("✅ Connected to Supabase Postgres:", res.rows);
 
     app.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`);
@@ -109,4 +110,3 @@ async function startServer() {
   }
 }
 
-startServer();
