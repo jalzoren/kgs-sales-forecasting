@@ -1,17 +1,24 @@
 // backend/config/db.js
-const mysql = require("mysql2");
+const { Pool } = require("pg");
 
 // Create a connection pool
-const pool = mysql.createPool({
+const pool = new Pool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  port: 3306,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  port: process.env.DB_PORT || 5432,
+  ssl: { rejectUnauthorized: false } // required for Supabase
 });
 
-// Export promise-based pool for queries
-module.exports = pool.promise();
+// Test connection
+pool.on("connect", () => {
+  console.log("✅ Database connected to Supabase");
+});
+
+pool.on("error", (err) => {
+  console.error("❌ Database connection error:", err);
+});
+
+// Export pool for queries
+module.exports = pool;
