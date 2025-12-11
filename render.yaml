@@ -1,0 +1,69 @@
+services:
+  # ================================
+  # Backend (Express JS)
+  # ================================
+  - type: web
+    name: express-backend
+    env: node
+    rootDir: backend
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    plan: starter
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: PYTHON_API
+        fromService:
+          name: fastapi-ml-service
+          type: web
+          property: url
+      - key: CORS_ORIGIN
+        fromService:
+          name: react-frontend
+          type: static_site
+          property: url
+      # DB Variables (edit manually later)
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASS
+        sync: false
+      - key: DB_NAME
+        sync: false
+
+    disk:
+      name: backend-storage
+      mountPath: /opt/render/project/src/files
+      sizeGB: 5
+
+  # ================================
+  # ML Service (Python FastAPI)
+  # ================================
+  - type: web
+    name: fastapi-ml-service
+    env: python
+    rootDir: ml-service
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "uvicorn main_app:app --host 0.0.0.0 --port 8000"
+    plan: starter
+
+  # ================================
+  # Frontend (React Vite)
+  # ================================
+  - type: static_site
+    name: react-frontend
+    rootDir: frontend
+    buildCommand: "npm install && npm run build"
+    publishPath: "dist"
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: express-backend
+          type: web
+          property: url
+      - key: VITE_PYTHON_URL
+        fromService:
+          name: fastapi-ml-service
+          type: web
+          property: url
