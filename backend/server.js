@@ -1,59 +1,79 @@
 // backend/server.js
+const db = require("./config/db"); // your Pool from db.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+
+// ROUTES
 const sessionConfig = require("./config/sessionConfig");
-
-// Database
-const db = require("./config/db");
-
-// Routes
 const authRoutes = require("./routes/authRoutes");
 const dataRoutes = require("./routes/dataRoutes");
-const forecastRoutes = require("./routes/forecast");
-const analyticsRoutes = require("./routes/analyticsRoutes");
-const homeRoutes = require("./routes/homeRoutes");
+const forecastRoutes = require("./routes/forecast"); 
+const analyticsRoutes = require("./routes/analyticsRoutes"); 
+const homeRoutes = require("./routes/homeRoutes"); 
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000; // REQUIRED in Render
 
+// =====================================================
 // Enable CORS
+// =====================================================
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "https://kgs-sales-forecasting-frontend.onrender.com",
-  credentials: true
+  origin: "https://kgs-sales-forecasting-frontend.onrender.com",
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // ✅ Added PATCH
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+
+// =====================================================
 // Sessions
+// =====================================================
 app.use(sessionConfig);
 
-// JSON parser
+// =====================================================
+// JSON Body Parser
+// =====================================================
 app.use(express.json());
 
-// Static files
-app.use("/files", express.static(path.join(__dirname, "files")));
+// =====================================================
+// Serve static files (forecast Excel files)
+// =====================================================
+app.use(
+  "/files",
+  express.static(path.join(__dirname, "files"))
+);
 
-// Routes
+// =====================================================
+// Mount routes
+// =====================================================
 app.use("/", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
-app.use("/", analyticsRoutes);
-app.use("/", homeRoutes);
+app.use("/", analyticsRoutes); 
+app.use("/", homeRoutes); 
 app.use("/api/notifications", notificationRoutes);
 
+// =====================================================
 // Default route
-app.get("/", (req, res) => res.send("Sales Forecasting System - Backend Running 🚀"));
-
-// Session check endpoints
-app.get("/api/check-session", (req, res) => {
-  if (req.session && req.session.user) {
-    return res.json({ loggedIn: true, user: req.session.user });
-  }
-  res.status(401).json({ loggedIn: false });
+// =====================================================
+app.get("/", (req, res) => {
+  res.send("Sales Forecasting System - Backend Running 🚀");
 });
 
-// Debug session
+// =====================================================
+// Session check endpoint
+// =====================================================
+app.get("/api/check-session", (req, res) => {
+  if (req.session && req.session.user) {
+    res.json({ loggedIn: true, user: req.session.user });
+  } else {
+    res.status(401).json({ loggedIn: false });
+  }
+});
+
 app.get("/api/debug-session", (req, res) => {
   res.json({
     hasSession: !!req.session,
@@ -63,27 +83,32 @@ app.get("/api/debug-session", (req, res) => {
   });
 });
 
-// Test notification
 app.post("/test-notification", (req, res) => {
+  console.log("Test notification - Session:", req.session);
+  console.log("Test notification - User:", req.session?.user);
   res.json({
     hasSession: !!req.session,
     user: req.session?.user || null
   });
 });
 
-// Start server after DB connection
+// =====================================================
+// Start server
+// =====================================================
 async function startServer() {
   try {
+    // Test DB connection
     await db.query("SELECT 1");
-    console.log("✅ Connected to Supabase Postgres");
+    console.log("✅ Connected to Supabase");
 
     app.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`);
     });
   } catch (err) {
     console.error("❌ Database connection failed:", err.message);
-    process.exit(1);
+    process.exit(1); // Stop server if DB fails
   }
 }
 
 startServer();
+
