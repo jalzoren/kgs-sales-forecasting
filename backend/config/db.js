@@ -1,7 +1,7 @@
 // backend/config/db.js
 const axios = require("axios");
 
-const SUPABASE_URL = process.env.SUPABASE_URL + "/rest/v1"; // REST endpoint
+const SUPABASE_URL = process.env.SUPABASE_URL; // REST endpoint
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 // Mimic query interface
