@@ -556,7 +556,57 @@ def forecast_for_user(user_id: str):
     else:
         print(" No evaluation performed (no weekly actuals found).")
 
-    return out_path
+    result = {
+    "status": "success",
+    "user_id": str(user_id),
+    "forecast_file": out_path,
+    "generated_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    "forecast_period": {
+        "start": forecast_start_date.strftime("%Y-%m-%d"),
+        "end_7d": forecast_end_date_7d.strftime("%Y-%m-%d"),
+        "end_90d": forecast_end_date_90d.strftime("%Y-%m-%d")
+    },
+    "forecasts": {},
+    "evaluation": {},
+    "demand_levels": []
+    }
+
+    # --- 1. Add forecast slices ---
+    for horizon in HORIZONS:
+        key = f"{horizon}d_forecast"
+        if key in combined_forecasts:
+            result["forecasts"][str(horizon)] = (
+                combined_forecasts[key]
+                .to_dict(orient="records")
+            )
+
+    # --- 2. Add demand classification ---
+    if "90d_forecast" in combined_forecasts:
+        demand = calculate_demand_levels(combined_forecasts["90d_forecast"])
+        result["demand_levels"] = demand.to_dict(orient="records")
+
+    # --- 3. Add evaluation summary ---
+    if actuals_df is not None:
+        eval_summary = {}
+        for horizon in HORIZONS:
+            sheet_key = f"{horizon}d_forecast"
+            if sheet_key not in combined_forecasts:
+                continue
+
+            fdf = combined_forecasts[sheet_key]
+            eval_df, overall = evaluate_forecasts_against_actuals(fdf, actuals_df)
+
+            eval_summary[str(horizon)] = {
+                "overall": overall["overall"],
+                "records": overall["n"],
+                "per_product": eval_df.to_dict(orient="records")
+            }
+
+        result["evaluation"] = eval_summary
+    else:
+        result["evaluation"] = {"note": "No weekly actuals found"}
+
+    return result
 
 
 # -------------------------
