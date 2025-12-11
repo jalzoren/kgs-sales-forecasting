@@ -1,7 +1,5 @@
 services:
-  # ================================
   # Backend (Express JS)
-  # ================================
   - type: web
     name: express-backend
     env: node
@@ -18,11 +16,7 @@ services:
           type: web
           property: url
       - key: CORS_ORIGIN
-        fromService:
-          name: react-frontend
-          type: static_site
-          property: url
-      # DB Variables for Supabase
+        value: https://kgs-sales-forecasting-frontend.onrender.com
       - key: DB_HOST
         value: db.ismmhblktrfumijtynxx.supabase.co
       - key: DB_PORT
@@ -33,7 +27,6 @@ services:
         value: BCFsalesPCym6D9NDKJR3MHs
       - key: DB_NAME
         value: postgres
-      # Session & Email
       - key: SESSION_SECRET
         value: superSecretKey123!
       - key: EMAIL_USER
@@ -46,9 +39,7 @@ services:
       mountPath: /opt/render/project/src/files
       sizeGB: 5
 
-  # ================================
   # ML Service (Python FastAPI)
-  # ================================
   - type: web
     name: fastapi-ml-service
     env: python
@@ -57,9 +48,7 @@ services:
     startCommand: "uvicorn main_app:app --host 0.0.0.0 --port 8000"
     plan: starter
 
-  # ================================
   # Frontend (React Vite)
-  # ================================
   - type: static_site
     name: react-frontend
     rootDir: frontend
