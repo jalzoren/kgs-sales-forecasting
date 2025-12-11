@@ -1,16 +1,30 @@
-const { Pool } = require("pg");
+// backend/config/db.js
+const axios = require("axios");
 
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT || 5432,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  ssl: { rejectUnauthorized: false }, // required for Supabase
-  family: 4 // force IPv4
-});
+const SUPABASE_URL = process.env.SUPABASE_URL + "/rest/v1"; // REST endpoint
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
-pool.on("connect", () => console.log("✅ Database pool initialized"));
-pool.on("error", (err) => console.error("❌ Postgres Pool Error:", err));
+// Mimic query interface
+const db = {
+  query: async (table, options = {}) => {
+    try {
+      const res = await axios({
+        method: options.method || "GET",
+        url: `${SUPABASE_URL}/${table}`,
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+        },
+        params: options.params || null,
+        data: options.data || null,
+      });
+      return res.data;
+    } catch (err) {
+      console.error("❌ Supabase API query error:", err.response?.data || err.message);
+      throw err;
+    }
+  }
+};
 
-module.exports = pool;
+module.exports = db;
