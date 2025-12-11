@@ -141,48 +141,54 @@ const Register = () => {
       },
     });
 
-    try {
-      const response = await fetch("${API}/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+   try {
+  const response = await fetch(`${API}/register`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(formData),
+  });
 
-      const data = await response.json();
+  let data = {};
 
-      // Close loading alert
-      Swal.close();
+  try {
+    data = await response.json();
+  } catch (e) {
+    console.warn("⚠ No JSON body returned from server");
+  }
 
-      if (response.ok) {
-        Swal.fire({
-          icon: "success",
-          title: "Registration Successful!",
-          text: "Welcome! Let's get started with setting up your forecasting system.",
-          confirmButtonColor: "#001D39",
-        }).then(() => {
-          navigate("/welcome"); // ✅ Changed from /home to /welcome
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Registration Failed",
-          text: data.message || "Failed to create account",
-          confirmButtonColor: "#001D39",
-        });
-      }
-    } catch (error) {
-      // Close loading alert on error
-      Swal.close();
-      console.error("Error:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Connection Error",
-        text: "Cannot connect to the server. Please try again.",
-        confirmButtonColor: "#001D39",
-      });
-    }
-  };
+  Swal.close();
+
+  if (response.ok) {
+    Swal.fire({
+      icon: "success",
+      title: "Registration Successful!",
+      text: "Welcome! Let's get started with setting up your forecasting system.",
+      confirmButtonColor: "#001D39",
+    }).then(() => {
+      navigate("/welcome");
+    });
+  } else {
+    Swal.fire({
+      icon: "error",
+      title: "Registration Failed",
+      text: data.message || "Failed to create account",
+      confirmButtonColor: "#001D39",
+    });
+  }
+} catch (error) {
+  Swal.close();
+  console.error("Error:", error);
+  Swal.fire({
+    icon: "error",
+    title: "Connection Error",
+    text: "Cannot connect to the server. Please try again.",
+    confirmButtonColor: "#001D39",
+  });
+}
+
 
   // PRIVACY & TERMS MODALS
   const showTermsModal = () => {
