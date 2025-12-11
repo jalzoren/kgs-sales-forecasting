@@ -1,5 +1,5 @@
 // backend/config/db.js
-const mysql = require("mysql2"); // use only mysql2
+const mysql = require("mysql2");
 
 // Create a connection pool
 const pool = mysql.createPool({
