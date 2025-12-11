@@ -29,10 +29,10 @@ function Navbar() {
 
       if (data.success) {
         const newStats = {
-          predictedSales: data.stats?.predictedSales || 0,
+          predictedSales: data.pythonForecast?.total_predicted_7d || data.stats.predictedSales,
           actualSales: data.stats?.actualSales || 0,
-          forecastAccuracy: data.stats?.forecastAccuracy || 0,
-          inventoryAlertsCount: data.inventoryAlerts?.length || 0,
+          forecastAccuracy: data.pythonForecast?.overall_accuracy || data.stats.forecastAccuracy,
+          inventoryAlertsCount: data.pythonForecast?.demand_alerts?.length || 0,
           variance: data.stats?.variance || 0,
         };
 

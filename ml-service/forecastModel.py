@@ -603,8 +603,16 @@ def forecast_for_user(user_id: str):
             }
 
         result["evaluation"] = eval_summary
+
     else:
         result["evaluation"] = {"note": "No weekly actuals found"}
+
+    # ----------------------------------------------------------
+    # FIX: Always define json_out BEFORE writing JSON
+    # ----------------------------------------------------------
+    json_out = os.path.join(out_dir, f"forecast_{week_start_str}.json")
+    with open(json_out, "w") as f:
+        json.dump(result, f, indent=4)
 
     return result
 
