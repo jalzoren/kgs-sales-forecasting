@@ -60,8 +60,6 @@ app.get("/api/check-session", (req, res) => {
 // =====================================================
 async function startServer() {
   try {
-    // Test API connection: GET first row from "salesData" table
-    const test = await db.query("salesData", { params: { select: "*" , limit: 1 } });
     console.log("✅ Connected to Supabase API, rows fetched:", test.length);
 
     app.listen(PORT, () => {
