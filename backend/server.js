@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000; // REQUIRED in Render
 // Enable CORS
 // =====================================================
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://kgs-sales-forecasting-frontend.onrender.com",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // ✅ Added PATCH
   allowedHeaders: ["Content-Type", "Authorization"]
