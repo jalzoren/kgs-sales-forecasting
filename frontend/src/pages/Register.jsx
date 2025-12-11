@@ -142,12 +142,13 @@ const Register = () => {
   });
 
   try {
-    const response = await fetch(`${API}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(formData),
-    });
+    const response = await fetch(`${API}/register`, { // use backticks ``, not quotes ""
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify(formData),
+});
+
 
     // Safely parse JSON
     let data = {};
