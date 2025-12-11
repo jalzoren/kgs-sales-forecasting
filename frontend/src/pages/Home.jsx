@@ -58,6 +58,55 @@ export default function Home() {
         throw new Error(response.error || "Failed to load dashboard data");
       }
 
+      // ============================================================================================
+      // NEW: If Python ML data exists, use it for the graph
+      if (response.pythonForecast) {
+        const ml = response.pythonForecast;
+
+        const actual = ml.actual_sales || [];
+        const forecasted = ml.forecast_7d || [];
+        const future =
+          dayRange === 30
+            ? ml.forecast_30d
+            : dayRange === 90
+            ? ml.forecast_90d
+            : ml.forecast_7d;
+
+        // Combine into dashboard format
+        const mlChart = [];
+
+        actual.forEach((item) => {
+          mlChart.push({
+            date: item.date,
+            actual: item.revenue,
+            forecasted: null,
+            future: null,
+          });
+        });
+
+        forecasted.forEach((item) => {
+          mlChart.push({
+            date: item.date,
+            actual: null,
+            forecasted: item.revenue,
+            future: null,
+          });
+        });
+
+        future.forEach((item) => {
+          mlChart.push({
+            date: item.date,
+            actual: null,
+            forecasted: null,
+            future: item.revenue,
+          });
+        });
+
+        // Set ML data as graph data
+        setSalesData(mlChart);
+      }
+      // ============================================================================================
+
       // Store file info
       setFileInfo({
         salesFile: response.salesFile || "",
@@ -79,7 +128,7 @@ export default function Home() {
       // Set inventory alerts
       if (response.inventoryAlerts && response.inventoryAlerts.length > 0) {
         console.log("✅ Setting inventory alerts:", response.inventoryAlerts);
-        setInventoryAlerts(response.inventoryAlerts);
+        setInventoryAlerts(response.pythonForecast?.demand_alerts || response.inventoryAlerts);
       } else {
         setInventoryAlerts([]);
       }
@@ -87,7 +136,7 @@ export default function Home() {
       // Set category accuracy
       if (response.categoryAccuracy && response.categoryAccuracy.length > 0) {
         console.log("✅ Setting category accuracy:", response.categoryAccuracy);
-        setCategoryAccuracy(response.categoryAccuracy);
+        setCategoryAccuracy(response.pythonForecast?.category_accuracy || []);
       } else {
         setCategoryAccuracy([]);
       }
@@ -464,14 +513,18 @@ export default function Home() {
                         <div
                           className="progress-fill"
                           style={{
-                            width: `${getAlertPercentage(alert.avgDailySales)}%`,
+                            width: `${getAlertPercentage(
+                              alert.avgDailySales
+                            )}%`,
                             backgroundColor: getAlertColor(alert.avgDailySales),
                           }}
                         ></div>
                       </div>
                     </div>
 
-                    <span className="value">{Math.round(alert.avgDailySales)}</span>
+                    <span className="value">
+                      {Math.round(alert.avgDailySales)}
+                    </span>
                   </div>
                 ))
               )}
@@ -494,7 +547,10 @@ export default function Home() {
                 <p className="category-empty">No category data available</p>
               ) : (
                 <ResponsiveContainer width="100%" height={250}>
-                  <BarChart data={categoryAccuracy} margin={{ top: 20, right: 20, left: -10, bottom: 20 }}>
+                  <BarChart
+                    data={categoryAccuracy}
+                    margin={{ top: 20, right: 20, left: -10, bottom: 20 }}
+                  >
                     <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
                     <XAxis
                       dataKey="name"
@@ -506,11 +562,20 @@ export default function Home() {
                     <YAxis
                       tick={{ fontSize: 12, fill: "#555" }}
                       domain={[0, 100]}
-                      label={{ value: "%", angle: -90, position: "insideLeft", fill: "#555", fontSize: 12 }}
+                      label={{
+                        value: "%",
+                        angle: -90,
+                        position: "insideLeft",
+                        fill: "#555",
+                        fontSize: 12,
+                      }}
                     />
                     <Tooltip
                       formatter={(value) => `${value}%`}
-                      contentStyle={{ borderRadius: "8px", border: "1px solid #ddd" }}
+                      contentStyle={{
+                        borderRadius: "8px",
+                        border: "1px solid #ddd",
+                      }}
                     />
                     <Bar
                       dataKey="accuracy"
