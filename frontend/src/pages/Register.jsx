@@ -152,11 +152,10 @@ const Register = () => {
   });
 
   let data = {};
-
   try {
     data = await response.json();
-  } catch (e) {
-    console.warn("⚠ No JSON body returned from server");
+  } catch {
+    console.warn("⚠ Server returned no JSON body.");
   }
 
   Swal.close();
@@ -181,6 +180,7 @@ const Register = () => {
 } catch (error) {
   Swal.close();
   console.error("Error:", error);
+
   Swal.fire({
     icon: "error",
     title: "Connection Error",
