@@ -56,7 +56,7 @@ app.get("/api/check-session", (req, res) => {
 });
 
 // =====================================================
-// Start serverVHGVHGVH with Supabase API test
+// Start serverVHGVHGVH with Supagjhgjgbase API test
 // =====================================================
 async function startServer() {
   try {
