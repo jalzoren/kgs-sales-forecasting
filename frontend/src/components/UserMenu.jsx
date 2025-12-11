@@ -7,6 +7,7 @@ import { IoChevronDown } from "react-icons/io5";
 import Swal from "sweetalert2";
 import SessionManager from "../services/sessionManager";
 import "./components-css/UserMenu.css";
+const API = import.meta.env.VITE_API_URL;
 
 function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -62,10 +63,10 @@ function UserMenu() {
       confirmButtonText: "Yes, log out!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch("http://localhost:5000/logout", {
-          method: "POST",
-          credentials: "include",
-        })
+        fetch(`${API}/logout`, {
+  method: "POST",
+  credentials: "include",
+})
           .then(() => {
             // ✅ Clear all cached session data
             SessionManager.clearCache();

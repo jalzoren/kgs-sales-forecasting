@@ -14,6 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+const API = import.meta.env.VITE_API_URL;
 
 export default function Analytics() {
   const [activeTab, setActiveTab] = useState("sales");
@@ -50,7 +51,7 @@ export default function Analytics() {
       }
     });
     
-    fetch(`http://localhost:5000/api/forecast/analytics?horizon=${forecastHorizon}`, {
+    fetch(`${API}/api/forecast/analytics?horizon=${forecastHorizon}`, {
       credentials: "include",
     })
       .then((res) => {

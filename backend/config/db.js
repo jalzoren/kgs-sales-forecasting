@@ -1,19 +1,17 @@
-// backend/config/db.js, this is the database connection module
-const mysql = require("mysql");
+// backend/config/db.js
+const mysql = require("mysql2");
 
-const db = mysql.createConnection({
+// Create a connection pool
+const pool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-});
-
-db.connect((error) => {
-  if (error) {
-    console.error("❌ Database connection failed:", error.message);
-    process.exit(1);
+  port: 3306,
+  ssl: {
+    rejectUnauthorized: false
   }
-  console.log("✅ Connected to MySQL Database");
 });
 
-module.exports = db;
+// Export promise-based pool for queries
+module.exports = pool.promise();

@@ -1,8 +1,10 @@
-// backend/server.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+
+// DATABASE
+const db = require("./config/db"); // Import DB connection
 
 // ROUTES
 const sessionConfig = require("./config/sessionConfig");
@@ -14,18 +16,17 @@ const homeRoutes = require("./routes/homeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000; // REQUIRED in Render
 
 // =====================================================
 // Enable CORS
 // =====================================================
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://kgs-sales-forecasting-frontend.onrender.com",
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // ✅ Added PATCH
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
 
 // =====================================================
 // Sessions
@@ -63,7 +64,7 @@ app.get("/", (req, res) => {
 });
 
 // =====================================================
-// Session check endpoint
+// Session check endpoints
 // =====================================================
 app.get("/api/check-session", (req, res) => {
   if (req.session && req.session.user) {
@@ -92,8 +93,20 @@ app.post("/test-notification", (req, res) => {
 });
 
 // =====================================================
-// Start server
+// Connect to Database and Start Server
 // =====================================================
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    await db.query("SELECT 1"); // Test DB connection
+    console.log("✅ Connected to MySQL Database");
+
+    app.listen(PORT, () => {
+      console.log(`✅ Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("❌ Database connection failed:", err.message);
+    process.exit(1); // Stop server if DB fails
+  }
+}
+
+startServer();

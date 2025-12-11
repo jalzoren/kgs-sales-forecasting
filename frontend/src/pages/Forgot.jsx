@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react"; // ✅ Add useEffect
 import Swal from "sweetalert2";
 import "../css/Forgot.css";
+const API = import.meta.env.VITE_API_URL;
 
 export default function Forgot() {
   const [step, setStep] = useState(1);
@@ -114,7 +115,7 @@ export default function Forgot() {
     });
 
     try {
-      const response = await fetch("http://localhost:5000/forgot", {
+      const response = await fetch("${API}/forgot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -173,7 +174,7 @@ export default function Forgot() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/verify-code", {
+      const response = await fetch("${API}/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
@@ -254,7 +255,7 @@ export default function Forgot() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/reset-password", {
+      const response = await fetch("${API}/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, newPassword }),
