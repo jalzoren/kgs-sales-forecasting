@@ -13,7 +13,6 @@
   "dependencies": {
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
-    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "csv-parser": "^3.2.0",
@@ -27,6 +26,7 @@
     "nodemailer": "^7.0.9",
     "pdfmake": "^0.2.20",
     "pg": "^8.16.3",
+    "supabase": "^2.65.10",
     "xlsx": "^0.18.5"
   }
 }

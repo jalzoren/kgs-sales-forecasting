@@ -24,13 +24,13 @@ services:
           property: url
       # DB Variables (edit manually later)
       - key: DB_HOST
-        sync: false
+        value: db.ismmhblktrfumijtynxx.supabase.co
       - key: DB_USER
-        sync: false
+        value: postgres
       - key: DB_PASS
-        sync: false
+        value: BCFsalesPCym6D9NDKJR3MHs
       - key: DB_NAME
-        sync: false
+        value: postgres
 
     disk:
       name: backend-storage
