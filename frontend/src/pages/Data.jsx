@@ -19,6 +19,7 @@ import {
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
+const API = import.meta.env.VITE_API_URL;
 
 export default function UploadBox() {
   const {
@@ -53,8 +54,8 @@ export default function UploadBox() {
 
     try {
       const url = showLoading 
-        ? "http://localhost:5000/api/data"
-        : "http://localhost:5000/api/data?polling=true";
+        ? "${API}/api/data"
+        : "${API}/api/data?polling=true";
       
       const res = await fetch(url, {
         credentials: "include",
@@ -152,7 +153,7 @@ export default function UploadBox() {
     });
 
     try {
-      const res = await fetch("http://localhost:5000/api/data/upload", {
+      const res = await fetch("${API}/api/data/upload", {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -196,7 +197,7 @@ export default function UploadBox() {
         const poll = async () => {
           try {
             const statusRes = await fetch(
-              "http://localhost:5000/api/data/preprocess-status",
+              "${API}/api/data/preprocess-status",
               {
                 credentials: "include",
               }
@@ -277,7 +278,7 @@ export default function UploadBox() {
           const pollTraining = async () => {
             try {
               const trainingStatusRes = await fetch(
-                "http://localhost:5000/api/data/training-status",
+                "${API}/api/data/training-status",
                 {
                   credentials: "include",
                 }
@@ -409,7 +410,7 @@ export default function UploadBox() {
     if (!confirmDelete.isConfirmed) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/data/${id}`, {
+      const res = await fetch(`${API}/api/data/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

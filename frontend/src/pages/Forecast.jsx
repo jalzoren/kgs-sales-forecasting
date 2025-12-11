@@ -11,6 +11,7 @@ import {
 } from "react-icons/io5";
 import { FaEye, FaDownload, FaRedoAlt, FaArchive } from "react-icons/fa";
 import { useNotifications } from "../components/Notifications";
+const API = import.meta.env.VITE_API_URL;
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -18,7 +19,7 @@ dayjs.tz.setDefault("Asia/Manila");
 
 // ==================== CONSTANTS ====================
 const ITEMS_PER_PAGE = 5;
-const FORECAST_API_BASE = "http://localhost:5000/api/forecast";
+const FORECAST_API_BASE = "${API}/api/forecast";
 const STORAGE_KEYS = {
   DOWNLOADS: "forecastDownloadedFiles",
   ARCHIVE: "forecastArchivedFiles",
