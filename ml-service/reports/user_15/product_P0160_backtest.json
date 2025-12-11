@@ -1,0 +1,22 @@
+{
+  "product_id": "P0160",
+  "product_name": "Paldo Wang Cup Kimchi",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 165,
+      "val_start_idx": 166,
+      "val_end_idx": 255,
+      "LSTM": {
+        "RMSE": 0.8095008200229115,
+        "MAE": 0.6643659012201354,
+        "MAPE": 96.3278755148436
+      },
+      "XGB": {
+        "RMSE": 0.9773626670167956,
+        "MAE": 0.8321141600608826,
+        "MAPE": 45.781304871594465
+      }
+    }
+  ]
+}

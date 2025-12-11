@@ -1,0 +1,22 @@
+{
+  "product_id": "P0234",
+  "product_name": "CJ Beksul Spicy Pork Sauce 290g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 196,
+      "val_start_idx": 197,
+      "val_end_idx": 286,
+      "LSTM": {
+        "RMSE": 1.0519525767626976,
+        "MAE": 0.8746366385251276,
+        "MAPE": 99.7345993654996
+      },
+      "XGB": {
+        "RMSE": 0.977150931461157,
+        "MAE": 0.7714866691165501,
+        "MAPE": 46.634562638070854
+      }
+    }
+  ]
+}

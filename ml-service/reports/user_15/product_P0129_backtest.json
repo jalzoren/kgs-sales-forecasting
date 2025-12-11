@@ -1,0 +1,22 @@
+{
+  "product_id": "P0129",
+  "product_name": "Sunhari Grape 360mL",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 155,
+      "val_start_idx": 156,
+      "val_end_idx": 245,
+      "LSTM": {
+        "RMSE": 0.8886279939027991,
+        "MAE": 0.7242315993541445,
+        "MAPE": 100.1071599537463
+      },
+      "XGB": {
+        "RMSE": 1.1186270233784879,
+        "MAE": 0.8537627471817865,
+        "MAPE": 44.4667475876354
+      }
+    }
+  ]
+}

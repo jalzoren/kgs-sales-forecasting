@@ -2,6 +2,7 @@
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from forecastModel import forecast_for_user
 import os
 from trainModel import SalesForecasterPipeline
 
@@ -96,3 +97,11 @@ async def get_metrics_by_product(user_id: str, product_id: str):
         raise HTTPException(404, detail=f"No metrics found for Product_ID {product_id}")
 
     return matching.to_dict(orient="records")[0]
+
+@app.get("/api/forecast/{user_id}")
+async def api_get_forecast(user_id: str):
+    try:
+        result = forecast_for_user(user_id)
+        return result  # FastAPI automatically serializes dict → JSON
+    except Exception as e:
+        raise HTTPException(500, detail=str(e))
