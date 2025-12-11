@@ -1,4 +1,3 @@
-// backend/config/db.js
 const { Pool } = require("pg");
 
 const pool = new Pool({
@@ -11,7 +10,7 @@ const pool = new Pool({
   family: 4 // force IPv4
 });
 
-pool.on("connect", () => console.log("✅ Database connected to Supabase"));
-pool.on("error", (err) => console.error("❌ Database connection error:", err));
+pool.on("connect", () => console.log("✅ Database pool initialized"));
+pool.on("error", (err) => console.error("❌ Postgres Pool Error:", err));
 
 module.exports = pool;
