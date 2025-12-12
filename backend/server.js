@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 // Enable CORS
 // =======================
 app.use(cors({
-  origin: process.env.VITE_API_BASE_URL, // frontend URL
+  origin: process.env.VITE_API_URL, // frontend URL
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -45,7 +45,7 @@ app.use("/files", express.static(path.join(__dirname, "files")));
 // Mount routes
 // =======================
 // authRoutes handles POST /register, /login, etc.
-app.use("/", authRoutes);
+app.use("/api", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
 app.use("/", analyticsRoutes);
