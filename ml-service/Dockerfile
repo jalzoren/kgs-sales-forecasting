@@ -1,11 +1,7 @@
-# ===========================================
-# Base image — TensorFlow 2.15 requires Python 3.10
-# ===========================================
+# Use Python 3.10 (TensorFlow 2.15 compatible)
 FROM python:3.10-slim
 
-# ===========================================
-# System dependencies for numpy, scipy, sklearn, xgboost
-# ===========================================
+# Install system dependencies for ML packages
 RUN apt-get update && apt-get install -y \
     build-essential \
     gcc \
@@ -15,30 +11,21 @@ RUN apt-get update && apt-get install -y \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# ===========================================
 # Set working directory
-# ===========================================
 WORKDIR /app
 
-# ===========================================
-# Install Python dependencies
-# ===========================================
+# Copy requirements
 COPY requirements.txt .
 
+# Upgrade pip and install dependencies
 RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
-# ===========================================
-# Copy application files
-# ===========================================
+# Copy project files
 COPY . .
 
-# ===========================================
-# Expose port (Render overrides with $PORT)
-# ===========================================
+# Expose port (Render uses $PORT)
 EXPOSE 8000
 
-# ===========================================
-# Start FastAPI using Uvicorn
-# ===========================================
-CMD ["uvicorn", "main_app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start FastAPI app
+CMD ["uvicorn", "ml_service.main_app:app", "--host", "0.0.0.0", "--port", "8000"]
