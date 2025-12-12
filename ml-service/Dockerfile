@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # ===========================================
-# Set app directory
+# Set working directory
 # ===========================================
 WORKDIR /app
 
@@ -28,16 +28,11 @@ RUN pip install --no-cache-dir --upgrade pip setuptools wheel
 RUN pip install --no-cache-dir -r requirements.txt
 
 # ===========================================
-# Copy all project files
+# Copy application files
 # ===========================================
 COPY . .
 
 # ===========================================
-# Expose port (Render overrides with $PORT)
-# ===========================================
-EXPOSE 8000
-
-# ===========================================
-# Start FastAPI using Uvicorn
+# Run FastAPI via Uvicorn
 # ===========================================
 CMD ["uvicorn", "main_app:app", "--host", "0.0.0.0", "--port", "8000"]
