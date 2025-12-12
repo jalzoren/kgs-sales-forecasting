@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from forecastModel import forecast_for_user
 import os
 from trainModel import SalesForecasterPipeline
+import pandas as pd
 
 app = FastAPI()
 
