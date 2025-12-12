@@ -6,7 +6,7 @@ import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
 const API = import.meta.env.VITE_API_URL;
 
-const LOGIN_API = "${API}/login";
+const LOGIN_API = `${API}/login`;
 
 const Login = () => {
   const navigate = useNavigate();
