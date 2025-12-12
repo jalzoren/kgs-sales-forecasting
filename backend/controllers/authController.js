@@ -4,12 +4,6 @@ const bcrypt = require("bcrypt");
 const db = require("../config/db");
 const mailService = require("../services/mailService");
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
-
 class AuthController {
   // REGISTER
   async register(req, res) {
@@ -43,18 +37,11 @@ class AuthController {
 
     try {
       // Check if email already exists
-      const { data: existingUser, error: checkError } = await supabase
-        .from("user")
-        .select("*")
-        .eq("email", email)
-        .single();
+      const existingUsers = await db.query("user", {
+        params: { email: `eq.${email}` },
+      });
 
-      if (checkError && checkError.code !== "PGRST116") {
-        // PGRST116 is "not found" error
-        return res.status(500).json({ message: "Database error" });
-      }
-
-      if (existingUser) {
+      if (existingUsers && existingUsers.length > 0) {
         return res.status(409).json({ message: "Email already registered" });
       }
 
@@ -62,30 +49,27 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert new user
-      const { data: newUser, error: insertError } = await supabase
-        .from("user")
-        .insert([
-          {
-            firstname: firstName,
-            lastname: lastName,
-            email: email,
-            password: hashedPassword,
-          },
-        ])
-        .select()
-        .single();
+      const newUser = await db.query("user", {
+        method: "POST",
+        data: {
+          firstname: firstName,
+          lastname: lastName,
+          email: email,
+          password: hashedPassword,
+        },
+      });
 
-      if (insertError) {
-        console.error("Registration error:", insertError);
+      if (!newUser || newUser.length === 0) {
+        console.error("Registration error: No user returned");
         return res.status(500).json({ message: "Failed to create account" });
       }
 
       // Auto-login after registration
       req.session.user = {
-        id: newUser.userid,
-        email: newUser.email,
-        firstName: newUser.firstname,
-        lastName: newUser.lastname,
+        id: newUser[0].userid,
+        email: newUser[0].email,
+        firstName: newUser[0].firstname,
+        lastName: newUser[0].lastname,
       };
 
       res.json({
@@ -106,15 +90,15 @@ class AuthController {
 
     try {
       // Get user by email
-      const { data: user, error: userError } = await supabase
-        .from("user")
-        .select("*")
-        .eq("email", email)
-        .single();
+      const results = await db.query("user", {
+        params: { email: `eq.${email}` },
+      });
 
-      if (userError || !user) {
+      if (!results || results.length === 0) {
         return res.status(404).json({ message: "User not found" });
       }
+
+      const user = results[0];
 
       // Initialize session attempts if not exists
       if (!req.session.loginAttempts) {
@@ -225,20 +209,16 @@ class AuthController {
     const expiry = new Date(Date.now() + 3 * 60000);
 
     try {
-      const { data, error } = await supabase
-        .from("user")
-        .update({
+      const result = await db.query("user", {
+        method: "PATCH",
+        params: { email: `eq.${email}` },
+        data: {
           resetcode: code,
           codeexpiry: expiry.toISOString(),
-        })
-        .eq("email", email)
-        .select();
+        },
+      });
 
-      if (error) {
-        return res.status(500).json({ message: "Database error" });
-      }
-
-      if (!data || data.length === 0) {
+      if (!result || result.length === 0) {
         return res.status(404).json({ message: "Email not found" });
       }
 
@@ -250,7 +230,7 @@ class AuthController {
       res.json({ message: "OTP sent to your email" });
     } catch (error) {
       console.error("Forgot password error:", error);
-      res.status(500).json({ message: "Server error" });
+      res.status(500).json({ message: "Database error" });
     }
   }
 
@@ -261,16 +241,18 @@ class AuthController {
       return res.status(400).json({ message: "Missing email or code" });
 
     try {
-      const { data: user, error } = await supabase
-        .from("user")
-        .select("resetcode, codeexpiry")
-        .eq("email", email)
-        .single();
+      const results = await db.query("user", {
+        params: {
+          email: `eq.${email}`,
+          select: "resetcode,codeexpiry",
+        },
+      });
 
-      if (error || !user) {
+      if (!results || results.length === 0) {
         return res.status(404).json({ message: "Email not found" });
       }
 
+      const user = results[0];
       const now = new Date();
 
       if (user.resetcode !== code) {
@@ -307,21 +289,17 @@ class AuthController {
     try {
       const hashed = await bcrypt.hash(newPassword, 10);
 
-      const { data, error } = await supabase
-        .from("user")
-        .update({
+      const result = await db.query("user", {
+        method: "PATCH",
+        params: { email: `eq.${email}` },
+        data: {
           password: hashed,
           resetcode: null,
           codeexpiry: null,
-        })
-        .eq("email", email)
-        .select();
+        },
+      });
 
-      if (error) {
-        return res.status(500).json({ message: "Database error" });
-      }
-
-      if (!data || data.length === 0) {
+      if (!result || result.length === 0) {
         return res.status(404).json({ message: "Email not found" });
       }
 
