@@ -4,7 +4,9 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
-const API = import.meta.env.VITE_API_URL;
+
+// Ensure no trailing slash issues
+const API = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
 
 const LOGIN_API = `${API}/login`;
 
@@ -19,9 +21,8 @@ const Login = () => {
   // Countdown effect for lockout
   useEffect(() => {
     if (!isLocked || remainingTime <= 0) return;
-
     const timer = setInterval(() => {
-      setRemainingTime((prev) => {
+      setRemainingTime(prev => {
         if (prev <= 1) {
           setIsLocked(false);
           return 0;
@@ -29,7 +30,6 @@ const Login = () => {
         return prev - 1;
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, [isLocked, remainingTime]);
 
@@ -41,7 +41,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (isLocked) {
       Swal.fire({
         icon: "warning",
@@ -52,7 +51,6 @@ const Login = () => {
       return;
     }
 
-    // Show loading indicator
     Swal.fire({
       title: "Logging in...",
       html: "Preparing your dashboard",
@@ -60,29 +58,34 @@ const Login = () => {
       didOpen: () => Swal.showLoading(),
     });
 
- try {
-  const res = await fetch(LOGIN_API, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ email, password }),
-  });
+    try {
+      const res = await fetch(LOGIN_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (_) {
+        const text = await res.text();
+        console.error("Server returned non-JSON response:", text);
+        Swal.close();
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: "Server returned an unexpected response. Please try again.",
+          confirmButtonColor: "#001D39",
+        });
+        return;
+      }
 
-      // ============================================
-      // SUCCESS - Initialize session with parallel requests
-      // ============================================
       if (res.ok) {
         console.log("🔓 Login successful, initializing session...");
-        
-        // ✅ Fetch user info + forecast status in PARALLEL
-        // This takes ~500ms instead of 2-3 seconds!
         const { forecastStatus } = await SessionManager.initializeSession();
-        
         Swal.close();
-        
-        // Show success message
         await Swal.fire({
           icon: "success",
           title: "Login Successful",
@@ -90,24 +93,14 @@ const Login = () => {
           timer: 1500,
           showConfirmButton: false,
         });
-
-        // Navigate based on forecast status (instant decision - already cached!)
-        const destination = forecastStatus.hasForecast ? "/home" : "/welcome";
-        console.log(`✅ Navigating to ${destination}`);
-        navigate(destination, { replace: true });
-        
+        navigate(forecastStatus.hasForecast ? "/home" : "/welcome", { replace: true });
         return;
       }
 
-      // ============================================
-      // ACCOUNT LOCKED (423)
-      // ============================================
       if (res.status === 423) {
         const lockSeconds = data.remainingTime || 60;
         setIsLocked(true);
         setRemainingTime(lockSeconds);
-
-        let timerInterval;
         Swal.fire({
           icon: "warning",
           title: "Account Locked",
@@ -115,34 +108,23 @@ const Login = () => {
           timer: lockSeconds * 1000,
           timerProgressBar: true,
           showConfirmButton: false,
-          willClose: () => clearInterval(timerInterval),
         });
-
-        timerInterval = setInterval(() => {
-          const html = Swal.getHtmlContainer();
-          if (!html) return;
-          const b = html.querySelector("b");
-          if (b) b.textContent = Math.ceil(Swal.getTimerLeft() / 1000);
-        }, 1000);
-
         return;
       }
 
-      // ============================================
-      // WRONG CREDENTIALS
-      // ============================================
       Swal.fire({
         icon: "error",
         title: "Login Failed",
         text: data.message || "Invalid email or password",
         confirmButtonColor: "#001D39",
       });
+
     } catch (err) {
       console.error("❌ Login error:", err);
       Swal.fire({
         icon: "error",
         title: "Connection Error",
-        text: "Cannot connect to server. Please try again.",
+        text: "Cannot connect to server. Please check your internet or server status.",
         confirmButtonColor: "#001D39",
       });
     }
@@ -190,17 +172,11 @@ const Login = () => {
             className={`login-btn ${isLocked ? "disabled" : ""}`}
             disabled={isLocked}
           >
-            {isLocked
-              ? `Account Locked (${formatTime(remainingTime)})`
-              : "Login"}
+            {isLocked ? `Account Locked (${formatTime(remainingTime)})` : "Login"}
           </button>
 
-          <a href="/forgot" className="forgot">
-            Forgot your password?
-          </a>
-          <a href="/register" className="register">
-            Don't have an account? Register here.
-          </a>
+          <a href="/forgot" className="forgot">Forgot your password?</a>
+          <a href="/register" className="register">Don't have an account? Register here.</a>
         </form>
       </div>
     </div>
