@@ -7,12 +7,14 @@ const mailService = require("../services/mailService");
 class AuthController {
   // REGISTER
   async register(req, res) {
+    console.log("📥 Register request received:", req.body);
     const { firstName, lastName, email, password, confirmPassword } = req.body;
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
 
     // Validation
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      console.log("❌ Missing fields");
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -37,18 +39,23 @@ class AuthController {
 
     try {
       // Check if email already exists
+      console.log("🔍 Checking if email exists:", email);
       const existingUsers = await db.query("user", {
         params: { email: `eq.${email}` },
       });
+      console.log("📊 Existing users found:", existingUsers);
 
       if (existingUsers && existingUsers.length > 0) {
+        console.log("⚠️ Email already registered");
         return res.status(409).json({ message: "Email already registered" });
       }
 
       // Hash password
+      console.log("🔐 Hashing password...");
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert new user
+      console.log("💾 Inserting new user into database...");
       const newUser = await db.query("user", {
         method: "POST",
         data: {
@@ -58,9 +65,10 @@ class AuthController {
           password: hashedPassword,
         },
       });
+      console.log("✅ User created:", newUser);
 
       if (!newUser || newUser.length === 0) {
-        console.error("Registration error: No user returned");
+        console.error("❌ Registration error: No user returned");
         return res.status(500).json({ message: "Failed to create account" });
       }
 
@@ -77,8 +85,12 @@ class AuthController {
         user: req.session.user,
       });
     } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ message: "Server error during registration" });
+      console.error("❌ Registration error:", error);
+      console.error("Error details:", error.response?.data || error.message);
+      res.status(500).json({ 
+        message: "Server error during registration",
+        error: error.response?.data || error.message 
+      });
     }
   }
 
