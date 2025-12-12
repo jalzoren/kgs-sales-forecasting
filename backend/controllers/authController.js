@@ -1,7 +1,7 @@
 // controllers/authController.js
 // login, forgot, verify, and reset password logic
 const bcrypt = require("bcrypt");
-const { createClient } = require("@supabase/supabase-js");
+const db = require("../config/db");
 const mailService = require("../services/mailService");
 
 // Initialize Supabase client
