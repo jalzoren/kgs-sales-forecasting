@@ -33,6 +33,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # ===========================================
-# Run FastAPI via Uvicorn
+# Expose port (Render overrides with $PORT)
+# ===========================================
+EXPOSE 8000
+
+# ===========================================
+# Start FastAPI using Uvicorn
 # ===========================================
 CMD ["uvicorn", "main_app:app", "--host", "0.0.0.0", "--port", "8000"]
