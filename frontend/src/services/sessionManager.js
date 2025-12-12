@@ -21,7 +21,7 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // match your frontend env
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const DASHBOARD_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dashboard
 
@@ -252,64 +252,35 @@ class SessionManager {
    * Fetch user info from API
    * Private helper method
    */
-  async fetchUserInfo() {
-    try {
-      const response = await fetch(`${API_BASE}/api/check-session`, {
-        credentials: "include"
-      });
-
-      if (!response.ok) {
-        throw new Error("Not authenticated");
-      }
-
-      const data = await response.json();
-      
-      if (!data.loggedIn || !data.user) {
-        throw new Error("No user session");
-      }
-
-      return data.user;
-    } catch (err) {
-      console.error("❌ Failed to fetch user info:", err);
-      throw err;
-    }
+async fetchUserInfo() {
+  try {
+    const res = await fetch(`${API_BASE}/check-session`, { credentials: "include" }); // ✅ remove /api if backend has none
+    if (!res.ok) throw new Error("Not authenticated");
+    const data = await res.json();
+    if (!data.loggedIn || !data.user) throw new Error("No user session");
+    return data.user;
+  } catch (err) {
+    console.error("❌ Failed to fetch user info:", err);
+    throw err;
   }
+}
+
 
   /**
    * Fetch forecast status from API
    * Private helper method
    */
-  async fetchForecastStatus() {
-    try {
-      const response = await fetch(`${API_BASE}/api/forecast/status`, {
-        credentials: "include"
-      });
-
-      // ✅ Handle 404 gracefully (no forecasts yet)
-      if (response.status === 404) {
-        return {
-          hasForecast: false,
-          forecastCount: 0,
-          latestForecast: null
-        };
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      console.error("❌ Failed to fetch forecast status:", err);
-      // Return default "no forecast" status instead of throwing
-      return {
-        hasForecast: false,
-        forecastCount: 0,
-        latestForecast: null
-      };
-    }
+async fetchForecastStatus() {
+  try {
+    const res = await fetch(`${API_BASE}/forecast/status`, { credentials: "include" }); // ✅ adjust path
+    if (res.status === 404) return { hasForecast: false, forecastCount: 0, latestForecast: null };
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.error("❌ Failed to fetch forecast status:", err);
+    return { hasForecast: false, forecastCount: 0, latestForecast: null };
   }
+}
 
   /**
    * Fetch dashboard data from API
