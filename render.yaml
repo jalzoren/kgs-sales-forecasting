@@ -39,14 +39,15 @@ services:
       mountPath: /opt/render/project/src/files
       sizeGB: 5
 
-  # ML Service (Python FastAPI)
+services:
   - type: web
     name: fastapi-ml-service
     env: python
     rootDir: ml-service
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
     startCommand: "uvicorn main_app:app --host 0.0.0.0 --port 8000"
     plan: starter
+
 
   # Frontend (React Vite)
   - type: static_site

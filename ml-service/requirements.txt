@@ -15,7 +15,7 @@ threadpoolctl==3.5.0
 xgboost==2.0.3
 imbalanced-learn==0.12.4
 
-# --- TensorFlow (Render-compatible) ---
+# --- TensorFlow (Python 3.10-compatible) ---
 tensorflow==2.15.0
 
 # --- Plotting ---
