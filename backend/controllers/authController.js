@@ -1,8 +1,14 @@
 // controllers/authController.js
 // login, forgot, verify, and reset password logic
 const bcrypt = require("bcrypt");
-const db = require("../config/db");
+const { createClient } = require("@supabase/supabase-js");
 const mailService = require("../services/mailService");
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 class AuthController {
   // REGISTER
@@ -37,54 +43,55 @@ class AuthController {
 
     try {
       // Check if email already exists
-      db.query(
-        "SELECT * FROM user WHERE email = ?",
-        [email],
-        async (err, results) => {
-          if (err) return res.status(500).json({ message: "Database error" });
+      const { data: existingUser, error: checkError } = await supabase
+        .from("user")
+        .select("*")
+        .eq("email", email)
+        .single();
 
-          if (results.length > 0) {
-            return res
-              .status(409)
-              .json({ message: "Email already registered" });
-          }
+      if (checkError && checkError.code !== "PGRST116") {
+        // PGRST116 is "not found" error
+        return res.status(500).json({ message: "Database error" });
+      }
 
-          // Hash password
-          const hashedPassword = await bcrypt.hash(password, 10);
+      if (existingUser) {
+        return res.status(409).json({ message: "Email already registered" });
+      }
 
-          // Insert new user
-          const insertQuery = `
-        INSERT INTO user (firstName, lastName, email, password) 
-        VALUES (?, ?, ?, ?)
-      `;
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-          db.query(
-            insertQuery,
-            [firstName, lastName, email, hashedPassword],
-            (err, result) => {
-              if (err) {
-                console.error("Registration error:", err);
-                return res
-                  .status(500)
-                  .json({ message: "Failed to create account" });
-              }
+      // Insert new user
+      const { data: newUser, error: insertError } = await supabase
+        .from("user")
+        .insert([
+          {
+            firstname: firstName,
+            lastname: lastName,
+            email: email,
+            password: hashedPassword,
+          },
+        ])
+        .select()
+        .single();
 
-              // Auto-login after registration
-              req.session.user = {
-                id: result.insertId,
-                email: email,
-                firstName: firstName,
-                lastName: lastName,
-              };
+      if (insertError) {
+        console.error("Registration error:", insertError);
+        return res.status(500).json({ message: "Failed to create account" });
+      }
 
-              res.json({
-                message: "Account created successfully!",
-                user: req.session.user,
-              });
-            }
-          );
-        }
-      );
+      // Auto-login after registration
+      req.session.user = {
+        id: newUser.userid,
+        email: newUser.email,
+        firstName: newUser.firstname,
+        lastName: newUser.lastname,
+      };
+
+      res.json({
+        message: "Account created successfully!",
+        user: req.session.user,
+      });
     } catch (error) {
       console.error("Registration error:", error);
       res.status(500).json({ message: "Server error during registration" });
@@ -97,89 +104,93 @@ class AuthController {
     if (!email || !password)
       return res.status(400).json({ message: "Missing email or password" });
 
-    db.query(
-      "SELECT * FROM user WHERE email = ?",
-      [email],
-      async (err, results) => {
-        if (err) return res.status(500).json({ message: "Server error" });
-        if (results.length === 0)
-          return res.status(404).json({ message: "User not found" });
+    try {
+      // Get user by email
+      const { data: user, error: userError } = await supabase
+        .from("user")
+        .select("*")
+        .eq("email", email)
+        .single();
 
-        const user = results[0];
+      if (userError || !user) {
+        return res.status(404).json({ message: "User not found" });
+      }
 
-        // Initialize session attempts if not exists
-        if (!req.session.loginAttempts) {
-          req.session.loginAttempts = 0;
+      // Initialize session attempts if not exists
+      if (!req.session.loginAttempts) {
+        req.session.loginAttempts = 0;
+      }
+      if (!req.session.lockUntil) {
+        req.session.lockUntil = null;
+      }
+
+      const now = new Date();
+
+      // Check if account is locked in session
+      if (req.session.lockUntil && now < req.session.lockUntil) {
+        const remainingTime = Math.ceil((req.session.lockUntil - now) / 1000);
+        const minutes = Math.floor(remainingTime / 60);
+        const seconds = remainingTime % 60;
+
+        return res.status(423).json({
+          message: `Account locked. Try again in ${minutes}:${seconds
+            .toString()
+            .padStart(2, "0")}.`,
+          remainingTime: remainingTime,
+        });
+      }
+
+      // Reset lock if time has passed
+      if (req.session.lockUntil && now >= req.session.lockUntil) {
+        req.session.loginAttempts = 0;
+        req.session.lockUntil = null;
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        // Increment login attempts in session
+        req.session.loginAttempts += 1;
+        let lockUntil = null;
+
+        // Lock account after 3 failed attempts for 1 minute
+        if (req.session.loginAttempts >= 3) {
+          lockUntil = new Date(now.getTime() + 60000); // 1 minute
+          req.session.lockUntil = lockUntil;
         }
-        if (!req.session.lockUntil) {
-          req.session.lockUntil = null;
-        }
 
-        const now = new Date();
-
-        // Check if account is locked in session
-        if (req.session.lockUntil && now < req.session.lockUntil) {
-          const remainingTime = Math.ceil((req.session.lockUntil - now) / 1000);
-          const minutes = Math.floor(remainingTime / 60);
-          const seconds = remainingTime % 60;
+        let message = `Invalid password. ${
+          3 - req.session.loginAttempts
+        } attempts remaining.`;
+        if (lockUntil) {
+          const remainingTime = 60; // 60 seconds
+          message = "Too many failed attempts. Account locked for 1 minute.";
 
           return res.status(423).json({
-            message: `Account locked. Try again in ${minutes}:${seconds
-              .toString()
-              .padStart(2, "0")}.`,
+            message,
             remainingTime: remainingTime,
           });
         }
 
-        // Reset lock if time has passed
-        if (req.session.lockUntil && now >= req.session.lockUntil) {
-          req.session.loginAttempts = 0;
-          req.session.lockUntil = null;
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-          // Increment login attempts in session
-          req.session.loginAttempts += 1;
-          let lockUntil = null;
-
-          // Lock account after 3 failed attempts for 1 minute
-          if (req.session.loginAttempts >= 3) {
-            lockUntil = new Date(now.getTime() + 60000); // 1 minute
-            req.session.lockUntil = lockUntil;
-          }
-
-          let message = `Invalid password. ${
-            3 - req.session.loginAttempts
-          } attempts remaining.`;
-          if (lockUntil) {
-            const remainingTime = 60; // 60 seconds
-            message = "Too many failed attempts. Account locked for 1 minute.";
-
-            return res.status(423).json({
-              message,
-              remainingTime: remainingTime,
-            });
-          }
-
-          return res.status(401).json({ message });
-        }
-
-        // Successful login - reset session attempts
-        req.session.loginAttempts = 0;
-        req.session.lockUntil = null;
-
-        // Store user info in session
-        req.session.user = {
-          id: user.userId,
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        };
-
-        res.json({ message: "Login successful", user: req.session.user });
+        return res.status(401).json({ message });
       }
-    );
+
+      // Successful login - reset session attempts
+      req.session.loginAttempts = 0;
+      req.session.lockUntil = null;
+
+      // Store user info in session
+      req.session.user = {
+        id: user.userid,
+        email: user.email,
+        firstName: user.firstname,
+        lastName: user.lastname,
+      };
+
+      res.json({ message: "Login successful", user: req.session.user });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
   }
 
   // CHECK SESSION
@@ -192,18 +203,18 @@ class AuthController {
   }
 
   // LOGOUT
-async logout(req, res) {
-  try {
-    req.session.destroy((err) => {
-      if (err) return res.status(500).json({ message: "Logout failed" });
-      res.clearCookie("connect.sid");
-      res.json({ message: "Logged out successfully" });
-    });
-  } catch (error) {
-    console.error("Logout error:", error);
-    res.status(500).json({ message: "Server error during logout" });
+  async logout(req, res) {
+    try {
+      req.session.destroy((err) => {
+        if (err) return res.status(500).json({ message: "Logout failed" });
+        res.clearCookie("connect.sid");
+        res.json({ message: "Logged out successfully" });
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.status(500).json({ message: "Server error during logout" });
+    }
   }
-}
 
   // SEND RESET CODE
   async forgotPassword(req, res) {
@@ -213,49 +224,68 @@ async logout(req, res) {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 3 * 60000);
 
-    db.query(
-      "UPDATE user SET resetCode = ?, codeExpiry = ? WHERE email = ?",
-      [code, expiry, email],
-      async (err, result) => {
-        if (err) return res.status(500).json({ message: "Database error" });
-        if (result.affectedRows === 0)
-          return res.status(404).json({ message: "Email not found" });
+    try {
+      const { data, error } = await supabase
+        .from("user")
+        .update({
+          resetcode: code,
+          codeexpiry: expiry.toISOString(),
+        })
+        .eq("email", email)
+        .select();
 
-        const emailSent = await mailService.sendResetCode(email, code);
-        if (!emailSent)
-          return res.status(500).json({ message: "Failed to send email" });
-
-        res.json({ message: "OTP sent to your email" });
+      if (error) {
+        return res.status(500).json({ message: "Database error" });
       }
-    );
+
+      if (!data || data.length === 0) {
+        return res.status(404).json({ message: "Email not found" });
+      }
+
+      const emailSent = await mailService.sendResetCode(email, code);
+      if (!emailSent) {
+        return res.status(500).json({ message: "Failed to send email" });
+      }
+
+      res.json({ message: "OTP sent to your email" });
+    } catch (error) {
+      console.error("Forgot password error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
   }
 
   // VERIFY CODE
-  verifyCode(req, res) {
+  async verifyCode(req, res) {
     const { email, code } = req.body;
     if (!email || !code)
       return res.status(400).json({ message: "Missing email or code" });
 
-    db.query(
-      "SELECT resetCode, codeExpiry FROM user WHERE email = ?",
-      [email],
-      (err, results) => {
-        if (err) return res.status(500).json({ message: "Server error" });
-        if (results.length === 0)
-          return res.status(404).json({ message: "Email not found" });
+    try {
+      const { data: user, error } = await supabase
+        .from("user")
+        .select("resetcode, codeexpiry")
+        .eq("email", email)
+        .single();
 
-        const user = results[0];
-        const now = new Date();
-
-        if (user.resetCode !== code)
-          return res.status(401).json({ message: "Invalid code" });
-
-        if (now > user.codeExpiry)
-          return res.status(410).json({ message: "Code expired" });
-
-        res.json({ message: "Code verified successfully" });
+      if (error || !user) {
+        return res.status(404).json({ message: "Email not found" });
       }
-    );
+
+      const now = new Date();
+
+      if (user.resetcode !== code) {
+        return res.status(401).json({ message: "Invalid code" });
+      }
+
+      if (now > new Date(user.codeexpiry)) {
+        return res.status(410).json({ message: "Code expired" });
+      }
+
+      res.json({ message: "Code verified successfully" });
+    } catch (error) {
+      console.error("Verify code error:", error);
+      res.status(500).json({ message: "Server error" });
+    }
   }
 
   // RESET PASSWORD
@@ -276,17 +306,26 @@ async logout(req, res) {
 
     try {
       const hashed = await bcrypt.hash(newPassword, 10);
-      db.query(
-        "UPDATE user SET password = ?, resetCode = NULL, codeExpiry = NULL WHERE email = ?",
-        [hashed, email],
-        (err, result) => {
-          if (err) return res.status(500).json({ message: "Database error" });
-          if (result.affectedRows === 0)
-            return res.status(404).json({ message: "Email not found" });
 
-          res.json({ message: "Password reset successfully" });
-        }
-      );
+      const { data, error } = await supabase
+        .from("user")
+        .update({
+          password: hashed,
+          resetcode: null,
+          codeexpiry: null,
+        })
+        .eq("email", email)
+        .select();
+
+      if (error) {
+        return res.status(500).json({ message: "Database error" });
+      }
+
+      if (!data || data.length === 0) {
+        return res.status(404).json({ message: "Email not found" });
+      }
+
+      res.json({ message: "Password reset successfully" });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Hashing error" });
