@@ -45,7 +45,7 @@ app.use("/files", express.static(path.join(__dirname, "files")));
 // Mount routes
 // =======================
 // authRoutes handles POST /register, /login, etc.
-app.use("/api", authRoutes);
+app.use("/", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
 app.use("/", analyticsRoutes);
