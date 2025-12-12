@@ -6,8 +6,8 @@ import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
 
 // Remove trailing slash if any
-const API = import.meta.env.VITE_API_URL.replace(/\/+$/, "");
-const LOGIN_API = `${API}/login`; // Correct template literal
+const API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+const LOGIN_API = `${API}/login`;
 
 const Login = () => {
   const navigate = useNavigate();
