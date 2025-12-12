@@ -60,13 +60,13 @@ const Login = () => {
       didOpen: () => Swal.showLoading(),
     });
 
-    try {
-      const res = await fetch(LOGIN_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
+ try {
+  const res = await fetch(LOGIN_API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ email, password }),
+  });
 
       const data = await res.json();
 
