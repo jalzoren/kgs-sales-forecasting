@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 // Enable CORS
 // =======================
 app.use(cors({
-  origin: "https://kgs-sales-forecasting-frontend.onrender.com", // frontend URL
+  origin: process.env.VITE_API_BASE_URL, // your frontend URL
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
