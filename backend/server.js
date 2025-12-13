@@ -43,7 +43,7 @@ app.use("/files", express.static(path.join(__dirname, "files")));
 // =======================
 // Routes
 // =======================
-app.use("/api", authRoutes);
+app.use("/", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
 app.use("/", analyticsRoutes);

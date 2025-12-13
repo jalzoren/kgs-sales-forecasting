@@ -253,18 +253,17 @@ class SessionManager {
    * Private helper method
    */
 async fetchUserInfo() {
-  const res = await fetch(`${API_BASE}/api/check-session`, {
-    credentials: "include"
-  });
-
-  if (!res.ok) throw new Error("Not authenticated");
-
-  const data = await res.json();
-  if (!data.loggedIn) throw new Error("No session");
-
-  return data.user;
+  try {
+    const res = await fetch(`${API_BASE}/check-session`, { credentials: "include" }); // ✅ remove /api if backend has none
+    if (!res.ok) throw new Error("Not authenticated");
+    const data = await res.json();
+    if (!data.loggedIn || !data.user) throw new Error("No user session");
+    return data.user;
+  } catch (err) {
+    console.error("❌ Failed to fetch user info:", err);
+    throw err;
+  }
 }
-
 
 
   /**
@@ -273,7 +272,7 @@ async fetchUserInfo() {
    */
 async fetchForecastStatus() {
   try {
-    const res = await fetch(`${API_BASE}/api/forecast/status`, { credentials: "include" }); // ✅ adjust path
+    const res = await fetch(`${API_BASE}/forecast/status`, { credentials: "include" }); // ✅ adjust path
     if (res.status === 404) return { hasForecast: false, forecastCount: 0, latestForecast: null };
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
