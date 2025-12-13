@@ -20,10 +20,9 @@ const PORT = process.env.PORT || 5000;
 // CORS (RENDER SAFE)
 // =======================
 app.use(cors({
-  origin: process.env.VITE_API_URL,
+  origin: process.env.VITE_API_BASE_URL,
   credentials: true
 }));
-
 
 // =======================
 // Sessions
