@@ -1,7 +1,5 @@
 services:
-  # ================================
   # Backend (Express JS)
-  # ================================
   - type: web
     name: express-backend
     env: node
@@ -18,39 +16,40 @@ services:
           type: web
           property: url
       - key: CORS_ORIGIN
-        fromService:
-          name: react-frontend
-          type: static_site
-          property: url
-      # DB Variables (edit manually later)
+        value: https://kgs-sales-forecasting-frontend.onrender.com
       - key: DB_HOST
-        sync: false
+        value: db.ismmhblktrfumijtynxx.supabase.co
+      - key: DB_PORT
+        value: 5432
       - key: DB_USER
-        sync: false
+        value: postgres
       - key: DB_PASS
-        sync: false
+        value: BCFsalesPCym6D9NDKJR3MHs
       - key: DB_NAME
-        sync: false
+        value: postgres
+      - key: SESSION_SECRET
+        value: superSecretKey123!
+      - key: EMAIL_USER
+        value: salesforecastingbcf@gmail.com
+      - key: EMAIL_PASS
+        value: aaiz ckgx rtqc buck
 
     disk:
       name: backend-storage
       mountPath: /opt/render/project/src/files
       sizeGB: 5
 
-  # ================================
-  # ML Service (Python FastAPI)
-  # ================================
+services:
   - type: web
     name: fastapi-ml-service
     env: python
     rootDir: ml-service
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "pip install --upgrade pip && pip install -r requirements.txt"
     startCommand: "uvicorn main_app:app --host 0.0.0.0 --port 8000"
     plan: starter
 
-  # ================================
+
   # Frontend (React Vite)
-  # ================================
   - type: static_site
     name: react-frontend
     rootDir: frontend

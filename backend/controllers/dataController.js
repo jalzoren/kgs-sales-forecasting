@@ -1,4 +1,4 @@
-// controllers/dataController.js (FIXED WEEKLY vs TRAINING DETECTION)
+// controllers/dataController.js (FIXED WEEKLY vs TRAINING DETECTION - SUPABASE)
 const db = require("../config/db.js");
 const fs = require("fs");
 const path = require("path");
@@ -7,9 +7,9 @@ const PythonService = require("../services/pythonService");
 
 class DataController {
   async handleUpload(req, res) {
-    console.log("\n" + "="*70);
+    console.log("\n" + "=".repeat(70));
     console.log("📤 NEW UPLOAD REQUEST");
-    console.log("="*70);
+    console.log("=".repeat(70));
     
     const startTime = Date.now();
 
@@ -71,27 +71,34 @@ class DataController {
 
       // STEP 4: Check if this user already uploaded the same file
       try {
-        const checkSql = `SELECT salesID FROM salesdata WHERE userId = ? AND fileName = ?`;
-        const existing = await new Promise((resolve, reject) => {
-          db.query(checkSql, [userId, fileName], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
+        const existing = await db.query("salesdata", {
+          params: {
+            userid: `eq.${userId}`,
+            filename: `eq.${fileName}`,
+            select: "salesid"
+          },
         });
 
-        if (existing.length > 0) {
+        if (existing && existing.length > 0) {
           throw new Error(`File "${fileName}" already exists for your account.`);
         }
 
         // Insert new record with "Uploaded" status (will be updated as processing progresses)
-        const insertSql = `INSERT INTO salesdata (userId, fileName, records, status) VALUES (?, ?, ?, ?)`;
-        const insertResult = await new Promise((resolve, reject) => {
-          db.query(insertSql, [userId, fileName, rowCount, "Uploaded"], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
+        const newRecord = await db.query("salesdata", {
+          method: "POST",
+          data: {
+            userid: userId,
+            filename: fileName,
+            records: rowCount,
+            status: "Uploaded",
+          },
         });
-        salesID = insertResult.insertId;
+
+        if (!newRecord || newRecord.length === 0) {
+          throw new Error("Failed to create database record");
+        }
+
+        salesID = newRecord[0].salesid;
         console.log(`✅ Database record created (ID: ${salesID})`);
       } catch (dbErr) {
         throw new Error(`Database error: ${dbErr.message}`);
@@ -111,7 +118,7 @@ class DataController {
       console.log(`🎉 Upload complete for ${fileName}`);
       console.log(`📊 Total records: ${rowCount.toLocaleString()}`);
       console.log(`⏰ Processing time: ${duration}s`);
-      console.log("="*70 + "\n");
+      console.log("=".repeat(70) + "\n");
 
       res.json({
         message: `File uploaded successfully (${rowCount.toLocaleString()} records)`,
@@ -123,9 +130,9 @@ class DataController {
       const modelDir = path.resolve(__dirname, "../../ml-service/models", `user_${userId}`);
       const modelExists = this.checkProductModelsExist(modelDir);
 
-      console.log("\n" + "="*70);
+      console.log("\n" + "=".repeat(70));
       console.log("🤔 UPLOAD TYPE DETECTION");
-      console.log("="*70);
+      console.log("=".repeat(70));
       console.log(`   Model exists: ${modelExists}`);
       console.log(`   Row count: ${rowCount}`);
 
@@ -140,7 +147,7 @@ class DataController {
         console.log("✅ DETECTED: Training data upload");
         console.log("   Reason: No models yet OR large file");
       }
-      console.log("="*70 + "\n");
+      console.log("=".repeat(70) + "\n");
 
       // STEP 7: Launch preprocessing
       this.updateUploadStatus(salesID, "Preprocessing")
@@ -217,7 +224,7 @@ class DataController {
     } catch (err) {
       console.error("\n❌ UPLOAD FAILED:");
       console.error("   " + err.message);
-      console.error("="*70 + "\n");
+      console.error("=".repeat(70) + "\n");
       return res.status(400).json({
         message: err.message || "Upload failed",
         error: process.env.NODE_ENV === "development" ? err.stack : undefined
@@ -232,13 +239,17 @@ class DataController {
     }
   
     try {
-      const sql = `UPDATE salesdata SET status = ? WHERE salesID = ?`;
-      await new Promise((resolve, reject) => {
-        db.query(sql, [status, salesID], (err) => {
-          if (err) return reject(err);
-          resolve();
-        });
+      const result = await db.query("salesdata", {
+        method: "PATCH",
+        params: { salesid: `eq.${salesID}` },
+        data: { status: status },
       });
+
+      if (!result || result.length === 0) {
+        console.warn(`⚠️ No record updated for salesID: ${salesID}`);
+        return;
+      }
+
       console.log(`✅ Status updated: ${status}`);
     } catch (err) {
       console.error(`❌ Status update failed:`, err.message);
@@ -278,62 +289,68 @@ class DataController {
     }
   }
 
-async getUploads(req, res) {
-  const userId = req.session.user?.id;
-  if (!userId) {
-    return res.status(401).json({ message: "Unauthorized: User not logged in" });
+  async getUploads(req, res) {
+    const userId = req.session.user?.id;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized: User not logged in" });
+    }
+
+    try {
+      const results = await db.query("salesdata", {
+        params: {
+          userid: `eq.${userId}`,
+          order: "uploaddate.desc",
+        },
+      });
+
+      // Log only when not polling
+      const isPolling = req.query.polling === "true";
+      if (!isPolling) {
+        console.log(`📡 Fetching uploaded data records...`);
+        console.log(`✅ Fetched ${results.length} upload records for user ${userId}`);
+      }
+
+      // Send response
+      return res.json(results || []);
+    } catch (err) {
+      console.error("❌ Get uploads error:", err);
+      return res.status(500).json({ message: "Database error", error: err.message });
+    }
   }
-
-  const sql = "SELECT * FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC";
-
-  db.query(sql, [userId], (err, results) => {
-    if (err) {
-      return res.status(500).json({ message: "Database error", error: err });
-    }
-
-    // Log only when not polling
-    const isPolling = req.query.polling === "true";
-    if (!isPolling) {
-      console.log(`📡 Fetching uploaded data records...`);
-      console.log(`✅ Fetched ${results.length} upload records for user ${userId}`);
-    }
-
-    // Send response ONCE
-    return res.json(results);
-  });
-}
 
   async deleteUpload(req, res) {
     const { id } = req.params;
     console.log(`🗑️ Deleting upload record ID: ${id}`);
     
     try {
-      const [record] = await new Promise((resolve, reject) => {
-        db.query("SELECT userId, fileName FROM salesdata WHERE salesID = ?", [id], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
+      // Get the record first
+      const records = await db.query("salesdata", {
+        params: {
+          salesid: `eq.${id}`,
+          select: "userid,filename"
+        },
       });
 
-      if (!record) {
+      if (!records || records.length === 0) {
         return res.status(404).json({ message: "Record not found" });
       }
 
-      await new Promise((resolve, reject) => {
-        db.query("DELETE FROM salesdata WHERE salesID = ?", [id], (err) => {
-          if (err) return reject(err);
-          resolve();
-        });
+      const record = records[0];
+
+      // Delete the record
+      await db.query("salesdata", {
+        method: "DELETE",
+        params: { salesid: `eq.${id}` },
       });
 
       // Delete files
-      const salesDir = path.join(__dirname, "../files/salesData", `user_${record.userId}`);
-      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${record.userId}`);
-      const weeklyDir = path.join(__dirname, "../files/weeklyData", `user_${record.userId}`);
+      const salesDir = path.join(__dirname, "../files/salesData", `user_${record.userid}`);
+      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${record.userid}`);
+      const weeklyDir = path.join(__dirname, "../files/weeklyData", `user_${record.userid}`);
 
       [salesDir, cleanDir, weeklyDir].forEach(dir => {
         try {
-          const filePath = path.join(dir, record.fileName);
+          const filePath = path.join(dir, record.filename);
           if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
         } catch (e) {
           console.warn("Could not delete file:", e.message);
@@ -342,7 +359,8 @@ async getUploads(req, res) {
 
       res.json({ message: "Upload deleted successfully" });
     } catch (err) {
-      return res.status(500).json({ message: "Deletion failed", error: err });
+      console.error("❌ Delete upload error:", err);
+      return res.status(500).json({ message: "Deletion failed", error: err.message });
     }
   }
 
@@ -364,49 +382,45 @@ async getUploads(req, res) {
     try {
       const userId = req.session.user?.id;
       if (!userId) {
-        console.error("❌ Status error:", err);
         return res.status(401).json({ message: "Unauthorized" });
       }
 
-      const sql = `SELECT salesID, fileName, status, uploadDate 
-                   FROM salesdata 
-                   WHERE userId = ? 
-                   ORDER BY uploadDate DESC 
-                   LIMIT 1`;
-      
-      db.query(sql, [userId], (err, results) => {
-        if (err) {
-          return res.status(500).json({ message: "Database error", error: err });
-        }
+      const results = await db.query("salesdata", {
+        params: {
+          userid: `eq.${userId}`,
+          select: "salesid,filename,status,uploaddate",
+          order: "uploaddate.desc",
+          limit: 1
+        },
+      });
 
-        if (results.length === 0) {
-          return res.json({ status: "idle", message: "No uploads found" });
-        }
+      if (!results || results.length === 0) {
+        return res.json({ status: "idle", message: "No uploads found" });
+      }
 
-        const record = results[0];
-        const statusMap = {
-          "Uploaded": { status: "preprocessing", message: "Preparing data..." },
-          "Preprocessing": { status: "preprocessing", message: "Processing data..." },
-          "Training": { status: "training", message: "Training models..." },
-          "Completed": { status: "completed", message: "Processing complete!" },
-          "Failed": { status: "failed", message: "Processing failed" }
-        };
+      const record = results[0];
+      const statusMap = {
+        "Uploaded": { status: "preprocessing", message: "Preparing data..." },
+        "Preprocessing": { status: "preprocessing", message: "Processing data..." },
+        "Training": { status: "training", message: "Training models..." },
+        "Completed": { status: "completed", message: "Processing complete!" },
+        "Failed": { status: "failed", message: "Processing failed" }
+      };
 
-        const response = statusMap[record.status] || {
-          status: "unknown",
-          message: record.status
-        };
+      const response = statusMap[record.status] || {
+        status: "unknown",
+        message: record.status
+      };
 
-        return res.json({
-          ...response,
-          salesID: record.salesID,
-          fileName: record.fileName,
-          uploadDate: record.uploadDate
-        });
+      return res.json({
+        ...response,
+        salesID: record.salesid,
+        fileName: record.filename,
+        uploadDate: record.uploaddate
       });
     } catch (err) {
       console.error("❌ Training status error:", err);
-      return res.status(500).json({ message: "Failed to get training status" });
+      return res.status(500).json({ message: "Failed to get training status", error: err.message });
     }
   }
 
@@ -418,28 +432,29 @@ async getUploads(req, res) {
     }
 
     try {
-      const sql = `SELECT salesID, status FROM salesdata WHERE userId = ? ORDER BY uploadDate DESC`;
+      const uploads = await db.query("salesdata", {
+        params: {
+          userid: `eq.${userId}`,
+          select: "salesid,status",
+          order: "uploaddate.desc"
+        },
+      });
+
+      const hasData = uploads && uploads.length > 0;
+      const hasCompletedTraining = uploads ? uploads.some(u => u.status === "Completed") : false;
+      const isProcessing = uploads ? uploads.some(u => 
+        u.status === "Preprocessing" || u.status === "Training"
+      ) : false;
       
-      db.query(sql, [userId], (err, uploads) => {
-        if (err) {
-          return res.status(500).json({ message: "Database error", error: err });
-        }
-        
-        const hasData = uploads.length > 0;
-        const hasCompletedTraining = uploads.some(u => u.status === "Completed");
-        const isProcessing = uploads.some(u => 
-          u.status === "Preprocessing" || u.status === "Training"
-        );
-        
-        res.json({
-          hasData,
-          hasCompletedTraining,
-          isProcessing,
-          totalUploads: uploads.length
-        });
+      res.json({
+        hasData,
+        hasCompletedTraining,
+        isProcessing,
+        totalUploads: uploads ? uploads.length : 0
       });
     } catch (error) {
-      res.status(500).json({ message: "Failed to check data status" });
+      console.error("❌ Get user data status error:", error);
+      res.status(500).json({ message: "Failed to check data status", error: error.message });
     }
   }
 }

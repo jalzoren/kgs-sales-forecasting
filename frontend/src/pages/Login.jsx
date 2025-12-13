@@ -4,9 +4,10 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
-const API = import.meta.env.VITE_API_URL;
 
-const LOGIN_API = "http://localhost:5000/login";
+// Remove trailing slash if any
+const API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+const LOGIN_API = `${API}/login`;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const Login = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
 
-  // Countdown effect for lockout
+  // Countdown for account lock
   useEffect(() => {
     if (!isLocked || remainingTime <= 0) return;
 
@@ -52,7 +53,6 @@ const Login = () => {
       return;
     }
 
-    // Show loading indicator
     Swal.fire({
       title: "Logging in...",
       html: "Preparing your dashboard",
@@ -70,19 +70,11 @@ const Login = () => {
 
       const data = await res.json();
 
-      // ============================================
-      // SUCCESS - Initialize session with parallel requests
-      // ============================================
       if (res.ok) {
         console.log("🔓 Login successful, initializing session...");
-        
-        // ✅ Fetch user info + forecast status in PARALLEL
-        // This takes ~500ms instead of 2-3 seconds!
         const { forecastStatus } = await SessionManager.initializeSession();
-        
         Swal.close();
-        
-        // Show success message
+
         await Swal.fire({
           icon: "success",
           title: "Login Successful",
@@ -91,17 +83,11 @@ const Login = () => {
           showConfirmButton: false,
         });
 
-        // Navigate based on forecast status (instant decision - already cached!)
         const destination = forecastStatus.hasForecast ? "/home" : "/welcome";
-        console.log(`✅ Navigating to ${destination}`);
         navigate(destination, { replace: true });
-        
         return;
       }
 
-      // ============================================
-      // ACCOUNT LOCKED (423)
-      // ============================================
       if (res.status === 423) {
         const lockSeconds = data.remainingTime || 60;
         setIsLocked(true);
@@ -128,9 +114,6 @@ const Login = () => {
         return;
       }
 
-      // ============================================
-      // WRONG CREDENTIALS
-      // ============================================
       Swal.fire({
         icon: "error",
         title: "Login Failed",
@@ -152,7 +135,6 @@ const Login = () => {
     <div className="login-wrapper">
       <div className="login-container">
         <h2 className="Title">Log In</h2>
-
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input
@@ -195,12 +177,8 @@ const Login = () => {
               : "Login"}
           </button>
 
-          <a href="/forgot" className="forgot">
-            Forgot your password?
-          </a>
-          <a href="/register" className="register">
-            Don't have an account? Register here.
-          </a>
+          <a href="/forgot" className="forgot">Forgot your password?</a>
+          <a href="/register" className="register">Don't have an account? Register here.</a>
         </form>
       </div>
     </div>

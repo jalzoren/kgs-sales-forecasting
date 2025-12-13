@@ -1,16 +1,15 @@
-// config/sessionConfig.js
 const session = require("express-session");
 
 const sessionConfig = session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || "secret-key",
   resave: false,
-  saveUninitialized: false,  // ✅ important: don’t save empty sessions
+  saveUninitialized: false,
   cookie: {
-    secure: false,           // ✅ keep false for localhost (no HTTPS)
+    secure: process.env.NODE_ENV === "production", // true in production (HTTPS)
     httpOnly: true,
-    sameSite: "lax",         // ✅ must allow cookies to be sent cross-origin
-    maxAge: 1000 * 60 * 30   // 30 minutes
-  }
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
+    maxAge: 1000 * 60 * 30, // 30 minutes
+  },
 });
 
 module.exports = sessionConfig;
