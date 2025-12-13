@@ -1,15 +1,19 @@
 const session = require("express-session");
 
+const isProd = process.env.NODE_ENV === "production";
+
 const sessionConfig = session({
-  secret: process.env.SESSION_SECRET || "secret-key",
+  name: "sid",
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
+  proxy: true, // ✅ REQUIRED for Render
   cookie: {
-    secure: process.env.NODE_ENV === "production", // true in production (HTTPS)
+    secure: isProd,                 // ✅ HTTPS on Render
     httpOnly: true,
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax", 
-    maxAge: 1000 * 60 * 30, // 30 minutes
-  },
+    sameSite: isProd ? "none" : "lax",
+    maxAge: 1000 * 60 * 30
+  }
 });
 
 module.exports = sessionConfig;

@@ -1,51 +1,48 @@
-// backend/server.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const db = require("./config/db"); // Supabase API
+
+const sessionConfig = require("./config/sessionConfig");
 
 // Routes
-const sessionConfig = require("./config/sessionConfig");
 const authRoutes = require("./routes/authRoutes");
 const dataRoutes = require("./routes/dataRoutes");
-const forecastRoutes = require("./routes/forecast"); 
-const analyticsRoutes = require("./routes/analyticsRoutes"); 
-const homeRoutes = require("./routes/homeRoutes"); 
+const forecastRoutes = require("./routes/forecast");
+const analyticsRoutes = require("./routes/analyticsRoutes");
+const homeRoutes = require("./routes/homeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // =======================
-// Enable CORS
+// CORS (RENDER SAFE)
 // =======================
 app.use(cors({
-  origin: process.env.VITE_API_BASE_URL, // your frontend URL
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  origin: process.env.VITE_API_BASE_URL,
+  credentials: true
 }));
 
 // =======================
 // Sessions
 // =======================
+app.set("trust proxy", 1); // ✅ REQUIRED
 app.use(sessionConfig);
 
 // =======================
-// JSON Body Parser
+// Body parser
 // =======================
 app.use(express.json());
 
 // =======================
-// Serve static files
+// Static files
 // =======================
 app.use("/files", express.static(path.join(__dirname, "files")));
 
 // =======================
-// Mount routes
+// Routes
 // =======================
-// authRoutes handles POST /register, /login, etc.
 app.use("/", authRoutes);
 app.use("/", dataRoutes);
 app.use("/", forecastRoutes);
@@ -54,38 +51,25 @@ app.use("/", homeRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 // =======================
-// Default route
+// SESSION CHECK (MATCH FRONTEND)
+// =======================
+app.get("/check-session", (req, res) => {
+  if (req.session?.user) {
+    return res.json({ loggedIn: true, user: req.session.user });
+  }
+  res.status(401).json({ loggedIn: false });
+});
+
+// =======================
+// Root
 // =======================
 app.get("/", (req, res) => {
-  res.send("Sales Forecasting System - Backend Running 🚀");
+  res.send("Backend running 🚀");
 });
 
 // =======================
-// Session check endpoint
+// START SERVER (NO DB TEST)
 // =======================
-app.get("/api/check-session", (req, res) => {
-  if (req.session?.user) {
-    res.json({ loggedIn: true, user: req.session.user });
-  } else {
-    res.status(401).json({ loggedIn: false });
-  }
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
-
-// =======================
-// Start server with Supabase API test
-// =======================
-async function startServer() {
-  try {
-    await db.query("SELECT 1"); // Test DB connection
-    console.log("✅ Connected to MySQL Database");
-
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error("❌ Supabase connection failed:", err.response?.data || err.message || err);
-    process.exit(1);
-  }
-}
-
-startServer();
