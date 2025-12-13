@@ -1,0 +1,22 @@
+{
+  "product_id": "P0229",
+  "product_name": "O'Food Korean BBQ Sauce",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 196,
+      "val_start_idx": 197,
+      "val_end_idx": 286,
+      "LSTM": {
+        "RMSE": 0.9818098223825101,
+        "MAE": 0.7539938817710263,
+        "MAPE": 99.82111496402017
+      },
+      "XGB": {
+        "RMSE": 1.402530939289636,
+        "MAE": 1.1043162087599436,
+        "MAPE": 57.71339723105153
+      }
+    }
+  ]
+}

@@ -1,10 +1,10 @@
 {
-    "mean": 10.212550607287449,
-    "std": 6.324184003930632,
-    "lookback": 90,
-    "product_id": "P0203",
-    "product_name": "Jin Ramen Spicy Cup",
-    "category": "Noodles",
-    "avg_unit_price": 50.0,
-    "total_samples": 988
+  "mean": 10.212550607287449,
+  "std": 6.324184003930632,
+  "lookback": 90,
+  "product_id": "P0203",
+  "product_name": "Jin Ramen Spicy Cup",
+  "category": "Noodles",
+  "avg_unit_price": 50.0,
+  "total_samples": 988
 }

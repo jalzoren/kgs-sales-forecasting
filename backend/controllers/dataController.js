@@ -150,15 +150,29 @@ class DataController {
         .then(async () => {
           console.log(`✅ Preprocessing completed for user ${userId}`);
 
-          // If weekly upload → generate forecast immediately
-          if (isWeeklyUpload) {
-            console.log("\n📅 Weekly upload → Generating forecast...");
-            try {
-              await PythonService.generateForecast(userId);
-              console.log("✅ Forecast generation complete!");
-              this.updateUploadStatus(salesID, "Completed");
-            } catch (forecastErr) {
-              console.error(`⚠️ Forecast failed: ${forecastErr.message}`);
+// If weekly upload → run full weekly forecast pipeline
+            if (isWeeklyUpload) {
+              console.log("\n📅 Weekly upload → Running full forecast pipeline...");
+              const WeeklyForecastService = require("../services/weeklyForecastService");
+              
+              try {
+                // Run the complete pipeline: evaluate prev forecast → generate new forecast → aggregate metrics
+                const pipelineResult = await WeeklyForecastService.processWeeklyUpload(userId, finalFilePath);
+                
+                if (pipelineResult && pipelineResult.success) {
+                  console.log("✅ Weekly pipeline complete!");
+                  
+                  // Save metrics for dashboard access
+                  WeeklyForecastService.saveMetrics(userId, pipelineResult.metrics);
+                  
+                  this.updateUploadStatus(salesID, "Completed");
+                } else {
+                  console.error(`⚠️ Pipeline completed with errors`);
+                  this.updateUploadStatus(salesID, "Completed");
+                  // Still mark as completed since forecast may have been generated
+                }
+              } catch (pipelineErr) {
+                console.error(`⚠️ Weekly pipeline failed: ${pipelineErr.message}`);
               this.updateUploadStatus(salesID, "Failed");
             }
             return;

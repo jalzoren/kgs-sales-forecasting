@@ -1,10 +1,10 @@
 {
-    "mean": 12.6521327014218,
-    "std": 7.224860405302773,
-    "lookback": 90,
-    "product_id": "P0163",
-    "product_name": "Samyang Buldak Rose 140g",
-    "category": "Noodles",
-    "avg_unit_price": 88.0,
-    "total_samples": 1055
+  "mean": 12.6521327014218,
+  "std": 7.224860405302773,
+  "lookback": 90,
+  "product_id": "P0163",
+  "product_name": "Samyang Buldak Rose 140g",
+  "category": "Noodles",
+  "avg_unit_price": 88.0,
+  "total_samples": 1055
 }

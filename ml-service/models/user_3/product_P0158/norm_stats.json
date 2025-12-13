@@ -1,10 +1,10 @@
 {
-    "mean": 2.282442748091603,
-    "std": 1.1762321112213698,
-    "lookback": 90,
-    "product_id": "P0158",
-    "product_name": "Nongshim Shin Ramen Black",
-    "category": "Noodles",
-    "avg_unit_price": 92.0,
-    "total_samples": 262
+  "mean": 2.282442748091603,
+  "std": 1.1762321112213698,
+  "lookback": 90,
+  "product_id": "P0158",
+  "product_name": "Nongshim Shin Ramen Black",
+  "category": "Noodles",
+  "avg_unit_price": 92.0,
+  "total_samples": 262
 }

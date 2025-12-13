@@ -1,10 +1,10 @@
 {
-    "mean": 2.598639455782313,
-    "std": 1.510644208333556,
-    "lookback": 90,
-    "product_id": "P0042",
-    "product_name": "CJ Hetbahn Brown Rice",
-    "category": "Dry Food",
-    "avg_unit_price": 95.0,
-    "total_samples": 294
+  "mean": 2.598639455782313,
+  "std": 1.510644208333556,
+  "lookback": 90,
+  "product_id": "P0042",
+  "product_name": "CJ Hetbahn Brown Rice",
+  "category": "Dry Food",
+  "avg_unit_price": 95.0,
+  "total_samples": 294
 }

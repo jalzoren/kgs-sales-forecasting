@@ -1,0 +1,38 @@
+{
+  "product_id": "P0080",
+  "product_name": "Samyang Buldak Original Spicy Mandu 700g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 641,
+      "val_start_idx": 642,
+      "val_end_idx": 731,
+      "LSTM": {
+        "RMSE": 1.0498630305798629,
+        "MAE": 0.7870745997147566,
+        "MAPE": 100.89596313002609
+      },
+      "XGB": {
+        "RMSE": 1.6874658290781988,
+        "MAE": 1.3462620019912719,
+        "MAPE": 45.16693576219009
+      }
+    },
+    {
+      "fold": 2,
+      "train_end_idx": 731,
+      "val_start_idx": 732,
+      "val_end_idx": 821,
+      "LSTM": {
+        "RMSE": 1.0620040992988755,
+        "MAE": 0.8108057170688353,
+        "MAPE": 99.53394588773683
+      },
+      "XGB": {
+        "RMSE": 1.898888440826491,
+        "MAE": 1.3119099391831293,
+        "MAPE": 38.87137807464066
+      }
+    }
+  ]
+}

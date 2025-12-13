@@ -1,10 +1,10 @@
 {
-    "mean": 4.69634703196347,
-    "std": 2.9366360038113903,
-    "lookback": 90,
-    "product_id": "P0210",
-    "product_name": "2Mins Snack Men",
-    "category": "Noodles",
-    "avg_unit_price": 40.0,
-    "total_samples": 438
+  "mean": 4.69634703196347,
+  "std": 2.9366360038113903,
+  "lookback": 90,
+  "product_id": "P0210",
+  "product_name": "2Mins Snack Men",
+  "category": "Noodles",
+  "avg_unit_price": 40.0,
+  "total_samples": 438
 }

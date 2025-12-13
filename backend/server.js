@@ -1,3 +1,4 @@
+// backend/server.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -22,7 +23,7 @@ const PORT = process.env.PORT || 5000; // REQUIRED in Render
 // Enable CORS
 // =====================================================
 app.use(cors({
-  origin: "https://kgs-sales-forecasting-frontend.onrender.com",
+  origin: "http://localhost:5173",
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
@@ -97,8 +98,8 @@ app.post("/test-notification", (req, res) => {
 // =====================================================
 async function startServer() {
   try {
-    await db.query("SELECT 1"); // Test DB connection
-    console.log("✅ Connected to MySQL Database");
+    await db.query("SELECT 1");
+    console.log("✅ Connected to Database");
 
     app.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`);

@@ -1,10 +1,10 @@
 {
-    "mean": 3.8887545344619103,
-    "std": 2.430577362724141,
-    "lookback": 90,
-    "product_id": "P0009",
-    "product_name": "CJ Beksul Corn Syrup",
-    "category": "Condiments",
-    "avg_unit_price": 95.0,
-    "total_samples": 827
+  "mean": 3.8887545344619103,
+  "std": 2.430577362724141,
+  "lookback": 90,
+  "product_id": "P0009",
+  "product_name": "CJ Beksul Corn Syrup",
+  "category": "Condiments",
+  "avg_unit_price": 95.0,
+  "total_samples": 827
 }

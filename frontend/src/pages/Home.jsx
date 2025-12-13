@@ -59,50 +59,52 @@ export default function Home() {
       }
 
       // ============================================================================================
-      // NEW: If Python ML data exists, use it for the graph
+      // NEW: If Python ML data exists, try to use it for the graph.
+      // The Python payload may use different shapes (legacy keys vs numeric keys
+      // like "7","30","90"). Normalize safely and aggregate revenue by date.
+      // NOTE: If forecasted is empty (first upload), only Actual + Future will show
       if (response.pythonForecast) {
         const ml = response.pythonForecast;
 
-        const actual = ml.actual_sales || [];
-        const forecasted = ml.forecast_7d || [];
-        const future =
-          dayRange === 30
-            ? ml.forecast_30d
-            : dayRange === 90
-            ? ml.forecast_90d
-            : ml.forecast_7d;
+        // Helper to safely aggregate revenue per date from product-level rows
+        const aggregateByDate = (arr = []) => {
+          const map = {};
+          (arr || []).forEach((it) => {
+            const date = it.Date || it.date;
+            const rev = it.Revenue_Estimate || it.revenue || it.Revenue || 0;
+            if (!date) return;
+            map[date] = (map[date] || 0) + Number(rev || 0);
+          });
+          return Object.keys(map).map((d) => ({ date: d, revenue: map[d] }));
+        };
 
-        // Combine into dashboard format
+        // Support multiple forecast key formats
+        const f7 = ml.forecasts?.["7"] || ml.forecasts?.["7d_forecast"] || ml.forecast_7d || [];
+        const f30 = ml.forecasts?.["30"] || ml.forecasts?.["30d_forecast"] || ml.forecast_30d || [];
+        const f90 = ml.forecasts?.["90"] || ml.forecasts?.["90d_forecast"] || ml.forecast_90d || [];
+
+        const forecastedAgg = aggregateByDate(f7);
+        const futureAgg = dayRange === 30 ? aggregateByDate(f30) : dayRange === 90 ? aggregateByDate(f90) : forecastedAgg;
+
+        // Use server combinedData for actual sales (more reliable aggregated series)
+        const combined = response.combinedData || [];
+        const actualAgg = (combined.slice(0, 7) || []).map((d) => ({ date: d.date, revenue: d.actual_revenue || 0 }));
+
+        // Build mlChart similar to previous shape but aggregated
+        // If forecasted is empty (first upload), only Actual + Future will be plotted
         const mlChart = [];
+        actualAgg.forEach((item) => mlChart.push({ date: item.date, actual: item.revenue, forecasted: null, future: null }));
+        
+        // Only add forecasted line if data exists (not first upload)
+        if (forecastedAgg.length > 0) {
+          forecastedAgg.forEach((item) => mlChart.push({ date: item.date, actual: null, forecasted: item.revenue, future: null }));
+          console.log(`✅ Including forecasted line (accuracy comparison mode - Week N vs Week N-1 forecast)`);
+        } else {
+          console.log(`⏭️  Skipping forecasted line (first upload - no previous forecast to compare)`);
+        }
+        
+        futureAgg.forEach((item) => mlChart.push({ date: item.date, actual: null, forecasted: null, future: item.revenue }));
 
-        actual.forEach((item) => {
-          mlChart.push({
-            date: item.date,
-            actual: item.revenue,
-            forecasted: null,
-            future: null,
-          });
-        });
-
-        forecasted.forEach((item) => {
-          mlChart.push({
-            date: item.date,
-            actual: null,
-            forecasted: item.revenue,
-            future: null,
-          });
-        });
-
-        future.forEach((item) => {
-          mlChart.push({
-            date: item.date,
-            actual: null,
-            forecasted: null,
-            future: item.revenue,
-          });
-        });
-
-        // Set ML data as graph data
         setSalesData(mlChart);
       }
       // ============================================================================================

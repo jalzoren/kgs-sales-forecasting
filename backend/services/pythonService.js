@@ -191,12 +191,65 @@ class PythonService {
     } catch (err) {
       console.error("❌ Forecast generation failed:", err.message || err);
       status = "Failed";
+      throw err; // Re-throw so caller knows it failed
     }
 
     // Note: No longer saving to JSON - forecast history is read directly from Excel files per user
     // The /api/forecast/history endpoint reads from backend/files/forecastData/user_{userId}/
 
     return resultPath;
+  }
+
+  // =====================================================
+  // ✅ Evaluate Forecast against weekly actuals
+  // =====================================================
+  async evaluateForecast(userId) {
+    console.log(`📊 Evaluating forecast for User ID: ${userId}...`);
+    
+    // Make HTTP POST request to ML service /api/evaluate endpoint
+    try {
+      const axios = require("axios");
+      
+      const mlServiceUrl = process.env.ML_SERVICE_URL || "http://localhost:8000";
+      const evaluateUrl = `${mlServiceUrl}/api/evaluate`;
+      
+      console.log(`   Calling: ${evaluateUrl}`);
+      
+      // Build payload without sending explicit nulls
+      const payload = { user_id: userId.toString() };
+
+      const response = await axios.post(evaluateUrl, payload, {
+        timeout: 60000  // 60 second timeout for evaluation
+      });
+
+      console.log(`✅ Evaluation completed for user ${userId}`);
+      console.log(`   Result: ${JSON.stringify(response.data, null, 2)}`);
+
+      return response.data;
+    } catch (err) {
+      // Better error logging
+      let errorMsg = "Unknown error";
+      
+      if (err.response) {
+        // Server responded with error
+        const rd = err.response.data;
+        errorMsg = rd?.detail || rd || err.response.statusText || "Server error";
+        // Ensure we stringify objects for readable logs
+        const printable = typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg);
+        console.error(`⚠️ Evaluation API returned ${err.response.status}: ${printable}`);
+      } else if (err.request) {
+        // Request made but no response
+        errorMsg = "No response from ML service - is it running on port 8000?";
+        console.error(`⚠️ ${errorMsg}`);
+      } else {
+        // Error in request setup
+        errorMsg = err.message;
+        console.error(`⚠️ Request error: ${err.message}`);
+      }
+      
+      console.error(`⚠️ Evaluation failed: ${errorMsg}`);
+      throw new Error(`Evaluation failed: ${typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg)}`);
+    }
   }
 
   // =====================================================

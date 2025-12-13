@@ -1,10 +1,10 @@
 {
-    "mean": 6.00974930362117,
-    "std": 4.132217156206283,
-    "lookback": 90,
-    "product_id": "P0298",
-    "product_name": "Pepero White Cookie",
-    "category": "Snacks",
-    "avg_unit_price": 55.0,
-    "total_samples": 718
+  "mean": 6.00974930362117,
+  "std": 4.132217156206283,
+  "lookback": 90,
+  "product_id": "P0298",
+  "product_name": "Pepero White Cookie",
+  "category": "Snacks",
+  "avg_unit_price": 55.0,
+  "total_samples": 718
 }

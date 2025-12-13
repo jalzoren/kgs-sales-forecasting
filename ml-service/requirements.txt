@@ -21,4 +21,7 @@ seaborn==0.13.2
 six==1.16.0
 threadpoolctl==3.5.0
 tzdata==2024.2
-tensorflow==2.14.0
+tensorflow==2.18.0
+fastapi==0.104.1
+uvicorn==0.24.0
+xgboost==2.0.3

@@ -1,10 +1,10 @@
 {
-    "mean": 4.845824411134903,
-    "std": 2.9737403499083785,
-    "lookback": 90,
-    "product_id": "P0206",
-    "product_name": "Nongshim Chapagetti",
-    "category": "Noodles",
-    "avg_unit_price": 45.0,
-    "total_samples": 467
+  "mean": 4.845824411134903,
+  "std": 2.9737403499083785,
+  "lookback": 90,
+  "product_id": "P0206",
+  "product_name": "Nongshim Chapagetti",
+  "category": "Noodles",
+  "avg_unit_price": 45.0,
+  "total_samples": 467
 }

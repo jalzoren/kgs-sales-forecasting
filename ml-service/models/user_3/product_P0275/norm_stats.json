@@ -1,10 +1,10 @@
 {
-    "mean": 2.747323340471092,
-    "std": 1.5778674110648225,
-    "lookback": 90,
-    "product_id": "P0275",
-    "product_name": "Haitai Sweet Potato Snack",
-    "category": "Snacks",
-    "avg_unit_price": 95.0,
-    "total_samples": 467
+  "mean": 2.747323340471092,
+  "std": 1.5778674110648225,
+  "lookback": 90,
+  "product_id": "P0275",
+  "product_name": "Haitai Sweet Potato Snack",
+  "category": "Snacks",
+  "avg_unit_price": 95.0,
+  "total_samples": 467
 }

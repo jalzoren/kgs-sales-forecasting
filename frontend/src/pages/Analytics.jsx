@@ -51,7 +51,7 @@ export default function Analytics() {
       }
     });
     
-    fetch(`${API}/api/forecast/analytics?horizon=${forecastHorizon}`, {
+    fetch(`http://localhost:5000/api/forecast/analytics?horizon=${forecastHorizon}`, {
       credentials: "include",
     })
       .then((res) => {

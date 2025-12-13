@@ -1,10 +1,10 @@
 {
-    "mean": 2.6723404255319148,
-    "std": 1.5750861658035014,
-    "lookback": 90,
-    "product_id": "P0018",
-    "product_name": "(Kaya) Korean Rice 1.5Kg",
-    "category": "Dry Food",
-    "avg_unit_price": 190.0,
-    "total_samples": 470
+  "mean": 2.6723404255319148,
+  "std": 1.5750861658035014,
+  "lookback": 90,
+  "product_id": "P0018",
+  "product_name": "(Kaya) Korean Rice 1.5Kg",
+  "category": "Dry Food",
+  "avg_unit_price": 190.0,
+  "total_samples": 470
 }

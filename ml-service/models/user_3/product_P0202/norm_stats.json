@@ -1,10 +1,10 @@
 {
-    "mean": 5.171532846715328,
-    "std": 3.234829849360268,
-    "lookback": 90,
-    "product_id": "P0202",
-    "product_name": "Nongshim Ansung Tangmen",
-    "category": "Noodles",
-    "avg_unit_price": 50.0,
-    "total_samples": 548
+  "mean": 5.171532846715328,
+  "std": 3.234829849360268,
+  "lookback": 90,
+  "product_id": "P0202",
+  "product_name": "Nongshim Ansung Tangmen",
+  "category": "Noodles",
+  "avg_unit_price": 50.0,
+  "total_samples": 548
 }

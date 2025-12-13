@@ -19,7 +19,7 @@ dayjs.tz.setDefault("Asia/Manila");
 
 // ==================== CONSTANTS ====================
 const ITEMS_PER_PAGE = 5;
-const FORECAST_API_BASE = "${API}/api/forecast";
+const FORECAST_API_BASE = "http://localhost:5000/api/forecast";
 const STORAGE_KEYS = {
   DOWNLOADS: "forecastDownloadedFiles",
   ARCHIVE: "forecastArchivedFiles",

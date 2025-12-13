@@ -1,10 +1,10 @@
 {
-    "mean": 2.650485436893204,
-    "std": 1.545474441057691,
-    "lookback": 90,
-    "product_id": "P0250",
-    "product_name": "Haitai Honey Butter Almonds",
-    "category": "Snacks",
-    "avg_unit_price": 190.0,
-    "total_samples": 412
+  "mean": 2.650485436893204,
+  "std": 1.545474441057691,
+  "lookback": 90,
+  "product_id": "P0250",
+  "product_name": "Haitai Honey Butter Almonds",
+  "category": "Snacks",
+  "avg_unit_price": 190.0,
+  "total_samples": 412
 }

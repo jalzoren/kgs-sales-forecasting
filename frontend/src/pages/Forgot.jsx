@@ -115,7 +115,7 @@ export default function Forgot() {
     });
 
     try {
-      const response = await fetch("${API}/forgot", {
+      const response = await fetch("http://localhost:5000/forgot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -174,7 +174,7 @@ export default function Forgot() {
     }
 
     try {
-      const response = await fetch("${API}/verify-code", {
+      const response = await fetch("http://localhost:5000/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, code }),
@@ -255,7 +255,7 @@ export default function Forgot() {
     }
 
     try {
-      const response = await fetch("${API}/reset-password", {
+      const response = await fetch("http://localhost:5000/reset-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, newPassword }),

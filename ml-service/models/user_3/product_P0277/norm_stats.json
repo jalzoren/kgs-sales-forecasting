@@ -1,10 +1,10 @@
 {
-    "mean": 4.403645833333333,
-    "std": 2.7490491571622258,
-    "lookback": 90,
-    "product_id": "P0277",
-    "product_name": "Orion Turtle Chips Sweet Corn",
-    "category": "Snacks",
-    "avg_unit_price": 89.0,
-    "total_samples": 384
+  "mean": 4.403645833333333,
+  "std": 2.7490491571622258,
+  "lookback": 90,
+  "product_id": "P0277",
+  "product_name": "Orion Turtle Chips Sweet Corn",
+  "category": "Snacks",
+  "avg_unit_price": 89.0,
+  "total_samples": 384
 }

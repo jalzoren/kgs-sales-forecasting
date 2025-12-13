@@ -1,0 +1,22 @@
+{
+  "product_id": "P0168",
+  "product_name": "Samyang Carbo Buldak",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 196,
+      "val_start_idx": 197,
+      "val_end_idx": 286,
+      "LSTM": {
+        "RMSE": 0.714492760321437,
+        "MAE": 0.5900310661943174,
+        "MAPE": 98.46182191630807
+      },
+      "XGB": {
+        "RMSE": 1.5482945053794057,
+        "MAE": 1.291053291161855,
+        "MAPE": 43.76516708305903
+      }
+    }
+  ]
+}

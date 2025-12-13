@@ -1,10 +1,10 @@
 {
-    "mean": 2.2598425196850394,
-    "std": 1.1366172571851862,
-    "lookback": 90,
-    "product_id": "P0232",
-    "product_name": "O'Food Tofu Stew Base",
-    "category": "Seasoned/Sauce/Powder",
-    "avg_unit_price": 135.0,
-    "total_samples": 254
+  "mean": 2.2598425196850394,
+  "std": 1.1366172571851862,
+  "lookback": 90,
+  "product_id": "P0232",
+  "product_name": "O'Food Tofu Stew Base",
+  "category": "Seasoned/Sauce/Powder",
+  "avg_unit_price": 135.0,
+  "total_samples": 254
 }

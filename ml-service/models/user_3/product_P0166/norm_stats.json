@@ -1,10 +1,10 @@
 {
-    "mean": 11.000971817298348,
-    "std": 7.052402454313682,
-    "lookback": 90,
-    "product_id": "P0166",
-    "product_name": "Samyang Buldak Original",
-    "category": "Noodles",
-    "avg_unit_price": 88.0,
-    "total_samples": 1029
+  "mean": 11.000971817298348,
+  "std": 7.052402454313682,
+  "lookback": 90,
+  "product_id": "P0166",
+  "product_name": "Samyang Buldak Original",
+  "category": "Noodles",
+  "avg_unit_price": 88.0,
+  "total_samples": 1029
 }

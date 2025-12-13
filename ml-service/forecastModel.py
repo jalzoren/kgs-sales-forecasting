@@ -18,6 +18,7 @@ os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 import sys
 import json
 from datetime import datetime, timedelta
+import re
 import io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
 
@@ -32,6 +33,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CLEAN_DIR = os.path.join(BASE_DIR, "../backend/files/cleanData")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 FORECAST_DIR = os.path.join(BASE_DIR, "../backend/files/forecastData")
+WEEKLY_DIR = os.path.join(BASE_DIR, "../backend/files/weeklyData")
 REPORT_DIR = os.path.join(BASE_DIR, "reports")
 
 LOOKBACK = 90
@@ -101,6 +103,7 @@ class DataLoader:
     def __init__(self, user_id: str):
         self.user_id = str(user_id)
         self.clean_path = os.path.abspath(os.path.join(CLEAN_DIR, f"user_{self.user_id}"))
+        self.weekly_path = os.path.abspath(os.path.join(WEEKLY_DIR, f"user_{self.user_id}"))
         if not os.path.exists(self.clean_path):
             raise FileNotFoundError(f"No cleaned data found for user {user_id}")
 
@@ -128,6 +131,67 @@ class DataLoader:
         df = pd.read_excel(path)
         df = df.sort_values(["Product_ID", "Date"]).reset_index(drop=True)
         return df, path
+    
+    def get_latest_weekly_data(self):
+        """
+        Load the latest weekly data if it exists
+        Returns: (weekly_df, path) or (None, None)
+        """
+        if not os.path.exists(self.weekly_path):
+            return None, None
+        
+        files = [f for f in os.listdir(self.weekly_path) if "_weekly_" in f and f.endswith(".xlsx")]
+        if not files:
+            return None, None
+        
+        latest = max(files, key=lambda f: os.path.getctime(os.path.join(self.weekly_path, f)))
+        weekly_file_path = os.path.join(self.weekly_path, latest)
+        
+        try:
+            weekly_df = pd.read_excel(weekly_file_path)
+            weekly_df["Date"] = pd.to_datetime(weekly_df["Date"])
+            print(f"[DataLoader] Found weekly data: {weekly_file_path}")
+            print(f"             Date range: {weekly_df['Date'].min()} to {weekly_df['Date'].max()}")
+            return weekly_df, weekly_file_path
+        except Exception as e:
+            print(f"[DataLoader] Failed to load weekly data: {str(e)}")
+
+        return None, None
+    
+    def should_merge_weekly_data(training_df: pd.DataFrame, weekly_df: pd.DataFrame) -> bool:
+        """
+        Decide if we should merge weekly data with training data
+        
+        Logic:
+        - If weekly data is NEWER than training data (gap exists) → MERGE
+        - If weekly data OVERLAPS with training data → DON'T MERGE
+        """
+        training_max = training_df["Date"].max()
+        weekly_min = weekly_df["Date"].min()
+        weekly_max = weekly_df["Date"].max()
+        
+        print(f"\n[Merge Decision]")
+        print(f"  Training ends: {training_max.strftime('%Y-%m-%d')}")
+        print(f"  Weekly starts: {weekly_min.strftime('%Y-%m-%d')}")
+        print(f"  Weekly ends:   {weekly_max.strftime('%Y-%m-%d')}")
+        
+        # Check if there's a gap (weekly starts after training ends)
+        gap_days = (weekly_min - training_max).days
+        
+        if gap_days > 1:
+            print(f"   GAP DETECTED: {gap_days} days between training and weekly data")
+            print(f"  → Decision: MERGE weekly data to bridge the gap")
+            return True
+        elif gap_days <= 0:
+            print(f"    Weekly data OVERLAPS with training data")
+            print(f"  → Decision: USE TRAINING DATA ONLY (no merge needed)")
+            return False
+        else:
+            print(f"    Weekly data is CONTINUOUS with training (1-day gap)")
+            print(f"  → Decision: MERGE for continuity")
+
+        return True
+
 
     def get_latest_weekly_processed(self):
         """
@@ -139,6 +203,48 @@ class DataLoader:
             return None
         latest = max(processed, key=lambda f: os.path.getctime(os.path.join(self.clean_path, f)))
         return os.path.join(self.clean_path, latest)
+
+    def find_weekly_files_for_period(self, start_date: pd.Timestamp, end_date: pd.Timestamp):
+        """
+        Search the user's weekly upload directory for weekly files whose date ranges
+        overlap the requested period [start_date, end_date]. Returns list of file
+        paths (may be empty).
+        """
+        if not os.path.exists(self.weekly_path):
+            print(f"[DEBUG] Weekly path does not exist: {self.weekly_path}")
+            return []
+
+        candidates = [f for f in os.listdir(self.weekly_path) if ("_weekly_" in f or "Sales_Data_Week" in f) and f.endswith(".xlsx")]
+        print(f"[DEBUG] Found {len(candidates)} candidate weekly files: {candidates}")
+        
+        matches = []
+        for fname in candidates:
+            # Attempt to extract a date from the filename. Support YYYY-MM-DD or YYYYMMDD
+            m = re.search(r"(\d{4}-\d{2}-\d{2})", fname)
+            if m:
+                file_start = datetime.strptime(m.group(1), "%Y-%m-%d").date()
+            else:
+                m2 = re.search(r"(\d{8})", fname)
+                if m2:
+                    file_start = datetime.strptime(m2.group(1), "%Y%m%d").date()
+                else:
+                    print(f"[DEBUG]   {fname}: Could not extract date")
+                    continue
+
+            file_end = file_start + timedelta(days=6)
+            period_start = start_date.date()
+            period_end = end_date.date()
+            # Check overlap
+            overlaps = not (file_end < period_start or file_start > period_end)
+            print(f"[DEBUG]   {fname}: dates {file_start} to {file_end}, period {period_start} to {period_end}, overlaps={overlaps}")
+            
+            if overlaps:
+                matches.append(os.path.join(self.weekly_path, fname))
+
+        print(f"[DEBUG] Matched {len(matches)} weekly files for period {start_date.date()} to {end_date.date()}")
+        # Sort by creation time ascending so older files come first
+        matches = sorted(matches, key=lambda p: os.path.getctime(p))
+        return matches
 
 
 # -------------------------
@@ -404,27 +510,97 @@ def calculate_demand_levels(forecast_df):
     return product_avg.sort_values("Avg_Daily_Sales", ascending=False)
 
 
+def convert_dates(obj):
+    if isinstance(obj, dict):
+        return {k: convert_dates(v) for k, v in obj.items()}
+
+    elif isinstance(obj, list):
+        return [convert_dates(v) for v in obj]
+
+    elif isinstance(obj, (pd.Timestamp, datetime, np.datetime64)):
+        # Convert to pandas timestamp then extract only the date
+        return pd.to_datetime(obj).strftime("%Y-%m-%d")
+
+    else:
+        return obj
 
 def forecast_for_user(user_id: str):
     print("\n" + "="*70)
     print(f" Starting Product-Level Forecasting for User {user_id}")
     print("="*70 + "\n")
 
-    # Load data and models
+    # Load training data (for historical context)
     loader = DataLoader(user_id)
     df, data_path = loader.load_df()
     models = load_product_models(user_id)
 
-    print(f"[Data] Loaded {len(df)} records")
+    print(f"[Training Data] Loaded {len(df)} records")
     print(f"[Models] Loaded {len(models)} product models\n")
 
+    # Validate training data dates
+    df["Date"] = pd.to_datetime(df["Date"])
+    training_date_range = f"{df['Date'].min().strftime('%Y-%m-%d')} to {df['Date'].max().strftime('%Y-%m-%d')}"
+    print(f"[Training Data] Date range: {training_date_range}")
+    
+    #  NEW: Load weekly data (from weekly uploads) to get CORRECT last date
+    weekly_df, weekly_path = loader.get_latest_weekly_data()
+
+    if weekly_df is not None:
+        print(f" Loading weekly data to determine forecast start date...")
+        weekly_df["Date"] = pd.to_datetime(weekly_df["Date"])
+
+        # Validate weekly data dates are after training data
+        weekly_min = weekly_df["Date"].min()
+        weekly_max = weekly_df["Date"].max()
+        training_max = df["Date"].max()
+
+        print(f"[Weekly Data] Date range: {weekly_min.strftime('%Y-%m-%d')} to {weekly_max.strftime('%Y-%m-%d')}")
+
+        # Use the LATEST date from weekly data
+        latest_date = weekly_max
+        print(f"   Latest data date: {latest_date.strftime('%Y-%m-%d')}")
+
+        # VALIDATION: Check if weekly data is actually newer
+        if weekly_min > training_max:
+            print(f"   ✓ Weekly data is newer than training data (gap of {(weekly_min - training_max).days} days)")
+        elif weekly_min == training_max:
+            print(f"   ✓ Weekly data starts exactly where training data ends")
+        else:
+            print(f"   ⚠ WARNING: Weekly data overlaps or precedes training data (check date parsing!)")
+    else:
+        print(" No weekly data found, using training data date")
+        latest_date = df["Date"].max()
+
+    print(f" Forecast will start from: {(latest_date + timedelta(days=1)).strftime('%Y-%m-%d')}\n")
+
+    # Generate forecasts for each product
     all_forecasts = {h: [] for h in HORIZONS}
 
     for idx, (product_id, product_models) in enumerate(models.items(), 1):
-        product_data = df[df["Product_ID"] == product_id]
-        product_name = product_models["stats"]["product_name"]
+        #  IMPORTANT: Use weekly data if available for that product
+        if weekly_df is not None and len(weekly_df) > 0:
+            try:
+                weekly_product_df = weekly_df[weekly_df["Product_ID"] == product_id].copy()
+                if len(weekly_product_df) > 0:
+                    # Append weekly data to training data for forecasting
+                    product_data = df[df["Product_ID"] == product_id].copy()
+                    
+                    #  Combine: training data + recent weekly data
+                    combined = pd.concat([product_data, weekly_product_df], ignore_index=True)
+                    combined = combined.drop_duplicates(subset=["Date"], keep="last")
+                    combined = combined.sort_values("Date").reset_index(drop=True)
+                    
+                    product_data = combined
+                    print(f"[{idx}/{len(models)}] {product_models['stats']['product_name']} - Using {len(weekly_product_df)} weekly records")
+                else:
+                    product_data = df[df["Product_ID"] == product_id]
+            except Exception as e:
+                print(f" Failed to merge weekly data for {product_id}: {str(e)}")
+                product_data = df[df["Product_ID"] == product_id]
+        else:
+            product_data = df[df["Product_ID"] == product_id]
 
-        print(f"[{idx}/{len(models)}] Forecasting: {product_name} (ID: {product_id})")
+        product_name = product_models["stats"]["product_name"]
 
         try:
             forecaster = ProductForecaster(product_id, product_data, product_models)
@@ -454,26 +630,15 @@ def forecast_for_user(user_id: str):
     else:
         print("[Training Report] No training report found")
 
-    # Try to load the latest weekly processed file for evaluation
-    weekly_path = loader.get_latest_weekly_processed()
-    actuals_df = None
-    if weekly_path:
-        try:
-            actuals_df = pd.read_excel(weekly_path)
-            # ensure it has expected columns (Date, Product_ID, Units_Sold)
-            if "Units_Sold" not in actuals_df.columns or "Date" not in actuals_df.columns or "Product_ID" not in actuals_df.columns:
-                print(f"[Evaluation] Weekly processed file found but required columns missing: {weekly_path}")
-                actuals_df = None
-            else:
-                print(f"[Evaluation] Found weekly processed file for evaluation: {weekly_path}")
-        except Exception as e:
-            print(f"[Evaluation] Failed to read weekly processed file: {str(e)}")
-            actuals_df = None
-    else:
-        print("[Evaluation] No weekly processed (_processed_) file found for user skipping forecast evaluation.")
+    # For evaluation we'll search weekly upload files that overlap each forecast horizon
+    # Use DataLoader.find_weekly_files_for_period to find any weekly files whose
+    # date ranges overlap the forecast window for each horizon (7/30/90).
+    # We'll load and concat any matching weekly files per-horizon and run evaluation
+    # only when overlapping actuals exist.
+    print("[Evaluation] Locating weekly files that overlap each forecast horizon...")
 
     # Build output path (week-based)
-    latest_date = df["Date"].max()
+    # Use the `latest_date` determined earlier (weekly if present, else training)
     forecast_start_date = latest_date + timedelta(days=1)
     forecast_end_date_7d = forecast_start_date + timedelta(days=6)
     forecast_end_date_90d = forecast_start_date + timedelta(days=89)
@@ -481,17 +646,21 @@ def forecast_for_user(user_id: str):
     week_start_str = forecast_start_date.strftime("%Y%m%d")
     week_end_str = forecast_end_date_7d.strftime("%Y%m%d")
     out_dir = ensure_dir(os.path.join(FORECAST_DIR, f"user_{user_id}"))
-    filename = f"forecast_week_{week_start_str}_to_{week_end_str}.xlsx"
+    # Filename clearly indicates the forecast date range and generation date
+    filename = f"forecast_week_{week_start_str}_to_{week_end_str}_generated_{datetime.now().strftime('%Y%m%d')}.xlsx"
     out_path = os.path.join(out_dir, filename)
 
     # remove existing file to replace with new forecast
     if os.path.exists(out_path):
         print(f"  Existing forecast file found for week {week_start_str} to {week_end_str}. Updating...")
-        os.remove(out_path)
 
     print(f"\n Saving forecast to: {out_path}")
     print(f" Forecast period: {forecast_start_date.strftime('%Y-%m-%d')} to {forecast_end_date_90d.strftime('%Y-%m-%d')}\n")
 
+
+    # Prepare evaluation accumulator
+    evaluation_summary_list = []
+    evaluation_detail_frames = {}
 
     # Write to Excel: forecasts + demand_alerts + training_metrics + evaluation (if any)
     with pd.ExcelWriter(out_path, engine="openpyxl") as writer:
@@ -508,41 +677,145 @@ def forecast_for_user(user_id: str):
         if training_metrics_df is not None:
             training_metrics_df.to_excel(writer, sheet_name="training_metrics", index=False)
 
-        # Evaluation: compare forecast -> actuals
-        if actuals_df is not None:
-            # Evaluate each horizon if overlapping dates exist
-            eval_results_frames = {}
-            overall_summary = []
-            for horizon in HORIZONS:
-                sheet_key = f"{horizon}d_forecast"
-                if sheet_key not in combined_forecasts:
-                    continue
-                fdf = combined_forecasts[sheet_key].copy()
-                # merge on Date/Product_ID and use Units_Sold from actuals
-                eval_df, overall = evaluate_forecasts_against_actuals(fdf, actuals_df)
-                if not eval_df.empty:
-                    eval_results_frames[f"{horizon}d_eval"] = eval_df
-                    overall_summary.append({
-                        "horizon_days": horizon,
-                        "RMSE": overall["overall"]["RMSE"],
-                        "MAE": overall["overall"]["MAE"],
-                        "MAPE": overall["overall"]["MAPE"],
-                        "records": overall["n"]
-                    })
+        # Evaluation: for each horizon, find weekly files overlapping the horizon
+        # results are collected into `evaluation_detail_frames` and `evaluation_summary_list`
+        overall_summary = []
+        for horizon in HORIZONS:
+            sheet_key = f"{horizon}d_forecast"
+            if sheet_key not in combined_forecasts:
+                continue
 
-            # save per-product evaluation frames (one sheet per horizon)
-            for sheet, frame in eval_results_frames.items():
-                frame.to_excel(writer, sheet_name=sheet, index=False)
+            fdf = combined_forecasts[sheet_key].copy()
+            fdf["Date"] = pd.to_datetime(fdf["Date"])
 
-            # Save overall summary
-            if overall_summary:
-                pd.DataFrame(overall_summary).to_excel(writer, sheet_name="forecast_evaluation_summary", index=False)
-            else:
-                # If no overlapping records found, write a small note sheet
-                pd.DataFrame([{"note": "No overlapping forecast vs actuals found for evaluation."}]).to_excel(writer, sheet_name="forecast_evaluation", index=False)
+            # Use actual forecast DataFrame date range (not computed from latest_date)
+            horizon_start = fdf["Date"].min()
+            horizon_end = fdf["Date"].max()
+            print(f"[DEBUG] Evaluating {horizon}-day forecast: dates {horizon_start.date()} to {horizon_end.date()}")
+
+            matches = loader.find_weekly_files_for_period(horizon_start, horizon_end)
+            if not matches:
+                print(f"[Evaluation] No weekly files overlapping {horizon}-day forecast window.")
+                continue
+
+            # Load and concat matching weekly files
+            dfs = []
+            for p in matches:
+                try:
+                    w = pd.read_excel(p)
+                    w["Date"] = pd.to_datetime(w["Date"])
+                    if {"Date", "Product_ID", "Units_Sold"}.issubset(set(w.columns)):
+                        dfs.append(w[["Date", "Product_ID", "Units_Sold"]])
+                    else:
+                        print(f"[Evaluation] Weekly file missing required columns: {p}")
+                except Exception as e:
+                    print(f"[Evaluation] Failed loading weekly file {p}: {e}")
+
+            if not dfs:
+                continue
+
+            actuals_h = pd.concat(dfs, ignore_index=True)
+
+            eval_df, overall = evaluate_forecasts_against_actuals(fdf, actuals_h)
+            if not eval_df.empty:
+                evaluation_detail_frames[f"{horizon}d_eval"] = eval_df
+                overall_summary.append({
+                    "horizon_days": horizon,
+                    "RMSE": overall["overall"]["RMSE"],
+                    "MAE": overall["overall"]["MAE"],
+                    "MAPE": overall["overall"]["MAPE"],
+                    "records": overall["n"]
+                })
+                evaluation_summary_list.append({
+                    "horizon": horizon,
+                    "overall": overall["overall"],
+                    "records": overall["n"]
+                })
+
+        # save per-product evaluation frames (one sheet per horizon)
+        for sheet, frame in evaluation_detail_frames.items():
+            frame.to_excel(writer, sheet_name=sheet, index=False)
+
+        # Save overall summary (or write a note if none)
+        if overall_summary:
+            pd.DataFrame(overall_summary).to_excel(writer, sheet_name="forecast_evaluation_summary", index=False)
         else:
-            # no actuals - write a placeholder
-            pd.DataFrame([{"note": "No weekly actuals available for evaluation."}]).to_excel(writer, sheet_name="forecast_evaluation", index=False)
+            pd.DataFrame([{"note": "No overlapping forecast vs actuals found for evaluation."}]).to_excel(writer, sheet_name="forecast_evaluation", index=False)
+
+        # --- Also evaluate the immediately previous forecast (if any) against available weekly actuals ---
+        try:
+            json_candidates = [f for f in os.listdir(out_dir) if f.startswith('forecast_') and f.endswith('.json')]
+            json_candidates = sorted(json_candidates, key=lambda f: os.path.getctime(os.path.join(out_dir, f)))
+            if len(json_candidates) >= 2:
+                prev_json_path = os.path.join(out_dir, json_candidates[-2])
+                print(f"[Evaluation] Found previous forecast JSON for evaluation: {prev_json_path}")
+                try:
+                    with open(prev_json_path, 'r') as fh:
+                        prev_res = json.load(fh)
+
+                    prev_eval_overall = []
+                    prev_detail_frames = {}
+                    prev_fp_start = prev_res.get('forecast_period', {}).get('start')
+                    if prev_fp_start:
+                        for horizon in HORIZONS:
+                            prev_forecasts = prev_res.get('forecasts', {}).get(str(horizon), [])
+                            if not prev_forecasts:
+                                continue
+                            pf_df = pd.DataFrame(prev_forecasts)
+                            if pf_df.empty:
+                                continue
+                            pf_df['Date'] = pd.to_datetime(pf_df['Date'])
+
+                            # Use actual previous forecast dates (not computed)
+                            prev_start_date = pf_df['Date'].min()
+                            prev_end_date = pf_df['Date'].max()
+                            print(f"[DEBUG] Evaluating previous {horizon}-day forecast: dates {prev_start_date.date()} to {prev_end_date.date()}")
+
+                            matches = loader.find_weekly_files_for_period(prev_start_date, prev_end_date)
+                            if not matches:
+                                print(f"[Evaluation] No weekly files overlap previous forecast {prev_start_date} (horizon {horizon})")
+                                continue
+
+                            dfs = []
+                            for p in matches:
+                                try:
+                                    w = pd.read_excel(p)
+                                    w['Date'] = pd.to_datetime(w['Date'])
+                                    if {"Date", "Product_ID", "Units_Sold"}.issubset(set(w.columns)):
+                                        dfs.append(w[["Date", "Product_ID", "Units_Sold"]])
+                                except Exception as e:
+                                    print(f"[Evaluation] Failed loading weekly file {p} for prev eval: {e}")
+
+                            if not dfs:
+                                continue
+
+                            actuals_prev = pd.concat(dfs, ignore_index=True)
+                            eval_df_prev, overall_prev = evaluate_forecasts_against_actuals(pf_df, actuals_prev)
+                            if not eval_df_prev.empty:
+                                sheet = f"prev_{horizon}d_eval"
+                                prev_detail_frames[sheet] = eval_df_prev
+                                prev_eval_overall.append({
+                                    "horizon_days": horizon,
+                                    "RMSE": overall_prev["overall"]["RMSE"],
+                                    "MAE": overall_prev["overall"]["MAE"],
+                                    "MAPE": overall_prev["overall"]["MAPE"],
+                                    "records": overall_prev["n"]
+                                })
+
+                        # write prev eval sheets and summary if any
+                        for sheet, df in prev_detail_frames.items():
+                            df.to_excel(writer, sheet_name=sheet, index=False)
+                        if prev_eval_overall:
+                            pd.DataFrame(prev_eval_overall).to_excel(writer, sheet_name="prev_forecast_evaluation_summary", index=False)
+                            # merge into main accumulators so JSON can include it
+                            evaluation_summary_list.extend([{"horizon": e["horizon_days"], "overall": {"RMSE": e["RMSE"], "MAE": e["MAE"], "MAPE": e["MAPE"]}, "records": e["records"]} for e in prev_eval_overall])
+                            for sheet, df in prev_detail_frames.items():
+                                evaluation_detail_frames[sheet] = df
+
+                except Exception as e:
+                    print(f"[Evaluation] Failed to read previous forecast JSON: {e}")
+        except Exception:
+            pass
 
     print("\n" + "=" * 70)
     print(" Forecasting Completed Successfully!")
@@ -551,7 +824,7 @@ def forecast_for_user(user_id: str):
     print(f" Forecast sheets: {sheet_list}")
     if training_metrics_df is not None:
         print(" Training metrics included in sheet: training_metrics")
-    if actuals_df is not None:
+    if evaluation_summary_list:
         print(" Evaluation sheets added (per-horizon) and summary: forecast_evaluation_summary")
     else:
         print(" No evaluation performed (no weekly actuals found).")
@@ -586,33 +859,92 @@ def forecast_for_user(user_id: str):
         result["demand_levels"] = demand.to_dict(orient="records")
 
     # --- 3. Add evaluation summary ---
-    if actuals_df is not None:
+    if evaluation_summary_list:
         eval_summary = {}
-        for horizon in HORIZONS:
-            sheet_key = f"{horizon}d_forecast"
-            if sheet_key not in combined_forecasts:
-                continue
-
-            fdf = combined_forecasts[sheet_key]
-            eval_df, overall = evaluate_forecasts_against_actuals(fdf, actuals_df)
-
-            eval_summary[str(horizon)] = {
-                "overall": overall["overall"],
-                "records": overall["n"],
-                "per_product": eval_df.to_dict(orient="records")
+        for entry in evaluation_summary_list:
+            h = entry["horizon"]
+            key = str(h)
+            eval_summary[key] = {
+                "overall": entry["overall"],
+                "records": entry["records"],
+                "per_product": []
             }
+            sheet_name = f"{h}d_eval"
+            if sheet_name in evaluation_detail_frames:
+                eval_summary[key]["per_product"] = evaluation_detail_frames[sheet_name].to_dict(orient="records")
 
         result["evaluation"] = eval_summary
-
     else:
         result["evaluation"] = {"note": "No weekly actuals found"}
 
     # ----------------------------------------------------------
-    # FIX: Always define json_out BEFORE writing JSON
+    # Persist evaluation metrics CSV (historical logs) and write JSON
     # ----------------------------------------------------------
-    json_out = os.path.join(out_dir, f"forecast_{week_start_str}.json")
+    # Ensure reports dir
+    ensure_dir(REPORT_DIR)
+    reports_dir = os.path.join(REPORT_DIR, "evaluation")
+    ensure_dir(reports_dir)
+
+    rows = []
+    # Helper to extract prev forecast start if needed
+    def _get_prev_forecast_start():
+        try:
+            json_candidates = [f for f in os.listdir(out_dir) if f.startswith('forecast_') and f.endswith('.json')]
+            json_candidates = sorted(json_candidates, key=lambda f: os.path.getctime(os.path.join(out_dir, f)))
+            if len(json_candidates) >= 2:
+                prev_json_path = os.path.join(out_dir, json_candidates[-2])
+                with open(prev_json_path, 'r') as fh:
+                    prev_res = json.load(fh)
+                    return prev_res.get('forecast_period', {}).get('start')
+        except Exception:
+            return None
+        return None
+
+    prev_forecast_start = _get_prev_forecast_start()
+
+    for sheet, frame in evaluation_detail_frames.items():
+        if frame is None or frame.empty:
+            continue
+        # sheet names: '7d_eval' or 'prev_7d_eval'
+        m = re.search(r'prev_(\d+)d_eval', sheet)
+        source = 'prev' if m else 'current'
+        if m:
+            horizon = int(m.group(1))
+            forecast_start_str = prev_forecast_start or ''
+        else:
+            m2 = re.search(r'(\d+)d_eval', sheet)
+            horizon = int(m2.group(1)) if m2 else None
+            forecast_start_str = forecast_start_date.strftime('%Y-%m-%d') if 'forecast_start_date' in locals() else ''
+
+        for _, r in frame.iterrows():
+            rows.append({
+                'generated_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'user_id': user_id,
+                'horizon': horizon,
+                'forecast_start': forecast_start_str,
+                'Product_ID': r.get('Product_ID'),
+                'Records': int(r.get('Records', 0)),
+                'RMSE': float(r.get('RMSE')) if r.get('RMSE') is not None else None,
+                'MAE': float(r.get('MAE')) if r.get('MAE') is not None else None,
+                'MAPE': float(r.get('MAPE')) if r.get('MAPE') is not None else None,
+                'source': source
+            })
+
+    if rows:
+        csv_name = f"evaluation_user_{user_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        csv_path = os.path.join(reports_dir, csv_name)
+        try:
+            pd.DataFrame(rows).to_csv(csv_path, index=False)
+            print(f"[Evaluation] Persisted evaluation CSV: {csv_path}")
+        except Exception as e:
+            print(f"[Evaluation] Failed to write evaluation CSV: {e}")
+
+    # Convert all timestamps to strings
+    result_clean = convert_dates(result)
+
+    json_out = os.path.join(out_dir, f"forecast_{week_start_str}_to_{week_end_str}.json")
     with open(json_out, "w") as f:
-        json.dump(result, f, indent=4)
+        json.dump(result_clean, f, indent=4)
 
     return result
 

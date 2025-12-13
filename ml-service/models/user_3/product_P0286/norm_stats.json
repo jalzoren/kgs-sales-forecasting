@@ -1,10 +1,10 @@
 {
-    "mean": 4.3963133640553,
-    "std": 2.639123875452354,
-    "lookback": 90,
-    "product_id": "P0286",
-    "product_name": "Crown Caramel Maple Corn",
-    "category": "Snacks",
-    "avg_unit_price": 80.0,
-    "total_samples": 434
+  "mean": 4.3963133640553,
+  "std": 2.639123875452354,
+  "lookback": 90,
+  "product_id": "P0286",
+  "product_name": "Crown Caramel Maple Corn",
+  "category": "Snacks",
+  "avg_unit_price": 80.0,
+  "total_samples": 434
 }

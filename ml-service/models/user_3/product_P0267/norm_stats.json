@@ -1,10 +1,10 @@
 {
-    "mean": 2.6604938271604937,
-    "std": 1.5243599173731168,
-    "lookback": 90,
-    "product_id": "P0267",
-    "product_name": "Lotte Pepero White Cookie",
-    "category": "Snacks",
-    "avg_unit_price": 110.0,
-    "total_samples": 486
+  "mean": 2.6604938271604937,
+  "std": 1.5243599173731168,
+  "lookback": 90,
+  "product_id": "P0267",
+  "product_name": "Lotte Pepero White Cookie",
+  "category": "Snacks",
+  "avg_unit_price": 110.0,
+  "total_samples": 486
 }
