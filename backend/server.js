@@ -19,20 +19,14 @@ const PORT = process.env.PORT || 5000;
 // =======================
 // CORS (RENDER SAFE)
 // =======================
+app.set("trust proxy", 1);
+
 app.use(cors({
   origin: process.env.VITE_API_BASE_URL,
   credentials: true
 }));
 
-// =======================
-// Sessions
-// =======================
-app.set("trust proxy", 1); // ✅ REQUIRED
 app.use(sessionConfig);
-
-// =======================
-// Body parser
-// =======================
 app.use(express.json());
 
 // =======================
