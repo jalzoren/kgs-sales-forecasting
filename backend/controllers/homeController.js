@@ -305,23 +305,50 @@ class HomeController {
           console.log(`[DEBUG] Checking forecast data for horizon ${h}: ${Array.isArray(forecastData) ? forecastData.length : "NOT_ARRAY"} records`);
           
           if (Array.isArray(forecastData) && forecastData.length > 0) {
-            const totalRevenue = forecastData.reduce((sum, f) => sum + (f.Revenue_Estimate || 0), 0);
-            const forecastDates = forecastData
-              .map((f) => this.parseAnyDate(f.Date))
-              .filter(Boolean)
-              .sort((a, b) => a - b);
-            
-            if (forecastDates.length > 0) {
-              const startDate = this.formatDate(forecastDates[0]);
-              const endDate = this.formatDate(forecastDates[forecastDates.length - 1]);
-              metrics.predicted_sales[h].label = `Forecasting ${startDate} – ${endDate}`;
-              metrics.predicted_sales[h].total = totalRevenue;
-              metrics.predicted_sales[h].start_date = startDate;
-              metrics.predicted_sales[h].end_date = endDate;
-              
-              console.log(`   ✅ Predicted Sales (${h}d): ₱${Math.round(totalRevenue).toLocaleString()} (${startDate} to ${endDate})`);
+            // Determine forecast window for this horizon using pythonForecast.forecast_period
+            const periodStartStr = pythonForecast.forecast_period?.start;
+            const periodEndStr = h === "7"
+              ? pythonForecast.forecast_period?.end_7d
+              : h === "30"
+              ? pythonForecast.forecast_period?.end_30d
+              : pythonForecast.forecast_period?.end_90d;
+
+            const periodStart = periodStartStr ? this.parseAnyDate(periodStartStr) : null;
+            const periodEnd = periodEndStr ? this.parseAnyDate(periodEndStr) : null;
+
+            // Filter forecast entries to those that fall within the forecast window
+            const filtered = forecastData.filter((f) => {
+              const d = this.parseAnyDate(f.Date) || this.parseAnyDate(f.date) || null;
+              if (!d) return false;
+              if (periodStart && d < periodStart) return false;
+              if (periodEnd && d > periodEnd) return false;
+              return true;
+            });
+
+            console.log(`   ℹ️ Filtered ${filtered.length}/${forecastData.length} records for horizon ${h} using forecast_period window`);
+
+            if (filtered.length > 0) {
+              const totalRevenue = filtered.reduce((sum, f) => sum + (f.Revenue_Estimate || f.Revenue || 0), 0);
+              const forecastDates = filtered
+                .map((f) => this.parseAnyDate(f.Date) || this.parseAnyDate(f.date))
+                .filter(Boolean)
+                .sort((a, b) => a - b);
+
+              if (forecastDates.length > 0) {
+                const startDate = this.formatDate(forecastDates[0]);
+                const endDate = this.formatDate(forecastDates[forecastDates.length - 1]);
+                metrics.predicted_sales[h].label = `Forecasting ${startDate} – ${endDate}`;
+                metrics.predicted_sales[h].total = totalRevenue;
+                metrics.predicted_sales[h].start_date = startDate;
+                metrics.predicted_sales[h].end_date = endDate;
+
+                console.log(`   ✅ Predicted Sales (${h}d): ₱${Math.round(totalRevenue).toLocaleString()} (${startDate} to ${endDate})`);
+              } else {
+                console.log(`   ⚠️ No valid dates found after filtering forecast data for horizon ${h}d`);
+              }
             } else {
-              console.log(`   ⚠️ No valid dates found in forecast data for horizon ${h}d`);
+              // No filtered entries within the forecast_period window
+              console.log(`   ⚠️ No forecast records fall within the forecast_period for horizon ${h}d`);
             }
           } else {
             // Fallback: Try to use forecast_period from pythonForecast if available

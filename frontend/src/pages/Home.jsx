@@ -116,15 +116,24 @@ export default function Home() {
         futureFile: response.futureFile || "",
       });
 
-      // Update global stats (for Navbar)
+      // Update global stats (for Navbar) - use functional merge to preserve labels
       if (response.stats) {
-        setStats({
+        const incoming = {
           predictedSales: response.stats.predictedSales || 0,
           actualSales: response.stats.actualSales || 0,
           forecastAccuracy: response.stats.forecastAccuracy || 0,
           inventoryAlertsCount: response.inventoryAlerts?.length || 0,
           variance: response.stats.variance || 0,
-        });
+        };
+
+        setStats(prev => ({
+          ...prev,
+          ...incoming,
+          // preserve any existing human-friendly labels if incoming payload lacks them
+          predictedSalesLabel: incoming.predictedSalesLabel ?? prev.predictedSalesLabel,
+          actualSalesLabel: incoming.actualSalesLabel ?? prev.actualSalesLabel,
+          forecastedOnDate: incoming.forecastedOnDate ?? prev.forecastedOnDate,
+        }));
       }
 
       // Set inventory alerts

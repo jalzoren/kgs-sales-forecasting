@@ -46,8 +46,28 @@ class NavbarStatsCalculator {
     return Math.round(variance);
   }
 
-  // Process dashboard data into navbar stats
-  static processStats(data) {
+  // 🔧 FIX: Process dashboard data while preserving existing labels
+  static processStats(data, existingStats = null) {
+    // 🔒 CRITICAL: If data is empty/loading, preserve ALL existing stats
+    if (!data.success || !data.metrics) {
+      console.log("⚠️ Incomplete data received, preserving existing stats");
+      return existingStats || {
+        predictedSales: 0,
+        actualSales: 0,
+        forecastAccuracy: 0,
+        variance: 0,
+        inventoryAlertsCount: 0,
+        predictedSalesLabel: "Loading...",
+        actualSalesLabel: "Loading...",
+        forecastedOnDate: "N/A",
+        predictedSalesTooltip: "Predicted sales for the next 7 days",
+        actualSalesTooltip: "Actual sales from the previous 7 days",
+        forecastAccuracyTooltip: "Accuracy of forecast predictions",
+        inventoryAlertsTooltip: "Items requiring immediate action",
+        metrics: null
+      };
+    }
+
     const stats = {
       predictedSales: 0,
       actualSales: 0,
@@ -55,22 +75,22 @@ class NavbarStatsCalculator {
       variance: 0,
       inventoryAlertsCount: 0,
       
-      // Date ranges
-      predictedSalesLabel: "Loading...",
-      actualSalesLabel: "Loading...",
-      forecastedOnDate: "N/A",
+      // 🔒 PRESERVE existing labels as fallback
+      predictedSalesLabel: existingStats?.predictedSalesLabel || "Loading...",
+      actualSalesLabel: existingStats?.actualSalesLabel || "Loading...",
+      forecastedOnDate: existingStats?.forecastedOnDate || "N/A",
       
       // Tooltip data
-      predictedSalesTooltip: "Predicted sales for the next 7 days",
-      actualSalesTooltip: "Actual sales from the previous 7 days",
-      forecastAccuracyTooltip: "Accuracy of forecast predictions",
-      inventoryAlertsTooltip: "Items requiring immediate action",
+      predictedSalesTooltip: existingStats?.predictedSalesTooltip || "Predicted sales for the next 7 days",
+      actualSalesTooltip: existingStats?.actualSalesTooltip || "Actual sales from the previous 7 days",
+      forecastAccuracyTooltip: existingStats?.forecastAccuracyTooltip || "Accuracy of forecast predictions",
+      inventoryAlertsTooltip: existingStats?.inventoryAlertsTooltip || "Items requiring immediate action",
       
       // Raw data for reference
       metrics: data.metrics || null
     };
 
-    // 1. Predicted Sales (7 days forecast) - FIXED: Read from correct path
+    // 1. Predicted Sales (7 days forecast) - NOW with fallback preservation
     if (data.metrics?.predicted_sales?.['7']) {
       const predicted = data.metrics.predicted_sales['7'];
       stats.predictedSales = predicted.total || 0;
@@ -84,9 +104,10 @@ class NavbarStatsCalculator {
         stats.predictedSalesLabel = predicted.label;
         stats.predictedSalesTooltip = predicted.label;
       }
+      // 🔒 ELSE: Keep existing label (already set from existingStats)
     }
 
-    // 2. Actual Sales (7 days historical) - FIXED: Read from correct path
+    // 2. Actual Sales (7 days historical) - NOW with fallback preservation
     if (data.metrics?.actual_sales) {
       const actual = data.metrics.actual_sales;
       stats.actualSales = actual.total || 0;
@@ -100,48 +121,37 @@ class NavbarStatsCalculator {
         stats.actualSalesLabel = actual.label;
         stats.actualSalesTooltip = actual.label;
       }
+      // 🔒 ELSE: Keep existing label (already set from existingStats)
     }
 
-    // 3. Forecast Accuracy - Using wMAPE formula - FIXED
+    // 3. Forecast Accuracy - Using wMAPE formula
     if (data.metrics?.forecast_accuracy?.['7']) {
       const accuracy = data.metrics.forecast_accuracy['7'];
       
       if (accuracy.status === "available") {
         stats.forecastAccuracy = accuracy.accuracy_percent || 0;
-        // Format the forecasted_on date to YYYY/MM/DD if it's in YYYY-MM-DD format
-        const forecastedDate = accuracy.forecasted_on ? accuracy.forecasted_on.replace(/-/g, '/') : "N/A";
-        stats.forecastedOnDate = forecastedDate;
+        stats.forecastedOnDate = accuracy.forecasted_on || "N/A";
         
         // Calculate variance if we have the raw data
         if (data.stats?.variance !== undefined) {
           stats.variance = data.stats.variance;
         }
         
-        // Label to show this is DELAYED, EVALUATION-BASED accuracy
-        const qualityDescription = accuracy.accuracy_percent >= 80 
-          ? "Excellent" 
-          : accuracy.accuracy_percent >= 60 
-          ? "Good" 
-          : accuracy.accuracy_percent >= 40 
-          ? "Fair" 
-          : "Poor";
-        
-        stats.forecastAccuracyTooltip = `📊 DELAYED, EVALUATION-BASED ACCURACY\n\nThis compares the forecast from ${forecastedDate} against actual sales that occurred later.\n\nAccuracy: ${accuracy.accuracy_percent}% (${qualityDescription})\nwMAPE Error: ${accuracy.wmape || 'N/A'}%\nVariance: ${stats.variance >= 0 ? '+' : ''}${stats.variance}%\n\nEvaluated on: ${accuracy.evaluated_on || 'N/A'}`;
+        stats.forecastAccuracyTooltip = `Forecast created on ${accuracy.forecasted_on || 'N/A'}. Variance: ${stats.variance >= 0 ? '+' : ''}${stats.variance}%`;
       } else {
         // Not available yet - use backend-provided stats as fallback
         if (data.stats) {
           stats.forecastAccuracy = data.stats.forecastAccuracy || 0;
           stats.variance = data.stats.variance || 0;
         }
-        stats.forecastedOnDate = "N/A";
-        stats.forecastAccuracyTooltip = accuracy.reason || "Forecast accuracy will be available after the forecast period ends and actual sales data is uploaded. This shows how well previous forecasts predicted actual outcomes.";
+        // 🔒 Keep existing forecastedOnDate from existingStats
+        stats.forecastAccuracyTooltip = accuracy.reason || "Forecast accuracy will be available after actual sales data is uploaded";
       }
     } else if (data.stats) {
       // Fallback to legacy stats structure
       stats.forecastAccuracy = data.stats.forecastAccuracy || 0;
       stats.variance = data.stats.variance || 0;
-      stats.forecastedOnDate = "N/A";
-      stats.forecastAccuracyTooltip = "Forecast accuracy will be available after evaluation data is available.";
+      // 🔒 Keep existing forecastedOnDate from existingStats
     }
 
     // 4. Inventory Alerts (HIGH DEMAND items)
@@ -165,16 +175,25 @@ function Navbar() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { stats, setStats } = useStats();
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false); // 🆕 Track fetch in progress
 
   useEffect(() => {
     fetchNavbarStats();
   }, []);
 
   const fetchNavbarStats = async () => {
+    // 🔒 Prevent concurrent fetches from overwriting with stale data
+    if (isFetching) {
+      console.log("⏸️ Navbar: Fetch already in progress, skipping...");
+      return;
+    }
+
     try {
+      setIsFetching(true);
       console.log("🔄 Navbar: Fetching stats (cached)...");
 
-      const data = await SessionManager.getDashboardData(7, false);
+      // 🆕 Use navbar-specific cache (NEVER affected by dashboard forceRefresh)
+      const data = await SessionManager.getDashboardData(7, false, 'navbar');
 
       if (data.success) {
         // 🐛 DEBUG: Log the COMPLETE raw data structure
@@ -187,20 +206,37 @@ function Navbar() {
           stats: data.stats
         });
 
-        const processedStats = NavbarStatsCalculator.processStats(data);
+        // 🔧 FIX: Pass current stats to preserve existing labels
+        const processedStats = NavbarStatsCalculator.processStats(data, stats);
         
         // 🐛 DEBUG: Log the COMPLETE processed stats
-        console.log("✅ Processed navbar stats:", processedStats);
+        console.log("✅ Processed navbar stats:", {
+          predictedSalesLabel: processedStats.predictedSalesLabel,
+          actualSalesLabel: processedStats.actualSalesLabel,
+          forecastedOnDate: processedStats.forecastedOnDate
+        });
         
-        setStats(processedStats);
+        // Use functional updater to avoid overwrites from concurrent responses
+        setStats(prev => ({
+          ...prev,
+          ...processedStats,
+          // Preserve existing labels when incoming payload lacks them
+          predictedSalesLabel: processedStats.predictedSalesLabel ?? prev.predictedSalesLabel,
+          actualSalesLabel: processedStats.actualSalesLabel ?? prev.actualSalesLabel,
+          forecastedOnDate: processedStats.forecastedOnDate ?? prev.forecastedOnDate
+        }));
       } else {
-        console.log("⚠️ Response not successful, using default stats");
+        console.log("⚠️ Response not successful, preserving current stats");
+        // Don't update stats if response fails
       }
 
       setLoading(false);
     } catch (err) {
       console.error("❌ Error fetching navbar stats:", err);
       setLoading(false);
+      // Don't clear stats on error
+    } finally {
+      setIsFetching(false);
     }
   };
 
@@ -266,7 +302,10 @@ function Navbar() {
             {loading ? "Loading..." : formatCurrency(stats.predictedSales)}
           </p>
           <span className="date-label">
-            {loading ? "Loading..." : stats.predictedSalesLabel}
+            {/* 🔒 NEVER show "Loading..." after initial load */}
+            {loading && !stats.predictedSalesLabel.includes("Date:") 
+              ? "Loading..." 
+              : stats.predictedSalesLabel}
           </span>
         </div>
 
@@ -281,7 +320,10 @@ function Navbar() {
             {loading ? "Loading..." : formatCurrency(stats.actualSales)}
           </p>
           <span className="date-label">
-            {loading ? "Loading..." : stats.actualSalesLabel}
+            {/* 🔒 NEVER show "Loading..." after initial load */}
+            {loading && !stats.actualSalesLabel.includes("Date:") 
+              ? "Loading..." 
+              : stats.actualSalesLabel}
           </span>
         </div>
 
@@ -307,7 +349,7 @@ function Navbar() {
           <span className="date-label">
             {loading 
               ? "Loading..." 
-              : `⏱️ Delayed (${stats.forecastedOnDate})`}
+              : `Date: ${stats.forecastedOnDate}`}
           </span>
         </div>
 
