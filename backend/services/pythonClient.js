@@ -3,7 +3,7 @@ const axios = require("axios");
 // Python FastAPI server (main_app.py) runs on port 8000
 // Frontend Vite dev server runs on port 5173
 // Node.js backend runs on port 3000
-const PYTHON_API = "http://localhost:8000"; // ✅ FastAPI server (main_app.py)
+const PYTHON_API = process.env.PYTHON_API_URL || "http://localhost:8000";
 
 /**
  * Fetch forecast results from Python FastAPI (forecastModel.py)
