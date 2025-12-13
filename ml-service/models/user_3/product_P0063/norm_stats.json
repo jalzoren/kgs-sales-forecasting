@@ -1,10 +1,10 @@
 {
-    "mean": 2.2300469483568075,
-    "std": 1.040971288845446,
-    "lookback": 90,
-    "product_id": "P0063",
-    "product_name": "Our Home Kimchi 1Kg Jar",
-    "category": "Food Fresh/Meat/Sidedish",
-    "avg_unit_price": 190.0,
-    "total_samples": 213
+  "mean": 2.2300469483568075,
+  "std": 1.040971288845446,
+  "lookback": 90,
+  "product_id": "P0063",
+  "product_name": "Our Home Kimchi 1Kg Jar",
+  "category": "Food Fresh/Meat/Sidedish",
+  "avg_unit_price": 190.0,
+  "total_samples": 213
 }

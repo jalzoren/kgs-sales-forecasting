@@ -1,10 +1,10 @@
 {
-    "mean": 2.4649122807017543,
-    "std": 1.2479648504435465,
-    "lookback": 90,
-    "product_id": "P0035",
-    "product_name": "CJ  Multi-Grains Cooked Rice 210g",
-    "category": "Dry Food",
-    "avg_unit_price": 110.0,
-    "total_samples": 342
+  "mean": 2.4649122807017543,
+  "std": 1.2479648504435465,
+  "lookback": 90,
+  "product_id": "P0035",
+  "product_name": "CJ  Multi-Grains Cooked Rice 210g",
+  "category": "Dry Food",
+  "avg_unit_price": 110.0,
+  "total_samples": 342
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 2.651315789473684,
-    "std": 1.5950191776216718,
-    "lookback": 90,
-    "product_id": "P0265",
-    "product_name": "Orion Almond Candy",
-    "category": "Snacks",
-    "avg_unit_price": 110.0,
-    "total_samples": 456
+  "mean": 2.651315789473684,
+  "std": 1.5950191776216718,
+  "lookback": 90,
+  "product_id": "P0265",
+  "product_name": "Orion Almond Candy",
+  "category": "Snacks",
+  "avg_unit_price": 110.0,
+  "total_samples": 456
 }

@@ -29,11 +29,12 @@ function Navbar() {
 
       if (data.success) {
         const newStats = {
-          predictedSales: data.pythonForecast?.total_predicted_7d || data.stats.predictedSales,
+          predictedSales: data.stats?.predictedSales || 0,
           actualSales: data.stats?.actualSales || 0,
-          forecastAccuracy: data.pythonForecast?.overall_accuracy || data.stats.forecastAccuracy,
-          inventoryAlertsCount: data.pythonForecast?.demand_alerts?.length || 0,
+          forecastAccuracy: data.stats?.forecastAccuracy || 0,
+          inventoryAlertsCount: data.inventoryAlerts?.length || 0,
           variance: data.stats?.variance || 0,
+          evaluationSummary: data.stats?.evaluationSummary || null
         };
 
         console.log("✅ Navbar stats updated:", newStats);
@@ -126,18 +127,29 @@ function Navbar() {
           <h4>Forecast Accuracy</h4>
           <p
             className={`value ${
-              stats.forecastAccuracy >= 80
+              stats.evaluationSummary && stats.evaluationSummary["7"]
+                ? (stats.evaluationSummary["7"].MAPE < 20
+                    ? "green"
+                    : stats.evaluationSummary["7"].MAPE < 50
+                    ? "yellow"
+                    : "red")
+                : stats.forecastAccuracy >= 80
                 ? "green"
                 : stats.forecastAccuracy >= 60
                 ? "yellow"
                 : "red"
             }`}
           >
-            {loading ? "0%" : `${stats.forecastAccuracy}%`}
+            {loading
+              ? "0%"
+              : stats.evaluationSummary && stats.evaluationSummary["7"]
+              ? `${Math.round(100 - stats.evaluationSummary["7"].MAPE)}%`
+              : `${stats.forecastAccuracy}%`}
           </p>
           <span>
-            variance:{" "}
-            {stats.variance >= 0 ? `+${stats.variance}` : stats.variance}%
+            {stats.evaluationSummary && stats.evaluationSummary["7"] && stats.evaluationSummary["7"].evaluation_date
+              ? `evaluated ${new Date(stats.evaluationSummary["7"].evaluation_date).toISOString().split("T")[0]}`
+              : `variance: ${stats.variance >= 0 ? `+${stats.variance}` : stats.variance}%`}
           </span>
         </div>
 

@@ -1,10 +1,10 @@
 {
-    "mean": 6.870967741935484,
-    "std": 4.35541453312064,
-    "lookback": 90,
-    "product_id": "P0124",
-    "product_name": "Terra Lager Beer 500mL",
-    "category": "Liquor/Beverage",
-    "avg_unit_price": 170.0,
-    "total_samples": 1023
+  "mean": 6.870967741935484,
+  "std": 4.35541453312064,
+  "lookback": 90,
+  "product_id": "P0124",
+  "product_name": "Terra Lager Beer 500mL",
+  "category": "Liquor/Beverage",
+  "avg_unit_price": 170.0,
+  "total_samples": 1023
 }

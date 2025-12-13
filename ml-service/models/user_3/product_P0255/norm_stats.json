@@ -1,10 +1,10 @@
 {
-    "mean": 2.7600767754318616,
-    "std": 1.6284782874069081,
-    "lookback": 90,
-    "product_id": "P0255",
-    "product_name": "Bibigo Crispy Seaweed Snack",
-    "category": "Snacks",
-    "avg_unit_price": 140.0,
-    "total_samples": 521
+  "mean": 2.7600767754318616,
+  "std": 1.6284782874069081,
+  "lookback": 90,
+  "product_id": "P0255",
+  "product_name": "Bibigo Crispy Seaweed Snack",
+  "category": "Snacks",
+  "avg_unit_price": 140.0,
+  "total_samples": 521
 }

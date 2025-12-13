@@ -1,10 +1,10 @@
 {
-    "mean": 4.044843049327354,
-    "std": 2.460088229490387,
-    "lookback": 90,
-    "product_id": "P0136",
-    "product_name": "Cass Fresh Beer",
-    "category": "Liquor/Beverage",
-    "avg_unit_price": 85.0,
-    "total_samples": 223
+  "mean": 4.044843049327354,
+  "std": 2.460088229490387,
+  "lookback": 90,
+  "product_id": "P0136",
+  "product_name": "Cass Fresh Beer",
+  "category": "Liquor/Beverage",
+  "avg_unit_price": 85.0,
+  "total_samples": 223
 }

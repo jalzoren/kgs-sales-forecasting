@@ -1,10 +1,10 @@
 {
-    "mean": 2.440729483282675,
-    "std": 1.2820218227614624,
-    "lookback": 90,
-    "product_id": "P0130",
-    "product_name": "Sunhari Apple 360mL",
-    "category": "Liquor/Beverage",
-    "avg_unit_price": 120.0,
-    "total_samples": 329
+  "mean": 2.440729483282675,
+  "std": 1.2820218227614624,
+  "lookback": 90,
+  "product_id": "P0130",
+  "product_name": "Sunhari Apple 360mL",
+  "category": "Liquor/Beverage",
+  "avg_unit_price": 120.0,
+  "total_samples": 329
 }

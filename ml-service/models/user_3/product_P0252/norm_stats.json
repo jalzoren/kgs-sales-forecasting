@@ -1,10 +1,10 @@
 {
-    "mean": 11.779411764705882,
-    "std": 6.383126533719447,
-    "lookback": 90,
-    "product_id": "P0252",
-    "product_name": "Lotte Banana Choco Pie 12Pcs",
-    "category": "Snacks",
-    "avg_unit_price": 180.0,
-    "total_samples": 1088
+  "mean": 11.779411764705882,
+  "std": 6.383126533719447,
+  "lookback": 90,
+  "product_id": "P0252",
+  "product_name": "Lotte Banana Choco Pie 12Pcs",
+  "category": "Snacks",
+  "avg_unit_price": 180.0,
+  "total_samples": 1088
 }

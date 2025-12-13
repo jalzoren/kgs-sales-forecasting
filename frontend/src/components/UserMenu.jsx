@@ -63,7 +63,7 @@ function UserMenu() {
       confirmButtonText: "Yes, log out!",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`${API}/logout`, {
+        fetch(`http://localhost:5000/logout`, {
   method: "POST",
   credentials: "include",
 })

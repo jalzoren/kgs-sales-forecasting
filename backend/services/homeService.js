@@ -50,7 +50,38 @@ class HomeService {
 
     // Handle string dates (with or without time)
     if (typeof val === "string") {
-      return val.split(" ")[0]; // Extract date part from datetime string
+      // Remove time portion if present
+      const dateStr = val.trim().split(" ")[0];
+      
+      // Try DD/MM/YYYY format (European format)
+      if (dateStr.includes("/")) {
+        const parts = dateStr.split("/");
+        if (parts.length === 3) {
+          // Check if first part is day (1-31) and second is month (1-12) = DD/MM/YYYY
+          const first = parseInt(parts[0]);
+          const second = parseInt(parts[1]);
+          const third = parseInt(parts[2]);
+          
+          if (first > 12 || (first <= 31 && second <= 12)) {
+            // Likely DD/MM/YYYY
+            const day = String(first).padStart(2, "0");
+            const month = String(second).padStart(2, "0");
+            return `${third}-${month}-${day}`;
+          } else if (second > 12) {
+            // Definitely MM/DD/YYYY - swap them
+            const day = String(second).padStart(2, "0");
+            const month = String(first).padStart(2, "0");
+            return `${third}-${month}-${day}`;
+          }
+        }
+      }
+      
+      // Try YYYY-MM-DD format (ISO format)
+      if (dateStr.includes("-") && dateStr.length >= 10) {
+        return dateStr.substring(0, 10);
+      }
+      
+      return dateStr;
     }
 
     return null;

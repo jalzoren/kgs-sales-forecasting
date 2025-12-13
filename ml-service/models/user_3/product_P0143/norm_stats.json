@@ -1,10 +1,10 @@
 {
-    "mean": 5.255700325732899,
-    "std": 3.383786080164216,
-    "lookback": 90,
-    "product_id": "P0143",
-    "product_name": "Nongshim Welchs Grape 355mL",
-    "category": "Liquor/Beverage",
-    "avg_unit_price": 60.0,
-    "total_samples": 614
+  "mean": 5.255700325732899,
+  "std": 3.383786080164216,
+  "lookback": 90,
+  "product_id": "P0143",
+  "product_name": "Nongshim Welchs Grape 355mL",
+  "category": "Liquor/Beverage",
+  "avg_unit_price": 60.0,
+  "total_samples": 614
 }

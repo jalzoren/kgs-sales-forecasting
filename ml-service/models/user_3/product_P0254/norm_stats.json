@@ -1,10 +1,10 @@
 {
-    "mean": 2.641025641025641,
-    "std": 1.4746439049944442,
-    "lookback": 90,
-    "product_id": "P0254",
-    "product_name": "Honey Roasted Peanuts",
-    "category": "Snacks",
-    "avg_unit_price": 165.0,
-    "total_samples": 429
+  "mean": 2.641025641025641,
+  "std": 1.4746439049944442,
+  "lookback": 90,
+  "product_id": "P0254",
+  "product_name": "Honey Roasted Peanuts",
+  "category": "Snacks",
+  "avg_unit_price": 165.0,
+  "total_samples": 429
 }

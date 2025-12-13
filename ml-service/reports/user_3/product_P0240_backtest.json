@@ -1,0 +1,22 @@
+{
+  "product_id": "P0240",
+  "product_name": "Ottogi Spaghetti Sauce",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 201,
+      "val_start_idx": 202,
+      "val_end_idx": 291,
+      "LSTM": {
+        "RMSE": 1.4404761836978524,
+        "MAE": 1.0179390798019494,
+        "MAPE": 99.96720307491172
+      },
+      "XGB": {
+        "RMSE": 1.4476031932869005,
+        "MAE": 1.0118920736842685,
+        "MAPE": 48.99900286401601
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "product_id": "P0063",
+  "product_name": "Our Home Kimchi 1Kg Jar",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 122,
+      "val_start_idx": 123,
+      "val_end_idx": 212,
+      "LSTM": {
+        "RMSE": 0.919444468900338,
+        "MAE": 0.7605917598330557,
+        "MAPE": 97.3667769527389
+      },
+      "XGB": {
+        "RMSE": 0.9973372476036899,
+        "MAE": 0.8006247811847262,
+        "MAPE": 46.819598771907664
+      }
+    }
+  ]
+}

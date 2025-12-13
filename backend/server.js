@@ -1,3 +1,4 @@
+// backend/server.js
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
@@ -75,9 +76,8 @@ app.get("/api/check-session", (req, res) => {
 // =======================
 async function startServer() {
   try {
-    // Test API connection: GET first row from "salesdata" table
-    const test = await db.query("salesdata", { params: { select: "*", limit: 1 } });
-    console.log("✅ Connected to Supabase API, rows fetched:", test.length);
+    await db.query("SELECT 1"); // Test DB connection
+    console.log("✅ Connected to MySQL Database");
 
     app.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`);

@@ -1,10 +1,10 @@
 {
-    "mean": 2.628099173553719,
-    "std": 1.4251932063564046,
-    "lookback": 90,
-    "product_id": "P0028",
-    "product_name": "CJ Bibigo Seaweed Soup",
-    "category": "Dry Food",
-    "avg_unit_price": 140.0,
-    "total_samples": 484
+  "mean": 2.628099173553719,
+  "std": 1.4251932063564046,
+  "lookback": 90,
+  "product_id": "P0028",
+  "product_name": "CJ Bibigo Seaweed Soup",
+  "category": "Dry Food",
+  "avg_unit_price": 140.0,
+  "total_samples": 484
 }

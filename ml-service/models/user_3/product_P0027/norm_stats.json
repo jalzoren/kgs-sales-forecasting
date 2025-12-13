@@ -1,10 +1,10 @@
 {
-    "mean": 7.455238095238095,
-    "std": 4.309122629548649,
-    "lookback": 90,
-    "product_id": "P0027",
-    "product_name": "Yopokki Cheese 240g",
-    "category": "Dry Food",
-    "avg_unit_price": 145.0,
-    "total_samples": 1050
+  "mean": 7.455238095238095,
+  "std": 4.309122629548649,
+  "lookback": 90,
+  "product_id": "P0027",
+  "product_name": "Yopokki Cheese 240g",
+  "category": "Dry Food",
+  "avg_unit_price": 145.0,
+  "total_samples": 1050
 }

@@ -1,10 +1,10 @@
 {
-    "mean": 8.500934579439253,
-    "std": 4.647288059721346,
-    "lookback": 90,
-    "product_id": "P0115",
-    "product_name": "Strawberry Milk 200mL 6Pcs",
-    "category": "Liquor/Beverage",
-    "avg_unit_price": 290.0,
-    "total_samples": 1070
+  "mean": 8.500934579439253,
+  "std": 4.647288059721346,
+  "lookback": 90,
+  "product_id": "P0115",
+  "product_name": "Strawberry Milk 200mL 6Pcs",
+  "category": "Liquor/Beverage",
+  "avg_unit_price": 290.0,
+  "total_samples": 1070
 }

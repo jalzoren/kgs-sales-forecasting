@@ -1,10 +1,10 @@
 {
-    "mean": 4.190625,
-    "std": 2.4934848491197954,
-    "lookback": 90,
-    "product_id": "P0071",
-    "product_name": "Kongsarang Firm Tofu",
-    "category": "Food Fresh/Meat/Sidedish",
-    "avg_unit_price": 65.0,
-    "total_samples": 320
+  "mean": 4.190625,
+  "std": 2.4934848491197954,
+  "lookback": 90,
+  "product_id": "P0071",
+  "product_name": "Kongsarang Firm Tofu",
+  "category": "Food Fresh/Meat/Sidedish",
+  "avg_unit_price": 65.0,
+  "total_samples": 320
 }

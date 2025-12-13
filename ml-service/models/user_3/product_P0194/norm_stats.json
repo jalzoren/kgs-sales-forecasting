@@ -1,10 +1,10 @@
 {
-    "mean": 4.33587786259542,
-    "std": 2.4555560294189642,
-    "lookback": 90,
-    "product_id": "P0194",
-    "product_name": "Shin Ramen Kimchi",
-    "category": "Noodles",
-    "avg_unit_price": 55.0,
-    "total_samples": 393
+  "mean": 4.33587786259542,
+  "std": 2.4555560294189642,
+  "lookback": 90,
+  "product_id": "P0194",
+  "product_name": "Shin Ramen Kimchi",
+  "category": "Noodles",
+  "avg_unit_price": 55.0,
+  "total_samples": 393
 }

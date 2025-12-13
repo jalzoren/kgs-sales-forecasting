@@ -1,0 +1,22 @@
+{
+  "product_id": "P0030",
+  "product_name": "Yopokki Onion Butter 120g Cup",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 150,
+      "val_start_idx": 151,
+      "val_end_idx": 240,
+      "LSTM": {
+        "RMSE": 0.8075720789091942,
+        "MAE": 0.6846217462048034,
+        "MAPE": 99.2405384818699
+      },
+      "XGB": {
+        "RMSE": 1.476918380232726,
+        "MAE": 1.2043565703762902,
+        "MAPE": 83.33521793506763
+      }
+    }
+  ]
+}

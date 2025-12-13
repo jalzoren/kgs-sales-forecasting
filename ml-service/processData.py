@@ -15,6 +15,53 @@ def ensure_user_folder(base_dir: str, user_id: str) -> str:
     os.makedirs(user_dir, exist_ok=True)
     return user_dir
 
+def parse_dates_safely(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    FIXED: Intelligent date parsing that handles DD/MM/YYYY format correctly
+    Always tries DD/MM/YYYY first since that's your data format
+    """
+    print("  Parsing dates intelligently...")
+    
+    # Strip whitespace from date column
+    df["Date"] = df["Date"].astype(str).str.strip()
+    
+    # Try to infer the format from first valid date
+    sample_date = df["Date"].dropna().iloc[0] if len(df["Date"].dropna()) > 0 else None
+    
+    if sample_date:
+        # Check if it looks like DD/MM/YYYY (day > 12)
+        parts = str(sample_date).split('/')
+        if len(parts) == 3:
+            first_num = int(parts[0])
+            # If first number > 12, it MUST be day (DD/MM/YYYY)
+            if first_num > 12:
+                print(f"     Detected DD/MM/YYYY format (sample: {sample_date})")
+                # Force strict format parsing (no inference)
+                df["Date"] = pd.to_datetime(df["Date"], format="%d/%m/%Y", errors="coerce")
+            else:
+                # Ambiguous (day <= 12) - try DD/MM/YYYY first (your data format)
+                print(f"     Ambiguous date format - trying DD/MM/YYYY first (sample: {sample_date})")
+                df["Date"] = pd.to_datetime(df["Date"], format="%d/%m/%Y", errors="coerce")
+                
+                # Check if parsing worked (if all NaN, try MM/DD/YYYY as fallback)
+                if df["Date"].isna().all():
+                    print(f"     DD/MM/YYYY parsing failed - trying MM/DD/YYYY fallback")
+                    df["Date"] = pd.to_datetime(df["Date"], format="%m/%d/%Y", errors="coerce")
+        else:
+            # Not slash format, let pandas handle it
+            df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    else:
+        df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    
+    # Show parsed date range
+    if not df["Date"].isna().all():
+        min_date = df["Date"].min()
+        max_date = df["Date"].max()
+        print(f" Parsed date range: {min_date.strftime('%Y-%m-%d')} to {max_date.strftime('%Y-%m-%d')}")
+    else:
+        print(" WARNING: All dates failed to parse!")
+    
+    return df
 
 # ==========================================
 # TRAINING DATA PREPROCESSING (3-YEAR DATA)
@@ -24,7 +71,7 @@ def preprocess_training_data(file_path: str, output_path: str):
     Full preprocessing for 3-YEAR training data.
     Includes: cleaning, aggregation, feature engineering, lags, rolling windows.
     """
-    print(f" TRAINING MODE: Reading data from: {file_path}")
+    print(f"TRAINING MODE: Reading data from: {file_path}")
     
     if file_path.endswith(".csv"):
         df = pd.read_csv(
@@ -44,8 +91,10 @@ def preprocess_training_data(file_path: str, output_path: str):
     df = df.drop_duplicates()
     df = df.dropna(subset=["Date", "Product_ID", "Product_Name", "Total_Amount", "Quantity"])
 
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    # ✅ FIX: Use intelligent date parsing
+    df = parse_dates_safely(df)
     df = df.dropna(subset=["Date"])
+
 
     numeric_cols = ["Quantity", "Unit_Price", "Discount", "Total_Amount"]
     for col in numeric_cols:
@@ -123,7 +172,6 @@ def preprocess_weekly_data(file_path: str, output_path: str):
     """
     Lightweight preprocessing for WEEKLY sales data.
     NO LAGS, NO ROLLING WINDOWS, NO TRENDS.
-    Just basic cleaning + daily aggregation.
     """
     print(f" WEEKLY MODE: Reading data from: {file_path}")
 
@@ -145,9 +193,11 @@ def preprocess_weekly_data(file_path: str, output_path: str):
     df = df.drop_duplicates()
     df = df.dropna(subset=["Date", "Product_ID", "Product_Name", "Total_Amount", "Quantity"])
 
-    df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
+    # Use intelligent date parsing
+    df = parse_dates_safely(df)
     df = df.dropna(subset=["Date"])
 
+    # Safe numeric conversion
     numeric_cols = ["Quantity", "Unit_Price", "Discount", "Total_Amount"]
     for col in numeric_cols:
         if col in df.columns:
@@ -170,10 +220,18 @@ def preprocess_weekly_data(file_path: str, output_path: str):
         .reset_index()
     )
 
-    # Save to WEEKLY folder (NOT cleanData)
+    # VERIFY: Show sample of processed data
+    if len(agg) > 0:
+        print(f"  Processed {len(agg)} records")
+        print(f"  Sample dates: {agg['Date'].head(3).tolist()}")
+    else:
+        print("  WARNING: No records after aggregation!")
+
+    # Save to WEEKLY folder
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     agg.to_excel(output_path, index=False)
-    print(f" Weekly data saved to: {output_path}")
+
+    print(f"Weekly data saved to: {output_path}\n")
     return output_path
 
 

@@ -1,10 +1,10 @@
 {
-    "mean": 4.305475504322766,
-    "std": 2.5407770399788676,
-    "lookback": 90,
-    "product_id": "P0073",
-    "product_name": "Perilla Leaves 2Packs",
-    "category": "Food Fresh/Meat/Sidedish",
-    "avg_unit_price": 40.0,
-    "total_samples": 347
+  "mean": 4.305475504322766,
+  "std": 2.5407770399788676,
+  "lookback": 90,
+  "product_id": "P0073",
+  "product_name": "Perilla Leaves 2Packs",
+  "category": "Food Fresh/Meat/Sidedish",
+  "avg_unit_price": 40.0,
+  "total_samples": 347
 }

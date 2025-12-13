@@ -1,0 +1,37 @@
+{
+  "user_id": "3",
+  "evaluation_date": "2025-12-13T06:26:38.829760",
+  "forecast_json": "forecast_20251110_to_20251116.json",
+  "horizons": {
+    "7": {
+      "status": "evaluated",
+      "records": 984,
+      "metrics": {
+        "RMSE": 5.6154,
+        "MAE": 3.4651,
+        "MAPE": 80.9201
+      },
+      "per_product_count": 220
+    },
+    "30": {
+      "status": "evaluated",
+      "records": 1056,
+      "metrics": {
+        "RMSE": 5.4791,
+        "MAE": 3.3637,
+        "MAPE": 81.4956
+      },
+      "per_product_count": 225
+    },
+    "90": {
+      "status": "evaluated",
+      "records": 1056,
+      "metrics": {
+        "RMSE": 5.4791,
+        "MAE": 3.3637,
+        "MAPE": 81.4956
+      },
+      "per_product_count": 225
+    }
+  }
+}

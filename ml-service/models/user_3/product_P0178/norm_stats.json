@@ -1,10 +1,10 @@
 {
-    "mean": 4.811214953271028,
-    "std": 3.2739845926461837,
-    "lookback": 90,
-    "product_id": "P0178",
-    "product_name": "Samyang Mala Buldak",
-    "category": "Noodles",
-    "avg_unit_price": 70.0,
-    "total_samples": 535
+  "mean": 4.811214953271028,
+  "std": 3.2739845926461837,
+  "lookback": 90,
+  "product_id": "P0178",
+  "product_name": "Samyang Mala Buldak",
+  "category": "Noodles",
+  "avg_unit_price": 70.0,
+  "total_samples": 535
 }

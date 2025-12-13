@@ -1,10 +1,10 @@
 {
-    "mean": 2.2370689655172415,
-    "std": 1.089026744682803,
-    "lookback": 90,
-    "product_id": "P0036",
-    "product_name": "Dongwon  Tuna Light Can 150g",
-    "category": "Dry Food",
-    "avg_unit_price": 110.0,
-    "total_samples": 232
+  "mean": 2.2370689655172415,
+  "std": 1.089026744682803,
+  "lookback": 90,
+  "product_id": "P0036",
+  "product_name": "Dongwon  Tuna Light Can 150g",
+  "category": "Dry Food",
+  "avg_unit_price": 110.0,
+  "total_samples": 232
 }
