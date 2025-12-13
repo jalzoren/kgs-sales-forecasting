@@ -6,12 +6,13 @@ const sessionConfig = session({
   resave: false,
   saveUninitialized: false,
   proxy: true,
-  cookie: {
-    secure: true,          // ✅ Render uses HTTPS
-    httpOnly: true,
-    sameSite: "none",      // ✅ REQUIRED for cross-site
-    maxAge: 1000 * 60 * 30 // 30 minutes
-  }
+ cookie: {
+  secure: process.env.NODE_ENV === "production", // only secure in prod
+  httpOnly: true,
+  sameSite: "none",
+  maxAge: 1000 * 60 * 30
+}
+
 });
 
 module.exports = sessionConfig;
