@@ -1,4 +1,4 @@
-// frontend/src/pages/Welcome.jsx
+// frontend/src/pages/AWelcome.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/Welcome.css";
