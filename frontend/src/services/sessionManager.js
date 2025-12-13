@@ -272,7 +272,10 @@ async fetchUserInfo() {
    */
 async fetchForecastStatus() {
   try {
-    const res = await fetch(`${API_BASE}/forecast/status`, { credentials: "include" }); // ✅ adjust path
+    const res = await fetch(`${API_BASE}/api/forecast/status`, {
+  credentials: "include"
+});
+ // ✅ adjust path
     if (res.status === 404) return { hasForecast: false, forecastCount: 0, latestForecast: null };
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
