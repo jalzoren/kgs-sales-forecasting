@@ -9,7 +9,7 @@ const PythonService = require("../services/pythonService");
 const PDFService = require("../services/pdfService");
 
 
-router.get("/api/forecast/download/:fileName", requireAuth, async (req, res) => {
+router.get("/download/:fileName", requireAuth, async (req, res) => {
   try {
     const user = req.session.user;
     console.log("Session user:", user);
@@ -71,7 +71,7 @@ async function ensurePDFExists(excelFilePath, userId) {
 }
 
 // Get forecast history for the logged-in user
-router.get("/api/forecast/history", requireAuth, async (req, res) => {
+router.get("/history", requireAuth, async (req, res) => {
   try {
     const userId = req.session.user?.id;
     if (!userId) {
@@ -255,7 +255,7 @@ router.get("/api/forecast/history", requireAuth, async (req, res) => {
 });
 
 // Generate a new forecast (reforecast)
-router.post("/api/forecast", requireAuth, async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
     const userId = req.session.user?.id;
     if (!userId) {
@@ -293,7 +293,7 @@ router.post("/api/forecast", requireAuth, async (req, res) => {
 
 
 // Get forecast PDF file for viewing
-router.get("/api/forecast/view/:fileName", requireAuth, async (req, res) => {
+router.get("/view/:fileName", requireAuth, async (req, res) => {
   try {
     const userId = req.session.user?.id;
     let { fileName } = req.params;
@@ -402,7 +402,7 @@ router.get("/api/forecast/view/:fileName", requireAuth, async (req, res) => {
 });
 
 // Generate PDF report from forecast Excel file (download)
-router.get("/api/forecast/pdf/:fileName", requireAuth, async (req, res) => {
+router.get("/pdf/:fileName", requireAuth, async (req, res) => {
   try {
     const userId = req.session.user?.id;
     let { fileName } = req.params;
@@ -546,7 +546,7 @@ router.get("/files/:userId", (req, res) => {
   }
 });
 
-router.get("/api/forecast/status", requireAuth, async (req, res) => {
+router.get("/status", requireAuth, async (req, res) => {
   try {
     const userId = req.session.user?.id;
     
