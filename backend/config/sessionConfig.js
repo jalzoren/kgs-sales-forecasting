@@ -7,10 +7,10 @@ const sessionConfig = session({
   saveUninitialized: false,
   proxy: true,
   cookie: {
-    secure: process.env.NODE_ENV === "production",
+    secure: true,          // ✅ Render uses HTTPS
     httpOnly: true,
-    sameSite: "none",
-    maxAge: 1000 * 60 * 30
+    sameSite: "none",      // ✅ REQUIRED for cross-site
+    maxAge: 1000 * 60 * 30 // 30 minutes
   }
 });
 

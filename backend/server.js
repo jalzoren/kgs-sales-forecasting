@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
+// Session
 const sessionConfig = require("./config/sessionConfig");
 
 // Routes
@@ -16,54 +17,64 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// =======================
-// CORS (RENDER SAFE)
-// =======================
+/* =====================================================
+   TRUST PROXY (REQUIRED FOR RENDER COOKIES)
+===================================================== */
 app.set("trust proxy", 1);
 
-app.use(cors({
-  origin: process.env.VITE_API_BASE_URL,
-  credentials: true
-}));
+/* =====================================================
+   CORS (FRONTEND DOMAIN ONLY)
+===================================================== */
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, // 🔴 NOT VITE_API_BASE_URL
+    credentials: true
+  })
+);
 
-app.use(sessionConfig);
+/* =====================================================
+   BODY PARSER
+===================================================== */
 app.use(express.json());
 
-// =======================
-// Static files
-// =======================
+/* =====================================================
+   SESSION (AFTER CORS, BEFORE ROUTES)
+===================================================== */
+app.use(sessionConfig);
+
+/* =====================================================
+   STATIC FILES
+===================================================== */
 app.use("/files", express.static(path.join(__dirname, "files")));
 
-// =======================
-// Routes
-// =======================
-app.use("/", authRoutes);
-app.use("/", dataRoutes);
-app.use("/", forecastRoutes);
-app.use("/", analyticsRoutes);
-app.use("/", homeRoutes);
+/* =====================================================
+   ROUTES
+===================================================== */
+
+// Auth & session
+app.use("/api", authRoutes);              // /api/login, /api/check-session
+
+// Data / forecast / analytics
+app.use("/api", dataRoutes);
+app.use("/api", forecastRoutes);
+app.use("/api", analyticsRoutes);
+
+// Dashboard (already has /api/home/dashboard)
+app.use(homeRoutes);
+
+// Notifications
 app.use("/api/notifications", notificationRoutes);
 
-// =======================
-// SESSION CHECK (MATCH FRONTEND)
-// =======================
-app.get("/check-session", (req, res) => {
-  if (req.session?.user) {
-    return res.json({ loggedIn: true, user: req.session.user });
-  }
-  res.status(401).json({ loggedIn: false });
-});
-
-// =======================
-// Root
-// =======================
+/* =====================================================
+   HEALTH CHECK
+===================================================== */
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
 });
 
-// =======================
-// START SERVER (NO DB TEST)
-// =======================
+/* =====================================================
+   START SERVER
+===================================================== */
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
