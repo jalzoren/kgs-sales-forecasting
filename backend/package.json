@@ -1,12 +1,13 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "Sales Forecasting Backend",
+  "description": "",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
+  "license": "ISC",
   "engines": {
     "node": "18.x"
   },
@@ -16,9 +17,7 @@
     "cors": "^2.8.5",
     "csv-parser": "^3.2.0",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0",
-    "body-parser": "^1.20.2",
-    "iconv-lite": "^0.6.4",
+    "express": "^4.19.2",
     "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
@@ -27,7 +26,8 @@
     "nodemailer": "^7.0.9",
     "pdfmake": "^0.2.20",
     "pg": "^8.16.3",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "@supabase/supabase-js": "^2.87.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
