@@ -1,0 +1,38 @@
+{
+  "product_id": "P0155",
+  "product_name": "Nongshim Dungji Mul Nengmyeon (Cold Noodle)",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 119,
+      "val_start_idx": 120,
+      "val_end_idx": 209,
+      "LSTM": {
+        "RMSE": 1.1364126722854848,
+        "MAE": 0.9352444279293576,
+        "MAPE": 98.10792808177933
+      },
+      "XGB": {
+        "RMSE": 1.0833132034354556,
+        "MAE": 0.8797297424740261,
+        "MAPE": 52.903648402955795
+      }
+    },
+    {
+      "fold": 2,
+      "train_end_idx": 209,
+      "val_start_idx": 210,
+      "val_end_idx": 299,
+      "LSTM": {
+        "RMSE": 1.2973628374466621,
+        "MAE": 0.9982045180695082,
+        "MAPE": 97.78700237819434
+      },
+      "XGB": {
+        "RMSE": 1.2546642934060734,
+        "MAE": 1.0010568022727966,
+        "MAPE": 54.62469864143896
+      }
+    }
+  ]
+}

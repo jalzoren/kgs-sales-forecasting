@@ -1,0 +1,22 @@
+{
+  "product_id": "P0170",
+  "product_name": "Ottogi Jin Jjajang",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 207,
+      "val_start_idx": 208,
+      "val_end_idx": 297,
+      "LSTM": {
+        "RMSE": 1.0619474068400168,
+        "MAE": 0.8166229912469589,
+        "MAPE": 102.03691225142313
+      },
+      "XGB": {
+        "RMSE": 2.254850568978946,
+        "MAE": 1.67642273373074,
+        "MAPE": 74.86741623658092
+      }
+    }
+  ]
+}

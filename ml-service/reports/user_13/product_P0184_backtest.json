@@ -1,0 +1,38 @@
+{
+  "product_id": "P0184",
+  "product_name": "Nongshim Baehongdong Bibimyeon 137g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 241,
+      "val_start_idx": 242,
+      "val_end_idx": 331,
+      "LSTM": {
+        "RMSE": 1.2709729979382534,
+        "MAE": 0.9593618101909746,
+        "MAPE": 94.2378819180445
+      },
+      "XGB": {
+        "RMSE": 2.7778447060168356,
+        "MAE": 2.2136563804414537,
+        "MAPE": 91.49687501349675
+      }
+    },
+    {
+      "fold": 2,
+      "train_end_idx": 331,
+      "val_start_idx": 332,
+      "val_end_idx": 421,
+      "LSTM": {
+        "RMSE": 0.7408770871914292,
+        "MAE": 0.5990131170326052,
+        "MAPE": 99.92430550357405
+      },
+      "XGB": {
+        "RMSE": 1.6008622626358764,
+        "MAE": 1.289589234193166,
+        "MAPE": 50.90645407030887
+      }
+    }
+  ]
+}

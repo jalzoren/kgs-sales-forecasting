@@ -1,0 +1,22 @@
+{
+  "product_id": "P0156",
+  "product_name": "Nongshim Ramyun King Bowl",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 178,
+      "val_start_idx": 179,
+      "val_end_idx": 268,
+      "LSTM": {
+        "RMSE": 1.0282862121886027,
+        "MAE": 0.8404154155988732,
+        "MAPE": 95.72512592674867
+      },
+      "XGB": {
+        "RMSE": 0.8410776637747174,
+        "MAE": 0.6936699820889367,
+        "MAPE": 39.38146697591853
+      }
+    }
+  ]
+}

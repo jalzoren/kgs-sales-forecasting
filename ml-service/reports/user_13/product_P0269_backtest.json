@@ -1,0 +1,38 @@
+{
+  "product_id": "P0269",
+  "product_name": "Lotte Soft Strawberry Milk Candy 79g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 257,
+      "val_start_idx": 258,
+      "val_end_idx": 347,
+      "LSTM": {
+        "RMSE": 1.0136783275996555,
+        "MAE": 0.8372226032419865,
+        "MAPE": 102.35684088285271
+      },
+      "XGB": {
+        "RMSE": 1.3237612394521179,
+        "MAE": 1.082397366894616,
+        "MAPE": 60.599956436762724
+      }
+    },
+    {
+      "fold": 2,
+      "train_end_idx": 347,
+      "val_start_idx": 348,
+      "val_end_idx": 437,
+      "LSTM": {
+        "RMSE": 0.9691599287872427,
+        "MAE": 0.716725281128342,
+        "MAPE": 102.9274939823566
+      },
+      "XGB": {
+        "RMSE": 1.20378967749481,
+        "MAE": 0.9676114956537882,
+        "MAPE": 50.57735514157243
+      }
+    }
+  ]
+}

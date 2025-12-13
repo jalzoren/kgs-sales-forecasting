@@ -1,0 +1,22 @@
+{
+  "product_id": "P0232",
+  "product_name": "O'Food Tofu Stew Base",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 163,
+      "val_start_idx": 164,
+      "val_end_idx": 253,
+      "LSTM": {
+        "RMSE": 1.086508515252374,
+        "MAE": 0.8781306651551026,
+        "MAPE": 95.28325433546333
+      },
+      "XGB": {
+        "RMSE": 0.9797674248118797,
+        "MAE": 0.7663790908124711,
+        "MAPE": 43.36626689743113
+      }
+    }
+  ]
+}

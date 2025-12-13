@@ -1,0 +1,22 @@
+{
+  "product_id": "P0165",
+  "product_name": "Samyang Cream Carbo Buldak 140g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 171,
+      "val_start_idx": 172,
+      "val_end_idx": 261,
+      "LSTM": {
+        "RMSE": 0.9028897489789074,
+        "MAE": 0.7186366954618135,
+        "MAPE": 334.7902033344525
+      },
+      "XGB": {
+        "RMSE": 2.010512221335676,
+        "MAE": 1.5704268958833483,
+        "MAPE": 66.2749193026906
+      }
+    }
+  ]
+}
