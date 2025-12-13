@@ -1,0 +1,22 @@
+{
+  "product_id": "P0154",
+  "product_name": "Nongshim Jjawang",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 158,
+      "val_start_idx": 159,
+      "val_end_idx": 248,
+      "LSTM": {
+        "RMSE": 1.3002033391904126,
+        "MAE": 0.9122826945963387,
+        "MAPE": 90.69458203831648
+      },
+      "XGB": {
+        "RMSE": 1.1294242294099446,
+        "MAE": 0.8451910787158542,
+        "MAPE": 40.693516612052925
+      }
+    }
+  ]
+}

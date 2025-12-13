@@ -1,0 +1,22 @@
+{
+  "product_id": "P0226",
+  "product_name": "CJ Beksul Sweet Korean Pancake Mix 400g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 178,
+      "val_start_idx": 179,
+      "val_end_idx": 268,
+      "LSTM": {
+        "RMSE": 1.1894805844483236,
+        "MAE": 0.8397167123769277,
+        "MAPE": 99.81814643598047
+      },
+      "XGB": {
+        "RMSE": 1.4145328056884343,
+        "MAE": 1.122198556529151,
+        "MAPE": 64.75136911206775
+      }
+    }
+  ]
+}

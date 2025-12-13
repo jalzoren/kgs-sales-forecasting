@@ -1,0 +1,22 @@
+{
+  "product_id": "P0137",
+  "product_name": "Hite Beer Can",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 122,
+      "val_start_idx": 123,
+      "val_end_idx": 212,
+      "LSTM": {
+        "RMSE": 0.878672713370442,
+        "MAE": 0.7660895719062675,
+        "MAPE": 95.62989179754014
+      },
+      "XGB": {
+        "RMSE": 2.0281519218764554,
+        "MAE": 1.6913368264834086,
+        "MAPE": 69.65161021455886
+      }
+    }
+  ]
+}

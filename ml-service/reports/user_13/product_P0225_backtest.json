@@ -1,0 +1,22 @@
+{
+  "product_id": "P0225",
+  "product_name": "Chung Jung One Soybean Paste",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 123,
+      "val_start_idx": 124,
+      "val_end_idx": 213,
+      "LSTM": {
+        "RMSE": 0.8415401811162063,
+        "MAE": 0.6986898297904042,
+        "MAPE": 96.23326178676206
+      },
+      "XGB": {
+        "RMSE": 1.150442817944016,
+        "MAE": 0.8979182296329075,
+        "MAPE": 51.57859697827587
+      }
+    }
+  ]
+}

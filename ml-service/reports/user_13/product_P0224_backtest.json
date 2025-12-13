@@ -1,0 +1,22 @@
+{
+  "product_id": "P0224",
+  "product_name": "Seasoned Seaweed 200g",
+  "folds": [
+    {
+      "fold": 1,
+      "train_end_idx": 128,
+      "val_start_idx": 129,
+      "val_end_idx": 218,
+      "LSTM": {
+        "RMSE": 1.0005621891864478,
+        "MAE": 0.7985948032076919,
+        "MAPE": 99.137137361607
+      },
+      "XGB": {
+        "RMSE": 1.3221913499863314,
+        "MAE": 1.04985111951828,
+        "MAPE": 62.59306612658122
+      }
+    }
+  ]
+}
