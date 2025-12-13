@@ -108,14 +108,25 @@ class NavbarStatsCalculator {
       
       if (accuracy.status === "available") {
         stats.forecastAccuracy = accuracy.accuracy_percent || 0;
-        stats.forecastedOnDate = accuracy.forecasted_on || "N/A";
+        // Format the forecasted_on date to YYYY/MM/DD if it's in YYYY-MM-DD format
+        const forecastedDate = accuracy.forecasted_on ? accuracy.forecasted_on.replace(/-/g, '/') : "N/A";
+        stats.forecastedOnDate = forecastedDate;
         
         // Calculate variance if we have the raw data
         if (data.stats?.variance !== undefined) {
           stats.variance = data.stats.variance;
         }
         
-        stats.forecastAccuracyTooltip = `Forecast created on ${accuracy.forecasted_on || 'N/A'}. Variance: ${stats.variance >= 0 ? '+' : ''}${stats.variance}%`;
+        // Label to show this is DELAYED, EVALUATION-BASED accuracy
+        const qualityDescription = accuracy.accuracy_percent >= 80 
+          ? "Excellent" 
+          : accuracy.accuracy_percent >= 60 
+          ? "Good" 
+          : accuracy.accuracy_percent >= 40 
+          ? "Fair" 
+          : "Poor";
+        
+        stats.forecastAccuracyTooltip = `📊 DELAYED, EVALUATION-BASED ACCURACY\n\nThis compares the forecast from ${forecastedDate} against actual sales that occurred later.\n\nAccuracy: ${accuracy.accuracy_percent}% (${qualityDescription})\nwMAPE Error: ${accuracy.wmape || 'N/A'}%\nVariance: ${stats.variance >= 0 ? '+' : ''}${stats.variance}%\n\nEvaluated on: ${accuracy.evaluated_on || 'N/A'}`;
       } else {
         // Not available yet - use backend-provided stats as fallback
         if (data.stats) {
@@ -123,13 +134,14 @@ class NavbarStatsCalculator {
           stats.variance = data.stats.variance || 0;
         }
         stats.forecastedOnDate = "N/A";
-        stats.forecastAccuracyTooltip = accuracy.reason || "Forecast accuracy will be available after actual sales data is uploaded";
+        stats.forecastAccuracyTooltip = accuracy.reason || "Forecast accuracy will be available after the forecast period ends and actual sales data is uploaded. This shows how well previous forecasts predicted actual outcomes.";
       }
     } else if (data.stats) {
       // Fallback to legacy stats structure
       stats.forecastAccuracy = data.stats.forecastAccuracy || 0;
       stats.variance = data.stats.variance || 0;
       stats.forecastedOnDate = "N/A";
+      stats.forecastAccuracyTooltip = "Forecast accuracy will be available after evaluation data is available.";
     }
 
     // 4. Inventory Alerts (HIGH DEMAND items)
@@ -295,7 +307,7 @@ function Navbar() {
           <span className="date-label">
             {loading 
               ? "Loading..." 
-              : `Date: ${stats.forecastedOnDate}`}
+              : `⏱️ Delayed (${stats.forecastedOnDate})`}
           </span>
         </div>
 
