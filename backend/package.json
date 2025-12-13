@@ -1,24 +1,20 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Sales Forecasting System Backend",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "build": "",
     "dev": "nodemon server.js"
   },
-  "author": "",
-  "license": "ISC",
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
-    "@react-pdf-viewer/core": "^3.12.0",
-    "@react-pdf-viewer/default-layout": "^3.12.0",
-    "@supabase/supabase-js": "^2.87.1",
-    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "csv-parser": "^3.2.0",
-    "dotenv": "^17.2.3",
+    "dotenv": "^17.3.0",
     "express": "^5.1.0",
     "express-mysql-session": "^3.0.3",
     "express-session": "^1.18.2",
@@ -29,5 +25,8 @@
     "pdfmake": "^0.2.20",
     "pg": "^8.16.3",
     "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
