@@ -7,18 +7,19 @@
   --fg-light: #EAEFF3;
   --notif: #EF480B;
 }
-body{
+
+body {
   margin: 0;
   padding: 0;
   font-family: "Poppins", sans-serif;
 }
+
 .navbar {
   position: relative;
   top: 0;
   left: 0;
   width: 100%;
   height: 295px;
-
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -29,7 +30,6 @@ body{
       rgba(9, 38, 68) 100%
     ),
     url("../images/pattern.png");
-
   background-size: cover, cover;
   background-repeat: no-repeat, no-repeat;
   background-position: center, center;
@@ -40,6 +40,7 @@ body{
   padding: 30px 60px 0 60px;
   font-family: "Merriweather", serif;
 }
+
 .navbar-top {
   display: flex;
   align-items: center;
@@ -131,7 +132,6 @@ body{
 .navbar-links a:hover,
 .navbar-links a.active {
   width: 100%;
-
   color: #ffffff;
   font-weight: 600;
 }
@@ -180,12 +180,13 @@ body{
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Stats Section - Matches Your Design Exactly */
 .navbar-stats {
   display: flex;
   justify-content: space-around;
   align-items: center;
   width: 90%;
-  margin: 10px auto;
+  margin: 10px auto 20px;
   background: rgba(255, 255, 255, 0.111);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
@@ -193,36 +194,88 @@ body{
   color: var(--fg-light);
   font-family: "Poppins", sans-serif;
   height: 150px;
-  margin-bottom: 20px;
-
+  padding: 20px 10px;
 }
 
 .stat-item {
   text-align: center;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Header with title and info icon */
+.stat-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
 }
 
 .stat-item h4 {
   font-size: 14px;
   font-weight: 500;
-  color: rgba(255, 255, 255);
-  margin-bottom: 6px;
-  padding-top: 0;
+  color: rgba(255, 255, 255, 0.95);
+  margin: 0;
+  padding: 0;
+  line-height: 1;
 }
 
+/* Info Icon Tooltip */
+.info-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  position: relative;
+}
+
+.info-icon {
+  font-size: 16px;
+  color: rgb(255, 255, 255);
+  transition: color 0.2s ease;
+}
+
+.info-icon-wrapper:hover .info-icon {
+  color: rgba(255, 255, 255, 1);
+}
+
+/* Tooltip styling (native browser tooltip via title attribute) */
+.info-icon-wrapper[title] {
+  cursor: help;
+}
+
+/* Value styling */
 .stat-item .value {
-  font-size: 22px;
+  font-size: 32px;
   font-weight: 700;
-  margin: 4px 0;
-  color: rgba(255, 255, 255);
+  margin: 0;
+  color: rgba(255, 255, 255, 1);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  letter-spacing: -0.5px;
 }
 
-.stat-item span {
-  font-size: 12px;
-  color: rgba(255, 255, 255);
+/* Date label styling */
+.date-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.75);
+  word-wrap: break-word;
+  white-space: normal;
+  max-width: 95%;
+  margin: 0;
+  display: block;
+  text-align: center;
+  line-height: 1.3;
 }
 
+/* Color classes for values */
 .stat-item .green {
   color: #00ff7f;
 }
@@ -232,23 +285,23 @@ body{
 }
 
 .stat-item .yellow {
-  color: #ffa940; /* Orange/Yellow for medium accuracy (60-79%) */
+  color: #ffa940;
 }
 
-/* Optional: Add loading animation */
+/* Loading animation */
 .navbar-stats .value {
   transition: all 0.3s ease;
-  justify-content: center;
 }
 
+/* Divider between stats */
 .divider {
   width: 1px;
-  height: 50px;
+  height: 60px;
   background: rgba(255, 255, 255, 0.2);
+  margin: 0 10px;
 }
 
-
-/* Settings Button - matches other navbar buttons */
+/* Settings Button */
 .settings {
   background: transparent;
   border: none;
@@ -260,7 +313,7 @@ body{
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
 .settings:hover {
@@ -272,7 +325,6 @@ body{
   transform: scale(0.95);
 }
 
-/* Optional: glass effect variant */
 .settings.glass {
   backdrop-filter: blur(8px);
   background: rgba(255, 255, 255, 0.1);
@@ -281,4 +333,19 @@ body{
 .settings.glass:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .stat-item .value {
+    font-size: 28px;
+  }
+  
+  .stat-item h4 {
+    font-size: 13px;
+  }
+  
+  .date-label {
+    font-size: 10px;
+  }
 }

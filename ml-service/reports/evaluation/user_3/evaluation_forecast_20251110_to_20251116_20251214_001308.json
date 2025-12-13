@@ -1,0 +1,4733 @@
+{
+  "user_id": "3",
+  "evaluation_date": "2025-12-14T00:13:03.651891",
+  "forecast_json": "forecast_20251110_to_20251116.json",
+  "horizons": {
+    "7": {
+      "status": "evaluated",
+      "records": 984,
+      "metrics": {
+        "RMSE": 5.6154,
+        "MAE": 3.4651,
+        "MAPE": 80.9201
+      },
+      "per_product_count": 220,
+      "per_product": [
+        {
+          "Product_ID": "P0228",
+          "Records": 1,
+          "RMSE": 0.05,
+          "MAE": 0.05,
+          "MAPE": 2.5
+        },
+        {
+          "Product_ID": "P0094",
+          "Records": 1,
+          "RMSE": 0.08,
+          "MAE": 0.08,
+          "MAPE": 4.0
+        },
+        {
+          "Product_ID": "P0131",
+          "Records": 1,
+          "RMSE": 0.21,
+          "MAE": 0.21,
+          "MAPE": 10.5
+        },
+        {
+          "Product_ID": "P0095",
+          "Records": 2,
+          "RMSE": 0.229,
+          "MAE": 0.185,
+          "MAPE": 9.25
+        },
+        {
+          "Product_ID": "P0234",
+          "Records": 1,
+          "RMSE": 0.27,
+          "MAE": 0.27,
+          "MAPE": 13.5
+        },
+        {
+          "Product_ID": "P0246",
+          "Records": 1,
+          "RMSE": 0.47,
+          "MAE": 0.47,
+          "MAPE": 23.5
+        },
+        {
+          "Product_ID": "P0019",
+          "Records": 2,
+          "RMSE": 0.4965,
+          "MAE": 0.49,
+          "MAPE": 19.75
+        },
+        {
+          "Product_ID": "P0249",
+          "Records": 4,
+          "RMSE": 0.5692,
+          "MAE": 0.4975,
+          "MAPE": 24.875
+        },
+        {
+          "Product_ID": "P0266",
+          "Records": 4,
+          "RMSE": 0.5762,
+          "MAE": 0.47,
+          "MAPE": 19.25
+        },
+        {
+          "Product_ID": "P0096",
+          "Records": 3,
+          "RMSE": 0.5962,
+          "MAE": 0.3733,
+          "MAPE": 35.8333
+        },
+        {
+          "Product_ID": "P0046",
+          "Records": 3,
+          "RMSE": 0.6345,
+          "MAE": 0.62,
+          "MAPE": 20.6667
+        },
+        {
+          "Product_ID": "P0001",
+          "Records": 1,
+          "RMSE": 0.64,
+          "MAE": 0.64,
+          "MAPE": 64.0
+        },
+        {
+          "Product_ID": "P0002",
+          "Records": 3,
+          "RMSE": 0.6425,
+          "MAE": 0.4067,
+          "MAPE": 14.1667
+        },
+        {
+          "Product_ID": "P0024",
+          "Records": 4,
+          "RMSE": 0.7257,
+          "MAE": 0.7175,
+          "MAPE": 29.2083
+        },
+        {
+          "Product_ID": "P0127",
+          "Records": 4,
+          "RMSE": 0.7478,
+          "MAE": 0.65,
+          "MAPE": 45.3333
+        },
+        {
+          "Product_ID": "P0229",
+          "Records": 3,
+          "RMSE": 0.8049,
+          "MAE": 0.7133,
+          "MAPE": 64.1667
+        },
+        {
+          "Product_ID": "P0241",
+          "Records": 3,
+          "RMSE": 0.8175,
+          "MAE": 0.6467,
+          "MAPE": 30.3333
+        },
+        {
+          "Product_ID": "P0239",
+          "Records": 6,
+          "RMSE": 0.8345,
+          "MAE": 0.615,
+          "MAPE": 27.6667
+        },
+        {
+          "Product_ID": "P0120",
+          "Records": 5,
+          "RMSE": 0.8515,
+          "MAE": 0.784,
+          "MAPE": 70.7
+        },
+        {
+          "Product_ID": "P0235",
+          "Records": 2,
+          "RMSE": 0.8575,
+          "MAE": 0.855,
+          "MAPE": 42.75
+        },
+        {
+          "Product_ID": "P0121",
+          "Records": 3,
+          "RMSE": 0.8659,
+          "MAE": 0.8167,
+          "MAPE": 30.75
+        },
+        {
+          "Product_ID": "P0258",
+          "Records": 5,
+          "RMSE": 0.8696,
+          "MAE": 0.762,
+          "MAPE": 53.1
+        },
+        {
+          "Product_ID": "P0132",
+          "Records": 3,
+          "RMSE": 0.872,
+          "MAE": 0.7667,
+          "MAPE": 21.8611
+        },
+        {
+          "Product_ID": "P0237",
+          "Records": 3,
+          "RMSE": 0.9194,
+          "MAE": 0.7833,
+          "MAPE": 58.5556
+        },
+        {
+          "Product_ID": "P0022",
+          "Records": 2,
+          "RMSE": 0.99,
+          "MAE": 0.99,
+          "MAPE": 37.125
+        },
+        {
+          "Product_ID": "P0225",
+          "Records": 2,
+          "RMSE": 1.0045,
+          "MAE": 0.99,
+          "MAPE": 71.6667
+        },
+        {
+          "Product_ID": "P0133",
+          "Records": 4,
+          "RMSE": 1.0217,
+          "MAE": 0.815,
+          "MAPE": 33.8333
+        },
+        {
+          "Product_ID": "P0168",
+          "Records": 7,
+          "RMSE": 1.0292,
+          "MAE": 0.8714,
+          "MAPE": 46.8929
+        },
+        {
+          "Product_ID": "P0064",
+          "Records": 2,
+          "RMSE": 1.0471,
+          "MAE": 0.92,
+          "MAPE": 81.5
+        },
+        {
+          "Product_ID": "P0018",
+          "Records": 3,
+          "RMSE": 1.0505,
+          "MAE": 1.0367,
+          "MAPE": 32.5833
+        },
+        {
+          "Product_ID": "P0254",
+          "Records": 4,
+          "RMSE": 1.055,
+          "MAE": 0.8175,
+          "MAPE": 27.875
+        },
+        {
+          "Product_ID": "P0035",
+          "Records": 2,
+          "RMSE": 1.0786,
+          "MAE": 1.03,
+          "MAPE": 79.3333
+        },
+        {
+          "Product_ID": "P0045",
+          "Records": 5,
+          "RMSE": 1.0786,
+          "MAE": 0.844,
+          "MAPE": 56.1
+        },
+        {
+          "Product_ID": "P0233",
+          "Records": 3,
+          "RMSE": 1.0853,
+          "MAE": 0.95,
+          "MAPE": 91.5
+        },
+        {
+          "Product_ID": "P0187",
+          "Records": 6,
+          "RMSE": 1.0957,
+          "MAE": 0.8233,
+          "MAPE": 35.0833
+        },
+        {
+          "Product_ID": "P0278",
+          "Records": 7,
+          "RMSE": 1.1074,
+          "MAE": 0.95,
+          "MAPE": 54.881
+        },
+        {
+          "Product_ID": "P0259",
+          "Records": 4,
+          "RMSE": 1.1172,
+          "MAE": 0.9275,
+          "MAPE": 69.2083
+        },
+        {
+          "Product_ID": "P0230",
+          "Records": 4,
+          "RMSE": 1.139,
+          "MAE": 0.775,
+          "MAPE": 25.0
+        },
+        {
+          "Product_ID": "P0232",
+          "Records": 1,
+          "RMSE": 1.15,
+          "MAE": 1.15,
+          "MAPE": 115.0
+        },
+        {
+          "Product_ID": "P0135",
+          "Records": 4,
+          "RMSE": 1.1513,
+          "MAE": 0.985,
+          "MAPE": 47.5833
+        },
+        {
+          "Product_ID": "P0020",
+          "Records": 1,
+          "RMSE": 1.19,
+          "MAE": 1.19,
+          "MAPE": 119.0
+        },
+        {
+          "Product_ID": "P0156",
+          "Records": 2,
+          "RMSE": 1.1985,
+          "MAE": 1.07,
+          "MAPE": 33.375
+        },
+        {
+          "Product_ID": "P0028",
+          "Records": 4,
+          "RMSE": 1.2173,
+          "MAE": 1.1525,
+          "MAPE": 80.625
+        },
+        {
+          "Product_ID": "P0276",
+          "Records": 2,
+          "RMSE": 1.2403,
+          "MAE": 1.235,
+          "MAPE": 95.5
+        },
+        {
+          "Product_ID": "P0041",
+          "Records": 3,
+          "RMSE": 1.2622,
+          "MAE": 1.1833,
+          "MAPE": 86.0833
+        },
+        {
+          "Product_ID": "P0226",
+          "Records": 6,
+          "RMSE": 1.2633,
+          "MAE": 1.1067,
+          "MAPE": 62.0
+        },
+        {
+          "Product_ID": "P0101",
+          "Records": 4,
+          "RMSE": 1.2708,
+          "MAE": 1.0,
+          "MAPE": 81.25
+        },
+        {
+          "Product_ID": "P0159",
+          "Records": 4,
+          "RMSE": 1.288,
+          "MAE": 1.16,
+          "MAPE": 80.8958
+        },
+        {
+          "Product_ID": "P0275",
+          "Records": 5,
+          "RMSE": 1.3272,
+          "MAE": 1.186,
+          "MAPE": 30.2767
+        },
+        {
+          "Product_ID": "P0161",
+          "Records": 3,
+          "RMSE": 1.3344,
+          "MAE": 1.1067,
+          "MAPE": 24.9
+        },
+        {
+          "Product_ID": "P0021",
+          "Records": 3,
+          "RMSE": 1.3647,
+          "MAE": 1.2,
+          "MAPE": 114.6667
+        },
+        {
+          "Product_ID": "P0102",
+          "Records": 4,
+          "RMSE": 1.3664,
+          "MAE": 1.285,
+          "MAPE": 57.1667
+        },
+        {
+          "Product_ID": "P0063",
+          "Records": 2,
+          "RMSE": 1.3765,
+          "MAE": 1.375,
+          "MAPE": 137.5
+        },
+        {
+          "Product_ID": "P0037",
+          "Records": 3,
+          "RMSE": 1.3941,
+          "MAE": 1.1133,
+          "MAPE": 41.3333
+        },
+        {
+          "Product_ID": "P0284",
+          "Records": 1,
+          "RMSE": 1.44,
+          "MAE": 1.44,
+          "MAPE": 24.0
+        },
+        {
+          "Product_ID": "P0048",
+          "Records": 3,
+          "RMSE": 1.4402,
+          "MAE": 1.0567,
+          "MAPE": 33.3889
+        },
+        {
+          "Product_ID": "P0093",
+          "Records": 3,
+          "RMSE": 1.4582,
+          "MAE": 1.4067,
+          "MAPE": 125.6667
+        },
+        {
+          "Product_ID": "P0042",
+          "Records": 5,
+          "RMSE": 1.4806,
+          "MAE": 1.382,
+          "MAPE": 69.65
+        },
+        {
+          "Product_ID": "P0227",
+          "Records": 2,
+          "RMSE": 1.5148,
+          "MAE": 1.44,
+          "MAPE": 119.75
+        },
+        {
+          "Product_ID": "P0036",
+          "Records": 3,
+          "RMSE": 1.5378,
+          "MAE": 1.0467,
+          "MAPE": 25.9333
+        },
+        {
+          "Product_ID": "P0224",
+          "Records": 5,
+          "RMSE": 1.55,
+          "MAE": 1.464,
+          "MAPE": 84.6
+        },
+        {
+          "Product_ID": "P0034",
+          "Records": 4,
+          "RMSE": 1.5872,
+          "MAE": 1.53,
+          "MAPE": 153.0
+        },
+        {
+          "Product_ID": "P0032",
+          "Records": 5,
+          "RMSE": 1.6006,
+          "MAE": 1.436,
+          "MAPE": 78.64
+        },
+        {
+          "Product_ID": "P0158",
+          "Records": 3,
+          "RMSE": 1.603,
+          "MAE": 1.58,
+          "MAPE": 92.75
+        },
+        {
+          "Product_ID": "P0191",
+          "Records": 5,
+          "RMSE": 1.6118,
+          "MAE": 1.392,
+          "MAPE": 37.1633
+        },
+        {
+          "Product_ID": "P0025",
+          "Records": 2,
+          "RMSE": 1.6271,
+          "MAE": 1.485,
+          "MAPE": 128.0
+        },
+        {
+          "Product_ID": "P0039",
+          "Records": 5,
+          "RMSE": 1.6879,
+          "MAE": 1.426,
+          "MAPE": 63.9667
+        },
+        {
+          "Product_ID": "P0097",
+          "Records": 1,
+          "RMSE": 1.71,
+          "MAE": 1.71,
+          "MAPE": 57.0
+        },
+        {
+          "Product_ID": "P0005",
+          "Records": 5,
+          "RMSE": 1.7964,
+          "MAE": 1.612,
+          "MAPE": 123.1333
+        },
+        {
+          "Product_ID": "P0007",
+          "Records": 5,
+          "RMSE": 1.8034,
+          "MAE": 1.174,
+          "MAPE": 29.4167
+        },
+        {
+          "Product_ID": "P0146",
+          "Records": 6,
+          "RMSE": 1.8195,
+          "MAE": 1.4717,
+          "MAPE": 34.9759
+        },
+        {
+          "Product_ID": "P0289",
+          "Records": 1,
+          "RMSE": 1.83,
+          "MAE": 1.83,
+          "MAPE": 91.5
+        },
+        {
+          "Product_ID": "P0155",
+          "Records": 6,
+          "RMSE": 1.8356,
+          "MAE": 1.5033,
+          "MAPE": 64.9083
+        },
+        {
+          "Product_ID": "P0150",
+          "Records": 5,
+          "RMSE": 1.855,
+          "MAE": 1.504,
+          "MAPE": 112.1467
+        },
+        {
+          "Product_ID": "P0261",
+          "Records": 4,
+          "RMSE": 1.8673,
+          "MAE": 1.6725,
+          "MAPE": 144.75
+        },
+        {
+          "Product_ID": "P0134",
+          "Records": 3,
+          "RMSE": 1.8936,
+          "MAE": 1.67,
+          "MAPE": 42.9
+        },
+        {
+          "Product_ID": "P0173",
+          "Records": 4,
+          "RMSE": 1.8989,
+          "MAE": 1.4825,
+          "MAPE": 28.7646
+        },
+        {
+          "Product_ID": "P0044",
+          "Records": 2,
+          "RMSE": 1.8993,
+          "MAE": 1.88,
+          "MAPE": 107.375
+        },
+        {
+          "Product_ID": "P0264",
+          "Records": 4,
+          "RMSE": 1.9301,
+          "MAE": 1.61,
+          "MAPE": 52.4
+        },
+        {
+          "Product_ID": "P0103",
+          "Records": 4,
+          "RMSE": 1.9409,
+          "MAE": 1.665,
+          "MAPE": 54.7667
+        },
+        {
+          "Product_ID": "P0040",
+          "Records": 4,
+          "RMSE": 1.9447,
+          "MAE": 1.5825,
+          "MAPE": 44.875
+        },
+        {
+          "Product_ID": "P0029",
+          "Records": 4,
+          "RMSE": 1.9453,
+          "MAE": 1.895,
+          "MAPE": 175.25
+        },
+        {
+          "Product_ID": "P0210",
+          "Records": 4,
+          "RMSE": 1.9467,
+          "MAE": 1.605,
+          "MAPE": 50.2875
+        },
+        {
+          "Product_ID": "P0151",
+          "Records": 3,
+          "RMSE": 2.016,
+          "MAE": 1.54,
+          "MAPE": 132.1667
+        },
+        {
+          "Product_ID": "P0176",
+          "Records": 4,
+          "RMSE": 2.0194,
+          "MAE": 1.8,
+          "MAPE": 109.1
+        },
+        {
+          "Product_ID": "P0157",
+          "Records": 3,
+          "RMSE": 2.0307,
+          "MAE": 1.62,
+          "MAPE": 43.7778
+        },
+        {
+          "Product_ID": "P0238",
+          "Records": 4,
+          "RMSE": 2.034,
+          "MAE": 1.6925,
+          "MAPE": 70.625
+        },
+        {
+          "Product_ID": "P0154",
+          "Records": 2,
+          "RMSE": 2.062,
+          "MAE": 1.99,
+          "MAPE": 55.7917
+        },
+        {
+          "Product_ID": "P0192",
+          "Records": 5,
+          "RMSE": 2.0702,
+          "MAE": 1.56,
+          "MAPE": 93.3533
+        },
+        {
+          "Product_ID": "P0236",
+          "Records": 4,
+          "RMSE": 2.0704,
+          "MAE": 1.615,
+          "MAPE": 58.1667
+        },
+        {
+          "Product_ID": "P0073",
+          "Records": 3,
+          "RMSE": 2.0747,
+          "MAE": 1.7533,
+          "MAPE": 167.1667
+        },
+        {
+          "Product_ID": "P0126",
+          "Records": 2,
+          "RMSE": 2.0789,
+          "MAE": 2.035,
+          "MAPE": 111.25
+        },
+        {
+          "Product_ID": "P0023",
+          "Records": 1,
+          "RMSE": 2.08,
+          "MAE": 2.08,
+          "MAPE": 208.0
+        },
+        {
+          "Product_ID": "P0128",
+          "Records": 3,
+          "RMSE": 2.0867,
+          "MAE": 1.78,
+          "MAPE": 55.8
+        },
+        {
+          "Product_ID": "P0280",
+          "Records": 3,
+          "RMSE": 2.0977,
+          "MAE": 1.98,
+          "MAPE": 58.2778
+        },
+        {
+          "Product_ID": "P0281",
+          "Records": 3,
+          "RMSE": 2.1061,
+          "MAE": 1.7733,
+          "MAPE": 126.1778
+        },
+        {
+          "Product_ID": "P0137",
+          "Records": 1,
+          "RMSE": 2.15,
+          "MAE": 2.15,
+          "MAPE": 107.5
+        },
+        {
+          "Product_ID": "P0279",
+          "Records": 5,
+          "RMSE": 2.2014,
+          "MAE": 1.868,
+          "MAPE": 50.5452
+        },
+        {
+          "Product_ID": "P0243",
+          "Records": 1,
+          "RMSE": 2.23,
+          "MAE": 2.23,
+          "MAPE": 111.5
+        },
+        {
+          "Product_ID": "P0136",
+          "Records": 4,
+          "RMSE": 2.2624,
+          "MAE": 2.14,
+          "MAPE": 82.375
+        },
+        {
+          "Product_ID": "P0143",
+          "Records": 6,
+          "RMSE": 2.2781,
+          "MAE": 1.9283,
+          "MAPE": 40.3519
+        },
+        {
+          "Product_ID": "P0283",
+          "Records": 6,
+          "RMSE": 2.2952,
+          "MAE": 2.145,
+          "MAPE": 105.1587
+        },
+        {
+          "Product_ID": "P0164",
+          "Records": 2,
+          "RMSE": 2.3016,
+          "MAE": 1.985,
+          "MAPE": 66.1667
+        },
+        {
+          "Product_ID": "P0033",
+          "Records": 6,
+          "RMSE": 2.3044,
+          "MAE": 1.685,
+          "MAPE": 57.7159
+        },
+        {
+          "Product_ID": "P0170",
+          "Records": 1,
+          "RMSE": 2.36,
+          "MAE": 2.36,
+          "MAPE": 236.0
+        },
+        {
+          "Product_ID": "P0287",
+          "Records": 6,
+          "RMSE": 2.3829,
+          "MAE": 2.1233,
+          "MAPE": 85.2528
+        },
+        {
+          "Product_ID": "P0251",
+          "Records": 4,
+          "RMSE": 2.4041,
+          "MAE": 2.335,
+          "MAPE": 136.3667
+        },
+        {
+          "Product_ID": "P0209",
+          "Records": 3,
+          "RMSE": 2.43,
+          "MAE": 1.77,
+          "MAPE": 142.6528
+        },
+        {
+          "Product_ID": "P0255",
+          "Records": 5,
+          "RMSE": 2.4414,
+          "MAE": 2.316,
+          "MAPE": 75.54
+        },
+        {
+          "Product_ID": "P0207",
+          "Records": 6,
+          "RMSE": 2.4815,
+          "MAE": 2.125,
+          "MAPE": 41.8944
+        },
+        {
+          "Product_ID": "P0256",
+          "Records": 6,
+          "RMSE": 2.5116,
+          "MAE": 1.9933,
+          "MAPE": 44.2593
+        },
+        {
+          "Product_ID": "P0071",
+          "Records": 3,
+          "RMSE": 2.53,
+          "MAE": 2.43,
+          "MAPE": 93.7778
+        },
+        {
+          "Product_ID": "P0141",
+          "Records": 3,
+          "RMSE": 2.5339,
+          "MAE": 2.1,
+          "MAPE": 152.55
+        },
+        {
+          "Product_ID": "P0179",
+          "Records": 7,
+          "RMSE": 2.5894,
+          "MAE": 2.1186,
+          "MAPE": 107.3884
+        },
+        {
+          "Product_ID": "P0285",
+          "Records": 5,
+          "RMSE": 2.6137,
+          "MAE": 2.372,
+          "MAPE": 125.9214
+        },
+        {
+          "Product_ID": "P0273",
+          "Records": 3,
+          "RMSE": 2.6247,
+          "MAE": 2.3833,
+          "MAPE": 58.2222
+        },
+        {
+          "Product_ID": "P0165",
+          "Records": 6,
+          "RMSE": 2.6334,
+          "MAE": 2.515,
+          "MAPE": 143.9722
+        },
+        {
+          "Product_ID": "P0265",
+          "Records": 4,
+          "RMSE": 2.6599,
+          "MAE": 1.99,
+          "MAPE": 39.7286
+        },
+        {
+          "Product_ID": "P0267",
+          "Records": 6,
+          "RMSE": 2.6804,
+          "MAE": 2.4583,
+          "MAPE": 54.1353
+        },
+        {
+          "Product_ID": "P0153",
+          "Records": 2,
+          "RMSE": 2.6903,
+          "MAE": 2.67,
+          "MAPE": 114.0
+        },
+        {
+          "Product_ID": "P0171",
+          "Records": 5,
+          "RMSE": 2.711,
+          "MAE": 2.156,
+          "MAPE": 150.5333
+        },
+        {
+          "Product_ID": "P0148",
+          "Records": 7,
+          "RMSE": 2.7653,
+          "MAE": 2.4629,
+          "MAPE": 127.3778
+        },
+        {
+          "Product_ID": "P0268",
+          "Records": 4,
+          "RMSE": 2.7757,
+          "MAE": 1.89,
+          "MAPE": 73.1875
+        },
+        {
+          "Product_ID": "P0080",
+          "Records": 7,
+          "RMSE": 2.8499,
+          "MAE": 2.51,
+          "MAPE": 45.683
+        },
+        {
+          "Product_ID": "P0006",
+          "Records": 7,
+          "RMSE": 2.8547,
+          "MAE": 1.79,
+          "MAPE": 57.0238
+        },
+        {
+          "Product_ID": "P0231",
+          "Records": 3,
+          "RMSE": 2.8556,
+          "MAE": 2.8167,
+          "MAPE": 198.8333
+        },
+        {
+          "Product_ID": "P0003",
+          "Records": 6,
+          "RMSE": 2.8618,
+          "MAE": 2.4333,
+          "MAPE": 45.2262
+        },
+        {
+          "Product_ID": "P0038",
+          "Records": 4,
+          "RMSE": 3.0217,
+          "MAE": 2.14,
+          "MAPE": 38.8646
+        },
+        {
+          "Product_ID": "P0189",
+          "Records": 5,
+          "RMSE": 3.0446,
+          "MAE": 2.276,
+          "MAPE": 35.3
+        },
+        {
+          "Product_ID": "P0100",
+          "Records": 1,
+          "RMSE": 3.1,
+          "MAE": 3.1,
+          "MAPE": 310.0
+        },
+        {
+          "Product_ID": "P0197",
+          "Records": 4,
+          "RMSE": 3.1314,
+          "MAE": 2.74,
+          "MAPE": 53.0889
+        },
+        {
+          "Product_ID": "P0200",
+          "Records": 5,
+          "RMSE": 3.1858,
+          "MAE": 2.338,
+          "MAPE": 33.1156
+        },
+        {
+          "Product_ID": "P0162",
+          "Records": 5,
+          "RMSE": 3.2036,
+          "MAE": 2.412,
+          "MAPE": 70.9833
+        },
+        {
+          "Product_ID": "P0292",
+          "Records": 7,
+          "RMSE": 3.2152,
+          "MAE": 2.88,
+          "MAPE": 112.6476
+        },
+        {
+          "Product_ID": "P0070",
+          "Records": 4,
+          "RMSE": 3.239,
+          "MAE": 2.305,
+          "MAPE": 119.1
+        },
+        {
+          "Product_ID": "P0257",
+          "Records": 7,
+          "RMSE": 3.3037,
+          "MAE": 2.8071,
+          "MAPE": 56.4116
+        },
+        {
+          "Product_ID": "P0043",
+          "Records": 3,
+          "RMSE": 3.3167,
+          "MAE": 3.0667,
+          "MAPE": 85.6746
+        },
+        {
+          "Product_ID": "P0274",
+          "Records": 6,
+          "RMSE": 3.3443,
+          "MAE": 2.855,
+          "MAPE": 47.9687
+        },
+        {
+          "Product_ID": "P0270",
+          "Records": 3,
+          "RMSE": 3.3842,
+          "MAE": 2.0033,
+          "MAPE": 26.9167
+        },
+        {
+          "Product_ID": "P0139",
+          "Records": 5,
+          "RMSE": 3.3904,
+          "MAE": 2.862,
+          "MAPE": 205.78
+        },
+        {
+          "Product_ID": "P0250",
+          "Records": 7,
+          "RMSE": 3.4499,
+          "MAE": 2.79,
+          "MAPE": 85.7452
+        },
+        {
+          "Product_ID": "P0240",
+          "Records": 4,
+          "RMSE": 3.5211,
+          "MAE": 3.055,
+          "MAPE": 65.9583
+        },
+        {
+          "Product_ID": "P0145",
+          "Records": 7,
+          "RMSE": 3.5659,
+          "MAE": 2.5714,
+          "MAPE": 29.3386
+        },
+        {
+          "Product_ID": "P0140",
+          "Records": 4,
+          "RMSE": 3.5793,
+          "MAE": 3.44,
+          "MAPE": 151.2861
+        },
+        {
+          "Product_ID": "P0008",
+          "Records": 7,
+          "RMSE": 3.6037,
+          "MAE": 2.9943,
+          "MAPE": 79.461
+        },
+        {
+          "Product_ID": "P0272",
+          "Records": 7,
+          "RMSE": 3.6055,
+          "MAE": 3.1014,
+          "MAPE": 57.9116
+        },
+        {
+          "Product_ID": "P0175",
+          "Records": 6,
+          "RMSE": 3.6096,
+          "MAE": 3.115,
+          "MAPE": 142.8194
+        },
+        {
+          "Product_ID": "P0290",
+          "Records": 6,
+          "RMSE": 3.6202,
+          "MAE": 2.765,
+          "MAPE": 58.6064
+        },
+        {
+          "Product_ID": "P0208",
+          "Records": 5,
+          "RMSE": 3.6745,
+          "MAE": 3.482,
+          "MAPE": 128.4033
+        },
+        {
+          "Product_ID": "P0167",
+          "Records": 4,
+          "RMSE": 3.6993,
+          "MAE": 2.45,
+          "MAPE": 43.8864
+        },
+        {
+          "Product_ID": "P0184",
+          "Records": 4,
+          "RMSE": 3.7642,
+          "MAE": 2.8425,
+          "MAPE": 88.9306
+        },
+        {
+          "Product_ID": "P0172",
+          "Records": 5,
+          "RMSE": 3.8842,
+          "MAE": 2.818,
+          "MAPE": 36.903
+        },
+        {
+          "Product_ID": "P0123",
+          "Records": 7,
+          "RMSE": 3.9675,
+          "MAE": 2.96,
+          "MAPE": 38.7194
+        },
+        {
+          "Product_ID": "P0174",
+          "Records": 6,
+          "RMSE": 4.0698,
+          "MAE": 3.385,
+          "MAPE": 111.5833
+        },
+        {
+          "Product_ID": "P0277",
+          "Records": 6,
+          "RMSE": 4.0824,
+          "MAE": 2.9267,
+          "MAPE": 66.9643
+        },
+        {
+          "Product_ID": "P0248",
+          "Records": 4,
+          "RMSE": 4.1287,
+          "MAE": 3.895,
+          "MAPE": 317.125
+        },
+        {
+          "Product_ID": "P0182",
+          "Records": 4,
+          "RMSE": 4.1335,
+          "MAE": 3.775,
+          "MAPE": 49.9444
+        },
+        {
+          "Product_ID": "P0194",
+          "Records": 4,
+          "RMSE": 4.1457,
+          "MAE": 2.8375,
+          "MAPE": 43.9125
+        },
+        {
+          "Product_ID": "P0114",
+          "Records": 7,
+          "RMSE": 4.1585,
+          "MAE": 3.4743,
+          "MAPE": 44.0558
+        },
+        {
+          "Product_ID": "P0260",
+          "Records": 6,
+          "RMSE": 4.1738,
+          "MAE": 3.9233,
+          "MAPE": 68.3875
+        },
+        {
+          "Product_ID": "P0195",
+          "Records": 5,
+          "RMSE": 4.1947,
+          "MAE": 3.808,
+          "MAPE": 52.96
+        },
+        {
+          "Product_ID": "P0294",
+          "Records": 7,
+          "RMSE": 4.2807,
+          "MAE": 3.47,
+          "MAPE": 45.4951
+        },
+        {
+          "Product_ID": "P0130",
+          "Records": 3,
+          "RMSE": 4.363,
+          "MAE": 3.94,
+          "MAPE": 93.7143
+        },
+        {
+          "Product_ID": "P0204",
+          "Records": 6,
+          "RMSE": 4.4126,
+          "MAE": 3.905,
+          "MAPE": 79.6563
+        },
+        {
+          "Product_ID": "P0282",
+          "Records": 3,
+          "RMSE": 4.4663,
+          "MAE": 3.7967,
+          "MAPE": 42.4815
+        },
+        {
+          "Product_ID": "P0104",
+          "Records": 7,
+          "RMSE": 4.6686,
+          "MAE": 3.7,
+          "MAPE": 43.5283
+        },
+        {
+          "Product_ID": "P0253",
+          "Records": 7,
+          "RMSE": 4.6734,
+          "MAE": 3.3943,
+          "MAPE": 57.1088
+        },
+        {
+          "Product_ID": "P0177",
+          "Records": 7,
+          "RMSE": 4.6904,
+          "MAE": 3.14,
+          "MAPE": 73.1509
+        },
+        {
+          "Product_ID": "P0004",
+          "Records": 6,
+          "RMSE": 4.7278,
+          "MAE": 4.02,
+          "MAPE": 96.4055
+        },
+        {
+          "Product_ID": "P0138",
+          "Records": 6,
+          "RMSE": 4.7336,
+          "MAE": 3.155,
+          "MAPE": 41.6909
+        },
+        {
+          "Product_ID": "P0202",
+          "Records": 7,
+          "RMSE": 4.7696,
+          "MAE": 4.3186,
+          "MAPE": 75.4316
+        },
+        {
+          "Product_ID": "P0205",
+          "Records": 5,
+          "RMSE": 4.8599,
+          "MAE": 4.754,
+          "MAPE": 143.1694
+        },
+        {
+          "Product_ID": "P0009",
+          "Records": 7,
+          "RMSE": 4.8606,
+          "MAE": 3.84,
+          "MAPE": 51.8435
+        },
+        {
+          "Product_ID": "P0269",
+          "Records": 4,
+          "RMSE": 4.925,
+          "MAE": 3.925,
+          "MAPE": 80.8194
+        },
+        {
+          "Product_ID": "P0144",
+          "Records": 4,
+          "RMSE": 5.0081,
+          "MAE": 4.115,
+          "MAPE": 84.375
+        },
+        {
+          "Product_ID": "P0296",
+          "Records": 7,
+          "RMSE": 5.0264,
+          "MAE": 3.5114,
+          "MAPE": 43.6772
+        },
+        {
+          "Product_ID": "P0298",
+          "Records": 6,
+          "RMSE": 5.2518,
+          "MAE": 4.395,
+          "MAPE": 120.6968
+        },
+        {
+          "Product_ID": "P0291",
+          "Records": 7,
+          "RMSE": 5.4229,
+          "MAE": 4.4843,
+          "MAPE": 88.5711
+        },
+        {
+          "Product_ID": "P0186",
+          "Records": 7,
+          "RMSE": 5.5302,
+          "MAE": 4.8729,
+          "MAPE": 135.7175
+        },
+        {
+          "Product_ID": "P0288",
+          "Records": 5,
+          "RMSE": 5.6163,
+          "MAE": 4.026,
+          "MAPE": 52.153
+        },
+        {
+          "Product_ID": "P0196",
+          "Records": 6,
+          "RMSE": 5.6684,
+          "MAE": 4.705,
+          "MAPE": 111.9613
+        },
+        {
+          "Product_ID": "P0293",
+          "Records": 7,
+          "RMSE": 5.7644,
+          "MAE": 4.9857,
+          "MAPE": 51.9835
+        },
+        {
+          "Product_ID": "P0180",
+          "Records": 7,
+          "RMSE": 5.8009,
+          "MAE": 4.3843,
+          "MAPE": 66.1304
+        },
+        {
+          "Product_ID": "P0286",
+          "Records": 7,
+          "RMSE": 5.814,
+          "MAE": 4.49,
+          "MAPE": 55.3253
+        },
+        {
+          "Product_ID": "P0178",
+          "Records": 7,
+          "RMSE": 6.014,
+          "MAE": 5.1971,
+          "MAPE": 61.0185
+        },
+        {
+          "Product_ID": "P0206",
+          "Records": 5,
+          "RMSE": 6.0725,
+          "MAE": 5.236,
+          "MAPE": 126.6342
+        },
+        {
+          "Product_ID": "P0203",
+          "Records": 6,
+          "RMSE": 6.201,
+          "MAE": 5.77,
+          "MAPE": 90.6699
+        },
+        {
+          "Product_ID": "P0188",
+          "Records": 4,
+          "RMSE": 6.2208,
+          "MAE": 3.8725,
+          "MAPE": 45.8021
+        },
+        {
+          "Product_ID": "P0169",
+          "Records": 2,
+          "RMSE": 6.2349,
+          "MAE": 6.155,
+          "MAPE": 443.5
+        },
+        {
+          "Product_ID": "P0262",
+          "Records": 5,
+          "RMSE": 6.4015,
+          "MAE": 6.066,
+          "MAPE": 68.9506
+        },
+        {
+          "Product_ID": "P0199",
+          "Records": 6,
+          "RMSE": 6.4327,
+          "MAE": 5.1483,
+          "MAPE": 51.0845
+        },
+        {
+          "Product_ID": "P0124",
+          "Records": 7,
+          "RMSE": 6.6112,
+          "MAE": 5.9486,
+          "MAPE": 60.8365
+        },
+        {
+          "Product_ID": "P0026",
+          "Records": 3,
+          "RMSE": 6.6328,
+          "MAE": 6.5267,
+          "MAPE": 462.5
+        },
+        {
+          "Product_ID": "P0166",
+          "Records": 6,
+          "RMSE": 6.72,
+          "MAE": 5.5433,
+          "MAPE": 75.1795
+        },
+        {
+          "Product_ID": "P0183",
+          "Records": 7,
+          "RMSE": 6.7355,
+          "MAE": 5.1943,
+          "MAPE": 54.6962
+        },
+        {
+          "Product_ID": "P0201",
+          "Records": 5,
+          "RMSE": 6.8221,
+          "MAE": 5.156,
+          "MAPE": 65.2911
+        },
+        {
+          "Product_ID": "P0198",
+          "Records": 7,
+          "RMSE": 6.8423,
+          "MAE": 4.6543,
+          "MAPE": 52.3532
+        },
+        {
+          "Product_ID": "P0271",
+          "Records": 6,
+          "RMSE": 6.9421,
+          "MAE": 5.675,
+          "MAPE": 62.8019
+        },
+        {
+          "Product_ID": "P0244",
+          "Records": 3,
+          "RMSE": 7.0305,
+          "MAE": 6.8667,
+          "MAPE": 686.6667
+        },
+        {
+          "Product_ID": "P0125",
+          "Records": 7,
+          "RMSE": 7.1959,
+          "MAE": 6.6529,
+          "MAPE": 75.0414
+        },
+        {
+          "Product_ID": "P0181",
+          "Records": 6,
+          "RMSE": 7.4318,
+          "MAE": 6.5233,
+          "MAPE": 59.0899
+        },
+        {
+          "Product_ID": "P0149",
+          "Records": 5,
+          "RMSE": 7.4871,
+          "MAE": 4.136,
+          "MAPE": 37.63
+        },
+        {
+          "Product_ID": "P0263",
+          "Records": 7,
+          "RMSE": 8.0632,
+          "MAE": 6.3014,
+          "MAPE": 72.7167
+        },
+        {
+          "Product_ID": "P0027",
+          "Records": 6,
+          "RMSE": 8.0765,
+          "MAE": 6.5,
+          "MAPE": 134.5673
+        },
+        {
+          "Product_ID": "P0163",
+          "Records": 5,
+          "RMSE": 8.345,
+          "MAE": 8.19,
+          "MAPE": 364.1333
+        },
+        {
+          "Product_ID": "P0247",
+          "Records": 2,
+          "RMSE": 8.4601,
+          "MAE": 8.46,
+          "MAPE": 635.5
+        },
+        {
+          "Product_ID": "P0300",
+          "Records": 7,
+          "RMSE": 8.8771,
+          "MAE": 7.8229,
+          "MAPE": 72.0157
+        },
+        {
+          "Product_ID": "P0142",
+          "Records": 7,
+          "RMSE": 8.947,
+          "MAE": 7.9014,
+          "MAPE": 126.8795
+        },
+        {
+          "Product_ID": "P0185",
+          "Records": 7,
+          "RMSE": 9.1267,
+          "MAE": 6.1114,
+          "MAPE": 85.9797
+        },
+        {
+          "Product_ID": "P0297",
+          "Records": 7,
+          "RMSE": 9.396,
+          "MAE": 8.2271,
+          "MAPE": 77.1748
+        },
+        {
+          "Product_ID": "P0122",
+          "Records": 7,
+          "RMSE": 9.7769,
+          "MAE": 8.2914,
+          "MAPE": 57.0329
+        },
+        {
+          "Product_ID": "P0252",
+          "Records": 5,
+          "RMSE": 9.8619,
+          "MAE": 9.43,
+          "MAPE": 302.3367
+        },
+        {
+          "Product_ID": "P0190",
+          "Records": 6,
+          "RMSE": 10.0021,
+          "MAE": 7.3167,
+          "MAPE": 43.2871
+        },
+        {
+          "Product_ID": "P0193",
+          "Records": 7,
+          "RMSE": 11.1485,
+          "MAE": 8.7371,
+          "MAPE": 68.1941
+        },
+        {
+          "Product_ID": "P0245",
+          "Records": 7,
+          "RMSE": 11.5515,
+          "MAE": 11.2314,
+          "MAPE": 61.4203
+        },
+        {
+          "Product_ID": "P0152",
+          "Records": 7,
+          "RMSE": 11.8611,
+          "MAE": 11.0614,
+          "MAPE": 86.6885
+        },
+        {
+          "Product_ID": "P0147",
+          "Records": 6,
+          "RMSE": 12.2256,
+          "MAE": 7.6083,
+          "MAPE": 66.9965
+        },
+        {
+          "Product_ID": "P0299",
+          "Records": 7,
+          "RMSE": 13.2412,
+          "MAE": 9.7929,
+          "MAPE": 76.3445
+        },
+        {
+          "Product_ID": "P0211",
+          "Records": 6,
+          "RMSE": 14.7979,
+          "MAE": 10.31,
+          "MAPE": 92.9286
+        },
+        {
+          "Product_ID": "P0295",
+          "Records": 7,
+          "RMSE": 32.9067,
+          "MAE": 31.1143,
+          "MAPE": 72.936
+        }
+      ]
+    },
+    "30": {
+      "status": "evaluated",
+      "records": 1056,
+      "metrics": {
+        "RMSE": 5.4791,
+        "MAE": 3.3637,
+        "MAPE": 81.4956
+      },
+      "per_product_count": 225,
+      "per_product": [
+        {
+          "Product_ID": "P0072",
+          "Records": 2,
+          "RMSE": 0.0552,
+          "MAE": 0.055,
+          "MAPE": 1.375
+        },
+        {
+          "Product_ID": "P0094",
+          "Records": 1,
+          "RMSE": 0.08,
+          "MAE": 0.08,
+          "MAPE": 4.0
+        },
+        {
+          "Product_ID": "P0030",
+          "Records": 1,
+          "RMSE": 0.14,
+          "MAE": 0.14,
+          "MAPE": 7.0
+        },
+        {
+          "Product_ID": "P0095",
+          "Records": 2,
+          "RMSE": 0.229,
+          "MAE": 0.185,
+          "MAPE": 9.25
+        },
+        {
+          "Product_ID": "P0068",
+          "Records": 1,
+          "RMSE": 0.3,
+          "MAE": 0.3,
+          "MAPE": 10.0
+        },
+        {
+          "Product_ID": "P0246",
+          "Records": 1,
+          "RMSE": 0.47,
+          "MAE": 0.47,
+          "MAPE": 23.5
+        },
+        {
+          "Product_ID": "P0019",
+          "Records": 3,
+          "RMSE": 0.4754,
+          "MAE": 0.47,
+          "MAPE": 17.9444
+        },
+        {
+          "Product_ID": "P0249",
+          "Records": 4,
+          "RMSE": 0.5692,
+          "MAE": 0.4975,
+          "MAPE": 24.875
+        },
+        {
+          "Product_ID": "P0266",
+          "Records": 4,
+          "RMSE": 0.5762,
+          "MAE": 0.47,
+          "MAPE": 19.25
+        },
+        {
+          "Product_ID": "P0096",
+          "Records": 3,
+          "RMSE": 0.5962,
+          "MAE": 0.3733,
+          "MAPE": 35.8333
+        },
+        {
+          "Product_ID": "P0046",
+          "Records": 3,
+          "RMSE": 0.6345,
+          "MAE": 0.62,
+          "MAPE": 20.6667
+        },
+        {
+          "Product_ID": "P0001",
+          "Records": 1,
+          "RMSE": 0.64,
+          "MAE": 0.64,
+          "MAPE": 64.0
+        },
+        {
+          "Product_ID": "P0002",
+          "Records": 3,
+          "RMSE": 0.6425,
+          "MAE": 0.4067,
+          "MAPE": 14.1667
+        },
+        {
+          "Product_ID": "P0234",
+          "Records": 3,
+          "RMSE": 0.7204,
+          "MAE": 0.56,
+          "MAPE": 48.0
+        },
+        {
+          "Product_ID": "P0024",
+          "Records": 4,
+          "RMSE": 0.7257,
+          "MAE": 0.7175,
+          "MAPE": 29.2083
+        },
+        {
+          "Product_ID": "P0127",
+          "Records": 4,
+          "RMSE": 0.7478,
+          "MAE": 0.65,
+          "MAPE": 45.3333
+        },
+        {
+          "Product_ID": "P0229",
+          "Records": 3,
+          "RMSE": 0.8049,
+          "MAE": 0.7133,
+          "MAPE": 64.1667
+        },
+        {
+          "Product_ID": "P0228",
+          "Records": 4,
+          "RMSE": 0.811,
+          "MAE": 0.69,
+          "MAPE": 44.0417
+        },
+        {
+          "Product_ID": "P0237",
+          "Records": 4,
+          "RMSE": 0.8142,
+          "MAE": 0.6725,
+          "MAPE": 48.1667
+        },
+        {
+          "Product_ID": "P0241",
+          "Records": 3,
+          "RMSE": 0.8175,
+          "MAE": 0.6467,
+          "MAPE": 30.3333
+        },
+        {
+          "Product_ID": "P0239",
+          "Records": 6,
+          "RMSE": 0.8345,
+          "MAE": 0.615,
+          "MAPE": 27.6667
+        },
+        {
+          "Product_ID": "P0120",
+          "Records": 5,
+          "RMSE": 0.8515,
+          "MAE": 0.784,
+          "MAPE": 70.7
+        },
+        {
+          "Product_ID": "P0235",
+          "Records": 3,
+          "RMSE": 0.8583,
+          "MAE": 0.8567,
+          "MAPE": 42.8333
+        },
+        {
+          "Product_ID": "P0121",
+          "Records": 3,
+          "RMSE": 0.8659,
+          "MAE": 0.8167,
+          "MAPE": 30.75
+        },
+        {
+          "Product_ID": "P0258",
+          "Records": 5,
+          "RMSE": 0.8696,
+          "MAE": 0.762,
+          "MAPE": 53.1
+        },
+        {
+          "Product_ID": "P0064",
+          "Records": 3,
+          "RMSE": 0.8887,
+          "MAE": 0.7533,
+          "MAPE": 61.3333
+        },
+        {
+          "Product_ID": "P0132",
+          "Records": 5,
+          "RMSE": 0.9212,
+          "MAE": 0.856,
+          "MAPE": 26.3167
+        },
+        {
+          "Product_ID": "P0233",
+          "Records": 4,
+          "RMSE": 0.9438,
+          "MAE": 0.755,
+          "MAPE": 70.75
+        },
+        {
+          "Product_ID": "P0018",
+          "Records": 4,
+          "RMSE": 0.973,
+          "MAE": 0.95,
+          "MAPE": 33.0625
+        },
+        {
+          "Product_ID": "P0022",
+          "Records": 2,
+          "RMSE": 0.99,
+          "MAE": 0.99,
+          "MAPE": 37.125
+        },
+        {
+          "Product_ID": "P0225",
+          "Records": 2,
+          "RMSE": 1.0045,
+          "MAE": 0.99,
+          "MAPE": 71.6667
+        },
+        {
+          "Product_ID": "P0131",
+          "Records": 3,
+          "RMSE": 1.0209,
+          "MAE": 0.7467,
+          "MAPE": 64.5
+        },
+        {
+          "Product_ID": "P0133",
+          "Records": 4,
+          "RMSE": 1.0217,
+          "MAE": 0.815,
+          "MAPE": 33.8333
+        },
+        {
+          "Product_ID": "P0168",
+          "Records": 7,
+          "RMSE": 1.0292,
+          "MAE": 0.8714,
+          "MAPE": 46.8929
+        },
+        {
+          "Product_ID": "P0254",
+          "Records": 4,
+          "RMSE": 1.055,
+          "MAE": 0.8175,
+          "MAPE": 27.875
+        },
+        {
+          "Product_ID": "P0129",
+          "Records": 2,
+          "RMSE": 1.0756,
+          "MAE": 0.965,
+          "MAPE": 80.1667
+        },
+        {
+          "Product_ID": "P0035",
+          "Records": 2,
+          "RMSE": 1.0786,
+          "MAE": 1.03,
+          "MAPE": 79.3333
+        },
+        {
+          "Product_ID": "P0187",
+          "Records": 6,
+          "RMSE": 1.0957,
+          "MAE": 0.8233,
+          "MAPE": 35.0833
+        },
+        {
+          "Product_ID": "P0278",
+          "Records": 7,
+          "RMSE": 1.1074,
+          "MAE": 0.95,
+          "MAPE": 54.881
+        },
+        {
+          "Product_ID": "P0259",
+          "Records": 4,
+          "RMSE": 1.1172,
+          "MAE": 0.9275,
+          "MAPE": 69.2083
+        },
+        {
+          "Product_ID": "P0045",
+          "Records": 6,
+          "RMSE": 1.1225,
+          "MAE": 0.9233,
+          "MAPE": 52.25
+        },
+        {
+          "Product_ID": "P0063",
+          "Records": 3,
+          "RMSE": 1.1355,
+          "MAE": 1.01,
+          "MAPE": 96.3333
+        },
+        {
+          "Product_ID": "P0230",
+          "Records": 4,
+          "RMSE": 1.139,
+          "MAE": 0.775,
+          "MAPE": 25.0
+        },
+        {
+          "Product_ID": "P0232",
+          "Records": 1,
+          "RMSE": 1.15,
+          "MAE": 1.15,
+          "MAPE": 115.0
+        },
+        {
+          "Product_ID": "P0135",
+          "Records": 4,
+          "RMSE": 1.1513,
+          "MAE": 0.985,
+          "MAPE": 47.5833
+        },
+        {
+          "Product_ID": "P0020",
+          "Records": 1,
+          "RMSE": 1.19,
+          "MAE": 1.19,
+          "MAPE": 119.0
+        },
+        {
+          "Product_ID": "P0156",
+          "Records": 2,
+          "RMSE": 1.1985,
+          "MAE": 1.07,
+          "MAPE": 33.375
+        },
+        {
+          "Product_ID": "P0028",
+          "Records": 4,
+          "RMSE": 1.2173,
+          "MAE": 1.1525,
+          "MAPE": 80.625
+        },
+        {
+          "Product_ID": "P0276",
+          "Records": 2,
+          "RMSE": 1.2403,
+          "MAE": 1.235,
+          "MAPE": 95.5
+        },
+        {
+          "Product_ID": "P0041",
+          "Records": 3,
+          "RMSE": 1.2622,
+          "MAE": 1.1833,
+          "MAPE": 86.0833
+        },
+        {
+          "Product_ID": "P0226",
+          "Records": 6,
+          "RMSE": 1.2633,
+          "MAE": 1.1067,
+          "MAPE": 62.0
+        },
+        {
+          "Product_ID": "P0101",
+          "Records": 4,
+          "RMSE": 1.2708,
+          "MAE": 1.0,
+          "MAPE": 81.25
+        },
+        {
+          "Product_ID": "P0159",
+          "Records": 4,
+          "RMSE": 1.288,
+          "MAE": 1.16,
+          "MAPE": 80.8958
+        },
+        {
+          "Product_ID": "P0275",
+          "Records": 5,
+          "RMSE": 1.3272,
+          "MAE": 1.186,
+          "MAPE": 30.2767
+        },
+        {
+          "Product_ID": "P0227",
+          "Records": 3,
+          "RMSE": 1.3438,
+          "MAE": 1.2633,
+          "MAPE": 95.0
+        },
+        {
+          "Product_ID": "P0021",
+          "Records": 3,
+          "RMSE": 1.3647,
+          "MAE": 1.2,
+          "MAPE": 114.6667
+        },
+        {
+          "Product_ID": "P0102",
+          "Records": 4,
+          "RMSE": 1.3664,
+          "MAE": 1.285,
+          "MAPE": 57.1667
+        },
+        {
+          "Product_ID": "P0036",
+          "Records": 4,
+          "RMSE": 1.3783,
+          "MAE": 0.9625,
+          "MAPE": 25.3667
+        },
+        {
+          "Product_ID": "P0023",
+          "Records": 3,
+          "RMSE": 1.3935,
+          "MAE": 1.2167,
+          "MAPE": 95.5
+        },
+        {
+          "Product_ID": "P0037",
+          "Records": 3,
+          "RMSE": 1.3941,
+          "MAE": 1.1133,
+          "MAPE": 41.3333
+        },
+        {
+          "Product_ID": "P0284",
+          "Records": 1,
+          "RMSE": 1.44,
+          "MAE": 1.44,
+          "MAPE": 24.0
+        },
+        {
+          "Product_ID": "P0048",
+          "Records": 3,
+          "RMSE": 1.4402,
+          "MAE": 1.0567,
+          "MAPE": 33.3889
+        },
+        {
+          "Product_ID": "P0093",
+          "Records": 3,
+          "RMSE": 1.4582,
+          "MAE": 1.4067,
+          "MAPE": 125.6667
+        },
+        {
+          "Product_ID": "P0042",
+          "Records": 5,
+          "RMSE": 1.4806,
+          "MAE": 1.382,
+          "MAPE": 69.65
+        },
+        {
+          "Product_ID": "P0224",
+          "Records": 5,
+          "RMSE": 1.55,
+          "MAE": 1.464,
+          "MAPE": 84.6
+        },
+        {
+          "Product_ID": "P0034",
+          "Records": 4,
+          "RMSE": 1.5872,
+          "MAE": 1.53,
+          "MAPE": 153.0
+        },
+        {
+          "Product_ID": "P0032",
+          "Records": 5,
+          "RMSE": 1.6006,
+          "MAE": 1.436,
+          "MAPE": 78.64
+        },
+        {
+          "Product_ID": "P0158",
+          "Records": 3,
+          "RMSE": 1.603,
+          "MAE": 1.58,
+          "MAPE": 92.75
+        },
+        {
+          "Product_ID": "P0044",
+          "Records": 4,
+          "RMSE": 1.604,
+          "MAE": 1.445,
+          "MAPE": 99.3542
+        },
+        {
+          "Product_ID": "P0191",
+          "Records": 5,
+          "RMSE": 1.6118,
+          "MAE": 1.392,
+          "MAPE": 37.1633
+        },
+        {
+          "Product_ID": "P0039",
+          "Records": 5,
+          "RMSE": 1.6879,
+          "MAE": 1.426,
+          "MAPE": 63.9667
+        },
+        {
+          "Product_ID": "P0097",
+          "Records": 1,
+          "RMSE": 1.71,
+          "MAE": 1.71,
+          "MAPE": 57.0
+        },
+        {
+          "Product_ID": "P0137",
+          "Records": 2,
+          "RMSE": 1.7839,
+          "MAE": 1.735,
+          "MAPE": 75.75
+        },
+        {
+          "Product_ID": "P0073",
+          "Records": 5,
+          "RMSE": 1.7946,
+          "MAE": 1.438,
+          "MAPE": 112.7667
+        },
+        {
+          "Product_ID": "P0005",
+          "Records": 5,
+          "RMSE": 1.7964,
+          "MAE": 1.612,
+          "MAPE": 123.1333
+        },
+        {
+          "Product_ID": "P0157",
+          "Records": 4,
+          "RMSE": 1.7971,
+          "MAE": 1.4,
+          "MAPE": 42.0833
+        },
+        {
+          "Product_ID": "P0025",
+          "Records": 3,
+          "RMSE": 1.8025,
+          "MAE": 1.6933,
+          "MAPE": 155.6667
+        },
+        {
+          "Product_ID": "P0007",
+          "Records": 5,
+          "RMSE": 1.8034,
+          "MAE": 1.174,
+          "MAPE": 29.4167
+        },
+        {
+          "Product_ID": "P0146",
+          "Records": 6,
+          "RMSE": 1.8195,
+          "MAE": 1.4717,
+          "MAPE": 34.9759
+        },
+        {
+          "Product_ID": "P0238",
+          "Records": 5,
+          "RMSE": 1.8236,
+          "MAE": 1.41,
+          "MAPE": 58.3667
+        },
+        {
+          "Product_ID": "P0289",
+          "Records": 1,
+          "RMSE": 1.83,
+          "MAE": 1.83,
+          "MAPE": 91.5
+        },
+        {
+          "Product_ID": "P0155",
+          "Records": 6,
+          "RMSE": 1.8356,
+          "MAE": 1.5033,
+          "MAPE": 64.9083
+        },
+        {
+          "Product_ID": "P0150",
+          "Records": 5,
+          "RMSE": 1.855,
+          "MAE": 1.504,
+          "MAPE": 112.1467
+        },
+        {
+          "Product_ID": "P0261",
+          "Records": 4,
+          "RMSE": 1.8673,
+          "MAE": 1.6725,
+          "MAPE": 144.75
+        },
+        {
+          "Product_ID": "P0134",
+          "Records": 3,
+          "RMSE": 1.8936,
+          "MAE": 1.67,
+          "MAPE": 42.9
+        },
+        {
+          "Product_ID": "P0264",
+          "Records": 4,
+          "RMSE": 1.9301,
+          "MAE": 1.61,
+          "MAPE": 52.4
+        },
+        {
+          "Product_ID": "P0103",
+          "Records": 4,
+          "RMSE": 1.9409,
+          "MAE": 1.665,
+          "MAPE": 54.7667
+        },
+        {
+          "Product_ID": "P0040",
+          "Records": 4,
+          "RMSE": 1.9447,
+          "MAE": 1.5825,
+          "MAPE": 44.875
+        },
+        {
+          "Product_ID": "P0029",
+          "Records": 4,
+          "RMSE": 1.9453,
+          "MAE": 1.895,
+          "MAPE": 175.25
+        },
+        {
+          "Product_ID": "P0173",
+          "Records": 5,
+          "RMSE": 1.9926,
+          "MAE": 1.652,
+          "MAPE": 46.3117
+        },
+        {
+          "Product_ID": "P0161",
+          "Records": 6,
+          "RMSE": 2.0047,
+          "MAE": 1.4733,
+          "MAPE": 28.2675
+        },
+        {
+          "Product_ID": "P0151",
+          "Records": 3,
+          "RMSE": 2.016,
+          "MAE": 1.54,
+          "MAPE": 132.1667
+        },
+        {
+          "Product_ID": "P0136",
+          "Records": 6,
+          "RMSE": 2.0456,
+          "MAE": 1.9133,
+          "MAPE": 63.7083
+        },
+        {
+          "Product_ID": "P0154",
+          "Records": 2,
+          "RMSE": 2.062,
+          "MAE": 1.99,
+          "MAPE": 55.7917
+        },
+        {
+          "Product_ID": "P0192",
+          "Records": 5,
+          "RMSE": 2.0702,
+          "MAE": 1.56,
+          "MAPE": 93.3533
+        },
+        {
+          "Product_ID": "P0236",
+          "Records": 4,
+          "RMSE": 2.0704,
+          "MAE": 1.615,
+          "MAPE": 58.1667
+        },
+        {
+          "Product_ID": "P0126",
+          "Records": 2,
+          "RMSE": 2.0789,
+          "MAE": 2.035,
+          "MAPE": 111.25
+        },
+        {
+          "Product_ID": "P0128",
+          "Records": 3,
+          "RMSE": 2.0867,
+          "MAE": 1.78,
+          "MAPE": 55.8
+        },
+        {
+          "Product_ID": "P0280",
+          "Records": 3,
+          "RMSE": 2.0977,
+          "MAE": 1.98,
+          "MAPE": 58.2778
+        },
+        {
+          "Product_ID": "P0281",
+          "Records": 3,
+          "RMSE": 2.1061,
+          "MAE": 1.7733,
+          "MAPE": 126.1778
+        },
+        {
+          "Product_ID": "P0176",
+          "Records": 5,
+          "RMSE": 2.1953,
+          "MAE": 1.998,
+          "MAPE": 95.2514
+        },
+        {
+          "Product_ID": "P0279",
+          "Records": 5,
+          "RMSE": 2.2014,
+          "MAE": 1.868,
+          "MAPE": 50.5452
+        },
+        {
+          "Product_ID": "P0243",
+          "Records": 1,
+          "RMSE": 2.23,
+          "MAE": 2.23,
+          "MAPE": 111.5
+        },
+        {
+          "Product_ID": "P0143",
+          "Records": 6,
+          "RMSE": 2.2781,
+          "MAE": 1.9283,
+          "MAPE": 40.3519
+        },
+        {
+          "Product_ID": "P0283",
+          "Records": 6,
+          "RMSE": 2.2952,
+          "MAE": 2.145,
+          "MAPE": 105.1587
+        },
+        {
+          "Product_ID": "P0033",
+          "Records": 6,
+          "RMSE": 2.3044,
+          "MAE": 1.685,
+          "MAPE": 57.7159
+        },
+        {
+          "Product_ID": "P0210",
+          "Records": 6,
+          "RMSE": 2.3458,
+          "MAE": 2.0,
+          "MAPE": 107.4139
+        },
+        {
+          "Product_ID": "P0287",
+          "Records": 6,
+          "RMSE": 2.3829,
+          "MAE": 2.1233,
+          "MAPE": 85.2528
+        },
+        {
+          "Product_ID": "P0251",
+          "Records": 4,
+          "RMSE": 2.4041,
+          "MAE": 2.335,
+          "MAPE": 136.3667
+        },
+        {
+          "Product_ID": "P0209",
+          "Records": 3,
+          "RMSE": 2.43,
+          "MAE": 1.77,
+          "MAPE": 142.6528
+        },
+        {
+          "Product_ID": "P0256",
+          "Records": 7,
+          "RMSE": 2.4381,
+          "MAE": 1.9857,
+          "MAPE": 51.7937
+        },
+        {
+          "Product_ID": "P0255",
+          "Records": 5,
+          "RMSE": 2.4414,
+          "MAE": 2.316,
+          "MAPE": 75.54
+        },
+        {
+          "Product_ID": "P0207",
+          "Records": 6,
+          "RMSE": 2.4815,
+          "MAE": 2.125,
+          "MAPE": 41.8944
+        },
+        {
+          "Product_ID": "P0170",
+          "Records": 2,
+          "RMSE": 2.4934,
+          "MAE": 2.49,
+          "MAPE": 249.0
+        },
+        {
+          "Product_ID": "P0071",
+          "Records": 3,
+          "RMSE": 2.53,
+          "MAE": 2.43,
+          "MAPE": 93.7778
+        },
+        {
+          "Product_ID": "P0179",
+          "Records": 7,
+          "RMSE": 2.5894,
+          "MAE": 2.1186,
+          "MAPE": 107.3884
+        },
+        {
+          "Product_ID": "P0285",
+          "Records": 5,
+          "RMSE": 2.6137,
+          "MAE": 2.372,
+          "MAPE": 125.9214
+        },
+        {
+          "Product_ID": "P0165",
+          "Records": 6,
+          "RMSE": 2.6334,
+          "MAE": 2.515,
+          "MAPE": 143.9722
+        },
+        {
+          "Product_ID": "P0003",
+          "Records": 7,
+          "RMSE": 2.6557,
+          "MAE": 2.1543,
+          "MAPE": 41.051
+        },
+        {
+          "Product_ID": "P0265",
+          "Records": 4,
+          "RMSE": 2.6599,
+          "MAE": 1.99,
+          "MAPE": 39.7286
+        },
+        {
+          "Product_ID": "P0267",
+          "Records": 6,
+          "RMSE": 2.6804,
+          "MAE": 2.4583,
+          "MAPE": 54.1353
+        },
+        {
+          "Product_ID": "P0043",
+          "Records": 5,
+          "RMSE": 2.688,
+          "MAE": 2.34,
+          "MAPE": 63.9048
+        },
+        {
+          "Product_ID": "P0153",
+          "Records": 2,
+          "RMSE": 2.6903,
+          "MAE": 2.67,
+          "MAPE": 114.0
+        },
+        {
+          "Product_ID": "P0141",
+          "Records": 5,
+          "RMSE": 2.7087,
+          "MAE": 2.272,
+          "MAPE": 103.67
+        },
+        {
+          "Product_ID": "P0171",
+          "Records": 5,
+          "RMSE": 2.711,
+          "MAE": 2.156,
+          "MAPE": 150.5333
+        },
+        {
+          "Product_ID": "P0148",
+          "Records": 7,
+          "RMSE": 2.7653,
+          "MAE": 2.4629,
+          "MAPE": 127.3778
+        },
+        {
+          "Product_ID": "P0268",
+          "Records": 4,
+          "RMSE": 2.7757,
+          "MAE": 1.89,
+          "MAPE": 73.1875
+        },
+        {
+          "Product_ID": "P0080",
+          "Records": 7,
+          "RMSE": 2.8499,
+          "MAE": 2.51,
+          "MAPE": 45.683
+        },
+        {
+          "Product_ID": "P0006",
+          "Records": 7,
+          "RMSE": 2.8547,
+          "MAE": 1.79,
+          "MAPE": 57.0238
+        },
+        {
+          "Product_ID": "P0231",
+          "Records": 6,
+          "RMSE": 2.8646,
+          "MAE": 2.8283,
+          "MAPE": 199.25
+        },
+        {
+          "Product_ID": "P0038",
+          "Records": 4,
+          "RMSE": 3.0217,
+          "MAE": 2.14,
+          "MAPE": 38.8646
+        },
+        {
+          "Product_ID": "P0189",
+          "Records": 5,
+          "RMSE": 3.0446,
+          "MAE": 2.276,
+          "MAPE": 35.3
+        },
+        {
+          "Product_ID": "P0100",
+          "Records": 1,
+          "RMSE": 3.1,
+          "MAE": 3.1,
+          "MAPE": 310.0
+        },
+        {
+          "Product_ID": "P0273",
+          "Records": 4,
+          "RMSE": 3.1083,
+          "MAE": 2.8475,
+          "MAPE": 58.8095
+        },
+        {
+          "Product_ID": "P0240",
+          "Records": 5,
+          "RMSE": 3.1526,
+          "MAE": 2.508,
+          "MAPE": 55.9667
+        },
+        {
+          "Product_ID": "P0197",
+          "Records": 5,
+          "RMSE": 3.1806,
+          "MAE": 2.866,
+          "MAPE": 50.8961
+        },
+        {
+          "Product_ID": "P0200",
+          "Records": 5,
+          "RMSE": 3.1858,
+          "MAE": 2.338,
+          "MAPE": 33.1156
+        },
+        {
+          "Product_ID": "P0167",
+          "Records": 6,
+          "RMSE": 3.1962,
+          "MAE": 2.2367,
+          "MAPE": 59.4242
+        },
+        {
+          "Product_ID": "P0162",
+          "Records": 5,
+          "RMSE": 3.2036,
+          "MAE": 2.412,
+          "MAPE": 70.9833
+        },
+        {
+          "Product_ID": "P0292",
+          "Records": 7,
+          "RMSE": 3.2152,
+          "MAE": 2.88,
+          "MAPE": 112.6476
+        },
+        {
+          "Product_ID": "P0070",
+          "Records": 4,
+          "RMSE": 3.239,
+          "MAE": 2.305,
+          "MAPE": 119.1
+        },
+        {
+          "Product_ID": "P0257",
+          "Records": 7,
+          "RMSE": 3.3037,
+          "MAE": 2.8071,
+          "MAPE": 56.4116
+        },
+        {
+          "Product_ID": "P0274",
+          "Records": 6,
+          "RMSE": 3.3443,
+          "MAE": 2.855,
+          "MAPE": 47.9687
+        },
+        {
+          "Product_ID": "P0270",
+          "Records": 3,
+          "RMSE": 3.3842,
+          "MAE": 2.0033,
+          "MAPE": 26.9167
+        },
+        {
+          "Product_ID": "P0139",
+          "Records": 5,
+          "RMSE": 3.3904,
+          "MAE": 2.862,
+          "MAPE": 205.78
+        },
+        {
+          "Product_ID": "P0250",
+          "Records": 7,
+          "RMSE": 3.4499,
+          "MAE": 2.79,
+          "MAPE": 85.7452
+        },
+        {
+          "Product_ID": "P0145",
+          "Records": 7,
+          "RMSE": 3.5659,
+          "MAE": 2.5714,
+          "MAPE": 29.3386
+        },
+        {
+          "Product_ID": "P0140",
+          "Records": 4,
+          "RMSE": 3.5793,
+          "MAE": 3.44,
+          "MAPE": 151.2861
+        },
+        {
+          "Product_ID": "P0008",
+          "Records": 7,
+          "RMSE": 3.6037,
+          "MAE": 2.9943,
+          "MAPE": 79.461
+        },
+        {
+          "Product_ID": "P0272",
+          "Records": 7,
+          "RMSE": 3.6055,
+          "MAE": 3.1014,
+          "MAPE": 57.9116
+        },
+        {
+          "Product_ID": "P0175",
+          "Records": 6,
+          "RMSE": 3.6096,
+          "MAE": 3.115,
+          "MAPE": 142.8194
+        },
+        {
+          "Product_ID": "P0290",
+          "Records": 6,
+          "RMSE": 3.6202,
+          "MAE": 2.765,
+          "MAPE": 58.6064
+        },
+        {
+          "Product_ID": "P0208",
+          "Records": 5,
+          "RMSE": 3.6745,
+          "MAE": 3.482,
+          "MAPE": 128.4033
+        },
+        {
+          "Product_ID": "P0184",
+          "Records": 4,
+          "RMSE": 3.7642,
+          "MAE": 2.8425,
+          "MAPE": 88.9306
+        },
+        {
+          "Product_ID": "P0172",
+          "Records": 5,
+          "RMSE": 3.8842,
+          "MAE": 2.818,
+          "MAPE": 36.903
+        },
+        {
+          "Product_ID": "P0123",
+          "Records": 7,
+          "RMSE": 3.9675,
+          "MAE": 2.96,
+          "MAPE": 38.7194
+        },
+        {
+          "Product_ID": "P0174",
+          "Records": 6,
+          "RMSE": 4.0698,
+          "MAE": 3.385,
+          "MAPE": 111.5833
+        },
+        {
+          "Product_ID": "P0277",
+          "Records": 6,
+          "RMSE": 4.0824,
+          "MAE": 2.9267,
+          "MAPE": 66.9643
+        },
+        {
+          "Product_ID": "P0248",
+          "Records": 4,
+          "RMSE": 4.1287,
+          "MAE": 3.895,
+          "MAPE": 317.125
+        },
+        {
+          "Product_ID": "P0182",
+          "Records": 4,
+          "RMSE": 4.1335,
+          "MAE": 3.775,
+          "MAPE": 49.9444
+        },
+        {
+          "Product_ID": "P0194",
+          "Records": 4,
+          "RMSE": 4.1457,
+          "MAE": 2.8375,
+          "MAPE": 43.9125
+        },
+        {
+          "Product_ID": "P0114",
+          "Records": 7,
+          "RMSE": 4.1585,
+          "MAE": 3.4743,
+          "MAPE": 44.0558
+        },
+        {
+          "Product_ID": "P0204",
+          "Records": 7,
+          "RMSE": 4.1638,
+          "MAE": 3.6514,
+          "MAPE": 74.3626
+        },
+        {
+          "Product_ID": "P0260",
+          "Records": 6,
+          "RMSE": 4.1738,
+          "MAE": 3.9233,
+          "MAPE": 68.3875
+        },
+        {
+          "Product_ID": "P0195",
+          "Records": 5,
+          "RMSE": 4.1947,
+          "MAE": 3.808,
+          "MAPE": 52.96
+        },
+        {
+          "Product_ID": "P0294",
+          "Records": 7,
+          "RMSE": 4.2807,
+          "MAE": 3.47,
+          "MAPE": 45.4951
+        },
+        {
+          "Product_ID": "P0130",
+          "Records": 3,
+          "RMSE": 4.363,
+          "MAE": 3.94,
+          "MAPE": 93.7143
+        },
+        {
+          "Product_ID": "P0282",
+          "Records": 3,
+          "RMSE": 4.4663,
+          "MAE": 3.7967,
+          "MAPE": 42.4815
+        },
+        {
+          "Product_ID": "P0104",
+          "Records": 7,
+          "RMSE": 4.6686,
+          "MAE": 3.7,
+          "MAPE": 43.5283
+        },
+        {
+          "Product_ID": "P0253",
+          "Records": 7,
+          "RMSE": 4.6734,
+          "MAE": 3.3943,
+          "MAPE": 57.1088
+        },
+        {
+          "Product_ID": "P0177",
+          "Records": 7,
+          "RMSE": 4.6904,
+          "MAE": 3.14,
+          "MAPE": 73.1509
+        },
+        {
+          "Product_ID": "P0004",
+          "Records": 6,
+          "RMSE": 4.7278,
+          "MAE": 4.02,
+          "MAPE": 96.4055
+        },
+        {
+          "Product_ID": "P0138",
+          "Records": 6,
+          "RMSE": 4.7336,
+          "MAE": 3.155,
+          "MAPE": 41.6909
+        },
+        {
+          "Product_ID": "P0202",
+          "Records": 7,
+          "RMSE": 4.7696,
+          "MAE": 4.3186,
+          "MAPE": 75.4316
+        },
+        {
+          "Product_ID": "P0205",
+          "Records": 5,
+          "RMSE": 4.8599,
+          "MAE": 4.754,
+          "MAPE": 143.1694
+        },
+        {
+          "Product_ID": "P0009",
+          "Records": 7,
+          "RMSE": 4.8606,
+          "MAE": 3.84,
+          "MAPE": 51.8435
+        },
+        {
+          "Product_ID": "P0269",
+          "Records": 4,
+          "RMSE": 4.925,
+          "MAE": 3.925,
+          "MAPE": 80.8194
+        },
+        {
+          "Product_ID": "P0144",
+          "Records": 4,
+          "RMSE": 5.0081,
+          "MAE": 4.115,
+          "MAPE": 84.375
+        },
+        {
+          "Product_ID": "P0296",
+          "Records": 7,
+          "RMSE": 5.0264,
+          "MAE": 3.5114,
+          "MAPE": 43.6772
+        },
+        {
+          "Product_ID": "P0298",
+          "Records": 6,
+          "RMSE": 5.2518,
+          "MAE": 4.395,
+          "MAPE": 120.6968
+        },
+        {
+          "Product_ID": "P0291",
+          "Records": 7,
+          "RMSE": 5.4229,
+          "MAE": 4.4843,
+          "MAPE": 88.5711
+        },
+        {
+          "Product_ID": "P0186",
+          "Records": 7,
+          "RMSE": 5.5302,
+          "MAE": 4.8729,
+          "MAPE": 135.7175
+        },
+        {
+          "Product_ID": "P0288",
+          "Records": 5,
+          "RMSE": 5.6163,
+          "MAE": 4.026,
+          "MAPE": 52.153
+        },
+        {
+          "Product_ID": "P0206",
+          "Records": 6,
+          "RMSE": 5.6551,
+          "MAE": 4.82,
+          "MAPE": 112.0523
+        },
+        {
+          "Product_ID": "P0196",
+          "Records": 6,
+          "RMSE": 5.6684,
+          "MAE": 4.705,
+          "MAPE": 111.9613
+        },
+        {
+          "Product_ID": "P0293",
+          "Records": 7,
+          "RMSE": 5.7644,
+          "MAE": 4.9857,
+          "MAPE": 51.9835
+        },
+        {
+          "Product_ID": "P0180",
+          "Records": 7,
+          "RMSE": 5.8009,
+          "MAE": 4.3843,
+          "MAPE": 66.1304
+        },
+        {
+          "Product_ID": "P0286",
+          "Records": 7,
+          "RMSE": 5.814,
+          "MAE": 4.49,
+          "MAPE": 55.3253
+        },
+        {
+          "Product_ID": "P0262",
+          "Records": 6,
+          "RMSE": 5.9111,
+          "MAE": 5.4183,
+          "MAPE": 64.7255
+        },
+        {
+          "Product_ID": "P0115",
+          "Records": 2,
+          "RMSE": 5.9358,
+          "MAE": 5.935,
+          "MAPE": 593.5
+        },
+        {
+          "Product_ID": "P0199",
+          "Records": 7,
+          "RMSE": 6.0019,
+          "MAE": 4.6943,
+          "MAPE": 53.1677
+        },
+        {
+          "Product_ID": "P0178",
+          "Records": 7,
+          "RMSE": 6.014,
+          "MAE": 5.1971,
+          "MAPE": 61.0185
+        },
+        {
+          "Product_ID": "P0201",
+          "Records": 7,
+          "RMSE": 6.1845,
+          "MAE": 4.8786,
+          "MAPE": 59.9222
+        },
+        {
+          "Product_ID": "P0203",
+          "Records": 6,
+          "RMSE": 6.201,
+          "MAE": 5.77,
+          "MAPE": 90.6699
+        },
+        {
+          "Product_ID": "P0188",
+          "Records": 4,
+          "RMSE": 6.2208,
+          "MAE": 3.8725,
+          "MAPE": 45.8021
+        },
+        {
+          "Product_ID": "P0169",
+          "Records": 2,
+          "RMSE": 6.2349,
+          "MAE": 6.155,
+          "MAPE": 443.5
+        },
+        {
+          "Product_ID": "P0271",
+          "Records": 7,
+          "RMSE": 6.4332,
+          "MAE": 4.97,
+          "MAPE": 59.1159
+        },
+        {
+          "Product_ID": "P0124",
+          "Records": 7,
+          "RMSE": 6.6112,
+          "MAE": 5.9486,
+          "MAPE": 60.8365
+        },
+        {
+          "Product_ID": "P0166",
+          "Records": 6,
+          "RMSE": 6.72,
+          "MAE": 5.5433,
+          "MAPE": 75.1795
+        },
+        {
+          "Product_ID": "P0183",
+          "Records": 7,
+          "RMSE": 6.7355,
+          "MAE": 5.1943,
+          "MAPE": 54.6962
+        },
+        {
+          "Product_ID": "P0198",
+          "Records": 7,
+          "RMSE": 6.8423,
+          "MAE": 4.6543,
+          "MAPE": 52.3532
+        },
+        {
+          "Product_ID": "P0026",
+          "Records": 4,
+          "RMSE": 6.8846,
+          "MAE": 6.7925,
+          "MAPE": 441.75
+        },
+        {
+          "Product_ID": "P0244",
+          "Records": 3,
+          "RMSE": 7.0305,
+          "MAE": 6.8667,
+          "MAPE": 686.6667
+        },
+        {
+          "Product_ID": "P0125",
+          "Records": 7,
+          "RMSE": 7.1959,
+          "MAE": 6.6529,
+          "MAPE": 75.0414
+        },
+        {
+          "Product_ID": "P0181",
+          "Records": 6,
+          "RMSE": 7.4318,
+          "MAE": 6.5233,
+          "MAPE": 59.0899
+        },
+        {
+          "Product_ID": "P0149",
+          "Records": 5,
+          "RMSE": 7.4871,
+          "MAE": 4.136,
+          "MAPE": 37.63
+        },
+        {
+          "Product_ID": "P0027",
+          "Records": 7,
+          "RMSE": 7.5009,
+          "MAE": 5.7957,
+          "MAPE": 120.9505
+        },
+        {
+          "Product_ID": "P0263",
+          "Records": 7,
+          "RMSE": 8.0632,
+          "MAE": 6.3014,
+          "MAPE": 72.7167
+        },
+        {
+          "Product_ID": "P0164",
+          "Records": 3,
+          "RMSE": 8.1861,
+          "MAE": 5.9233,
+          "MAPE": 274.1111
+        },
+        {
+          "Product_ID": "P0163",
+          "Records": 5,
+          "RMSE": 8.345,
+          "MAE": 8.19,
+          "MAPE": 364.1333
+        },
+        {
+          "Product_ID": "P0247",
+          "Records": 2,
+          "RMSE": 8.4601,
+          "MAE": 8.46,
+          "MAPE": 635.5
+        },
+        {
+          "Product_ID": "P0300",
+          "Records": 7,
+          "RMSE": 8.8771,
+          "MAE": 7.8229,
+          "MAPE": 72.0157
+        },
+        {
+          "Product_ID": "P0142",
+          "Records": 7,
+          "RMSE": 8.947,
+          "MAE": 7.9014,
+          "MAPE": 126.8795
+        },
+        {
+          "Product_ID": "P0185",
+          "Records": 7,
+          "RMSE": 9.1267,
+          "MAE": 6.1114,
+          "MAPE": 85.9797
+        },
+        {
+          "Product_ID": "P0297",
+          "Records": 7,
+          "RMSE": 9.396,
+          "MAE": 8.2271,
+          "MAPE": 77.1748
+        },
+        {
+          "Product_ID": "P0122",
+          "Records": 7,
+          "RMSE": 9.7769,
+          "MAE": 8.2914,
+          "MAPE": 57.0329
+        },
+        {
+          "Product_ID": "P0252",
+          "Records": 5,
+          "RMSE": 9.8619,
+          "MAE": 9.43,
+          "MAPE": 302.3367
+        },
+        {
+          "Product_ID": "P0190",
+          "Records": 6,
+          "RMSE": 10.0021,
+          "MAE": 7.3167,
+          "MAPE": 43.2871
+        },
+        {
+          "Product_ID": "P0193",
+          "Records": 7,
+          "RMSE": 11.1485,
+          "MAE": 8.7371,
+          "MAPE": 68.1941
+        },
+        {
+          "Product_ID": "P0245",
+          "Records": 7,
+          "RMSE": 11.5515,
+          "MAE": 11.2314,
+          "MAPE": 61.4203
+        },
+        {
+          "Product_ID": "P0152",
+          "Records": 7,
+          "RMSE": 11.8611,
+          "MAE": 11.0614,
+          "MAPE": 86.6885
+        },
+        {
+          "Product_ID": "P0147",
+          "Records": 6,
+          "RMSE": 12.2256,
+          "MAE": 7.6083,
+          "MAPE": 66.9965
+        },
+        {
+          "Product_ID": "P0299",
+          "Records": 7,
+          "RMSE": 13.2412,
+          "MAE": 9.7929,
+          "MAPE": 76.3445
+        },
+        {
+          "Product_ID": "P0211",
+          "Records": 7,
+          "RMSE": 14.3041,
+          "MAE": 10.3914,
+          "MAPE": 88.288
+        },
+        {
+          "Product_ID": "P0295",
+          "Records": 7,
+          "RMSE": 32.9067,
+          "MAE": 31.1143,
+          "MAPE": 72.936
+        }
+      ]
+    },
+    "90": {
+      "status": "evaluated",
+      "records": 1056,
+      "metrics": {
+        "RMSE": 5.4791,
+        "MAE": 3.3637,
+        "MAPE": 81.4956
+      },
+      "per_product_count": 225,
+      "per_product": [
+        {
+          "Product_ID": "P0072",
+          "Records": 2,
+          "RMSE": 0.0552,
+          "MAE": 0.055,
+          "MAPE": 1.375
+        },
+        {
+          "Product_ID": "P0094",
+          "Records": 1,
+          "RMSE": 0.08,
+          "MAE": 0.08,
+          "MAPE": 4.0
+        },
+        {
+          "Product_ID": "P0030",
+          "Records": 1,
+          "RMSE": 0.14,
+          "MAE": 0.14,
+          "MAPE": 7.0
+        },
+        {
+          "Product_ID": "P0095",
+          "Records": 2,
+          "RMSE": 0.229,
+          "MAE": 0.185,
+          "MAPE": 9.25
+        },
+        {
+          "Product_ID": "P0068",
+          "Records": 1,
+          "RMSE": 0.3,
+          "MAE": 0.3,
+          "MAPE": 10.0
+        },
+        {
+          "Product_ID": "P0246",
+          "Records": 1,
+          "RMSE": 0.47,
+          "MAE": 0.47,
+          "MAPE": 23.5
+        },
+        {
+          "Product_ID": "P0019",
+          "Records": 3,
+          "RMSE": 0.4754,
+          "MAE": 0.47,
+          "MAPE": 17.9444
+        },
+        {
+          "Product_ID": "P0249",
+          "Records": 4,
+          "RMSE": 0.5692,
+          "MAE": 0.4975,
+          "MAPE": 24.875
+        },
+        {
+          "Product_ID": "P0266",
+          "Records": 4,
+          "RMSE": 0.5762,
+          "MAE": 0.47,
+          "MAPE": 19.25
+        },
+        {
+          "Product_ID": "P0096",
+          "Records": 3,
+          "RMSE": 0.5962,
+          "MAE": 0.3733,
+          "MAPE": 35.8333
+        },
+        {
+          "Product_ID": "P0046",
+          "Records": 3,
+          "RMSE": 0.6345,
+          "MAE": 0.62,
+          "MAPE": 20.6667
+        },
+        {
+          "Product_ID": "P0001",
+          "Records": 1,
+          "RMSE": 0.64,
+          "MAE": 0.64,
+          "MAPE": 64.0
+        },
+        {
+          "Product_ID": "P0002",
+          "Records": 3,
+          "RMSE": 0.6425,
+          "MAE": 0.4067,
+          "MAPE": 14.1667
+        },
+        {
+          "Product_ID": "P0234",
+          "Records": 3,
+          "RMSE": 0.7204,
+          "MAE": 0.56,
+          "MAPE": 48.0
+        },
+        {
+          "Product_ID": "P0024",
+          "Records": 4,
+          "RMSE": 0.7257,
+          "MAE": 0.7175,
+          "MAPE": 29.2083
+        },
+        {
+          "Product_ID": "P0127",
+          "Records": 4,
+          "RMSE": 0.7478,
+          "MAE": 0.65,
+          "MAPE": 45.3333
+        },
+        {
+          "Product_ID": "P0229",
+          "Records": 3,
+          "RMSE": 0.8049,
+          "MAE": 0.7133,
+          "MAPE": 64.1667
+        },
+        {
+          "Product_ID": "P0228",
+          "Records": 4,
+          "RMSE": 0.811,
+          "MAE": 0.69,
+          "MAPE": 44.0417
+        },
+        {
+          "Product_ID": "P0237",
+          "Records": 4,
+          "RMSE": 0.8142,
+          "MAE": 0.6725,
+          "MAPE": 48.1667
+        },
+        {
+          "Product_ID": "P0241",
+          "Records": 3,
+          "RMSE": 0.8175,
+          "MAE": 0.6467,
+          "MAPE": 30.3333
+        },
+        {
+          "Product_ID": "P0239",
+          "Records": 6,
+          "RMSE": 0.8345,
+          "MAE": 0.615,
+          "MAPE": 27.6667
+        },
+        {
+          "Product_ID": "P0120",
+          "Records": 5,
+          "RMSE": 0.8515,
+          "MAE": 0.784,
+          "MAPE": 70.7
+        },
+        {
+          "Product_ID": "P0235",
+          "Records": 3,
+          "RMSE": 0.8583,
+          "MAE": 0.8567,
+          "MAPE": 42.8333
+        },
+        {
+          "Product_ID": "P0121",
+          "Records": 3,
+          "RMSE": 0.8659,
+          "MAE": 0.8167,
+          "MAPE": 30.75
+        },
+        {
+          "Product_ID": "P0258",
+          "Records": 5,
+          "RMSE": 0.8696,
+          "MAE": 0.762,
+          "MAPE": 53.1
+        },
+        {
+          "Product_ID": "P0064",
+          "Records": 3,
+          "RMSE": 0.8887,
+          "MAE": 0.7533,
+          "MAPE": 61.3333
+        },
+        {
+          "Product_ID": "P0132",
+          "Records": 5,
+          "RMSE": 0.9212,
+          "MAE": 0.856,
+          "MAPE": 26.3167
+        },
+        {
+          "Product_ID": "P0233",
+          "Records": 4,
+          "RMSE": 0.9438,
+          "MAE": 0.755,
+          "MAPE": 70.75
+        },
+        {
+          "Product_ID": "P0018",
+          "Records": 4,
+          "RMSE": 0.973,
+          "MAE": 0.95,
+          "MAPE": 33.0625
+        },
+        {
+          "Product_ID": "P0022",
+          "Records": 2,
+          "RMSE": 0.99,
+          "MAE": 0.99,
+          "MAPE": 37.125
+        },
+        {
+          "Product_ID": "P0225",
+          "Records": 2,
+          "RMSE": 1.0045,
+          "MAE": 0.99,
+          "MAPE": 71.6667
+        },
+        {
+          "Product_ID": "P0131",
+          "Records": 3,
+          "RMSE": 1.0209,
+          "MAE": 0.7467,
+          "MAPE": 64.5
+        },
+        {
+          "Product_ID": "P0133",
+          "Records": 4,
+          "RMSE": 1.0217,
+          "MAE": 0.815,
+          "MAPE": 33.8333
+        },
+        {
+          "Product_ID": "P0168",
+          "Records": 7,
+          "RMSE": 1.0292,
+          "MAE": 0.8714,
+          "MAPE": 46.8929
+        },
+        {
+          "Product_ID": "P0254",
+          "Records": 4,
+          "RMSE": 1.055,
+          "MAE": 0.8175,
+          "MAPE": 27.875
+        },
+        {
+          "Product_ID": "P0129",
+          "Records": 2,
+          "RMSE": 1.0756,
+          "MAE": 0.965,
+          "MAPE": 80.1667
+        },
+        {
+          "Product_ID": "P0035",
+          "Records": 2,
+          "RMSE": 1.0786,
+          "MAE": 1.03,
+          "MAPE": 79.3333
+        },
+        {
+          "Product_ID": "P0187",
+          "Records": 6,
+          "RMSE": 1.0957,
+          "MAE": 0.8233,
+          "MAPE": 35.0833
+        },
+        {
+          "Product_ID": "P0278",
+          "Records": 7,
+          "RMSE": 1.1074,
+          "MAE": 0.95,
+          "MAPE": 54.881
+        },
+        {
+          "Product_ID": "P0259",
+          "Records": 4,
+          "RMSE": 1.1172,
+          "MAE": 0.9275,
+          "MAPE": 69.2083
+        },
+        {
+          "Product_ID": "P0045",
+          "Records": 6,
+          "RMSE": 1.1225,
+          "MAE": 0.9233,
+          "MAPE": 52.25
+        },
+        {
+          "Product_ID": "P0063",
+          "Records": 3,
+          "RMSE": 1.1355,
+          "MAE": 1.01,
+          "MAPE": 96.3333
+        },
+        {
+          "Product_ID": "P0230",
+          "Records": 4,
+          "RMSE": 1.139,
+          "MAE": 0.775,
+          "MAPE": 25.0
+        },
+        {
+          "Product_ID": "P0232",
+          "Records": 1,
+          "RMSE": 1.15,
+          "MAE": 1.15,
+          "MAPE": 115.0
+        },
+        {
+          "Product_ID": "P0135",
+          "Records": 4,
+          "RMSE": 1.1513,
+          "MAE": 0.985,
+          "MAPE": 47.5833
+        },
+        {
+          "Product_ID": "P0020",
+          "Records": 1,
+          "RMSE": 1.19,
+          "MAE": 1.19,
+          "MAPE": 119.0
+        },
+        {
+          "Product_ID": "P0156",
+          "Records": 2,
+          "RMSE": 1.1985,
+          "MAE": 1.07,
+          "MAPE": 33.375
+        },
+        {
+          "Product_ID": "P0028",
+          "Records": 4,
+          "RMSE": 1.2173,
+          "MAE": 1.1525,
+          "MAPE": 80.625
+        },
+        {
+          "Product_ID": "P0276",
+          "Records": 2,
+          "RMSE": 1.2403,
+          "MAE": 1.235,
+          "MAPE": 95.5
+        },
+        {
+          "Product_ID": "P0041",
+          "Records": 3,
+          "RMSE": 1.2622,
+          "MAE": 1.1833,
+          "MAPE": 86.0833
+        },
+        {
+          "Product_ID": "P0226",
+          "Records": 6,
+          "RMSE": 1.2633,
+          "MAE": 1.1067,
+          "MAPE": 62.0
+        },
+        {
+          "Product_ID": "P0101",
+          "Records": 4,
+          "RMSE": 1.2708,
+          "MAE": 1.0,
+          "MAPE": 81.25
+        },
+        {
+          "Product_ID": "P0159",
+          "Records": 4,
+          "RMSE": 1.288,
+          "MAE": 1.16,
+          "MAPE": 80.8958
+        },
+        {
+          "Product_ID": "P0275",
+          "Records": 5,
+          "RMSE": 1.3272,
+          "MAE": 1.186,
+          "MAPE": 30.2767
+        },
+        {
+          "Product_ID": "P0227",
+          "Records": 3,
+          "RMSE": 1.3438,
+          "MAE": 1.2633,
+          "MAPE": 95.0
+        },
+        {
+          "Product_ID": "P0021",
+          "Records": 3,
+          "RMSE": 1.3647,
+          "MAE": 1.2,
+          "MAPE": 114.6667
+        },
+        {
+          "Product_ID": "P0102",
+          "Records": 4,
+          "RMSE": 1.3664,
+          "MAE": 1.285,
+          "MAPE": 57.1667
+        },
+        {
+          "Product_ID": "P0036",
+          "Records": 4,
+          "RMSE": 1.3783,
+          "MAE": 0.9625,
+          "MAPE": 25.3667
+        },
+        {
+          "Product_ID": "P0023",
+          "Records": 3,
+          "RMSE": 1.3935,
+          "MAE": 1.2167,
+          "MAPE": 95.5
+        },
+        {
+          "Product_ID": "P0037",
+          "Records": 3,
+          "RMSE": 1.3941,
+          "MAE": 1.1133,
+          "MAPE": 41.3333
+        },
+        {
+          "Product_ID": "P0284",
+          "Records": 1,
+          "RMSE": 1.44,
+          "MAE": 1.44,
+          "MAPE": 24.0
+        },
+        {
+          "Product_ID": "P0048",
+          "Records": 3,
+          "RMSE": 1.4402,
+          "MAE": 1.0567,
+          "MAPE": 33.3889
+        },
+        {
+          "Product_ID": "P0093",
+          "Records": 3,
+          "RMSE": 1.4582,
+          "MAE": 1.4067,
+          "MAPE": 125.6667
+        },
+        {
+          "Product_ID": "P0042",
+          "Records": 5,
+          "RMSE": 1.4806,
+          "MAE": 1.382,
+          "MAPE": 69.65
+        },
+        {
+          "Product_ID": "P0224",
+          "Records": 5,
+          "RMSE": 1.55,
+          "MAE": 1.464,
+          "MAPE": 84.6
+        },
+        {
+          "Product_ID": "P0034",
+          "Records": 4,
+          "RMSE": 1.5872,
+          "MAE": 1.53,
+          "MAPE": 153.0
+        },
+        {
+          "Product_ID": "P0032",
+          "Records": 5,
+          "RMSE": 1.6006,
+          "MAE": 1.436,
+          "MAPE": 78.64
+        },
+        {
+          "Product_ID": "P0158",
+          "Records": 3,
+          "RMSE": 1.603,
+          "MAE": 1.58,
+          "MAPE": 92.75
+        },
+        {
+          "Product_ID": "P0044",
+          "Records": 4,
+          "RMSE": 1.604,
+          "MAE": 1.445,
+          "MAPE": 99.3542
+        },
+        {
+          "Product_ID": "P0191",
+          "Records": 5,
+          "RMSE": 1.6118,
+          "MAE": 1.392,
+          "MAPE": 37.1633
+        },
+        {
+          "Product_ID": "P0039",
+          "Records": 5,
+          "RMSE": 1.6879,
+          "MAE": 1.426,
+          "MAPE": 63.9667
+        },
+        {
+          "Product_ID": "P0097",
+          "Records": 1,
+          "RMSE": 1.71,
+          "MAE": 1.71,
+          "MAPE": 57.0
+        },
+        {
+          "Product_ID": "P0137",
+          "Records": 2,
+          "RMSE": 1.7839,
+          "MAE": 1.735,
+          "MAPE": 75.75
+        },
+        {
+          "Product_ID": "P0073",
+          "Records": 5,
+          "RMSE": 1.7946,
+          "MAE": 1.438,
+          "MAPE": 112.7667
+        },
+        {
+          "Product_ID": "P0005",
+          "Records": 5,
+          "RMSE": 1.7964,
+          "MAE": 1.612,
+          "MAPE": 123.1333
+        },
+        {
+          "Product_ID": "P0157",
+          "Records": 4,
+          "RMSE": 1.7971,
+          "MAE": 1.4,
+          "MAPE": 42.0833
+        },
+        {
+          "Product_ID": "P0025",
+          "Records": 3,
+          "RMSE": 1.8025,
+          "MAE": 1.6933,
+          "MAPE": 155.6667
+        },
+        {
+          "Product_ID": "P0007",
+          "Records": 5,
+          "RMSE": 1.8034,
+          "MAE": 1.174,
+          "MAPE": 29.4167
+        },
+        {
+          "Product_ID": "P0146",
+          "Records": 6,
+          "RMSE": 1.8195,
+          "MAE": 1.4717,
+          "MAPE": 34.9759
+        },
+        {
+          "Product_ID": "P0238",
+          "Records": 5,
+          "RMSE": 1.8236,
+          "MAE": 1.41,
+          "MAPE": 58.3667
+        },
+        {
+          "Product_ID": "P0289",
+          "Records": 1,
+          "RMSE": 1.83,
+          "MAE": 1.83,
+          "MAPE": 91.5
+        },
+        {
+          "Product_ID": "P0155",
+          "Records": 6,
+          "RMSE": 1.8356,
+          "MAE": 1.5033,
+          "MAPE": 64.9083
+        },
+        {
+          "Product_ID": "P0150",
+          "Records": 5,
+          "RMSE": 1.855,
+          "MAE": 1.504,
+          "MAPE": 112.1467
+        },
+        {
+          "Product_ID": "P0261",
+          "Records": 4,
+          "RMSE": 1.8673,
+          "MAE": 1.6725,
+          "MAPE": 144.75
+        },
+        {
+          "Product_ID": "P0134",
+          "Records": 3,
+          "RMSE": 1.8936,
+          "MAE": 1.67,
+          "MAPE": 42.9
+        },
+        {
+          "Product_ID": "P0264",
+          "Records": 4,
+          "RMSE": 1.9301,
+          "MAE": 1.61,
+          "MAPE": 52.4
+        },
+        {
+          "Product_ID": "P0103",
+          "Records": 4,
+          "RMSE": 1.9409,
+          "MAE": 1.665,
+          "MAPE": 54.7667
+        },
+        {
+          "Product_ID": "P0040",
+          "Records": 4,
+          "RMSE": 1.9447,
+          "MAE": 1.5825,
+          "MAPE": 44.875
+        },
+        {
+          "Product_ID": "P0029",
+          "Records": 4,
+          "RMSE": 1.9453,
+          "MAE": 1.895,
+          "MAPE": 175.25
+        },
+        {
+          "Product_ID": "P0173",
+          "Records": 5,
+          "RMSE": 1.9926,
+          "MAE": 1.652,
+          "MAPE": 46.3117
+        },
+        {
+          "Product_ID": "P0161",
+          "Records": 6,
+          "RMSE": 2.0047,
+          "MAE": 1.4733,
+          "MAPE": 28.2675
+        },
+        {
+          "Product_ID": "P0151",
+          "Records": 3,
+          "RMSE": 2.016,
+          "MAE": 1.54,
+          "MAPE": 132.1667
+        },
+        {
+          "Product_ID": "P0136",
+          "Records": 6,
+          "RMSE": 2.0456,
+          "MAE": 1.9133,
+          "MAPE": 63.7083
+        },
+        {
+          "Product_ID": "P0154",
+          "Records": 2,
+          "RMSE": 2.062,
+          "MAE": 1.99,
+          "MAPE": 55.7917
+        },
+        {
+          "Product_ID": "P0192",
+          "Records": 5,
+          "RMSE": 2.0702,
+          "MAE": 1.56,
+          "MAPE": 93.3533
+        },
+        {
+          "Product_ID": "P0236",
+          "Records": 4,
+          "RMSE": 2.0704,
+          "MAE": 1.615,
+          "MAPE": 58.1667
+        },
+        {
+          "Product_ID": "P0126",
+          "Records": 2,
+          "RMSE": 2.0789,
+          "MAE": 2.035,
+          "MAPE": 111.25
+        },
+        {
+          "Product_ID": "P0128",
+          "Records": 3,
+          "RMSE": 2.0867,
+          "MAE": 1.78,
+          "MAPE": 55.8
+        },
+        {
+          "Product_ID": "P0280",
+          "Records": 3,
+          "RMSE": 2.0977,
+          "MAE": 1.98,
+          "MAPE": 58.2778
+        },
+        {
+          "Product_ID": "P0281",
+          "Records": 3,
+          "RMSE": 2.1061,
+          "MAE": 1.7733,
+          "MAPE": 126.1778
+        },
+        {
+          "Product_ID": "P0176",
+          "Records": 5,
+          "RMSE": 2.1953,
+          "MAE": 1.998,
+          "MAPE": 95.2514
+        },
+        {
+          "Product_ID": "P0279",
+          "Records": 5,
+          "RMSE": 2.2014,
+          "MAE": 1.868,
+          "MAPE": 50.5452
+        },
+        {
+          "Product_ID": "P0243",
+          "Records": 1,
+          "RMSE": 2.23,
+          "MAE": 2.23,
+          "MAPE": 111.5
+        },
+        {
+          "Product_ID": "P0143",
+          "Records": 6,
+          "RMSE": 2.2781,
+          "MAE": 1.9283,
+          "MAPE": 40.3519
+        },
+        {
+          "Product_ID": "P0283",
+          "Records": 6,
+          "RMSE": 2.2952,
+          "MAE": 2.145,
+          "MAPE": 105.1587
+        },
+        {
+          "Product_ID": "P0033",
+          "Records": 6,
+          "RMSE": 2.3044,
+          "MAE": 1.685,
+          "MAPE": 57.7159
+        },
+        {
+          "Product_ID": "P0210",
+          "Records": 6,
+          "RMSE": 2.3458,
+          "MAE": 2.0,
+          "MAPE": 107.4139
+        },
+        {
+          "Product_ID": "P0287",
+          "Records": 6,
+          "RMSE": 2.3829,
+          "MAE": 2.1233,
+          "MAPE": 85.2528
+        },
+        {
+          "Product_ID": "P0251",
+          "Records": 4,
+          "RMSE": 2.4041,
+          "MAE": 2.335,
+          "MAPE": 136.3667
+        },
+        {
+          "Product_ID": "P0209",
+          "Records": 3,
+          "RMSE": 2.43,
+          "MAE": 1.77,
+          "MAPE": 142.6528
+        },
+        {
+          "Product_ID": "P0256",
+          "Records": 7,
+          "RMSE": 2.4381,
+          "MAE": 1.9857,
+          "MAPE": 51.7937
+        },
+        {
+          "Product_ID": "P0255",
+          "Records": 5,
+          "RMSE": 2.4414,
+          "MAE": 2.316,
+          "MAPE": 75.54
+        },
+        {
+          "Product_ID": "P0207",
+          "Records": 6,
+          "RMSE": 2.4815,
+          "MAE": 2.125,
+          "MAPE": 41.8944
+        },
+        {
+          "Product_ID": "P0170",
+          "Records": 2,
+          "RMSE": 2.4934,
+          "MAE": 2.49,
+          "MAPE": 249.0
+        },
+        {
+          "Product_ID": "P0071",
+          "Records": 3,
+          "RMSE": 2.53,
+          "MAE": 2.43,
+          "MAPE": 93.7778
+        },
+        {
+          "Product_ID": "P0179",
+          "Records": 7,
+          "RMSE": 2.5894,
+          "MAE": 2.1186,
+          "MAPE": 107.3884
+        },
+        {
+          "Product_ID": "P0285",
+          "Records": 5,
+          "RMSE": 2.6137,
+          "MAE": 2.372,
+          "MAPE": 125.9214
+        },
+        {
+          "Product_ID": "P0165",
+          "Records": 6,
+          "RMSE": 2.6334,
+          "MAE": 2.515,
+          "MAPE": 143.9722
+        },
+        {
+          "Product_ID": "P0003",
+          "Records": 7,
+          "RMSE": 2.6557,
+          "MAE": 2.1543,
+          "MAPE": 41.051
+        },
+        {
+          "Product_ID": "P0265",
+          "Records": 4,
+          "RMSE": 2.6599,
+          "MAE": 1.99,
+          "MAPE": 39.7286
+        },
+        {
+          "Product_ID": "P0267",
+          "Records": 6,
+          "RMSE": 2.6804,
+          "MAE": 2.4583,
+          "MAPE": 54.1353
+        },
+        {
+          "Product_ID": "P0043",
+          "Records": 5,
+          "RMSE": 2.688,
+          "MAE": 2.34,
+          "MAPE": 63.9048
+        },
+        {
+          "Product_ID": "P0153",
+          "Records": 2,
+          "RMSE": 2.6903,
+          "MAE": 2.67,
+          "MAPE": 114.0
+        },
+        {
+          "Product_ID": "P0141",
+          "Records": 5,
+          "RMSE": 2.7087,
+          "MAE": 2.272,
+          "MAPE": 103.67
+        },
+        {
+          "Product_ID": "P0171",
+          "Records": 5,
+          "RMSE": 2.711,
+          "MAE": 2.156,
+          "MAPE": 150.5333
+        },
+        {
+          "Product_ID": "P0148",
+          "Records": 7,
+          "RMSE": 2.7653,
+          "MAE": 2.4629,
+          "MAPE": 127.3778
+        },
+        {
+          "Product_ID": "P0268",
+          "Records": 4,
+          "RMSE": 2.7757,
+          "MAE": 1.89,
+          "MAPE": 73.1875
+        },
+        {
+          "Product_ID": "P0080",
+          "Records": 7,
+          "RMSE": 2.8499,
+          "MAE": 2.51,
+          "MAPE": 45.683
+        },
+        {
+          "Product_ID": "P0006",
+          "Records": 7,
+          "RMSE": 2.8547,
+          "MAE": 1.79,
+          "MAPE": 57.0238
+        },
+        {
+          "Product_ID": "P0231",
+          "Records": 6,
+          "RMSE": 2.8646,
+          "MAE": 2.8283,
+          "MAPE": 199.25
+        },
+        {
+          "Product_ID": "P0038",
+          "Records": 4,
+          "RMSE": 3.0217,
+          "MAE": 2.14,
+          "MAPE": 38.8646
+        },
+        {
+          "Product_ID": "P0189",
+          "Records": 5,
+          "RMSE": 3.0446,
+          "MAE": 2.276,
+          "MAPE": 35.3
+        },
+        {
+          "Product_ID": "P0100",
+          "Records": 1,
+          "RMSE": 3.1,
+          "MAE": 3.1,
+          "MAPE": 310.0
+        },
+        {
+          "Product_ID": "P0273",
+          "Records": 4,
+          "RMSE": 3.1083,
+          "MAE": 2.8475,
+          "MAPE": 58.8095
+        },
+        {
+          "Product_ID": "P0240",
+          "Records": 5,
+          "RMSE": 3.1526,
+          "MAE": 2.508,
+          "MAPE": 55.9667
+        },
+        {
+          "Product_ID": "P0197",
+          "Records": 5,
+          "RMSE": 3.1806,
+          "MAE": 2.866,
+          "MAPE": 50.8961
+        },
+        {
+          "Product_ID": "P0200",
+          "Records": 5,
+          "RMSE": 3.1858,
+          "MAE": 2.338,
+          "MAPE": 33.1156
+        },
+        {
+          "Product_ID": "P0167",
+          "Records": 6,
+          "RMSE": 3.1962,
+          "MAE": 2.2367,
+          "MAPE": 59.4242
+        },
+        {
+          "Product_ID": "P0162",
+          "Records": 5,
+          "RMSE": 3.2036,
+          "MAE": 2.412,
+          "MAPE": 70.9833
+        },
+        {
+          "Product_ID": "P0292",
+          "Records": 7,
+          "RMSE": 3.2152,
+          "MAE": 2.88,
+          "MAPE": 112.6476
+        },
+        {
+          "Product_ID": "P0070",
+          "Records": 4,
+          "RMSE": 3.239,
+          "MAE": 2.305,
+          "MAPE": 119.1
+        },
+        {
+          "Product_ID": "P0257",
+          "Records": 7,
+          "RMSE": 3.3037,
+          "MAE": 2.8071,
+          "MAPE": 56.4116
+        },
+        {
+          "Product_ID": "P0274",
+          "Records": 6,
+          "RMSE": 3.3443,
+          "MAE": 2.855,
+          "MAPE": 47.9687
+        },
+        {
+          "Product_ID": "P0270",
+          "Records": 3,
+          "RMSE": 3.3842,
+          "MAE": 2.0033,
+          "MAPE": 26.9167
+        },
+        {
+          "Product_ID": "P0139",
+          "Records": 5,
+          "RMSE": 3.3904,
+          "MAE": 2.862,
+          "MAPE": 205.78
+        },
+        {
+          "Product_ID": "P0250",
+          "Records": 7,
+          "RMSE": 3.4499,
+          "MAE": 2.79,
+          "MAPE": 85.7452
+        },
+        {
+          "Product_ID": "P0145",
+          "Records": 7,
+          "RMSE": 3.5659,
+          "MAE": 2.5714,
+          "MAPE": 29.3386
+        },
+        {
+          "Product_ID": "P0140",
+          "Records": 4,
+          "RMSE": 3.5793,
+          "MAE": 3.44,
+          "MAPE": 151.2861
+        },
+        {
+          "Product_ID": "P0008",
+          "Records": 7,
+          "RMSE": 3.6037,
+          "MAE": 2.9943,
+          "MAPE": 79.461
+        },
+        {
+          "Product_ID": "P0272",
+          "Records": 7,
+          "RMSE": 3.6055,
+          "MAE": 3.1014,
+          "MAPE": 57.9116
+        },
+        {
+          "Product_ID": "P0175",
+          "Records": 6,
+          "RMSE": 3.6096,
+          "MAE": 3.115,
+          "MAPE": 142.8194
+        },
+        {
+          "Product_ID": "P0290",
+          "Records": 6,
+          "RMSE": 3.6202,
+          "MAE": 2.765,
+          "MAPE": 58.6064
+        },
+        {
+          "Product_ID": "P0208",
+          "Records": 5,
+          "RMSE": 3.6745,
+          "MAE": 3.482,
+          "MAPE": 128.4033
+        },
+        {
+          "Product_ID": "P0184",
+          "Records": 4,
+          "RMSE": 3.7642,
+          "MAE": 2.8425,
+          "MAPE": 88.9306
+        },
+        {
+          "Product_ID": "P0172",
+          "Records": 5,
+          "RMSE": 3.8842,
+          "MAE": 2.818,
+          "MAPE": 36.903
+        },
+        {
+          "Product_ID": "P0123",
+          "Records": 7,
+          "RMSE": 3.9675,
+          "MAE": 2.96,
+          "MAPE": 38.7194
+        },
+        {
+          "Product_ID": "P0174",
+          "Records": 6,
+          "RMSE": 4.0698,
+          "MAE": 3.385,
+          "MAPE": 111.5833
+        },
+        {
+          "Product_ID": "P0277",
+          "Records": 6,
+          "RMSE": 4.0824,
+          "MAE": 2.9267,
+          "MAPE": 66.9643
+        },
+        {
+          "Product_ID": "P0248",
+          "Records": 4,
+          "RMSE": 4.1287,
+          "MAE": 3.895,
+          "MAPE": 317.125
+        },
+        {
+          "Product_ID": "P0182",
+          "Records": 4,
+          "RMSE": 4.1335,
+          "MAE": 3.775,
+          "MAPE": 49.9444
+        },
+        {
+          "Product_ID": "P0194",
+          "Records": 4,
+          "RMSE": 4.1457,
+          "MAE": 2.8375,
+          "MAPE": 43.9125
+        },
+        {
+          "Product_ID": "P0114",
+          "Records": 7,
+          "RMSE": 4.1585,
+          "MAE": 3.4743,
+          "MAPE": 44.0558
+        },
+        {
+          "Product_ID": "P0204",
+          "Records": 7,
+          "RMSE": 4.1638,
+          "MAE": 3.6514,
+          "MAPE": 74.3626
+        },
+        {
+          "Product_ID": "P0260",
+          "Records": 6,
+          "RMSE": 4.1738,
+          "MAE": 3.9233,
+          "MAPE": 68.3875
+        },
+        {
+          "Product_ID": "P0195",
+          "Records": 5,
+          "RMSE": 4.1947,
+          "MAE": 3.808,
+          "MAPE": 52.96
+        },
+        {
+          "Product_ID": "P0294",
+          "Records": 7,
+          "RMSE": 4.2807,
+          "MAE": 3.47,
+          "MAPE": 45.4951
+        },
+        {
+          "Product_ID": "P0130",
+          "Records": 3,
+          "RMSE": 4.363,
+          "MAE": 3.94,
+          "MAPE": 93.7143
+        },
+        {
+          "Product_ID": "P0282",
+          "Records": 3,
+          "RMSE": 4.4663,
+          "MAE": 3.7967,
+          "MAPE": 42.4815
+        },
+        {
+          "Product_ID": "P0104",
+          "Records": 7,
+          "RMSE": 4.6686,
+          "MAE": 3.7,
+          "MAPE": 43.5283
+        },
+        {
+          "Product_ID": "P0253",
+          "Records": 7,
+          "RMSE": 4.6734,
+          "MAE": 3.3943,
+          "MAPE": 57.1088
+        },
+        {
+          "Product_ID": "P0177",
+          "Records": 7,
+          "RMSE": 4.6904,
+          "MAE": 3.14,
+          "MAPE": 73.1509
+        },
+        {
+          "Product_ID": "P0004",
+          "Records": 6,
+          "RMSE": 4.7278,
+          "MAE": 4.02,
+          "MAPE": 96.4055
+        },
+        {
+          "Product_ID": "P0138",
+          "Records": 6,
+          "RMSE": 4.7336,
+          "MAE": 3.155,
+          "MAPE": 41.6909
+        },
+        {
+          "Product_ID": "P0202",
+          "Records": 7,
+          "RMSE": 4.7696,
+          "MAE": 4.3186,
+          "MAPE": 75.4316
+        },
+        {
+          "Product_ID": "P0205",
+          "Records": 5,
+          "RMSE": 4.8599,
+          "MAE": 4.754,
+          "MAPE": 143.1694
+        },
+        {
+          "Product_ID": "P0009",
+          "Records": 7,
+          "RMSE": 4.8606,
+          "MAE": 3.84,
+          "MAPE": 51.8435
+        },
+        {
+          "Product_ID": "P0269",
+          "Records": 4,
+          "RMSE": 4.925,
+          "MAE": 3.925,
+          "MAPE": 80.8194
+        },
+        {
+          "Product_ID": "P0144",
+          "Records": 4,
+          "RMSE": 5.0081,
+          "MAE": 4.115,
+          "MAPE": 84.375
+        },
+        {
+          "Product_ID": "P0296",
+          "Records": 7,
+          "RMSE": 5.0264,
+          "MAE": 3.5114,
+          "MAPE": 43.6772
+        },
+        {
+          "Product_ID": "P0298",
+          "Records": 6,
+          "RMSE": 5.2518,
+          "MAE": 4.395,
+          "MAPE": 120.6968
+        },
+        {
+          "Product_ID": "P0291",
+          "Records": 7,
+          "RMSE": 5.4229,
+          "MAE": 4.4843,
+          "MAPE": 88.5711
+        },
+        {
+          "Product_ID": "P0186",
+          "Records": 7,
+          "RMSE": 5.5302,
+          "MAE": 4.8729,
+          "MAPE": 135.7175
+        },
+        {
+          "Product_ID": "P0288",
+          "Records": 5,
+          "RMSE": 5.6163,
+          "MAE": 4.026,
+          "MAPE": 52.153
+        },
+        {
+          "Product_ID": "P0206",
+          "Records": 6,
+          "RMSE": 5.6551,
+          "MAE": 4.82,
+          "MAPE": 112.0523
+        },
+        {
+          "Product_ID": "P0196",
+          "Records": 6,
+          "RMSE": 5.6684,
+          "MAE": 4.705,
+          "MAPE": 111.9613
+        },
+        {
+          "Product_ID": "P0293",
+          "Records": 7,
+          "RMSE": 5.7644,
+          "MAE": 4.9857,
+          "MAPE": 51.9835
+        },
+        {
+          "Product_ID": "P0180",
+          "Records": 7,
+          "RMSE": 5.8009,
+          "MAE": 4.3843,
+          "MAPE": 66.1304
+        },
+        {
+          "Product_ID": "P0286",
+          "Records": 7,
+          "RMSE": 5.814,
+          "MAE": 4.49,
+          "MAPE": 55.3253
+        },
+        {
+          "Product_ID": "P0262",
+          "Records": 6,
+          "RMSE": 5.9111,
+          "MAE": 5.4183,
+          "MAPE": 64.7255
+        },
+        {
+          "Product_ID": "P0115",
+          "Records": 2,
+          "RMSE": 5.9358,
+          "MAE": 5.935,
+          "MAPE": 593.5
+        },
+        {
+          "Product_ID": "P0199",
+          "Records": 7,
+          "RMSE": 6.0019,
+          "MAE": 4.6943,
+          "MAPE": 53.1677
+        },
+        {
+          "Product_ID": "P0178",
+          "Records": 7,
+          "RMSE": 6.014,
+          "MAE": 5.1971,
+          "MAPE": 61.0185
+        },
+        {
+          "Product_ID": "P0201",
+          "Records": 7,
+          "RMSE": 6.1845,
+          "MAE": 4.8786,
+          "MAPE": 59.9222
+        },
+        {
+          "Product_ID": "P0203",
+          "Records": 6,
+          "RMSE": 6.201,
+          "MAE": 5.77,
+          "MAPE": 90.6699
+        },
+        {
+          "Product_ID": "P0188",
+          "Records": 4,
+          "RMSE": 6.2208,
+          "MAE": 3.8725,
+          "MAPE": 45.8021
+        },
+        {
+          "Product_ID": "P0169",
+          "Records": 2,
+          "RMSE": 6.2349,
+          "MAE": 6.155,
+          "MAPE": 443.5
+        },
+        {
+          "Product_ID": "P0271",
+          "Records": 7,
+          "RMSE": 6.4332,
+          "MAE": 4.97,
+          "MAPE": 59.1159
+        },
+        {
+          "Product_ID": "P0124",
+          "Records": 7,
+          "RMSE": 6.6112,
+          "MAE": 5.9486,
+          "MAPE": 60.8365
+        },
+        {
+          "Product_ID": "P0166",
+          "Records": 6,
+          "RMSE": 6.72,
+          "MAE": 5.5433,
+          "MAPE": 75.1795
+        },
+        {
+          "Product_ID": "P0183",
+          "Records": 7,
+          "RMSE": 6.7355,
+          "MAE": 5.1943,
+          "MAPE": 54.6962
+        },
+        {
+          "Product_ID": "P0198",
+          "Records": 7,
+          "RMSE": 6.8423,
+          "MAE": 4.6543,
+          "MAPE": 52.3532
+        },
+        {
+          "Product_ID": "P0026",
+          "Records": 4,
+          "RMSE": 6.8846,
+          "MAE": 6.7925,
+          "MAPE": 441.75
+        },
+        {
+          "Product_ID": "P0244",
+          "Records": 3,
+          "RMSE": 7.0305,
+          "MAE": 6.8667,
+          "MAPE": 686.6667
+        },
+        {
+          "Product_ID": "P0125",
+          "Records": 7,
+          "RMSE": 7.1959,
+          "MAE": 6.6529,
+          "MAPE": 75.0414
+        },
+        {
+          "Product_ID": "P0181",
+          "Records": 6,
+          "RMSE": 7.4318,
+          "MAE": 6.5233,
+          "MAPE": 59.0899
+        },
+        {
+          "Product_ID": "P0149",
+          "Records": 5,
+          "RMSE": 7.4871,
+          "MAE": 4.136,
+          "MAPE": 37.63
+        },
+        {
+          "Product_ID": "P0027",
+          "Records": 7,
+          "RMSE": 7.5009,
+          "MAE": 5.7957,
+          "MAPE": 120.9505
+        },
+        {
+          "Product_ID": "P0263",
+          "Records": 7,
+          "RMSE": 8.0632,
+          "MAE": 6.3014,
+          "MAPE": 72.7167
+        },
+        {
+          "Product_ID": "P0164",
+          "Records": 3,
+          "RMSE": 8.1861,
+          "MAE": 5.9233,
+          "MAPE": 274.1111
+        },
+        {
+          "Product_ID": "P0163",
+          "Records": 5,
+          "RMSE": 8.345,
+          "MAE": 8.19,
+          "MAPE": 364.1333
+        },
+        {
+          "Product_ID": "P0247",
+          "Records": 2,
+          "RMSE": 8.4601,
+          "MAE": 8.46,
+          "MAPE": 635.5
+        },
+        {
+          "Product_ID": "P0300",
+          "Records": 7,
+          "RMSE": 8.8771,
+          "MAE": 7.8229,
+          "MAPE": 72.0157
+        },
+        {
+          "Product_ID": "P0142",
+          "Records": 7,
+          "RMSE": 8.947,
+          "MAE": 7.9014,
+          "MAPE": 126.8795
+        },
+        {
+          "Product_ID": "P0185",
+          "Records": 7,
+          "RMSE": 9.1267,
+          "MAE": 6.1114,
+          "MAPE": 85.9797
+        },
+        {
+          "Product_ID": "P0297",
+          "Records": 7,
+          "RMSE": 9.396,
+          "MAE": 8.2271,
+          "MAPE": 77.1748
+        },
+        {
+          "Product_ID": "P0122",
+          "Records": 7,
+          "RMSE": 9.7769,
+          "MAE": 8.2914,
+          "MAPE": 57.0329
+        },
+        {
+          "Product_ID": "P0252",
+          "Records": 5,
+          "RMSE": 9.8619,
+          "MAE": 9.43,
+          "MAPE": 302.3367
+        },
+        {
+          "Product_ID": "P0190",
+          "Records": 6,
+          "RMSE": 10.0021,
+          "MAE": 7.3167,
+          "MAPE": 43.2871
+        },
+        {
+          "Product_ID": "P0193",
+          "Records": 7,
+          "RMSE": 11.1485,
+          "MAE": 8.7371,
+          "MAPE": 68.1941
+        },
+        {
+          "Product_ID": "P0245",
+          "Records": 7,
+          "RMSE": 11.5515,
+          "MAE": 11.2314,
+          "MAPE": 61.4203
+        },
+        {
+          "Product_ID": "P0152",
+          "Records": 7,
+          "RMSE": 11.8611,
+          "MAE": 11.0614,
+          "MAPE": 86.6885
+        },
+        {
+          "Product_ID": "P0147",
+          "Records": 6,
+          "RMSE": 12.2256,
+          "MAE": 7.6083,
+          "MAPE": 66.9965
+        },
+        {
+          "Product_ID": "P0299",
+          "Records": 7,
+          "RMSE": 13.2412,
+          "MAE": 9.7929,
+          "MAPE": 76.3445
+        },
+        {
+          "Product_ID": "P0211",
+          "Records": 7,
+          "RMSE": 14.3041,
+          "MAE": 10.3914,
+          "MAPE": 88.288
+        },
+        {
+          "Product_ID": "P0295",
+          "Records": 7,
+          "RMSE": 32.9067,
+          "MAE": 31.1143,
+          "MAPE": 72.936
+        }
+      ]
+    }
+  }
+}
