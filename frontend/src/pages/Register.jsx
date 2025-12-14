@@ -7,14 +7,15 @@ const API = import.meta.env.VITE_API_URL;
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    acceptterms: false,
-    acceptPrivacy: false,
-  });
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  acceptTerms: false,      // ✅ should match checkbox id
+  acceptPrivacy: false,    // ✅ should match checkbox id
+});
+
   const [showPassword, setShowPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState({
     length: false,
