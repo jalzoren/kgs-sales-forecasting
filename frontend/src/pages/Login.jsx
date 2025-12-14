@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
 
-const API = import.meta.env.VITE_API_URL; // ✅ use environment variable
+const API = import.meta.env.VITE_API_URL; // ✅ use Render backend URL from .env
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,10 +15,9 @@ const Login = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
 
-  // Countdown effect for lockout
+  // Countdown for account lockout
   useEffect(() => {
     if (!isLocked || remainingTime <= 0) return;
-
     const timer = setInterval(() => {
       setRemainingTime((prev) => {
         if (prev <= 1) {
@@ -28,7 +27,6 @@ const Login = () => {
         return prev - 1;
       });
     }, 1000);
-
     return () => clearInterval(timer);
   }, [isLocked, remainingTime]);
 
@@ -51,7 +49,6 @@ const Login = () => {
       return;
     }
 
-    // Show loading alert
     Swal.fire({
       title: "Logging in...",
       html: "Preparing your dashboard",
@@ -63,18 +60,16 @@ const Login = () => {
       const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: "include", // ✅ for cookies/session handling
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
       Swal.close();
 
-      // ✅ SUCCESS
       if (res.ok) {
+        // Login successful
         console.log("🔓 Login successful, initializing session...");
-
-        // Fetch user info + forecast status
         const { forecastStatus } = await SessionManager.initializeSession();
 
         await Swal.fire({
@@ -90,7 +85,7 @@ const Login = () => {
         return;
       }
 
-      // ⚠ ACCOUNT LOCKED
+      // Account locked
       if (res.status === 423) {
         const lockSeconds = data.remainingTime || 60;
         setIsLocked(true);
@@ -117,22 +112,11 @@ const Login = () => {
         return;
       }
 
-      // ❌ WRONG CREDENTIALS
-      if (res.status === 401 || res.status === 409) {
-        Swal.fire({
-          icon: "error",
-          title: "Login Failed",
-          text: data.message || "Invalid email or password",
-          confirmButtonColor: "#001D39",
-        });
-        return;
-      }
-
-      // ❌ OTHER ERRORS
+      // Wrong credentials
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: data.message || "Something went wrong",
+        text: data.message || "Invalid email or password",
         confirmButtonColor: "#001D39",
       });
     } catch (err) {
@@ -150,6 +134,7 @@ const Login = () => {
     <div className="login-wrapper">
       <div className="login-container">
         <h2 className="Title">Log In</h2>
+
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input
