@@ -58,6 +58,8 @@ export default function UploadBox() {
         : fetch(`${API}/data?polling=true`);
       
       const res = await fetch(url, {
+          method: "GET",
+
         credentials: "include",
       });
       
