@@ -7,15 +7,14 @@ const API = import.meta.env.VITE_API_URL;
 
 const Register = () => {
   const [formData, setFormData] = useState({
-  firstName: "",
-  lastName: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-  acceptTerms: false,      // ✅ should match checkbox id
-  acceptPrivacy: false,    // ✅ should match checkbox id
-});
-
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    acceptTerms: false,  // ✅ Fixed: Changed from acceptterms to acceptTerms
+    acceptPrivacy: false,
+  });
   const [showPassword, setShowPassword] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState({
     length: false,
@@ -122,6 +121,12 @@ const Register = () => {
       return;
     }
 
+    // ✅ Added: Check terms and privacy acceptance
+    if (!formData.acceptTerms || !formData.acceptPrivacy) {
+      Swal.fire("Warning", "You must accept Terms & Conditions and Privacy Policy.", "warning");
+      return;
+    }
+
     if (!isPasswordValid) {
       Swal.fire("Error", "Please fix password validation errors.", "error");
       return;
@@ -143,14 +148,20 @@ const Register = () => {
     });
 
     try {
-     const response = await fetch(`${API}/register`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  credentials: "include",
-  body: JSON.stringify(formData),
-});
+      const response = await fetch(`${API}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+      });
 
-      const data = await response.json();
+      // Safely parse JSON
+      let data = {};
+      try {
+        data = await response.json();
+      } catch {
+        console.warn("⚠ Server returned no JSON body.");
+      }
 
       // Close loading alert
       Swal.close();
@@ -162,7 +173,7 @@ const Register = () => {
           text: "Welcome! Let's get started with setting up your forecasting system.",
           confirmButtonColor: "#001D39",
         }).then(() => {
-          navigate("/welcome"); // ✅ Changed from /home to /welcome
+          navigate("/welcome");
         });
       } else {
         Swal.fire({
@@ -173,7 +184,7 @@ const Register = () => {
         });
       }
     } catch (error) {
-      // Close loading alert on error
+      // Close loading alert on network/error
       Swal.close();
       console.error("Error:", error);
       Swal.fire({
@@ -363,20 +374,7 @@ const Register = () => {
             <label htmlFor="showPassword">Show Password</label>
           </div>
 
-          <button
-            type="submit"
-            className="create-btn"
-            disabled={
-              !isPasswordValid ||
-              formData.password !== formData.confirmPassword ||
-              !formData.acceptTerms ||
-              !formData.acceptPrivacy
-            }
-          >
-            Create Account
-          </button>
-
-          {/* Terms and Privacy Checkboxes */}
+          {/* Terms and Privacy Checkboxes - Moved BEFORE the button */}
           <div className="terms-section">
             <div className="checkbox-group">
               <input
@@ -414,6 +412,19 @@ const Register = () => {
               </label>
             </div>
           </div>
+
+          <button
+            type="submit"
+            className="create-btn"
+            disabled={
+              !isPasswordValid ||
+              formData.password !== formData.confirmPassword ||
+              !formData.acceptTerms ||
+              !formData.acceptPrivacy
+            }
+          >
+            Create Account
+          </button>
 
           <a href="/login" className="login">
             Already have an account? Log In Here

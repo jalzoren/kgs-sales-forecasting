@@ -1,78 +1,39 @@
 // backend/config/db.js
-/*
-  Dual-mode database adapter: MySQL (local) or Postgres (Supabase)
-*/
+const axios = require("axios");
 
-const mysql = require("mysql");
-const { Pool } = require("pg");
+const SUPABASE_URL = process.env.SUPABASE_URL; // https://xxxx.supabase.co/rest/v1
+const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
-// Determine which DB to use
-const useSupabaseDb = !!process.env.SUPABASE_DB_URL || process.env.USE_SUPABASE_DB === 'true';
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+  throw new Error("❌ SUPABASE_URL or SUPABASE_KEY is not set in .env");
+}
 
-let db = {};
+const db = {
+  query: async (table, options = {}) => {
+    if (!table) throw new Error("❌ Table name is required");
 
-if (useSupabaseDb) {
-  if (!process.env.SUPABASE_DB_URL) {
-    throw new Error("❌ SUPABASE_DB_URL is required when using Supabase/Postgres mode");
-  }
-
-  const pool = new Pool({
-    connectionString: process.env.SUPABASE_DB_URL,
-    ssl: { rejectUnauthorized: false },
-    // Force IPv4 to avoid ENETUNREACH issues
-    family: 4,
-    idleTimeoutMillis: 30000,
-    connectionTimeoutMillis: 30000,
-  });
-
-  db.query = (text, params, cb) => {
-    if (typeof params === "function") {
-      cb = params;
-      params = [];
-    }
-
-    // Convert MySQL ? placeholders to Postgres $1, $2...
-    const convertPlaceholders = (sql) => {
-      if (!sql || !sql.includes("?")) return sql;
-      let i = 0;
-      return sql.replace(/\?/g, () => {
-        i += 1;
-        return `$${i}`;
-      });
+    const url = `${SUPABASE_URL}/${table}`;
+    const config = {
+      method: options.method || "GET",
+      url,
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: options.prefer || "return=representation", // Supabase default
+      },
+      params: options.params || undefined,
+      data: options.data || undefined,
     };
 
-    const finalSql = convertPlaceholders(text);
-
-    if (cb && typeof cb === "function") {
-      pool
-        .query(finalSql, params)
-        .then((result) => cb(null, result.rows))
-        .catch((err) => cb(err));
-      return;
+    try {
+      const res = await axios(config);
+      return res.data;
+    } catch (err) {
+      console.error("❌ Supabase API query error:", err.response?.data || err.message);
+      throw err;
     }
-
-    return pool.query(finalSql, params).then((r) => r.rows);
-  };
-
-  db.getClient = () => pool;
-
-  console.log("🔌 Database adapter: using Supabase/Postgres (pg, IPv4 forced)");
-
-} else {
-  // MySQL local dev
-  const pool = mysql.createPool({
-    connectionLimit: 10,
-    host: process.env.MYSQL_HOST || "localhost",
-    user: process.env.MYSQL_USER || "root",
-    password: process.env.MYSQL_PASSWORD || "",
-    database: process.env.MYSQL_DATABASE || "kgs",
-  });
-
-  db.query = (sql, params, cb) => pool.query(sql, params, cb);
-
-  db.getPool = () => pool;
-
-  console.log("🔌 Database adapter: using MySQL (mysql)");
-}
+  },
+};
 
 module.exports = db;

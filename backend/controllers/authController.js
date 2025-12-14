@@ -1,11 +1,8 @@
 // controllers/authController.js
-// Hybrid MySQL/PostgreSQL authentication controller
+// login, forgot, verify, and reset password logic
 const bcrypt = require("bcrypt");
 const db = require("../config/db");
 const mailService = require("../services/mailService");
-
-// Helper: Detect if using PostgreSQL or MySQL
-const isPostgres = process.env.USE_SUPABASE_DB === 'true' || !!process.env.SUPABASE_DB_URL;
 
 class AuthController {
   // REGISTER
@@ -32,21 +29,20 @@ class AuthController {
       });
     }
 
+    /*
+    // Add this check after other validations
+    if (!acceptTerms || !acceptPrivacy) {
+      return res.status(400).json({
+        message: "You must accept Terms & Conditions and Privacy Policy",
+      });
+    }*/
+
     try {
       // Check if email already exists
       console.log("🔍 Checking if email exists:", email);
-      
-      const checkEmailSql = isPostgres 
-        ? `SELECT userid FROM "user" WHERE email = $1`
-        : `SELECT userid FROM user WHERE email = ?`;
-      
-      const existingUsers = await new Promise((resolve, reject) => {
-        db.query(checkEmailSql, [email], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
+      const existingUsers = await db.query("user", {
+        params: { email: `eq.${email}` },
       });
-
       console.log("📊 Existing users found:", existingUsers);
 
       if (existingUsers && existingUsers.length > 0) {
@@ -60,43 +56,15 @@ class AuthController {
 
       // Insert new user
       console.log("💾 Inserting new user into database...");
-      
-      let newUser;
-      if (isPostgres) {
-        const insertUserSql = `
-          INSERT INTO "user" (firstname, lastname, email, password) 
-          VALUES ($1, $2, $3, $4) 
-          RETURNING userid, email, firstname, lastname
-        `;
-        newUser = await new Promise((resolve, reject) => {
-          db.query(insertUserSql, [firstName, lastName, email, hashedPassword], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-      } else {
-        // MySQL
-        const insertUserSql = `
-          INSERT INTO user (firstname, lastname, email, password) 
-          VALUES (?, ?, ?, ?)
-        `;
-        const result = await new Promise((resolve, reject) => {
-          db.query(insertUserSql, [firstName, lastName, email, hashedPassword], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-        
-        // Fetch the inserted user
-        const selectSql = `SELECT userid, email, firstname, lastname FROM user WHERE userid = ?`;
-        newUser = await new Promise((resolve, reject) => {
-          db.query(selectSql, [result.insertId], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-      }
-
+      const newUser = await db.query("user", {
+        method: "POST",
+        data: {
+          firstname: firstName,
+          lastname: lastName,
+          email: email,
+          password: hashedPassword,
+        },
+      });
       console.log("✅ User created:", newUser);
 
       if (!newUser || newUser.length === 0) {
@@ -118,10 +86,10 @@ class AuthController {
       });
     } catch (error) {
       console.error("❌ Registration error:", error);
-      console.error("Error details:", error.message);
+      console.error("Error details:", error.response?.data || error.message);
       res.status(500).json({ 
         message: "Server error during registration",
-        error: error.message 
+        error: error.response?.data || error.message 
       });
     }
   }
@@ -134,15 +102,8 @@ class AuthController {
 
     try {
       // Get user by email
-      const getUserSql = isPostgres
-        ? `SELECT userid, email, firstname, lastname, password FROM "user" WHERE email = $1`
-        : `SELECT userid, email, firstname, lastname, password FROM user WHERE email = ?`;
-      
-      const results = await new Promise((resolve, reject) => {
-        db.query(getUserSql, [email], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
+      const results = await db.query("user", {
+        params: { email: `eq.${email}` },
       });
 
       if (!results || results.length === 0) {
@@ -260,40 +221,14 @@ class AuthController {
     const expiry = new Date(Date.now() + 3 * 60000);
 
     try {
-      // Update user with reset code
-      let result;
-      if (isPostgres) {
-        const updateSql = `
-          UPDATE "user" 
-          SET resetcode = $1, codeexpiry = $2 
-          WHERE email = $3 
-          RETURNING userid
-        `;
-        result = await new Promise((resolve, reject) => {
-          db.query(updateSql, [code, expiry.toISOString(), email], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-      } else {
-        const updateSql = `
-          UPDATE user 
-          SET resetcode = ?, codeexpiry = ? 
-          WHERE email = ?
-        `;
-        result = await new Promise((resolve, reject) => {
-          db.query(updateSql, [code, expiry.toISOString(), email], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-        // MySQL doesn't return rows, check affectedRows
-        if (result.affectedRows === 0) {
-          result = [];
-        } else {
-          result = [{ userid: 1 }]; // Dummy to pass length check
-        }
-      }
+      const result = await db.query("user", {
+        method: "PATCH",
+        params: { email: `eq.${email}` },
+        data: {
+          resetcode: code,
+          codeexpiry: expiry.toISOString(),
+        },
+      });
 
       if (!result || result.length === 0) {
         return res.status(404).json({ message: "Email not found" });
@@ -318,16 +253,11 @@ class AuthController {
       return res.status(400).json({ message: "Missing email or code" });
 
     try {
-      // Get reset code and expiry
-      const getUserSql = isPostgres
-        ? `SELECT resetcode, codeexpiry FROM "user" WHERE email = $1`
-        : `SELECT resetcode, codeexpiry FROM user WHERE email = ?`;
-      
-      const results = await new Promise((resolve, reject) => {
-        db.query(getUserSql, [email], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
+      const results = await db.query("user", {
+        params: {
+          email: `eq.${email}`,
+          select: "resetcode,codeexpiry",
+        },
       });
 
       if (!results || results.length === 0) {
@@ -371,40 +301,15 @@ class AuthController {
     try {
       const hashed = await bcrypt.hash(newPassword, 10);
 
-      // Update password and clear reset fields
-      let result;
-      if (isPostgres) {
-        const updateSql = `
-          UPDATE "user" 
-          SET password = $1, resetcode = NULL, codeexpiry = NULL 
-          WHERE email = $2 
-          RETURNING userid
-        `;
-        result = await new Promise((resolve, reject) => {
-          db.query(updateSql, [hashed, email], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-      } else {
-        const updateSql = `
-          UPDATE user 
-          SET password = ?, resetcode = NULL, codeexpiry = NULL 
-          WHERE email = ?
-        `;
-        result = await new Promise((resolve, reject) => {
-          db.query(updateSql, [hashed, email], (err, results) => {
-            if (err) return reject(err);
-            resolve(results);
-          });
-        });
-        // MySQL check
-        if (result.affectedRows === 0) {
-          result = [];
-        } else {
-          result = [{ userid: 1 }];
-        }
-      }
+      const result = await db.query("user", {
+        method: "PATCH",
+        params: { email: `eq.${email}` },
+        data: {
+          password: hashed,
+          resetcode: null,
+          codeexpiry: null,
+        },
+      });
 
       if (!result || result.length === 0) {
         return res.status(404).json({ message: "Email not found" });
