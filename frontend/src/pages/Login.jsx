@@ -5,7 +5,9 @@ import Swal from "sweetalert2";
 import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
 
-const API = import.meta.env.VITE_API_URL; // ✅ use Render backend URL from .env
+// Remove trailing slash if any
+const API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+const LOGIN_API = `${API}/login`;
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,9 +17,10 @@ const Login = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
 
-  // Countdown for account lockout
+  // Countdown for account lock
   useEffect(() => {
     if (!isLocked || remainingTime <= 0) return;
+
     const timer = setInterval(() => {
       setRemainingTime((prev) => {
         if (prev <= 1) {
@@ -27,6 +30,7 @@ const Login = () => {
         return prev - 1;
       });
     }, 1000);
+
     return () => clearInterval(timer);
   }, [isLocked, remainingTime]);
 
@@ -57,20 +61,19 @@ const Login = () => {
     });
 
     try {
-      const res = await fetch(`${API}/login`, {
+      const res = await fetch(LOGIN_API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include", // ✅ for cookies/session handling
+        credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-      Swal.close();
 
       if (res.ok) {
-        // Login successful
         console.log("🔓 Login successful, initializing session...");
         const { forecastStatus } = await SessionManager.initializeSession();
+        Swal.close();
 
         await Swal.fire({
           icon: "success",
@@ -85,7 +88,6 @@ const Login = () => {
         return;
       }
 
-      // Account locked
       if (res.status === 423) {
         const lockSeconds = data.remainingTime || 60;
         setIsLocked(true);
@@ -112,7 +114,6 @@ const Login = () => {
         return;
       }
 
-      // Wrong credentials
       Swal.fire({
         icon: "error",
         title: "Login Failed",
@@ -134,7 +135,6 @@ const Login = () => {
     <div className="login-wrapper">
       <div className="login-container">
         <h2 className="Title">Log In</h2>
-
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input
@@ -177,12 +177,8 @@ const Login = () => {
               : "Login"}
           </button>
 
-          <a href="/forgot" className="forgot">
-            Forgot your password?
-          </a>
-          <a href="/register" className="register">
-            Don't have an account? Register here.
-          </a>
+          <a href="/forgot" className="forgot">Forgot your password?</a>
+          <a href="/register" className="register">Don't have an account? Register here.</a>
         </form>
       </div>
     </div>
