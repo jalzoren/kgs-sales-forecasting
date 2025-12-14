@@ -1,3 +1,4 @@
+// backend/config/sessionConfig.js
 const session = require("express-session");
 
 const sessionConfig = session({

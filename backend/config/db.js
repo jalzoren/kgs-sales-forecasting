@@ -1,3 +1,4 @@
+// backend/config/db.js
 const axios = require("axios");
 
 const SUPABASE_URL = process.env.SUPABASE_URL; // https://xxxx.supabase.co/rest/v1
