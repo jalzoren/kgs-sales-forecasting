@@ -33,7 +33,7 @@ export default function Welcome() {
 
   const checkUserStatus = async (isInitial = false) => {
     try {
-      const res = await fetch(`${API}/api/data?polling=true`, {
+      const res = await fetch(`${API}/data?polling=true`, {
         credentials: "include",
       });
       
@@ -61,7 +61,7 @@ export default function Welcome() {
       // ✅ Check forecast with proper validation
       let hasForecast = false;
       try {
-        const forecastRes = await fetch(`${API}/api/forecast/history`, {
+        const forecastRes = await fetch(`${API}/forecast/history`, {
           credentials: "include",
         });
         
