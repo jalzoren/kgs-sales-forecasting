@@ -6,8 +6,11 @@ import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
 
 // Remove trailing slash if any
-const API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
-const LOGIN_API = `${API}/login`;
+
+
+const LOGIN_API = `${import.meta.env.VITE_API_URL}/login`;
+
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -62,11 +65,11 @@ const Login = () => {
 
     try {
       const res = await fetch(LOGIN_API, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include", // ✅ required for session cookies
+  body: JSON.stringify({ email, password }),
+});
 
       const data = await res.json();
 
