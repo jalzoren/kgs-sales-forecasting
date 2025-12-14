@@ -12,22 +12,16 @@
  *   - Without cache: Login → LoadingCheck = 2-3 API calls (~2000ms)
  *   - With cache: Login → LoadingCheck = 1 API call (~500ms)
  * 
- * CACHE ISOLATION (🆕):
- *   - Navbar has its own cache that's NEVER force-cleared
- *   - Dashboard has its own cache that can be force-refreshed
- *   - Prevents dashboard refresh from breaking navbar dates
- * 
  * USAGE:
  *   - Login.jsx: initializeSession() after successful login
  *   - LoadingCheck.jsx: getForecastStatus() for navigation
  *   - ProtectedRoute.jsx: getForecastStatus() for access control
  *   - UserMenu.jsx: getUserInfo() for display
- *   - Navbar.jsx: getDashboardData(7, false, 'navbar')
- *   - Dashboard.jsx: getDashboardData(days, true, 'dashboard')
+ *   - Navbar.jsx: invalidateForecastCache() after data changes
  * ═══════════════════════════════════════════════════════════════
  */
 
-const API_BASE = import.meta.env.VITE_API_URL; // ✅ backend URL from .env
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // match your frontend env
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const DASHBOARD_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dashboard
 
@@ -40,12 +34,7 @@ class SessionManager {
       userTimestamp: null,
       forecastTimestamp: null,
       
-      // 🆕 SEPARATE CACHES: Navbar and Dashboard
-      // This prevents dashboard refresh from affecting navbar
-      navbar: {
-        data: null,
-        timestamp: null
-      },
+      // Dashboard data cache (by day range)
       dashboard: {
         7: null,
         30: null,
@@ -139,75 +128,45 @@ class SessionManager {
 
   /**
    * ═══════════════════════════════════════════════════════════════
-   * DASHBOARD DATA CACHE WITH SOURCE ISOLATION (🆕 FIXED)
+   * NEW: DASHBOARD DATA CACHE
    * ═══════════════════════════════════════════════════════════════
    */
 
   /**
-   * Get dashboard data with source-based isolation
+   * Get dashboard data (uses cache if fresh)
    * 
    * @param {number} days - Day range (7, 30, or 90)
    * @param {boolean} forceRefresh - Force fetch from API
-   * @param {string} source - 'navbar' or 'dashboard' (determines cache behavior)
    * @returns {Object} Dashboard data
-   * 
-   * CACHE STRATEGY:
-   *   - source='navbar': Uses navbar cache, NEVER affected by forceRefresh
-   *   - source='dashboard': Uses day-based cache, CAN be force-refreshed
-   * 
    * Performance: <10ms (cached) or ~1500ms (first load)
    */
-  async getDashboardData(days = 7, forceRefresh = false, source = 'dashboard') {
+  async getDashboardData(days = 7, forceRefresh = false) {
     // Validate day range
     const validDays = [7, 30, 90];
     if (!validDays.includes(days)) {
       days = 7;
     }
 
-    // 🔒 NAVBAR CACHE: Completely isolated, never force-cleared
-    if (source === 'navbar') {
-      // Check navbar-specific cache
-      if (!forceRefresh && this.isNavbarCacheFresh()) {
-        const age = Math.round((Date.now() - this.cache.navbar.timestamp) / 1000);
-        console.log(`✅ Using cached navbar data (age: ${age}s)`);
-        return this.cache.navbar.data;
-      }
-
-      // Fetch fresh data for navbar
-      console.log(`🔄 Fetching fresh navbar data (${days} days)...`);
-      const data = await this.fetchDashboardData(days);
-      
-      // Cache in navbar-specific slot
-      this.cache.navbar.data = data;
-      this.cache.navbar.timestamp = Date.now();
-      
-      console.log(`✅ Cached navbar data successfully`);
-      return data;
-    }
-
-    // 📊 DASHBOARD CACHE: Day-based, can be force-refreshed
     // Check cache
     if (!forceRefresh && this.isDashboardCacheFresh(days)) {
-      const age = Math.round((Date.now() - this.cache.dashboardTimestamp[days]) / 1000);
-      console.log(`✅ Using cached dashboard data (${days} days, age: ${age}s)`);
+      console.log(`✅ Using cached dashboard data (${days} days)`);
       return this.cache.dashboard[days];
     }
 
     // Fetch fresh data
-    console.log(`🔄 Fetching fresh dashboard data (${days} days, forceRefresh: ${forceRefresh})...`);
+    console.log(`🔄 Fetching fresh dashboard data (${days} days)...`);
     const data = await this.fetchDashboardData(days);
     
-    // Cache the result in day-specific slot
+    // Cache the result
     this.cache.dashboard[days] = data;
     this.cache.dashboardTimestamp[days] = Date.now();
     
-    console.log(`✅ Cached dashboard data (${days} days) successfully`);
     return data;
   }
 
   /**
    * Invalidate dashboard cache (call after data upload or forecast generation)
-   * Clears ONLY dashboard caches, NOT navbar cache
+   * Clears all day ranges
    */
   invalidateDashboardCache() {
     console.log("🔄 Invalidating dashboard cache (all ranges)...");
@@ -221,17 +180,6 @@ class SessionManager {
       30: null,
       90: null
     };
-    // 🔒 Navbar cache is NOT cleared here
-  }
-
-  /**
-   * Invalidate navbar cache (call after data upload if needed)
-   * Rarely used - navbar cache usually stays valid
-   */
-  invalidateNavbarCache() {
-    console.log("🔄 Invalidating navbar cache...");
-    this.cache.navbar.data = null;
-    this.cache.navbar.timestamp = null;
   }
 
   /**
@@ -246,9 +194,6 @@ class SessionManager {
     
     // Also invalidate dashboard cache
     this.invalidateDashboardCache();
-    
-    // 🆕 ALSO invalidate navbar cache when forecast changes
-    this.invalidateNavbarCache();
   }
 
   /**
@@ -261,10 +206,6 @@ class SessionManager {
       forecastStatus: null,
       userTimestamp: null,
       forecastTimestamp: null,
-      navbar: {
-        data: null,
-        timestamp: null
-      },
       dashboard: {
         7: null,
         30: null,
@@ -295,19 +236,6 @@ class SessionManager {
   }
 
   /**
-   * 🆕 Check if navbar cache is fresh
-   * Private helper method
-   */
-  isNavbarCacheFresh() {
-    if (!this.cache.navbar.data || !this.cache.navbar.timestamp) {
-      return false;
-    }
-
-    const age = Date.now() - this.cache.navbar.timestamp;
-    return age < DASHBOARD_CACHE_DURATION;
-  }
-
-  /**
    * Check if dashboard cache is fresh for a specific day range
    * Private helper method
    */
@@ -324,70 +252,38 @@ class SessionManager {
    * Fetch user info from API
    * Private helper method
    */
-  async fetchUserInfo() {
-    try {
-      const response = await fetch(`${API_BASE}/api/check-session`, {
-        credentials: "include"
-      });
-
-      if (!response.ok) {
-        throw new Error("Not authenticated");
-      }
-
-      const data = await response.json();
-      
-      if (!data.loggedIn || !data.user) {
-        throw new Error("No user session");
-      }
-
-      return data.user;
-    } catch (err) {
-      console.error("❌ Failed to fetch user info:", err);
-      throw err;
-    }
+async fetchUserInfo() {
+  try {
+    const res = await fetch(`${API_BASE}/check-session`, { credentials: "include" }); // ✅ remove /api if backend has none
+    if (!res.ok) throw new Error("Not authenticated");
+    const data = await res.json();
+    if (!data.loggedIn || !data.user) throw new Error("No user session");
+    return data.user;
+  } catch (err) {
+    console.error("❌ Failed to fetch user info:", err);
+    throw err;
   }
+}
+
 
   /**
    * Fetch forecast status from API
    * Private helper method
    */
-  async fetchForecastStatus() {
-    try {
-      const response = await fetch(`${API_BASE}/api/forecast/status`, {
-        credentials: "include"
-      });
-
-      // ✅ Handle 404 gracefully (no forecasts yet)
-      if (response.status === 404) {
-        return {
-          hasForecast: false,
-          forecastCount: 0,
-          latestForecast: null
-        };
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const data = await response.json();
-      // Temporary debug: log raw dashboard response to help diagnose overwrites
-      try {
-        console.log('📦 SessionManager.fetchDashboardData raw response:', { days, success: data?.success, metrics_exists: !!data?.metrics });
-      } catch (e) {
-        // ignore logging errors
-      }
-      return data;
-    } catch (err) {
-      console.error("❌ Failed to fetch forecast status:", err);
-      // Return default "no forecast" status instead of throwing
-      return {
-        hasForecast: false,
-        forecastCount: 0,
-        latestForecast: null
-      };
-    }
+async fetchForecastStatus() {
+  try {
+    const res = await fetch(`${API_BASE}/api/forecast/status`, {
+  credentials: "include"
+});
+ // ✅ adjust path
+    if (res.status === 404) return { hasForecast: false, forecastCount: 0, latestForecast: null };
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.json();
+  } catch (err) {
+    console.error("❌ Failed to fetch forecast status:", err);
+    return { hasForecast: false, forecastCount: 0, latestForecast: null };
   }
+}
 
   /**
    * Fetch dashboard data from API
@@ -432,12 +328,6 @@ class SessionManager {
         cached: !!this.cache.forecastStatus,
         age: this.cache.forecastTimestamp
           ? Math.round((now - this.cache.forecastTimestamp) / 1000) + 's'
-          : 'N/A'
-      },
-      navbar: {
-        cached: !!this.cache.navbar.data,
-        age: this.cache.navbar.timestamp
-          ? Math.round((now - this.cache.navbar.timestamp) / 1000) + 's'
           : 'N/A'
       },
       dashboard: {
