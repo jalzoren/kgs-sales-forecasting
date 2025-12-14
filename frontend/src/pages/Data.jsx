@@ -54,8 +54,8 @@ export default function UploadBox() {
 
     try {
       const url = showLoading 
-        ? fetch(`${API}/api/data`)
-        : fetch(`${API}api/data?polling=true`);
+        ? fetch(`${API}/data`)
+        : fetch(`${API}/data?polling=true`);
       
       const res = await fetch(url, {
         credentials: "include",
@@ -153,7 +153,7 @@ export default function UploadBox() {
     });
 
     try {
-      const res = await fetch(`${API}/api/data/upload`, {
+      const res = await fetch(`${API}/data/upload`, {
         method: "POST",
         credentials: "include",
         body: formData,
@@ -196,7 +196,7 @@ export default function UploadBox() {
         let progressNotifId = null;
         const poll = async () => {
           try {
-            const statusRes = await fetch(`${API}/api/data/preprocess-status`,
+            const statusRes = await fetch(`${API}/data/preprocess-status`,
               {
                 credentials: "include",
               }
@@ -276,7 +276,7 @@ export default function UploadBox() {
           let trainingNotifId = null;
           const pollTraining = async () => {
             try {
-              const trainingStatusRes = await fetch(`${API}/api/data/training-status`,
+              const trainingStatusRes = await fetch(`${API}/data/training-status`,
                 {
                   credentials: "include",
                 }
@@ -408,7 +408,7 @@ export default function UploadBox() {
     if (!confirmDelete.isConfirmed) return;
 
     try {
-      const res = await fetch(`${API}api/data/${id}`, {
+      const res = await fetch(`${API}/data/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
