@@ -31,15 +31,6 @@ app.use(cors({
 // =======================
 app.set("trust proxy", 1); // Required behind proxy (Render)
 app.use(sessionConfig);
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true, // true if using HTTPS
-    sameSite: "none", // needed for cross-site cookies
-  },
-}));
 
 
 // =======================
