@@ -55,7 +55,7 @@ app.use("/api/forecast/status", forecastRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 // Other data/analytics/home routes
-app.use("/", dataRoutes);
+app.use("/api", dataRoutes);
 app.use("/", analyticsRoutes);
 app.use("/", homeRoutes);
 
