@@ -8,7 +8,7 @@ const sessionConfig = session({
   saveUninitialized: false,
   proxy: true,
  cookie: {
-  secure: true, // only secure in prod
+  secure: process.env.NODE_ENV === "production", // only secure in prod
   httpOnly: true,
   sameSite: "none",
   maxAge: 1000 * 60 * 30

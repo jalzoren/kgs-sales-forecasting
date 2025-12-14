@@ -53,15 +53,11 @@ export default function UploadBox() {
     }
 
     try {
-      const url = showLoading 
-        ? fetch(`${API}/data`)
-        : fetch(`${API}/data?polling=true`);
-      
-      const res = await fetch(url, {
-          method: "GET",
-
-        credentials: "include",
-      });
+     const url = showLoading ? `${API}/data` : `${API}/data?polling=true`;
+const res = await fetch(url, {
+  method: "GET",
+  credentials: "include",
+});
       
       if (res.status === 401) {
         if (showLoading && isInitialLoad) {
@@ -201,6 +197,7 @@ export default function UploadBox() {
             const statusRes = await fetch(`${API}/data/preprocess-status`,
               {
                 credentials: "include",
+                
               }
             );
             if (!statusRes.ok) return;

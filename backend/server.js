@@ -20,12 +20,9 @@ const PORT = process.env.PORT || 5000;
 // CORS (RENDER SAFE)
 // =======================
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production'
-          ? process.env.FRONTEND_URL_PROD
-          : process.env.FRONTEND_URL,
-  credentials: true,
+  origin: "https://your-frontend-url.onrender.com", // frontend URL
+  credentials: true
 }));
-
 // =======================
 // Sessions
 // =======================
