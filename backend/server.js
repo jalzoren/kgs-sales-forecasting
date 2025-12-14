@@ -20,14 +20,14 @@ const PORT = process.env.PORT || 5000;
 // CORS (RENDER SAFE)
 // =======================
 app.use(cors({
-  origin: process.env.VITE_API_BASE_URL,
-  credentials: true
+  origin: process.env.VITE_API_BASE_URL, // frontend URL
+  credentials: true,                     // allow cookies
 }));
 
 // =======================
 // Sessions
 // =======================
-app.set("trust proxy", 1); // ✅ REQUIRED
+app.set("trust proxy", 1); // Required behind proxy (Render)
 app.use(sessionConfig);
 
 // =======================
@@ -43,17 +43,24 @@ app.use("/files", express.static(path.join(__dirname, "files")));
 // =======================
 // Routes
 // =======================
+// Auth routes
 app.use("/api", authRoutes);
-app.use("/", dataRoutes);
+
+// Forecast routes
 app.use("/api/forecast", forecastRoutes);
-app.use("/", analyticsRoutes);
-app.use("/", homeRoutes);
+
+// Notifications routes
 app.use("/api/notifications", notificationRoutes);
 
+// Other data/analytics/home routes
+app.use("/", dataRoutes);
+app.use("/", analyticsRoutes);
+app.use("/", homeRoutes);
+
 // =======================
-// SESSION CHECK (MATCH FRONTEND)
+// SESSION CHECK
 // =======================
-app.get("/check-session", (req, res) => {
+app.get("/api/check-session", (req, res) => {
   if (req.session?.user) {
     return res.json({ loggedIn: true, user: req.session.user });
   }
@@ -68,7 +75,7 @@ app.get("/", (req, res) => {
 });
 
 // =======================
-// START SERVER (NO DB TEST)
+// START SERVER
 // =======================
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
