@@ -20,7 +20,7 @@ const PORT = process.env.PORT || 5000;
 // CORS (RENDER SAFE)
 // =======================
 app.use(cors({
-  origin: "https://your-frontend-url.onrender.com", // frontend URL
+  origin: "https://kgs-sales-forecasting-frontend.onrender.com", // frontend URL
   credentials: true
 }));
 // =======================
