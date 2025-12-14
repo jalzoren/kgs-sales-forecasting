@@ -61,7 +61,7 @@ export default function Welcome() {
       // ✅ Check forecast with proper validation
       let hasForecast = false;
       try {
-        const forecastRes = await fetch(`${API}/forecast/history`, {
+        const forecastRes = await fetch(`${API}/api/forecast/history`, {
           credentials: "include",
         });
         
