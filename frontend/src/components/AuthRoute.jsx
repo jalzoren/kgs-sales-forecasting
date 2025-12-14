@@ -1,6 +1,7 @@
 // frontend/src/components/AuthRoute.jsx
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
+const API = import.meta.env.VITE_API_URL;
 
 export default function AuthRoute({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
@@ -13,7 +14,7 @@ export default function AuthRoute({ children }) {
   const checkAuth = async () => {
     try {
       // ✅ Use your existing check-session endpoint
-      const res = await fetch("http://localhost:5000/check-session", {
+      const res = await fetch(`${API}/check-session`, {
         credentials: "include",
       });
       
