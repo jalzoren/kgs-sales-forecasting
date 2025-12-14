@@ -17,44 +17,39 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // =======================
-// CORS (RENDER SAFE)
+// CORS (LOCAL + PROD SAFE)
 // =======================
 const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  process.env.FRONTEND_URL_PROD
+  process.env.FRONTEND_URL,       // Local
+  process.env.FRONTEND_URL_PROD   // Production
 ].filter(Boolean);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow server-to-server tools
+    // Allow server-to-server tools or mobile apps with no origin
     if (!origin) return callback(null, true);
 
-    // ✅ Allow ALL localhost ports in development
-    if (
-      process.env.NODE_ENV !== "production" &&
-      origin.startsWith("http://localhost")
-    ) {
-      return callback(null, true);
-    }
+    // Allow localhost in development
+    if (origin.startsWith("http://localhost")) return callback(null, true);
 
-    // ✅ Allow production frontend
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+    // Allow production frontend (exact match)
+    if (allowedOrigins.some(o => o === origin || o + "/" === origin)) return callback(null, true);
 
-    // ❌ DO NOT THROW — just deny silently
-    return callback(null, false);
+    // Deny all others
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+// ✅ Handle OPTIONS requests globally
+app.options("*", cors());
 
 // =======================
 // Sessions
 // =======================
-app.set("trust proxy", 1); // ✅ REQUIRED
+app.set("trust proxy", 1); // REQUIRED for secure cookies on Render
 app.use(sessionConfig);
 
 // =======================
@@ -78,7 +73,7 @@ app.use("/", homeRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 // =======================
-// SESSION CHECK (MATCH FRONTEND)
+// SESSION CHECK
 // =======================
 app.get("/check-session", (req, res) => {
   if (req.session?.user) {
@@ -95,7 +90,7 @@ app.get("/", (req, res) => {
 });
 
 // =======================
-// START SERVER (NO DB TEST)
+// START SERVER
 // =======================
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
