@@ -294,8 +294,7 @@ async fetchForecastStatus() {
    */
   async fetchDashboardData(days) {
     try {
-      const response = await fetch(
-        `${API_BASE}/api/home/dashboard?days=${days}`,
+      const response = await fetch(`${API_BASE}/home/dashboard?days=${days}`,
         { credentials: "include" }
       );
 

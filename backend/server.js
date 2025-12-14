@@ -49,7 +49,7 @@ app.use("/files", express.static(path.join(__dirname, "files")));
 app.use("/api", authRoutes);
 
 // Forecast routes
-app.use("/api/forecast", forecastRoutes);
+app.use("/api/forecast/status", forecastRoutes);
 
 // Notifications routes
 app.use("/api/notifications", notificationRoutes);
