@@ -1,19 +1,17 @@
-// backend/config/sessionConfig.js
 const session = require("express-session");
 
-const sessionConfig = session({
+module.exports = session({
   name: "sid",
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  proxy: true,
- cookie: {
-  secure: process.env.NODE_ENV === "production", // only secure in prod
-  httpOnly: true,
-  sameSite: "none",
-  maxAge: 1000 * 60 * 30
-}
 
+  proxy: true, // REQUIRED on Render
+
+  cookie: {
+    httpOnly: true,
+    secure: true,        // REQUIRED for HTTPS
+    sameSite: "none",    // REQUIRED for cross-origin
+    maxAge: 1000 * 60 * 60 * 24, // 1 day
+  },
 });
-
-module.exports = sessionConfig;
