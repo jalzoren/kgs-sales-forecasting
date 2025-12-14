@@ -27,7 +27,7 @@
  * ═══════════════════════════════════════════════════════════════
  */
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL; // ✅ backend URL from .env
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const DASHBOARD_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dashboard
 
