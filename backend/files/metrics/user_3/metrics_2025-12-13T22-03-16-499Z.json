@@ -1,0 +1,352 @@
+{
+  "user_id": 3,
+  "timestamp": "2025-12-13T22:03:14.697Z",
+  "predicted_sales": {
+    "7": {
+      "label": "Predicted Sales (Forecasting 2024/12/22 – 2025/11/16)",
+      "total_revenue": 574528.54,
+      "date_range": {
+        "start": "2024/12/22",
+        "end": "2025/11/16"
+      }
+    },
+    "30": {
+      "label": "Predicted Sales (Forecasting 2024/12/22 – 2025/12/09)",
+      "total_revenue": 3052428.3500000103,
+      "date_range": {
+        "start": "2024/12/22",
+        "end": "2025/12/09"
+      }
+    },
+    "90": {
+      "label": "Predicted Sales (Forecasting 2024/12/22 – 2026/02/07)",
+      "total_revenue": 9380887.390000045,
+      "date_range": {
+        "start": "2024/12/22",
+        "end": "2026/02/07"
+      }
+    }
+  },
+  "actual_sales": {
+    "label": "Actual Sales (Sales Data 1970/01/01 – 1970/01/01)",
+    "total_revenue": 0,
+    "date_range": {
+      "start": "1970/01/01",
+      "end": "1970/01/01"
+    }
+  },
+  "forecast_accuracy": {
+    "7": {
+      "status": "not_available",
+      "accuracy_percent": null,
+      "wmape": null,
+      "forecasted_on": null,
+      "evaluated_on": null,
+      "reason": null
+    },
+    "30": {
+      "status": "not_available",
+      "accuracy_percent": null,
+      "wmape": null,
+      "forecasted_on": null,
+      "evaluated_on": null,
+      "reason": null
+    },
+    "90": {
+      "status": "not_available",
+      "accuracy_percent": null,
+      "wmape": null,
+      "forecasted_on": null,
+      "evaluated_on": null,
+      "reason": null
+    }
+  },
+  "inventory_alerts": {
+    "alert_count": 47,
+    "products": [
+      {
+        "product_id": "P0295",
+        "product_name": "Pepero Almond",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0252",
+        "product_name": "Lotte Banana Choco Pie 12Pcs",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0163",
+        "product_name": "Samyang Buldak Rose 140g",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0164",
+        "product_name": "Samyang Buldak 4 Cheese 145g",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0247",
+        "product_name": "Choco Pie Green Tea 12Pcs",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0245",
+        "product_name": "Honey Butter Almond 190g",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0244",
+        "product_name": "Wasabi Almond 190g",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0208",
+        "product_name": "Ottogi Jin Ramen Mild",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0166",
+        "product_name": "Samyang Buldak Original",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0190",
+        "product_name": "Nongshim Tempura Udon Cup",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0026",
+        "product_name": "Yopokki Sweet & Spicy 280g",
+        "category": "Dry Food",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0169",
+        "product_name": "Samyang Buldak Stew Type 145g",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0203",
+        "product_name": "Jin Ramen Spicy Cup",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0282",
+        "product_name": "Orion Choco Boy",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0211",
+        "product_name": "Ottogi Jin Ramen Hot",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0248",
+        "product_name": "Choco Pie Black Sugar 12Pcs",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0186",
+        "product_name": "Ottogi Chachelin Blackbean 145g",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0027",
+        "product_name": "Yopokki Cheese 240g",
+        "category": "Dry Food",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0202",
+        "product_name": "Nongshim Ansung Tangmen",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0115",
+        "product_name": "Strawberry Milk 200mL 6Pcs",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0177",
+        "product_name": "Ottogi Beef Seaweed Soup Ramen",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0293",
+        "product_name": "Lotte Sand Biscuit",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0031",
+        "product_name": "Yopokki Cheese Cup 120g",
+        "category": "Dry Food",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0294",
+        "product_name": "Pepero Strawberry",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0047",
+        "product_name": "Dongwon Spicy Tuna",
+        "category": "Dry Food",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0142",
+        "product_name": "Nongshim Welchs White Grape 355mL",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0296",
+        "product_name": "Lotte Cereal Choco",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0139",
+        "product_name": "Paldo Pororo Juice",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0125",
+        "product_name": "Jinro Fresh Soju",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0291",
+        "product_name": "Crown Sando Biscuit",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0187",
+        "product_name": "Paldo Bibim Men",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0071",
+        "product_name": "Kongsarang Firm Tofu",
+        "category": "Food Fresh/Meat/Sidedish",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0152",
+        "product_name": "Samyang Buldak Original Cup",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0287",
+        "product_name": "Nongshim Banana Kick 75g",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0297",
+        "product_name": "Pepero Choco Filled",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0298",
+        "product_name": "Pepero White Cookie",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0192",
+        "product_name": "Nongshim Soon Veggie Ramen",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0179",
+        "product_name": "Ottogi Ramen Bokki Cup",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0141",
+        "product_name": "Woongjin Yogurt Apple 340mL",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0124",
+        "product_name": "Terra Lager Beer 500mL",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0145",
+        "product_name": "Binggrae Melon Soda",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0153",
+        "product_name": "Samyang Buldak Cheese Cup",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0146",
+        "product_name": "Binggrae Yogurt Drink",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0151",
+        "product_name": "Samyang Buldak 4 Cheese Ramen 110g",
+        "category": "Noodles",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0290",
+        "product_name": "Doritos Galbi Chicken",
+        "category": "Snacks",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0140",
+        "product_name": "Woongjin Yogurt Peach 340mL",
+        "category": "Liquor/Beverage",
+        "demand_level": "HIGH DEMAND"
+      },
+      {
+        "product_id": "P0048",
+        "product_name": "Dongwon Light Tuna",
+        "category": "Dry Food",
+        "demand_level": "HIGH DEMAND"
+      }
+    ]
+  },
+  "computed_at": "2025-12-13"
+}

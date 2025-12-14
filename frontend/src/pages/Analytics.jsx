@@ -352,11 +352,7 @@ export default function Analytics() {
                   <strong>Total Forecasted Units:</strong> {forecastData.reduce((sum, d) => sum + (parseFloat(d.forecasted) || 0), 0).toLocaleString()}
                 </p>
               </div>
-              <div className="analytics-metrics-charts">
-                {renderCircularChart("Total Products")}
-                {renderCircularChart("Categories")}
-                {renderCircularChart("Forecast Accuracy")}
-              </div>
+            
             </div>
 
             {/* Line Chart */}

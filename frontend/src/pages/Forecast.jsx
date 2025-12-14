@@ -154,7 +154,6 @@ const ForecastTableRow = ({ file, onView, onDownload, onReforecast, onArchive })
         {file.status}
       </span>
     </td>
-    <td>{file.accuracy}</td>
     <td className="actions">
       {file.fileName ? (
         <>
@@ -221,7 +220,6 @@ const ForecastTable = ({ forecasts, onView, onDownload, onReforecast, onArchive 
           <th>Scope</th>
           <th>Date</th>
           <th>Status</th>
-          <th>Accuracy</th>
           <th>Actions</th>
         </tr>
       </thead>

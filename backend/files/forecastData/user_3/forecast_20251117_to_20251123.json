@@ -2,7 +2,7 @@
     "status": "success",
     "user_id": "3",
     "forecast_file": "D:\\kgs-sales-forecasting\\ml-service\\../backend/files/forecastData\\user_3\\forecast_week_20251117_to_20251123_generated_20251214.xlsx",
-    "generated_date": "2025-12-14 00:20:41",
+    "generated_date": "2025-12-14 06:29:51",
     "forecast_period": {
         "start": "2025-11-17",
         "end_7d": "2025-11-23",

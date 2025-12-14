@@ -137,7 +137,8 @@ class NavbarStatsCalculator {
           stats.variance = data.stats.variance;
         }
         
-        stats.forecastAccuracyTooltip = `Forecast created on ${accuracy.forecasted_on || 'N/A'}. Variance: ${stats.variance >= 0 ? '+' : ''}${stats.variance}%`;
+        // Enhanced tooltip with accuracy legend
+        stats.forecastAccuracyTooltip = this.buildAccuracyTooltip(stats.forecastAccuracy, stats.forecastedOnDate, stats.variance);
       } else {
         // Not available yet - use backend-provided stats as fallback
         if (data.stats) {
@@ -168,6 +169,38 @@ class NavbarStatsCalculator {
     if (accuracy >= 80) return "green";
     if (accuracy >= 60) return "yellow";
     return "red";
+  }
+
+  // Get accuracy status with legend
+  static getAccuracyStatus(accuracy) {
+    if (accuracy >= 80) {
+      return {
+        emoji: "🟢",
+        status: "Good Accuracy",
+        range: "80% – 100%",
+        description: "Forecast closely matches historical sales. Low revenue deviation. Model is reliable for planning and inventory decisions."
+      };
+    } else if (accuracy >= 60) {
+      return {
+        emoji: "🟡",
+        status: "Moderate Accuracy",
+        range: "60% – 79%",
+        description: "Forecast captures the general trend. Some accumulated error exists. Suitable for trend analysis, but requires monitoring."
+      };
+    } else {
+      return {
+        emoji: "🔴",
+        status: "Low Accuracy",
+        range: "Below 60%",
+        description: "High deviation between forecast and actual sales. Often caused by demand shocks, promotions, or sparse data. Forecast should be used with caution."
+      };
+    }
+  }
+
+  // Build enhanced tooltip with legend
+  static buildAccuracyTooltip(accuracy, forecastedOn, variance) {
+    const status = this.getAccuracyStatus(accuracy);
+    return `${status.emoji} ${status.status} (${status.range})\n${status.description}\n\nForecast created on: ${forecastedOn || 'N/A'}\nVariance: ${variance >= 0 ? '+' : ''}${variance}%`;
   }
 }
 
@@ -333,7 +366,15 @@ function Navbar() {
         <div className="stat-item">
           <div className="stat-header">
             <h4>Forecast Accuracy</h4>
-            <div className="info-icon-wrapper" title={stats.forecastAccuracyTooltip}>
+            <div
+              className="info-icon-wrapper"
+              title={`Forecast Accuracy Legend:
+🟢 80–100%  Good
+🟡 60–79%   Moderate
+🔴 < 60%    Low
+
+Calculated using historical data only (future forecasts are not evaluated).`}
+            >
               <IoInformationCircleOutline className="info-icon" />
             </div>
           </div>
