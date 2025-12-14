@@ -19,22 +19,26 @@ const PORT = process.env.PORT || 5000;
 // =======================
 // CORS (RENDER SAFE)
 // =======================
+
+app.set("trust proxy", 1); // Required behind proxy (Render)
+
 app.use(cors({
   origin: "https://kgs-sales-forecasting-frontend.onrender.com",
   credentials: true,
 }));
 
+
+app.use(express.json());
+
 // =======================
 // Sessions
 // =======================
-app.set("trust proxy", 1); // Required behind proxy (Render)
 app.use(sessionConfig);
 
 
 // =======================
 // Body parser
 // =======================
-app.use(express.json());
 
 // =======================
 // Static files
