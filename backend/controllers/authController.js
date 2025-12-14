@@ -8,8 +8,7 @@ class AuthController {
   // REGISTER
   // =========================
   async register(req, res) {
-    const { firstName, lastName, email, password, confirmPassword, acceptTerms, acceptPrivacy } = req.body;
-
+    const { firstName, lastName, email, password, confirmPassword } = req.body;
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
 
@@ -17,11 +16,9 @@ class AuthController {
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
-
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
-
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         message:
@@ -29,21 +26,9 @@ class AuthController {
       });
     }
 
-    if (!acceptTerms || !acceptPrivacy) {
-      return res.status(400).json({
-        message: "You must accept Terms & Conditions and Privacy Policy",
-      });
-    }
-
     try {
-      const usingPostgres = process.env.USE_SUPABASE_DB === "true";
-      const tableName = usingPostgres ? '"user"' : "user";
-
       // Check if email exists
-      const checkQuery = usingPostgres
-        ? `SELECT * FROM ${tableName} WHERE email = $1`
-        : `SELECT * FROM ${tableName} WHERE email = ?`;
-      const existing = await db.query(checkQuery, [email]);
+      const existing = await db.query('SELECT * FROM "user" WHERE email = $1', [email]);
       if (existing.length > 0) {
         return res.status(409).json({ message: "Email already registered" });
       }
@@ -52,23 +37,25 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert new user
-      const insertQuery = usingPostgres
-        ? `INSERT INTO ${tableName} (firstname, lastname, email, password) VALUES ($1, $2, $3, $4) RETURNING userid`
-        : `INSERT INTO ${tableName} (firstName, lastName, email, password) VALUES (?, ?, ?, ?)`;
+      const insertQuery = `
+        INSERT INTO "user" (firstname, lastname, email, password)
+        VALUES ($1, $2, $3, $4)
+        RETURNING userid, firstname, lastname, email
+      `;
       const result = await db.query(insertQuery, [firstName, lastName, email, hashedPassword]);
 
       // Auto-login
       req.session.user = {
-        id: usingPostgres ? result[0].userid : result.insertId,
-        firstName,
-        lastName,
-        email,
+        id: result[0].userid,
+        firstName: result[0].firstname,
+        lastName: result[0].lastname,
+        email: result[0].email,
       };
 
       res.json({ message: "Account created successfully!", user: req.session.user });
     } catch (err) {
       console.error("Registration error:", err);
-      res.status(500).json({ message: "Server error during registration" });
+      res.status(500).json({ message: "Server error during registration", error: err.message });
     }
   }
 
@@ -80,45 +67,28 @@ class AuthController {
     if (!email || !password) return res.status(400).json({ message: "Missing email or password" });
 
     try {
-      const usingPostgres = process.env.USE_SUPABASE_DB === "true";
-      const tableName = usingPostgres ? '"user"' : "user";
-
-      const selectQuery = usingPostgres
-        ? `SELECT * FROM ${tableName} WHERE email = $1`
-        : `SELECT * FROM ${tableName} WHERE email = ?`;
-
-      const users = await db.query(selectQuery, [email]);
+      const users = await db.query('SELECT * FROM "user" WHERE email = $1', [email]);
       if (users.length === 0) return res.status(404).json({ message: "User not found" });
 
       const user = users[0];
 
-      // Login attempts/session lock
+      // Initialize session attempts
       if (!req.session.loginAttempts) req.session.loginAttempts = 0;
       if (!req.session.lockUntil) req.session.lockUntil = null;
-
       const now = new Date();
 
+      // Account lock check
       if (req.session.lockUntil && now < req.session.lockUntil) {
         const remainingTime = Math.ceil((req.session.lockUntil - now) / 1000);
-        const minutes = Math.floor(remainingTime / 60);
-        const seconds = remainingTime % 60;
-        return res.status(423).json({
-          message: `Account locked. Try again in ${minutes}:${seconds.toString().padStart(2, "0")}.`,
-          remainingTime,
-        });
-      }
-
-      if (req.session.lockUntil && now >= req.session.lockUntil) {
-        req.session.loginAttempts = 0;
-        req.session.lockUntil = null;
+        return res.status(423).json({ message: `Account locked. Try again in ${remainingTime} seconds.` });
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         req.session.loginAttempts += 1;
         if (req.session.loginAttempts >= 3) {
-          req.session.lockUntil = new Date(now.getTime() + 60000); // lock 1 min
-          return res.status(423).json({ message: "Too many failed attempts. Account locked for 1 minute.", remainingTime: 60 });
+          req.session.lockUntil = new Date(now.getTime() + 60000); // 1 min
+          return res.status(423).json({ message: "Too many failed attempts. Account locked for 1 minute." });
         }
         return res.status(401).json({ message: `Invalid password. ${3 - req.session.loginAttempts} attempts remaining.` });
       }
@@ -126,18 +96,17 @@ class AuthController {
       // Successful login
       req.session.loginAttempts = 0;
       req.session.lockUntil = null;
-
       req.session.user = {
-        id: user.userid || user.id,
-        firstName: user.firstname || user.firstName,
-        lastName: user.lastname || user.lastName,
+        id: user.userid,
+        firstName: user.firstname,
+        lastName: user.lastname,
         email: user.email,
       };
 
       res.json({ message: "Login successful", user: req.session.user });
     } catch (err) {
       console.error("Login error:", err);
-      res.status(500).json({ message: "Server error during login" });
+      res.status(500).json({ message: "Server error during login", error: err.message });
     }
   }
 
@@ -172,18 +141,15 @@ class AuthController {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: "Email required" });
 
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 3 * 60000); // 3 min
+
     try {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      const expiry = new Date(Date.now() + 3 * 60000);
-      const usingPostgres = process.env.USE_SUPABASE_DB === "true";
-      const tableName = usingPostgres ? '"user"' : "user";
-
-      const updateQuery = usingPostgres
-        ? `UPDATE ${tableName} SET resetcode=$1, codeexpiry=$2 WHERE email=$3`
-        : `UPDATE ${tableName} SET resetCode=?, codeExpiry=? WHERE email=?`;
-
-      const result = await db.query(updateQuery, [code, expiry, email]);
-      if ((result.rowCount || result.affectedRows) === 0) return res.status(404).json({ message: "Email not found" });
+      const update = await db.query(
+        'UPDATE "user" SET resetcode = $1, codeexpiry = $2 WHERE email = $3 RETURNING userid',
+        [code, expiry, email]
+      );
+      if (update.length === 0) return res.status(404).json({ message: "Email not found" });
 
       const emailSent = await mailService.sendResetCode(email, code);
       if (!emailSent) return res.status(500).json({ message: "Failed to send email" });
@@ -191,7 +157,7 @@ class AuthController {
       res.json({ message: "OTP sent to your email" });
     } catch (err) {
       console.error("Forgot password error:", err);
-      res.status(500).json({ message: "Server error during forgot password" });
+      res.status(500).json({ message: "Server error during forgot password", error: err.message });
     }
   }
 
@@ -203,25 +169,21 @@ class AuthController {
     if (!email || !code) return res.status(400).json({ message: "Missing email or code" });
 
     try {
-      const usingPostgres = process.env.USE_SUPABASE_DB === "true";
-      const tableName = usingPostgres ? '"user"' : "user";
-      const selectQuery = usingPostgres
-        ? `SELECT resetcode, codeexpiry FROM ${tableName} WHERE email=$1`
-        : `SELECT resetCode, codeExpiry FROM ${tableName} WHERE email=?`;
-
-      const users = await db.query(selectQuery, [email]);
-      if (users.length === 0) return res.status(404).json({ message: "Email not found" });
+      const users = await db.query(
+        'SELECT resetcode, codeexpiry FROM "user" WHERE email = $1',
+        [email]
+      );
+      if (!users || users.length === 0) return res.status(404).json({ message: "Email not found" });
 
       const user = users[0];
       const now = new Date();
-
-      if (user.resetcode !== code && user.resetCode !== code) return res.status(401).json({ message: "Invalid code" });
-      if (now > user.codeexpiry && now > user.codeExpiry) return res.status(410).json({ message: "Code expired" });
+      if (user.resetcode !== code) return res.status(401).json({ message: "Invalid code" });
+      if (now > new Date(user.codeexpiry)) return res.status(410).json({ message: "Code expired" });
 
       res.json({ message: "Code verified successfully" });
     } catch (err) {
       console.error("Verify code error:", err);
-      res.status(500).json({ message: "Server error during code verification" });
+      res.status(500).json({ message: "Server error during code verification", error: err.message });
     }
   }
 
@@ -235,25 +197,21 @@ class AuthController {
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
     if (!passwordRegex.test(newPassword)) return res.status(400).json({
-      message: "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character"
+      message: "Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character",
     });
 
     try {
       const hashed = await bcrypt.hash(newPassword, 10);
-      const usingPostgres = process.env.USE_SUPABASE_DB === "true";
-      const tableName = usingPostgres ? '"user"' : "user";
-
-      const updateQuery = usingPostgres
-        ? `UPDATE ${tableName} SET password=$1, resetcode=NULL, codeexpiry=NULL WHERE email=$2`
-        : `UPDATE ${tableName} SET password=?, resetCode=NULL, codeExpiry=NULL WHERE email=?`;
-
-      const result = await db.query(updateQuery, [hashed, email]);
-      if ((result.rowCount || result.affectedRows) === 0) return res.status(404).json({ message: "Email not found" });
+      const update = await db.query(
+        'UPDATE "user" SET password = $1, resetcode = NULL, codeexpiry = NULL WHERE email = $2 RETURNING userid',
+        [hashed, email]
+      );
+      if (update.length === 0) return res.status(404).json({ message: "Email not found" });
 
       res.json({ message: "Password reset successfully" });
     } catch (err) {
       console.error("Reset password error:", err);
-      res.status(500).json({ message: "Server error during password reset" });
+      res.status(500).json({ message: "Server error during password reset", error: err.message });
     }
   }
 }
