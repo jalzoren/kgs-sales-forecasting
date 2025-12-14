@@ -1,5 +1,5 @@
-// controllers/dataController.js - FINAL VERSION FOR RENDER
-const db = require("../config/db.js");
+// controllers/dataController.js - SUPABASE/POSTGRES VERSION + RENDER ML SERVICE
+const db = require("../config/db.js"); // ✅ This should be your Supabase/Postgres client
 const fs = require("fs");
 const path = require("path");
 const SalesFileValidator = require("../services/salesFileValidator");
@@ -45,7 +45,6 @@ class DataController {
             throw new Error("Excel conversion returned empty path");
           }
           
-          // Update file references
           filePath = convertedPath;
           fileName = path.basename(convertedPath);
           console.log(`✅ New filename: ${fileName}`);
@@ -86,7 +85,7 @@ class DataController {
       // STEP 4: Check if this user already uploaded the same file
       console.log("\n🔍 Checking for duplicate filename...");
       try {
-        // ✅ MATCH DATABASE SCHEMA: salesid, userid, filename (lowercase)
+        // ✅ SUPABASE/POSTGRES: Use $1, $2 placeholders (NOT ?)
         const checkSql = `
           SELECT salesid
           FROM salesdata
@@ -102,7 +101,7 @@ class DataController {
 
         console.log("✅ No duplicate found");
 
-        // ✅ MATCH DATABASE SCHEMA: userid, filename, records, status (lowercase)
+        // ✅ SUPABASE/POSTGRES: Insert and return salesid
         console.log("\n💾 Creating database record...");
         const insertSql = `
           INSERT INTO salesdata (userid, filename, records, status)
@@ -166,7 +165,7 @@ class DataController {
       console.log("🤔 UPLOAD TYPE DETECTION");
       console.log("=".repeat(70));
       
-      // Check if models exist using HTTP request to ML service
+      // ✅ Check models via HTTP to Render ML service (NOT local filesystem)
       let modelExists = false;
       try {
         console.log("🔍 Checking if models exist via ML service...");
@@ -213,16 +212,13 @@ class DataController {
             const WeeklyForecastService = require("../services/weeklyForecastService");
             
             try {
-              // Run the complete pipeline: evaluate prev forecast → generate new forecast → aggregate metrics
               const pipelineResult = await WeeklyForecastService.processWeeklyUpload(userId, finalFilePath);
               
               if (pipelineResult && pipelineResult.success) {
                 console.log("✅ Weekly pipeline completed successfully!");
                 console.log(`   Metrics: ${JSON.stringify(pipelineResult.metrics, null, 2)}`);
                 
-                // Save metrics for dashboard access
                 WeeklyForecastService.saveMetrics(userId, pipelineResult.metrics);
-                
                 await this.updateUploadStatus(salesID, "Completed");
               } else {
                 console.error(`⚠️  Pipeline completed with warnings`);
@@ -332,7 +328,7 @@ class DataController {
   
     try {
       console.log(`\n💾 Updating status for salesID ${salesID} → ${status}`);
-      // ✅ MATCH DATABASE SCHEMA: salesid (lowercase)
+      // ✅ SUPABASE/POSTGRES: Use $1, $2 placeholders
       const sql = `
         UPDATE salesdata
         SET status = $1
@@ -355,8 +351,12 @@ class DataController {
     }
 
     try {
-      console.log(`\n📋 Fetching uploads for user ${userId}`);
-      // ✅ MATCH DATABASE SCHEMA: userid (lowercase)
+      const isPolling = req.query.polling === "true";
+      if (!isPolling) {
+        console.log(`\n📋 Fetching uploads for user ${userId}`);
+      }
+      
+      // ✅ SUPABASE/POSTGRES: Use $1 placeholder
       const sql = `
         SELECT *
         FROM salesdata
@@ -365,11 +365,15 @@ class DataController {
       `;
 
       const { rows } = await db.query(sql, [userId]);
-      console.log(`✅ Found ${rows.length} uploads`);
+      
+      if (!isPolling) {
+        console.log(`✅ Found ${rows.length} uploads`);
+      }
+      
       return res.json(rows);
     } catch (err) {
       console.error("❌ Failed to fetch uploads:", err.message);
-      return res.status(500).json({ message: "Failed to fetch uploads" });
+      return res.status(500).json({ message: "Failed to fetch uploads", error: err.message });
     }
   }
 
@@ -378,7 +382,7 @@ class DataController {
     console.log(`\n🗑️  DELETE REQUEST - Upload ID: ${id}`);
     
     try {
-      // ✅ MATCH DATABASE SCHEMA: userid, filename, salesid (lowercase)
+      // ✅ SUPABASE/POSTGRES: Use $1 placeholder
       console.log("   Fetching record from database...");
       const { rows } = await db.query(
         "SELECT userid, filename FROM salesdata WHERE salesid = $1",
@@ -394,7 +398,7 @@ class DataController {
 
       console.log(`   Found: ${record.filename} (User: ${record.userid})`);
 
-      // Delete from DB
+      // ✅ SUPABASE/POSTGRES: Use $1 placeholder
       console.log("   Deleting from database...");
       await db.query("DELETE FROM salesdata WHERE salesid = $1", [id]);
       console.log("   ✅ Database record deleted");
@@ -453,7 +457,7 @@ class DataController {
       }
 
       console.log(`\n📊 Fetching training status for user ${userId}`);
-      // ✅ MATCH DATABASE SCHEMA: salesid, filename, userid (lowercase)
+      // ✅ SUPABASE/POSTGRES: Use $1 placeholder
       const sql = `
         SELECT salesid, filename, status, uploaddate
         FROM salesdata
@@ -486,9 +490,9 @@ class DataController {
 
       return res.json({
         ...response,
-        salesID: record.salesid,  // ✅ Use lowercase from DB
-        fileName: record.filename,  // ✅ Use lowercase from DB
-        uploadDate: record.uploaddate,  // ✅ Use lowercase from DB
+        salesID: record.salesid,
+        fileName: record.filename,
+        uploadDate: record.uploaddate,
       });
     } catch (err) {
       console.error("❌ Training status error:", err.message);
@@ -505,7 +509,7 @@ class DataController {
 
     try {
       console.log(`\n📊 Fetching data status for user ${userId}`);
-      // ✅ MATCH DATABASE SCHEMA: salesid, userid (lowercase)
+      // ✅ SUPABASE/POSTGRES: Use $1 placeholder
       const sql = `
         SELECT salesid, status
         FROM salesdata
