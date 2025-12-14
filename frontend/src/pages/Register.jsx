@@ -100,103 +100,46 @@ const Register = () => {
       : "input-invalid";
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  // Mark password fields as touched for validation
-  setTouched({
-    password: true,
-    confirmPassword: true,
-  });
-
-  // Basic validation
-  if (
-    !formData.firstName ||
-    !formData.lastName ||
-    !formData.email ||
-    !formData.password ||
-    !formData.confirmPassword
-  ) {
-    Swal.fire("Warning", "Please fill in all required fields.", "warning");
-    return;
-  }
-
-  if (!isPasswordValid) {
-    Swal.fire("Error", "Please fix password validation errors.", "error");
-    return;
-  }
-
-  if (formData.password !== formData.confirmPassword) {
-    Swal.fire("Error", "Passwords do not match.", "error");
-    return;
-  }
-
-  if (!formData.acceptTerms || !formData.acceptPrivacy) {
-    Swal.fire("Error", "You must accept the Terms and Privacy Policy.", "error");
-    return;
-  }
-
-  // Show loading alert
-  Swal.fire({
-    title: "Creating Account...",
-    text: "Please wait while we create your account",
-    allowOutsideClick: false,
-    didOpen: () => Swal.showLoading(),
-  });
-
-  try {
-    // Only send necessary fields
-    const payload = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      password: formData.password,
-    };
-
-    const response = await fetch(`${API}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(payload),
+    // Mark fields as touched
+    setTouched({
+      password: true,
+      confirmPassword: true,
     });
 
-    const data = await response.json();
-    Swal.close();
-
-    if (response.ok) {
-      Swal.fire({
-        icon: "success",
-        title: "Registration Successful!",
-        text: "Welcome! Let's get started with setting up your forecasting system.",
-        confirmButtonColor: "#001D39",
-      }).then(() => navigate("/welcome"));
-    } else if (response.status === 409) {
-      // Specific message for duplicate email
-      Swal.fire({
-        icon: "error",
-        title: "Registration Failed",
-        text: data.message || "Email already exists. Try logging in.",
-        confirmButtonColor: "#001D39",
-      });
-    } else {
-      Swal.fire({
-        icon: "error",
-        title: "Registration Failed",
-        text: data.message || "Failed to create account",
-        confirmButtonColor: "#001D39",
-      });
+    // Basic validation
+    if (
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email ||
+      !formData.password ||
+      !formData.confirmPassword
+    ) {
+      Swal.fire("Warning", "Please fill in all required fields.", "warning");
+      return;
     }
-  } catch (error) {
-    Swal.close();
-    console.error("Error:", error);
-    Swal.fire({
-      icon: "error",
-      title: "Connection Error",
-      text: "Cannot connect to the server. Please try again.",
-      confirmButtonColor: "#001D39",
-    });
-  }
 
+    if (!isPasswordValid) {
+      Swal.fire("Error", "Please fix password validation errors.", "error");
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      Swal.fire("Error", "Passwords do not match.", "error");
+      return;
+    }
+
+    // Show loading alert
+    Swal.fire({
+      title: "Creating Account...",
+      text: "Please wait while we create your account",
+      allowOutsideClick: false,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
 
     try {
      const response = await fetch(`${API}/register`, {
