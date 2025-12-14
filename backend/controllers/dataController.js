@@ -304,48 +304,50 @@ const { rows } = await db.query(sql, [userId]);
 return res.json(rows);
 
 }
+async deleteUpload(req, res) {
+  const { id } = req.params;
+  console.log(`🗑️ Deleting upload record ID: ${id}`);
+  
+  try {
+    // Fetch the record
+    const { rows } = await db.query(
+      "SELECT userId, fileName FROM salesdata WHERE salesID = $1",
+      [id]
+    );
 
-  async deleteUpload(req, res) {
-    const { id } = req.params;
-    console.log(`🗑️ Deleting upload record ID: ${id}`);
-    
-    try {
-      const [record] = await new Promise((resolve, reject) => {
-        db.query("SELECT userId, fileName FROM salesdata WHERE salesID = ?", [id], (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        });
-      });
+    const record = rows[0];
 
-      if (!record) {
-        return res.status(404).json({ message: "Record not found" });
-      }
-
-      await db.query(
-  `DELETE FROM salesdata WHERE salesID = $1`,
-  [id]
-);
-
-
-      // Delete files
-      const salesDir = path.join(__dirname, "../files/salesData", `user_${record.userId}`);
-      const cleanDir = path.join(__dirname, "../files/cleanData", `user_${record.userId}`);
-      const weeklyDir = path.join(__dirname, "../files/weeklyData", `user_${record.userId}`);
-
-      [salesDir, cleanDir, weeklyDir].forEach(dir => {
-        try {
-          const filePath = path.join(dir, record.fileName);
-          if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
-        } catch (e) {
-          console.warn("Could not delete file:", e.message);
-        }
-      });
-
-      res.json({ message: "Upload deleted successfully" });
-    } catch (err) {
-      return res.status(500).json({ message: "Deletion failed", error: err });
+    if (!record) {
+      return res.status(404).json({ message: "Record not found" });
     }
+
+    // Delete from DB
+    await db.query(
+      "DELETE FROM salesdata WHERE salesID = $1",
+      [id]
+    );
+
+    // Delete files
+    const salesDir = path.join(__dirname, "../files/salesData", `user_${record.userId}`);
+    const cleanDir = path.join(__dirname, "../files/cleanData", `user_${record.userId}`);
+    const weeklyDir = path.join(__dirname, "../files/weeklyData", `user_${record.userId}`);
+
+    [salesDir, cleanDir, weeklyDir].forEach(dir => {
+      try {
+        const filePath = path.join(dir, record.fileName);
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      } catch (e) {
+        console.warn("Could not delete file:", e.message);
+      }
+    });
+
+    res.json({ message: "Upload deleted successfully" });
+  } catch (err) {
+    console.error("❌ Deletion failed:", err);
+    return res.status(500).json({ message: "Deletion failed", error: err.message });
   }
+}
+
 
   async getPreprocessStatus(req, res) {
     try {
@@ -405,46 +407,36 @@ async getTrainingStatus(req, res) {
 }
 
 
-  async getUserDataStatus(req, res) {
-    const userId = req.session.user?.id;
-    
-    if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
+ async getUserDataStatus(req, res) {
+  const userId = req.session.user?.id;
+  if (!userId) return res.status(401).json({ message: "Unauthorized" });
 
-    try {
+  try {
     const sql = `
-  SELECT salesID, status
-  FROM salesdata
-  WHERE userId = $1
-  ORDER BY uploadDate DESC
-`;
+      SELECT salesID, status
+      FROM salesdata
+      WHERE userId = $1
+      ORDER BY uploadDate DESC
+    `;
+    
+    const { rows: uploads } = await db.query(sql, [userId]);
 
-const { rows: uploads } = await db.query(sql, [userId]);
+    const hasData = uploads.length > 0;
+    const hasCompletedTraining = uploads.some(u => u.status === "Completed");
+    const isProcessing = uploads.some(u => ["Preprocessing", "Training"].includes(u.status));
 
-      
-      db.query(sql, [userId], (err, uploads) => {
-        if (err) {
-          return res.status(500).json({ message: "Database error", error: err });
-        }
-        
-        const hasData = uploads.length > 0;
-        const hasCompletedTraining = uploads.some(u => u.status === "Completed");
-        const isProcessing = uploads.some(u => 
-          u.status === "Preprocessing" || u.status === "Training"
-        );
-        
-        res.json({
-          hasData,
-          hasCompletedTraining,
-          isProcessing,
-          totalUploads: uploads.length
-        });
-      });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to check data status" });
-    }
+    res.json({
+      hasData,
+      hasCompletedTraining,
+      isProcessing,
+      totalUploads: uploads.length
+    });
+  } catch (error) {
+    console.error("❌ Failed to check data status:", error);
+    res.status(500).json({ message: "Failed to check data status", error: error.message });
   }
+}
+
 }
 
 module.exports = new DataController();

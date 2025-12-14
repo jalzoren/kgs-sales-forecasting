@@ -1,201 +1,163 @@
 // services/pythonService.js
-const { spawn } = require("child_process");
+const axios = require("axios");
 const path = require("path");
 const fs = require("fs");
 
 class PythonService {
   constructor() {
-    // ✅ Central Python path (venv)
-    this.pythonPath =
-      "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe";
-
-    // Note: Removed historyPath - we now read directly from Excel files per user, not JSON storage
-
-    // Preprocess status tracking
+    this.mlServiceUrl = process.env.ML_SERVICE_URL || "http://localhost:8000";
     this.preprocessStatusByUserId = new Map();
-  }
-
-  // =====================================================
-  // ✅ Core runner for Python scripts
-  // =====================================================
-  runScript(scriptPath, args = [], options = {}) {
-    return new Promise((resolve, reject) => {
-      console.log(`🐍 Using Python at: ${this.pythonPath}`);
-      console.log(`➡️ Running: ${scriptPath} ${args.join(" ")}`);
-
-      const python = spawn(this.pythonPath, [scriptPath, ...args], {
-        cwd: options.cwd || path.dirname(scriptPath),
-      });
-
-      let output = "";
-      let errorMsg = "";
-
-      python.stdout.on("data", (data) => {
-        const msg = data.toString();
-        output += msg;
-        console.log("🧩 Python STDOUT:", msg);
-      });
-
-      python.stderr.on("data", (data) => {
-        const msg = data.toString();
-        errorMsg += msg;
-        console.error("🐍 Python STDERR:", msg);
-      });
-
-      python.on("close", (code) => {
-        if (code === 0 && !errorMsg.toLowerCase().includes("error")) {
-          resolve(output.trim());
-        } else {
-          reject(
-            new Error(`Python exited with code ${code}. Error:\n${errorMsg || "Unknown"}`)
-          );
-        }
-      });
-    });
+    
+    console.log("═══════════════════════════════════════════════════");
+    console.log("🚀 PYTHON SERVICE INITIALIZED (HTTP MODE)");
+    console.log("═══════════════════════════════════════════════════");
+    console.log(`🌐 ML Service URL: ${this.mlServiceUrl}`);
+    console.log(`📝 Mode: Remote HTTP calls (no local Python)`);
+    console.log("═══════════════════════════════════════════════════\n");
   }
 
   // =====================================================
   // ✅ Preprocess status getter
   // =====================================================
   getPreprocessStatus(userId) {
-    return (
-      this.preprocessStatusByUserId.get(String(userId)) || {
-        state: "idle",
-        progress: 0,
-        message: "No preprocessing started yet.",
-      }
-    );
+    console.log(`\n📊 [GET STATUS] User: ${userId}`);
+    const status = this.preprocessStatusByUserId.get(String(userId)) || {
+      state: "idle",
+      progress: 0,
+      message: "No preprocessing started yet.",
+    };
+    console.log(`   Status: ${JSON.stringify(status, null, 2)}`);
+    return status;
   }
 
   // =====================================================
-  // ✅ Generate Forecast (generates all horizons: 7d, 30d, 90d by default)
+  // ✅ Generate Forecast (HTTP request to ML service)
   // =====================================================
   async generateForecast(userId, horizonDays = null) {
-    console.log(`📈 Generating forecast for User ID: ${userId}...`);
+    console.log("\n╔═══════════════════════════════════════════════════╗");
+    console.log("║          GENERATE FORECAST REQUEST                ║");
+    console.log("╚═══════════════════════════════════════════════════╝");
+    console.log(`📈 User ID: ${userId}`);
+    console.log(`⏱️  Horizon Days: ${horizonDays || 'ALL (7d, 30d, 90d)'}`);
+    console.log(`🌐 Target URL: ${this.mlServiceUrl}/api/forecast`);
+    
     if (horizonDays) {
-      console.log(`   Note: horizonDays parameter is ignored - forecastModel.py generates all horizons (7d, 30d, 90d) by default`);
+      console.log(`⚠️  Note: horizonDays parameter is ignored - ML service generates all horizons by default`);
     }
 
-    const script = path.join(__dirname, "../../ml-service/forecastModel.py");
-
-    // Python args: only userId (forecastModel.py generates all horizons by default)
-    const args = [userId.toString()];
-
-    let status = "Completed";
     let resultPath = null;
 
     try {
-      const stdout = await this.runScript(script, args);
-
-      // Extract the saved file path from Python stdout
-      // Try multiple patterns to catch the output file path
-      let pathMatch = stdout.match(/Output file:\s*(.+\.xlsx)/i);
-      if (!pathMatch) {
-        // Try alternative pattern
-        pathMatch = stdout.match(/Output file:\s*(.+)/i);
-      }
-      if (!pathMatch) {
-        // Try pattern without colon
-        pathMatch = stdout.match(/Output file\s+(.+\.xlsx)/i);
-      }
-      if (!pathMatch) {
-        // Try to find any .xlsx file path in the output
-        pathMatch = stdout.match(/([^\s]+\.xlsx)/i);
-      }
+      console.log("\n📤 Sending HTTP POST request...");
+      const payload = { user_id: userId.toString() };
+      console.log(`   Payload: ${JSON.stringify(payload, null, 2)}`);
       
-      if (pathMatch) {
-        resultPath = pathMatch[1].trim();
-        console.log("✅ Forecast saved at:", resultPath);
-        console.log("📋 Full stdout (last 500 chars):", stdout.slice(-500));
+      const startTime = Date.now();
+      const response = await axios.post(
+        `${this.mlServiceUrl}/api/forecast`,
+        payload,
+        { timeout: 120000 } // 2 minute timeout
+      );
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      
+      console.log(`\n✅ HTTP Response received in ${elapsed}s`);
+      console.log(`   Status: ${response.status} ${response.statusText}`);
+      console.log(`   Data: ${JSON.stringify(response.data, null, 2)}`);
+      
+      resultPath = response.data.forecast_path;
+      console.log(`\n📂 Forecast Path: ${resultPath}`);
+
+      // Auto-generate PDF after Excel is created
+      if (resultPath) {
+        console.log("\n┌─────────────────────────────────────────────────┐");
+        console.log("│     AUTO-GENERATING PDF REPORT                  │");
+        console.log("└─────────────────────────────────────────────────┘");
         
-        // Auto-generate PDF after Excel is created
         try {
           const PDFService = require("./pdfService");
-          const path = require("path");
-          const fs = require("fs");
           
-          // Normalize the resultPath (it might be absolute or relative)
-          let absoluteExcelPath;
-          if (path.isAbsolute(resultPath)) {
-            absoluteExcelPath = resultPath;
-          } else {
-            // Try to resolve relative to backend directory
-            const backendDir = path.join(__dirname, "..");
-            absoluteExcelPath = path.resolve(backendDir, resultPath);
-            
-            // If still doesn't exist, try resolving from current working directory
-            if (!fs.existsSync(absoluteExcelPath)) {
-              absoluteExcelPath = path.resolve(resultPath);
-            }
-          }
+          // The ML service returns a path relative to its own structure
+          // We need to construct the absolute path in our backend
+          const fileName = path.basename(resultPath);
+          console.log(`   File name: ${fileName}`);
           
-          console.log(`🔍 Checking Excel file at: ${absoluteExcelPath}`);
-          
-          // Ensure the Excel file exists
-          if (!fs.existsSync(absoluteExcelPath)) {
-            console.warn(`⚠️ Excel file not found at: ${absoluteExcelPath}`);
-            console.warn(`   Trying to find file in forecastData directory...`);
-            
-            // Try to find it in the forecastData directory
-            const forecastDir = path.join(__dirname, "../files/forecastData", `user_${userId}`);
-            const fileName = path.basename(resultPath);
-            const altPath = path.join(forecastDir, fileName);
-            
-            if (fs.existsSync(altPath)) {
-              absoluteExcelPath = altPath;
-              console.log(`✅ Found Excel file at: ${absoluteExcelPath}`);
-            } else {
-              console.error(`❌ Excel file not found at any location`);
-              console.error(`   Tried: ${absoluteExcelPath}`);
-              console.error(`   Tried: ${altPath}`);
-              return;
-            }
-          }
-          
-          const pdfFileName = path.basename(absoluteExcelPath).replace(".xlsx", ".pdf");
-          // PDF directory should be: backend/files/forecastPdf/user_{userId}/
           const filesDir = path.join(__dirname, "../files");
+          const excelDir = path.join(filesDir, "forecastData", `user_${userId}`);
+          const absoluteExcelPath = path.join(excelDir, fileName);
+          
+          console.log(`\n🔍 Looking for Excel file...`);
+          console.log(`   Expected path: ${absoluteExcelPath}`);
+          console.log(`   Files dir: ${filesDir}`);
+          console.log(`   Excel dir: ${excelDir}`);
+          
+          // Ensure the Excel file exists locally
+          if (!fs.existsSync(absoluteExcelPath)) {
+            console.warn(`\n⚠️  Excel file not found locally!`);
+            console.warn(`   Path checked: ${absoluteExcelPath}`);
+            console.warn(`   This is normal if files are stored only on ML service.`);
+            console.warn(`   Skipping PDF generation.`);
+            return resultPath;
+          }
+          
+          console.log(`✅ Excel file found!`);
+          const excelStats = fs.statSync(absoluteExcelPath);
+          console.log(`   Size: ${(excelStats.size / 1024).toFixed(2)} KB`);
+          
+          const pdfFileName = fileName.replace(".xlsx", ".pdf");
           const pdfDir = path.join(filesDir, "forecastPdf", `user_${userId}`);
           const pdfPath = path.join(pdfDir, pdfFileName);
           
+          console.log(`\n📁 PDF Output Configuration:`);
+          console.log(`   PDF Directory: ${pdfDir}`);
+          console.log(`   PDF Filename: ${pdfFileName}`);
+          console.log(`   Full PDF Path: ${pdfPath}`);
+          
           // Ensure PDF directory exists
           if (!fs.existsSync(pdfDir)) {
+            console.log(`\n📂 Creating PDF directory...`);
             fs.mkdirSync(pdfDir, { recursive: true });
-            console.log(`📁 Created PDF directory: ${pdfDir}`);
+            console.log(`✅ PDF directory created: ${pdfDir}`);
+          } else {
+            console.log(`✅ PDF directory already exists`);
           }
           
-          console.log(`📄 Auto-generating PDF report...`);
-          console.log(`   Excel: ${absoluteExcelPath}`);
-          console.log(`   PDF: ${pdfPath}`);
+          console.log(`\n📄 Generating PDF report...`);
+          console.log(`   Source (Excel): ${absoluteExcelPath}`);
+          console.log(`   Target (PDF): ${pdfPath}`);
           
+          const pdfStartTime = Date.now();
           await PDFService.generateForecastReport(absoluteExcelPath, pdfPath);
+          const pdfElapsed = ((Date.now() - pdfStartTime) / 1000).toFixed(2);
           
           // Verify PDF was created
           if (fs.existsSync(pdfPath)) {
             const pdfStats = fs.statSync(pdfPath);
-            console.log(`✅ PDF report generated successfully!`);
+            console.log(`\n✅ PDF report generated successfully in ${pdfElapsed}s!`);
             console.log(`   Path: ${pdfPath}`);
             console.log(`   Size: ${(pdfStats.size / 1024).toFixed(2)} KB`);
           } else {
-            console.error(`❌ PDF file was not created at: ${pdfPath}`);
+            console.error(`\n❌ PDF file was not created at: ${pdfPath}`);
           }
         } catch (pdfErr) {
-          console.error("❌ Failed to auto-generate PDF (forecast still successful):", pdfErr.message);
-          console.error("   Stack:", pdfErr.stack);
+          console.error("\n❌ PDF GENERATION FAILED (forecast still successful)");
+          console.error(`   Error: ${pdfErr.message}`);
+          console.error(`   Stack: ${pdfErr.stack}`);
           // Don't fail the forecast if PDF generation fails
         }
       } else {
-        console.warn("⚠️ Could not parse output file path from Python stdout");
-        console.warn("   Full stdout:", stdout);
+        console.warn("\n⚠️  No forecast path returned from ML service");
       }
+      
+      console.log("\n✅ Forecast generation completed successfully");
+      console.log("═══════════════════════════════════════════════════\n");
+      
     } catch (err) {
-      console.error("❌ Forecast generation failed:", err.message || err);
-      status = "Failed";
-      throw err; // Re-throw so caller knows it failed
+      console.error("\n❌ FORECAST GENERATION FAILED");
+      console.error("═══════════════════════════════════════════════════");
+      this._logError(err);
+      console.error("═══════════════════════════════════════════════════\n");
+      throw new Error(`Forecast generation failed: ${this._formatError(err)}`);
     }
-
-    // Note: No longer saving to JSON - forecast history is read directly from Excel files per user
-    // The /api/forecast/history endpoint reads from backend/files/forecastData/user_{userId}/
 
     return resultPath;
   }
@@ -204,218 +166,330 @@ class PythonService {
   // ✅ Evaluate Forecast against weekly actuals
   // =====================================================
   async evaluateForecast(userId) {
-    console.log(`📊 Evaluating forecast for User ID: ${userId}...`);
+    console.log("\n╔═══════════════════════════════════════════════════╗");
+    console.log("║           EVALUATE FORECAST REQUEST               ║");
+    console.log("╚═══════════════════════════════════════════════════╝");
+    console.log(`📊 User ID: ${userId}`);
     
-    // Make HTTP POST request to ML service /api/evaluate endpoint
     try {
-      const axios = require("axios");
+      const evaluateUrl = `${this.mlServiceUrl}/api/evaluate`;
+      console.log(`🌐 Target URL: ${evaluateUrl}`);
       
-      const mlServiceUrl = process.env.ML_SERVICE_URL || "http://localhost:8000";
-      const evaluateUrl = `${mlServiceUrl}/api/evaluate`;
-      
-      console.log(`   Calling: ${evaluateUrl}`);
-      
-      // Build payload without sending explicit nulls
       const payload = { user_id: userId.toString() };
-
+      console.log(`📤 Payload: ${JSON.stringify(payload, null, 2)}`);
+      
+      console.log(`\n⏳ Sending HTTP POST request...`);
+      const startTime = Date.now();
+      
       const response = await axios.post(evaluateUrl, payload, {
-        timeout: 60000  // 60 second timeout for evaluation
+        timeout: 60000  // 60 second timeout
       });
-
-      console.log(`✅ Evaluation completed for user ${userId}`);
-      console.log(`   Result: ${JSON.stringify(response.data, null, 2)}`);
+      
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      console.log(`\n✅ HTTP Response received in ${elapsed}s`);
+      console.log(`   Status: ${response.status} ${response.statusText}`);
+      console.log(`   Data: ${JSON.stringify(response.data, null, 2)}`);
+      
+      console.log("\n✅ Evaluation completed successfully");
+      console.log("═══════════════════════════════════════════════════\n");
 
       return response.data;
     } catch (err) {
-      // Better error logging
-      let errorMsg = "Unknown error";
+      console.error("\n❌ EVALUATION FAILED");
+      console.error("═══════════════════════════════════════════════════");
+      this._logError(err);
+      console.error("═══════════════════════════════════════════════════\n");
       
-      if (err.response) {
-        // Server responded with error
-        const rd = err.response.data;
-        errorMsg = rd?.detail || rd || err.response.statusText || "Server error";
-        // Ensure we stringify objects for readable logs
-        const printable = typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg);
-        console.error(`⚠️ Evaluation API returned ${err.response.status}: ${printable}`);
-      } else if (err.request) {
-        // Request made but no response
-        errorMsg = "No response from ML service - is it running on port 8000?";
-        console.error(`⚠️ ${errorMsg}`);
-      } else {
-        // Error in request setup
-        errorMsg = err.message;
-        console.error(`⚠️ Request error: ${err.message}`);
-      }
-      
-      console.error(`⚠️ Evaluation failed: ${errorMsg}`);
-      throw new Error(`Evaluation failed: ${typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg)}`);
+      const errorMsg = this._formatError(err);
+      throw new Error(`Evaluation failed: ${errorMsg}`);
     }
   }
 
   // =====================================================
-  // ❌ Removed: Save forecast history to JSON
-  // Forecast history is now read directly from Excel files per user
-  // See: /api/forecast/history endpoint in backend/routes/forecast.js
+  // ✅ Check if model exists (HTTP request to ML service)
   // =====================================================
-
-  // =====================================================
-  // ✅ Check if model exists
-  // ====================================================No forecast directory found=
-  checkIfModelExists(userId) {
-    const modelDir = path.join(__dirname, "../../ml-service/models", `user_${userId}`);
-    const lstmPath = path.join(modelDir, "lstm_model.keras");
-    const xgbPath = path.join(modelDir, "xgb_model.json");
-    return fs.existsSync(lstmPath) && fs.existsSync(xgbPath);
+  async checkIfModelExists(userId) {
+    console.log("\n╔═══════════════════════════════════════════════════╗");
+    console.log("║          CHECK MODEL EXISTS REQUEST                ║");
+    console.log("╚═══════════════════════════════════════════════════╝");
+    console.log(`🔍 User ID: ${userId}`);
+    
+    try {
+      const url = `${this.mlServiceUrl}/api/model-exists`;
+      console.log(`🌐 Target URL: ${url}`);
+      console.log(`📤 Params: { user_id: "${userId}" }`);
+      
+      const startTime = Date.now();
+      const response = await axios.get(url, {
+        params: { user_id: userId.toString() },
+        timeout: 10000
+      });
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      
+      console.log(`\n✅ HTTP Response received in ${elapsed}s`);
+      console.log(`   Status: ${response.status} ${response.statusText}`);
+      console.log(`   Data: ${JSON.stringify(response.data, null, 2)}`);
+      
+      const exists = response.data.exists;
+      console.log(`\n${exists ? '✅' : '❌'} Model exists: ${exists}`);
+      console.log("═══════════════════════════════════════════════════\n");
+      
+      return exists;
+    } catch (err) {
+      console.error("\n❌ CHECK MODEL EXISTS FAILED");
+      console.error("═══════════════════════════════════════════════════");
+      this._logError(err);
+      console.error("═══════════════════════════════════════════════════\n");
+      return false;
+    }
   }
 
   // =====================================================
-  // ✅ Preprocess Data
+  // ✅ Preprocess Data (HTTP request to ML service)
   // =====================================================
-  // Preprocess Data
-  // @param {string} userId - User ID
-  // @param {boolean} isWeekly - True if weekly upload, false if training data
-  // 
-
   async preprocessData(userId, isWeekly = false) {
-    console.log(`🔄 Starting preprocessing for User ID: ${userId}...`);
-    console.log(`   Type: ${isWeekly ? 'WEEKLY' : 'TRAINING'}`);
+    console.log("\n╔═══════════════════════════════════════════════════╗");
+    console.log("║           PREPROCESS DATA REQUEST                 ║");
+    console.log("╚═══════════════════════════════════════════════════╝");
+    console.log(`🔄 User ID: ${userId}`);
+    console.log(`📋 Type: ${isWeekly ? '📅 WEEKLY DATA' : '📊 TRAINING DATA'}`);
+    console.log(`🌐 Target URL: ${this.mlServiceUrl}/api/preprocess`);
     
     this.preprocessStatusByUserId.set(String(userId), {
       state: "running",
       progress: 0,
       message: "Starting data preprocessing...",
     });
-
-    const script = path.join(__dirname, "../../ml-service/processData.py");
-    const args = [userId.toString(), isWeekly.toString()];  // ✅ Pass is_weekly flag
+    console.log(`   Status set: RUNNING`);
 
     try {
-      const output = await this.runScript(script, args);
+      const payload = {
+        user_id: userId.toString(),
+        is_weekly: isWeekly,
+      };
+      console.log(`\n📤 Payload: ${JSON.stringify(payload, null, 2)}`);
+      console.log(`⏳ Sending HTTP POST request (timeout: 120s)...`);
+      
+      const startTime = Date.now();
+      const response = await axios.post(
+        `${this.mlServiceUrl}/api/preprocess`,
+        payload,
+        { timeout: 120000 } // 2 minute timeout
+      );
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      
+      console.log(`\n✅ HTTP Response received in ${elapsed}s`);
+      console.log(`   Status: ${response.status} ${response.statusText}`);
+      console.log(`   Data: ${JSON.stringify(response.data, null, 2)}`);
       
       this.preprocessStatusByUserId.set(String(userId), {
         state: "done",
         progress: 100,
         message: "Preprocessing completed successfully!",
       });
+      console.log(`   Status set: DONE`);
       
-      console.log(`✅ Preprocessing completed for user ${userId}`);
-      return output;
+      console.log("\n✅ Preprocessing completed successfully");
+      console.log("═══════════════════════════════════════════════════\n");
+      
+      return response.data;
     } catch (err) {
+      console.error("\n❌ PREPROCESSING FAILED");
+      console.error("═══════════════════════════════════════════════════");
+      this._logError(err);
+      
+      const errorMsg = this._formatError(err);
       this.preprocessStatusByUserId.set(String(userId), {
         state: "error",
         progress: 0,
-        message: `Preprocessing failed: ${err.message}`,
+        message: `Preprocessing failed: ${errorMsg}`,
       });
-      console.error(`❌ Preprocessing failed for user ${userId}:`, err.message);
-      throw err;
+      console.log(`   Status set: ERROR`);
+      console.error("═══════════════════════════════════════════════════\n");
+      
+      throw new Error(`Preprocessing failed: ${errorMsg}`);
     }
   }
 
   // =====================================================
-  // ✅ Train Model
+  // ✅ Train Model (HTTP request to ML service)
   // =====================================================
   async trainModel(userId) {
-    console.log(`🎯 Starting model training for User ID: ${userId}...`);
-
-    const script = path.join(__dirname, "../../ml-service/trainModel.py");
-    const args = [userId.toString()];
+    console.log("\n╔═══════════════════════════════════════════════════╗");
+    console.log("║            TRAIN MODEL REQUEST                    ║");
+    console.log("╚═══════════════════════════════════════════════════╝");
+    console.log(`🎯 User ID: ${userId}`);
+    console.log(`🌐 Target URL: ${this.mlServiceUrl}/api/train`);
 
     try {
-      const output = await this.runScript(script, args);
-      console.log(`✅ Model training completed for user ${userId}`);
-      return output;
+      const payload = { user_id: userId.toString() };
+      console.log(`\n📤 Payload: ${JSON.stringify(payload, null, 2)}`);
+      console.log(`⏳ Sending HTTP POST request (timeout: 300s)...`);
+      
+      const startTime = Date.now();
+      const response = await axios.post(
+        `${this.mlServiceUrl}/api/train`,
+        payload,
+        { timeout: 300000 } // 5 minute timeout
+      );
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      
+      console.log(`\n✅ HTTP Response received in ${elapsed}s`);
+      console.log(`   Status: ${response.status} ${response.statusText}`);
+      console.log(`   Data: ${JSON.stringify(response.data, null, 2)}`);
+      
+      console.log("\n✅ Model training completed successfully");
+      console.log("═══════════════════════════════════════════════════\n");
+
+      return response.data;
     } catch (err) {
-      console.error(`❌ Model training failed for user ${userId}:`, err.message);
-      throw err;
+      console.error("\n❌ MODEL TRAINING FAILED");
+      console.error("═══════════════════════════════════════════════════");
+      this._logError(err);
+      console.error("═══════════════════════════════════════════════════\n");
+      
+      const errorMsg = this._formatError(err);
+      throw new Error(`Model training failed: ${errorMsg}`);
     }
   }
 
   // =====================================================
-  // ✅ Convert Excel to CSV
+  // ✅ Convert Excel to CSV (HTTP request to ML service)
   // =====================================================
   async convertToCsv(excelPath) {
-    console.log(`🔄 Converting Excel to CSV: ${excelPath}`);
+    console.log("\n╔═══════════════════════════════════════════════════╗");
+    console.log("║          CONVERT EXCEL TO CSV REQUEST            ║");
+    console.log("╚═══════════════════════════════════════════════════╝");
+    console.log(`📊 Excel Path: ${excelPath}`);
+    console.log(`🌐 Target URL: ${this.mlServiceUrl}/api/convert-to-csv`);
     
-    const script = path.join(__dirname, "../../ml-service/convertToCsv.py");
-    const args = [excelPath];
-
     try {
-      const output = await this.runScript(script, args);
-      // The Python script should output the CSV file path
-      // Extract it from output or construct it
-      const csvPath = excelPath.replace(/\.xlsx?$/, ".csv");
+      const payload = { file_path: excelPath };
+      console.log(`\n📤 Payload: ${JSON.stringify(payload, null, 2)}`);
+      console.log(`⏳ Sending HTTP POST request...`);
       
-      if (fs.existsSync(csvPath)) {
-        console.log(`✅ Excel converted to CSV: ${csvPath}`);
-        return csvPath;
-      } else {
-        // Try to extract path from output
-        const pathMatch = output.match(/([^\s]+\.csv)/);
-        if (pathMatch && fs.existsSync(pathMatch[1])) {
-          return pathMatch[1];
-        }
-        throw new Error("CSV file not found after conversion");
-      }
+      const startTime = Date.now();
+      const response = await axios.post(
+        `${this.mlServiceUrl}/api/convert-to-csv`,
+        payload,
+        { timeout: 30000 }
+      );
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      
+      console.log(`\n✅ HTTP Response received in ${elapsed}s`);
+      console.log(`   Status: ${response.status} ${response.statusText}`);
+      console.log(`   Data: ${JSON.stringify(response.data, null, 2)}`);
+      
+      const csvPath = response.data.csv_path;
+      console.log(`\n📂 CSV Path: ${csvPath}`);
+      console.log("✅ Conversion completed successfully");
+      console.log("═══════════════════════════════════════════════════\n");
+
+      return csvPath;
     } catch (err) {
-      console.error(`❌ Excel to CSV conversion failed:`, err.message);
-      throw err;
+      console.error("\n❌ EXCEL TO CSV CONVERSION FAILED");
+      console.error("═══════════════════════════════════════════════════");
+      this._logError(err);
+      console.error("═══════════════════════════════════════════════════\n");
+      
+      const errorMsg = this._formatError(err);
+      throw new Error(`Conversion failed: ${errorMsg}`);
     }
   }
 
   // =====================================================
-  // ✅ Count rows in CSV or Excel file
+  // ✅ Count rows in CSV or Excel file (HTTP request)
   // =====================================================
   async countRows(filePath) {
-    try {
-      // Create a simple Python script to count rows
-      const countScript = `
-import sys
-import pandas as pd
-
-file_path = sys.argv[1]
-
-try:
-    if file_path.endswith('.csv'):
-        df = pd.read_csv(file_path, encoding='utf-8', on_bad_lines='skip', engine='python')
-    elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
-        df = pd.read_excel(file_path)
-    else:
-        print(0)
-        sys.exit(0)
+    console.log("\n╔═══════════════════════════════════════════════════╗");
+    console.log("║            COUNT ROWS REQUEST                     ║");
+    console.log("╚═══════════════════════════════════════════════════╝");
+    console.log(`📊 File Path: ${filePath}`);
+    console.log(`🌐 Target URL: ${this.mlServiceUrl}/api/count-rows`);
     
-    # Count non-empty rows (excluding header)
-    row_count = len(df.dropna(how='all'))
-    print(row_count)
-except Exception as e:
-    print(0)
-    sys.exit(1)
-`;
+    try {
+      const payload = { file_path: filePath };
+      console.log(`\n📤 Payload: ${JSON.stringify(payload, null, 2)}`);
+      console.log(`⏳ Sending HTTP POST request...`);
+      
+      const startTime = Date.now();
+      const response = await axios.post(
+        `${this.mlServiceUrl}/api/count-rows`,
+        payload,
+        { timeout: 30000 }
+      );
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(2);
+      
+      console.log(`\n✅ HTTP Response received in ${elapsed}s`);
+      console.log(`   Status: ${response.status} ${response.statusText}`);
+      console.log(`   Data: ${JSON.stringify(response.data, null, 2)}`);
 
-      // Write temporary script
-      const tempScriptPath = path.join(__dirname, "../../ml-service/temp_count_rows.py");
-      fs.writeFileSync(tempScriptPath, countScript, "utf8");
-
-      try {
-        const output = await this.runScript(tempScriptPath, [filePath]);
-        const count = parseInt(output.trim(), 10);
-        
-        // Clean up temp script
-        if (fs.existsSync(tempScriptPath)) {
-          fs.unlinkSync(tempScriptPath);
-        }
-        
-        return isNaN(count) ? 0 : count;
-      } catch (err) {
-        // Clean up temp script on error
-        if (fs.existsSync(tempScriptPath)) {
-          fs.unlinkSync(tempScriptPath);
-        }
-        console.error("❌ Error counting rows:", err.message);
-        return 0;
-      }
+      const count = response.data.row_count || 0;
+      console.log(`\n📊 Row count: ${count}`);
+      console.log("✅ Count completed successfully");
+      console.log("═══════════════════════════════════════════════════\n");
+      
+      return count;
     } catch (err) {
-      console.error("❌ Failed to count rows:", err.message);
+      console.error("\n❌ COUNT ROWS FAILED");
+      console.error("═══════════════════════════════════════════════════");
+      this._logError(err);
+      console.error("═══════════════════════════════════════════════════\n");
       return 0;
+    }
+  }
+
+  // =====================================================
+  // 🔧 Helper: Format error messages
+  // =====================================================
+  _formatError(err) {
+    if (err.response) {
+      // Server responded with error
+      const rd = err.response.data;
+      const errorMsg = rd?.detail || rd?.message || rd || err.response.statusText || "Server error";
+      return typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg);
+    } else if (err.request) {
+      // Request made but no response
+      return `No response from ML service at ${this.mlServiceUrl} - is it running?`;
+    } else {
+      // Error in request setup
+      return err.message || "Unknown error";
+    }
+  }
+
+  // =====================================================
+  // 🔧 Helper: Log detailed error information
+  // =====================================================
+  _logError(err) {
+    console.error(`🔴 Error Type: ${err.name || 'Unknown'}`);
+    console.error(`🔴 Error Message: ${err.message}`);
+    
+    if (err.response) {
+      console.error(`\n📡 HTTP Response Error:`);
+      console.error(`   Status: ${err.response.status} ${err.response.statusText}`);
+      console.error(`   Headers: ${JSON.stringify(err.response.headers, null, 2)}`);
+      console.error(`   Data: ${JSON.stringify(err.response.data, null, 2)}`);
+    } else if (err.request) {
+      console.error(`\n📡 No Response Received:`);
+      console.error(`   ML Service URL: ${this.mlServiceUrl}`);
+      console.error(`   Request: ${JSON.stringify({
+        method: err.config?.method,
+        url: err.config?.url,
+        timeout: err.config?.timeout
+      }, null, 2)}`);
+      console.error(`\n❗ Possible causes:`);
+      console.error(`   1. ML service is not running`);
+      console.error(`   2. ML service URL is incorrect`);
+      console.error(`   3. Network connectivity issues`);
+      console.error(`   4. Firewall blocking the connection`);
+    } else {
+      console.error(`\n⚠️  Request Setup Error:`);
+      console.error(`   ${err.message}`);
+    }
+    
+    if (err.stack) {
+      console.error(`\n📚 Stack Trace:`);
+      console.error(err.stack);
     }
   }
 }
