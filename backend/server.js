@@ -17,40 +17,17 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // =======================
-// CORS (LOCAL + PROD SAFE)
+// CORS (RENDER SAFE)
 // =======================
-const allowedOrigins = [
-  process.env.FRONTEND_URL,       // Local
-  process.env.FRONTEND_URL_PROD   // Production
-].filter(Boolean);
-
 app.use(cors({
-  origin: (origin, callback) => {
-    // Allow tools like Postman or server-to-server requests
-    if (!origin) return callback(null, true);
-
-    // Allow all localhost ports in development
-    if (process.env.NODE_ENV !== "production" && origin.startsWith("http://localhost")) {
-      return callback(null, true);
-    }
-
-    // Allow production frontend
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
-    // Deny anything else
-    return callback(null, false);
-  },
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  origin: process.env.VITE_API_BASE_URL,
+  credentials: true
 }));
 
 // =======================
 // Sessions
 // =======================
-app.set("trust proxy", 1); // REQUIRED for secure cookies on Render
+app.set("trust proxy", 1); // ✅ REQUIRED
 app.use(sessionConfig);
 
 // =======================
@@ -74,7 +51,7 @@ app.use("/", homeRoutes);
 app.use("/api/notifications", notificationRoutes);
 
 // =======================
-// SESSION CHECK
+// SESSION CHECK (MATCH FRONTEND)
 // =======================
 app.get("/check-session", (req, res) => {
   if (req.session?.user) {
@@ -91,8 +68,8 @@ app.get("/", (req, res) => {
 });
 
 // =======================
-// START SERVER
+// START SERVER (NO DB TEST)
 // =======================
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT} (${process.env.NODE_ENV})`);
+  console.log(`✅ Server running on port ${PORT}`);
 });
