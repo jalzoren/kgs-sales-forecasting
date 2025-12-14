@@ -8,8 +8,8 @@ import "../css/Login.css";
 // Remove trailing slash if any
 
 
-const LOGIN_API = `${import.meta.env.VITE_API_URL}/login`;
-
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // includes /api
+const LOGIN_API = `${API_BASE}/login`;
 
 
 const Login = () => {
@@ -64,11 +64,11 @@ const Login = () => {
     });
 
     try {
-      const res = await fetch(LOGIN_API, {
+     const res = await fetch(LOGIN_API, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  credentials: "include", // ✅ required for session cookies
   body: JSON.stringify({ email, password }),
+  credentials: "include"
 });
 
       const data = await res.json();

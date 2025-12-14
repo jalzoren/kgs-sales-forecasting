@@ -20,10 +20,14 @@
  *   - Navbar.jsx: invalidateForecastCache() after data changes
  * ═══════════════════════════════════════════════════════════════
  */
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // includes /api
+const LOGIN_API = `${API_BASE}/login`;
+const SESSION_API = `${API_BASE}/check-session`;
 
-const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // match your frontend env
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const DASHBOARD_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dashboard
+// sessionManager.js
+
 
 class SessionManager {
   constructor() {
@@ -254,7 +258,7 @@ class SessionManager {
    */
 async fetchUserInfo() {
   try {
-    const res = await fetch(`${API_BASE}/check-session`, { credentials: "include" }); // ✅ remove /api if backend has none
+const res = await fetch(SESSION_API, { credentials: "include" });
     if (!res.ok) throw new Error("Not authenticated");
     const data = await res.json();
     if (!data.loggedIn || !data.user) throw new Error("No user session");
@@ -272,9 +276,8 @@ async fetchUserInfo() {
    */
 async fetchForecastStatus() {
   try {
-    const res = await fetch(`${API_BASE}/api/forecast/status`, {
-  credentials: "include"
-});
+ const res = await fetch(`${API_BASE}/forecast/status`, { credentials: "include" });
+
  // ✅ adjust path
     if (res.status === 404) return { hasForecast: false, forecastCount: 0, latestForecast: null };
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
