@@ -1,13 +1,13 @@
+// controllers/authController.js
+// Hybrid MySQL/PostgreSQL authentication controller
 const bcrypt = require("bcrypt");
 const db = require("../config/db");
 const mailService = require("../services/mailService");
 
-class AuthController {
-  // Helper function to check if using Supabase/Postgres
-  isSupabase() {
-    return !!process.env.SUPABASE_DB_URL || process.env.USE_SUPABASE_DB === "true";
-  }
+// Helper: Detect if using PostgreSQL or MySQL
+const isPostgres = process.env.USE_SUPABASE_DB === 'true' || !!process.env.SUPABASE_DB_URL;
 
+class AuthController {
   // REGISTER
   async register(req, res) {
     console.log("📥 Register request received:", req.body);
@@ -17,11 +17,14 @@ class AuthController {
 
     // Validation
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
+      console.log("❌ Missing fields");
       return res.status(400).json({ message: "All fields are required" });
     }
+
     if (password !== confirmPassword) {
       return res.status(400).json({ message: "Passwords do not match" });
     }
+
     if (!passwordRegex.test(password)) {
       return res.status(400).json({
         message:
@@ -30,47 +33,75 @@ class AuthController {
     }
 
     try {
-      // Check if email exists
-      let existingUsers;
-      if (this.isSupabase()) {
-        // Supabase
-        existingUsers = await db.query(
-          "SELECT * FROM \"user\" WHERE email = $1",
-          [email]
-        );
-      } else {
-        // MySQL
-        existingUsers = await db.query("SELECT * FROM user WHERE email = ?", [
-          email,
-        ]);
-      }
+      // Check if email already exists
+      console.log("🔍 Checking if email exists:", email);
+      
+      const checkEmailSql = isPostgres 
+        ? `SELECT userid FROM "user" WHERE email = $1`
+        : `SELECT userid FROM user WHERE email = ?`;
+      
+      const existingUsers = await new Promise((resolve, reject) => {
+        db.query(checkEmailSql, [email], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
+      });
 
-      if (existingUsers.length > 0) {
+      console.log("📊 Existing users found:", existingUsers);
+
+      if (existingUsers && existingUsers.length > 0) {
+        console.log("⚠️ Email already registered");
         return res.status(409).json({ message: "Email already registered" });
       }
 
       // Hash password
+      console.log("🔐 Hashing password...");
       const hashedPassword = await bcrypt.hash(password, 10);
 
       // Insert new user
+      console.log("💾 Inserting new user into database...");
+      
       let newUser;
-      if (this.isSupabase()) {
-        const result = await db.query(
-          `INSERT INTO "user" (firstname, lastname, email, password) VALUES ($1,$2,$3,$4) RETURNING *`,
-          [firstName, lastName, email, hashedPassword]
-        );
-        newUser = result;
+      if (isPostgres) {
+        const insertUserSql = `
+          INSERT INTO "user" (firstname, lastname, email, password) 
+          VALUES ($1, $2, $3, $4) 
+          RETURNING userid, email, firstname, lastname
+        `;
+        newUser = await new Promise((resolve, reject) => {
+          db.query(insertUserSql, [firstName, lastName, email, hashedPassword], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
       } else {
-        const result = await db.query(
-          "INSERT INTO user (firstname, lastname, email, password) VALUES (?,?,?,?)",
-          [firstName, lastName, email, hashedPassword]
-        );
+        // MySQL
+        const insertUserSql = `
+          INSERT INTO user (firstname, lastname, email, password) 
+          VALUES (?, ?, ?, ?)
+        `;
+        const result = await new Promise((resolve, reject) => {
+          db.query(insertUserSql, [firstName, lastName, email, hashedPassword], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+        
         // Fetch the inserted user
-        const insertedId = result.insertId;
-        const [rows] = await db.query("SELECT * FROM user WHERE userid = ?", [
-          insertedId,
-        ]);
-        newUser = rows;
+        const selectSql = `SELECT userid, email, firstname, lastname FROM user WHERE userid = ?`;
+        newUser = await new Promise((resolve, reject) => {
+          db.query(selectSql, [result.insertId], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+      }
+
+      console.log("✅ User created:", newUser);
+
+      if (!newUser || newUser.length === 0) {
+        console.error("❌ Registration error: No user returned");
+        return res.status(500).json({ message: "Failed to create account" });
       }
 
       // Auto-login after registration
@@ -87,7 +118,11 @@ class AuthController {
       });
     } catch (error) {
       console.error("❌ Registration error:", error);
-      res.status(500).json({ message: "Server error during registration", error: error.message });
+      console.error("Error details:", error.message);
+      res.status(500).json({ 
+        message: "Server error during registration",
+        error: error.message 
+      });
     }
   }
 
@@ -98,33 +133,49 @@ class AuthController {
       return res.status(400).json({ message: "Missing email or password" });
 
     try {
-      let users;
-      if (this.isSupabase()) {
-        users = await db.query('SELECT * FROM "user" WHERE email = $1', [email]);
-      } else {
-        users = await db.query("SELECT * FROM user WHERE email = ?", [email]);
-      }
+      // Get user by email
+      const getUserSql = isPostgres
+        ? `SELECT userid, email, firstname, lastname, password FROM "user" WHERE email = $1`
+        : `SELECT userid, email, firstname, lastname, password FROM user WHERE email = ?`;
+      
+      const results = await new Promise((resolve, reject) => {
+        db.query(getUserSql, [email], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
+      });
 
-      if (!users || users.length === 0) {
+      if (!results || results.length === 0) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const user = users[0];
+      const user = results[0];
 
-      // Session lock/attempts logic
-      if (!req.session.loginAttempts) req.session.loginAttempts = 0;
-      if (!req.session.lockUntil) req.session.lockUntil = null;
+      // Initialize session attempts if not exists
+      if (!req.session.loginAttempts) {
+        req.session.loginAttempts = 0;
+      }
+      if (!req.session.lockUntil) {
+        req.session.lockUntil = null;
+      }
 
       const now = new Date();
+
+      // Check if account is locked in session
       if (req.session.lockUntil && now < req.session.lockUntil) {
         const remainingTime = Math.ceil((req.session.lockUntil - now) / 1000);
         const minutes = Math.floor(remainingTime / 60);
         const seconds = remainingTime % 60;
+
         return res.status(423).json({
-          message: `Account locked. Try again in ${minutes}:${seconds.toString().padStart(2, "0")}.`,
-          remainingTime,
+          message: `Account locked. Try again in ${minutes}:${seconds
+            .toString()
+            .padStart(2, "0")}.`,
+          remainingTime: remainingTime,
         });
       }
+
+      // Reset lock if time has passed
       if (req.session.lockUntil && now >= req.session.lockUntil) {
         req.session.loginAttempts = 0;
         req.session.lockUntil = null;
@@ -132,20 +183,37 @@ class AuthController {
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
+        // Increment login attempts in session
         req.session.loginAttempts += 1;
+        let lockUntil = null;
+
+        // Lock account after 3 failed attempts for 1 minute
         if (req.session.loginAttempts >= 3) {
-          req.session.lockUntil = new Date(now.getTime() + 60000);
+          lockUntil = new Date(now.getTime() + 60000); // 1 minute
+          req.session.lockUntil = lockUntil;
+        }
+
+        let message = `Invalid password. ${
+          3 - req.session.loginAttempts
+        } attempts remaining.`;
+        if (lockUntil) {
+          const remainingTime = 60; // 60 seconds
+          message = "Too many failed attempts. Account locked for 1 minute.";
+
           return res.status(423).json({
-            message: "Too many failed attempts. Account locked for 1 minute.",
-            remainingTime: 60,
+            message,
+            remainingTime: remainingTime,
           });
         }
-        return res.status(401).json({ message: `Invalid password. ${3 - req.session.loginAttempts} attempts remaining.` });
+
+        return res.status(401).json({ message });
       }
 
-      // Successful login
+      // Successful login - reset session attempts
       req.session.loginAttempts = 0;
       req.session.lockUntil = null;
+
+      // Store user info in session
       req.session.user = {
         id: user.userid,
         email: user.email,
@@ -154,12 +222,13 @@ class AuthController {
       };
 
       res.json({ message: "Login successful", user: req.session.user });
-    } catch (err) {
-      console.error("Login error:", err);
+    } catch (error) {
+      console.error("Login error:", error);
       res.status(500).json({ message: "Server error" });
     }
   }
 
+  // CHECK SESSION
   checkSession(req, res) {
     if (req.session.user) {
       res.json({ loggedIn: true, user: req.session.user });
@@ -168,6 +237,7 @@ class AuthController {
     }
   }
 
+  // LOGOUT
   async logout(req, res) {
     try {
       req.session.destroy((err) => {
@@ -175,12 +245,13 @@ class AuthController {
         res.clearCookie("connect.sid");
         res.json({ message: "Logged out successfully" });
       });
-    } catch (err) {
+    } catch (error) {
+      console.error("Logout error:", error);
       res.status(500).json({ message: "Server error during logout" });
     }
   }
 
-  // FORGOT PASSWORD
+  // SEND RESET CODE
   async forgotPassword(req, res) {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: "Email required" });
@@ -189,17 +260,39 @@ class AuthController {
     const expiry = new Date(Date.now() + 3 * 60000);
 
     try {
+      // Update user with reset code
       let result;
-      if (this.isSupabase()) {
-        result = await db.query(
-          'UPDATE "user" SET resetcode=$1, codeexpiry=$2 WHERE email=$3 RETURNING *',
-          [code, expiry.toISOString(), email]
-        );
+      if (isPostgres) {
+        const updateSql = `
+          UPDATE "user" 
+          SET resetcode = $1, codeexpiry = $2 
+          WHERE email = $3 
+          RETURNING userid
+        `;
+        result = await new Promise((resolve, reject) => {
+          db.query(updateSql, [code, expiry.toISOString(), email], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
       } else {
-        result = await db.query(
-          "UPDATE user SET resetcode=?, codeexpiry=? WHERE email=?",
-          [code, expiry, email]
-        );
+        const updateSql = `
+          UPDATE user 
+          SET resetcode = ?, codeexpiry = ? 
+          WHERE email = ?
+        `;
+        result = await new Promise((resolve, reject) => {
+          db.query(updateSql, [code, expiry.toISOString(), email], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+        // MySQL doesn't return rows, check affectedRows
+        if (result.affectedRows === 0) {
+          result = [];
+        } else {
+          result = [{ userid: 1 }]; // Dummy to pass length check
+        }
       }
 
       if (!result || result.length === 0) {
@@ -207,11 +300,13 @@ class AuthController {
       }
 
       const emailSent = await mailService.sendResetCode(email, code);
-      if (!emailSent) return res.status(500).json({ message: "Failed to send email" });
+      if (!emailSent) {
+        return res.status(500).json({ message: "Failed to send email" });
+      }
 
       res.json({ message: "OTP sent to your email" });
-    } catch (err) {
-      console.error("Forgot password error:", err);
+    } catch (error) {
+      console.error("Forgot password error:", error);
       res.status(500).json({ message: "Database error" });
     }
   }
@@ -219,27 +314,40 @@ class AuthController {
   // VERIFY CODE
   async verifyCode(req, res) {
     const { email, code } = req.body;
-    if (!email || !code) return res.status(400).json({ message: "Missing email or code" });
+    if (!email || !code)
+      return res.status(400).json({ message: "Missing email or code" });
 
     try {
-      let users;
-      if (this.isSupabase()) {
-        users = await db.query('SELECT resetcode, codeexpiry FROM "user" WHERE email=$1', [email]);
-      } else {
-        users = await db.query("SELECT resetcode, codeexpiry FROM user WHERE email=?", [email]);
+      // Get reset code and expiry
+      const getUserSql = isPostgres
+        ? `SELECT resetcode, codeexpiry FROM "user" WHERE email = $1`
+        : `SELECT resetcode, codeexpiry FROM user WHERE email = ?`;
+      
+      const results = await new Promise((resolve, reject) => {
+        db.query(getUserSql, [email], (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        });
+      });
+
+      if (!results || results.length === 0) {
+        return res.status(404).json({ message: "Email not found" });
       }
 
-      if (!users || users.length === 0) return res.status(404).json({ message: "Email not found" });
-
-      const user = users[0];
+      const user = results[0];
       const now = new Date();
 
-      if (user.resetcode !== code) return res.status(401).json({ message: "Invalid code" });
-      if (now > new Date(user.codeexpiry)) return res.status(410).json({ message: "Code expired" });
+      if (user.resetcode !== code) {
+        return res.status(401).json({ message: "Invalid code" });
+      }
+
+      if (now > new Date(user.codeexpiry)) {
+        return res.status(410).json({ message: "Code expired" });
+      }
 
       res.json({ message: "Code verified successfully" });
-    } catch (err) {
-      console.error("Verify code error:", err);
+    } catch (error) {
+      console.error("Verify code error:", error);
       res.status(500).json({ message: "Server error" });
     }
   }
@@ -247,10 +355,12 @@ class AuthController {
   // RESET PASSWORD
   async resetPassword(req, res) {
     const { email, newPassword } = req.body;
-    if (!email || !newPassword) return res.status(400).json({ message: "Missing data" });
+    if (!email || !newPassword)
+      return res.status(400).json({ message: "Missing data" });
 
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/;
+
     if (!passwordRegex.test(newPassword)) {
       return res.status(400).json({
         message:
@@ -260,14 +370,45 @@ class AuthController {
 
     try {
       const hashed = await bcrypt.hash(newPassword, 10);
+
+      // Update password and clear reset fields
       let result;
-      if (this.isSupabase()) {
-        result = await db.query('UPDATE "user" SET password=$1, resetcode=NULL, codeexpiry=NULL WHERE email=$2 RETURNING *', [hashed, email]);
+      if (isPostgres) {
+        const updateSql = `
+          UPDATE "user" 
+          SET password = $1, resetcode = NULL, codeexpiry = NULL 
+          WHERE email = $2 
+          RETURNING userid
+        `;
+        result = await new Promise((resolve, reject) => {
+          db.query(updateSql, [hashed, email], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
       } else {
-        result = await db.query("UPDATE user SET password=?, resetcode=NULL, codeexpiry=NULL WHERE email=?", [hashed, email]);
+        const updateSql = `
+          UPDATE user 
+          SET password = ?, resetcode = NULL, codeexpiry = NULL 
+          WHERE email = ?
+        `;
+        result = await new Promise((resolve, reject) => {
+          db.query(updateSql, [hashed, email], (err, results) => {
+            if (err) return reject(err);
+            resolve(results);
+          });
+        });
+        // MySQL check
+        if (result.affectedRows === 0) {
+          result = [];
+        } else {
+          result = [{ userid: 1 }];
+        }
       }
 
-      if (!result || result.length === 0) return res.status(404).json({ message: "Email not found" });
+      if (!result || result.length === 0) {
+        return res.status(404).json({ message: "Email not found" });
+      }
 
       res.json({ message: "Password reset successfully" });
     } catch (err) {
