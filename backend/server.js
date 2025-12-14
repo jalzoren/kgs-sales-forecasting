@@ -26,25 +26,26 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow server-to-server tools or mobile apps with no origin
+    // Allow tools like Postman or server-to-server requests
     if (!origin) return callback(null, true);
 
-    // Allow localhost in development
-    if (origin.startsWith("http://localhost")) return callback(null, true);
+    // Allow all localhost ports in development
+    if (process.env.NODE_ENV !== "production" && origin.startsWith("http://localhost")) {
+      return callback(null, true);
+    }
 
-    // Allow production frontend (exact match)
-    if (allowedOrigins.some(o => o === origin || o + "/" === origin)) return callback(null, true);
+    // Allow production frontend
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-    // Deny all others
-    return callback(new Error("Not allowed by CORS"));
+    // Deny anything else
+    return callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
-
-// ✅ Handle OPTIONS requests globally
-app.options("*", cors());
 
 // =======================
 // Sessions
@@ -93,5 +94,5 @@ app.get("/", (req, res) => {
 // START SERVER
 // =======================
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Server running on port ${PORT} (${process.env.NODE_ENV})`);
 });
