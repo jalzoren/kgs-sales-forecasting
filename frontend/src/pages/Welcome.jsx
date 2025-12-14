@@ -7,6 +7,16 @@ import { FaRegQuestionCircle } from "react-icons/fa";
 import Swal from "sweetalert2";
 const API = import.meta.env.VITE_API_URL;
 
+// ganto lang? yung pathing lalagyaan ng API na ganto tapos import?, oo kasi diba ang usual na ginagawa natin is nakalocalhost, papaltan lang yon, sa chatgpt ako nagaano kung saan error
+// tapos? check m lang logs, if may error, papagawa ko na rin dapat ung sa connection ng ml-service sa render
+// okay so sa laahat ng code sa backend na may ginamit na localhost5000 papalitan ko ng API, tulad dito? 
+// oo, naayos ko na yan check mo na lang error logs na binigay tas lapag mo kay chatgpt ano yung aayusin, ung API kasi is nakabase na sa render na env, hindi na sa mismong local dito sa vscode, ginagamit un para sa router na dineclare sa server and sa mismong controller, 
+// pahelp k n lang kay chat gpt, kasi ung sa env natin may /api which is nakadeclare dito sa taas na import, nasa website yon na environemnt, nasa edge ung mga anek
+// dito nalang ako magchchatgpt sakin para matuloy mo na yung sa ml-service, kaso baka magkaconflict tayo magruruun tapos need mo gumamit
+// un nga e, magcocommit palagi me, para macheck, ikaw muna fix, later ko na ix ml-service
+// okay. lista ko nalang muna mga files n na may locahost5000 na ginamit dito sa sakin heuheuheu, para maakagawa ka rin dito
+// oki sync k n lang sa ano mo
+
 export default function Welcome() {
   const navigate = useNavigate();
   const [isInitialLoad, setIsInitialLoad] = useState(true);
