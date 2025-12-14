@@ -546,7 +546,7 @@ router.get("/files/:userId", (req, res) => {
   }
 });
 
-router.get("/api/forecast/status", requireAuth, async (req, res) => {
+router.get("/status", requireAuth, async (req, res) => { 
   try {
     const userId = req.session.user?.id;
     
