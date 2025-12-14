@@ -3,109 +3,100 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-// DATABASE
-const db = require("./config/db");
-
-// ROUTES
 const sessionConfig = require("./config/sessionConfig");
+
+// Routes
 const authRoutes = require("./routes/authRoutes");
 const dataRoutes = require("./routes/dataRoutes");
-const forecastRoutes = require("./routes/forecast"); 
-const analyticsRoutes = require("./routes/analyticsRoutes"); 
-const homeRoutes = require("./routes/homeRoutes"); 
+const forecastRoutes = require("./routes/forecast");
+const analyticsRoutes = require("./routes/analyticsRoutes");
+const homeRoutes = require("./routes/homeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// =====================================================
-// Enable CORS
-// =====================================================
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+// =======================
+// CORS (RENDER SAFE)
+// =======================
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.FRONTEND_URL_PROD
+].filter(Boolean);
 
 app.use(cors({
-  origin: FRONTEND_URL,
+  origin: (origin, callback) => {
+    // Allow server-to-server tools
+    if (!origin) return callback(null, true);
+
+    // ✅ Allow ALL localhost ports in development
+    if (
+      process.env.NODE_ENV !== "production" &&
+      origin.startsWith("http://localhost")
+    ) {
+      return callback(null, true);
+    }
+
+    // ✅ Allow production frontend
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    // ❌ DO NOT THROW — just deny silently
+    return callback(null, false);
+  },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-// =====================================================
+
+// =======================
 // Sessions
-// =====================================================
+// =======================
+app.set("trust proxy", 1); // ✅ REQUIRED
 app.use(sessionConfig);
 
-// =====================================================
-// JSON Body Parser
-// =====================================================
+// =======================
+// Body parser
+// =======================
 app.use(express.json());
 
-// =====================================================
-// Serve static files (forecast Excel files)
-// =====================================================
+// =======================
+// Static files
+// =======================
 app.use("/files", express.static(path.join(__dirname, "files")));
 
-// =====================================================
-// Mount routes
-// =====================================================
+// =======================
+// Routes
+// =======================
 app.use("/", authRoutes);
 app.use("/", dataRoutes);
-app.use("/", forecastRoutes);
-app.use("/", analyticsRoutes); 
-app.use("/", homeRoutes); 
+app.use("/api/forecast", forecastRoutes);
+app.use("/", analyticsRoutes);
+app.use("/", homeRoutes);
 app.use("/api/notifications", notificationRoutes);
 
-// =====================================================
-// Default route
-// =====================================================
+// =======================
+// SESSION CHECK (MATCH FRONTEND)
+// =======================
+app.get("/check-session", (req, res) => {
+  if (req.session?.user) {
+    return res.json({ loggedIn: true, user: req.session.user });
+  }
+  res.status(401).json({ loggedIn: false });
+});
+
+// =======================
+// Root
+// =======================
 app.get("/", (req, res) => {
-  res.send("Sales Forecasting System - Backend Running 🚀");
+  res.send("Backend running 🚀");
 });
 
-// =====================================================
-// Session check endpoints
-// =====================================================
-app.get("/api/check-session", (req, res) => {
-  if (req.session && req.session.user) {
-    res.json({ loggedIn: true, user: req.session.user });
-  } else {
-    res.status(401).json({ loggedIn: false });
-  }
+// =======================
+// START SERVER (NO DB TEST)
+// =======================
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });
-
-app.get("/api/debug-session", (req, res) => {
-  res.json({
-    hasSession: !!req.session,
-    hasUser: !!(req.session && req.session.user),
-    userId: req.session?.user?.id,
-    userEmail: req.session?.user?.email
-  });
-});
-
-app.post("/test-notification", (req, res) => {
-  console.log("Test notification - Session:", req.session);
-  console.log("Test notification - User:", req.session?.user);
-  res.json({
-    hasSession: !!req.session,
-    user: req.session?.user || null
-  });
-});
-
-// =====================================================
-// Connect to Database and Start Server
-// =====================================================
-async function startServer() {
-  try {
-    await db.query("SELECT 1");
-    console.log("✅ Connected to Database");
-
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error("❌ Database connection failed:", err.message);
-    process.exit(1); // Stop server if DB fails
-  }
-}
-
-startServer();
