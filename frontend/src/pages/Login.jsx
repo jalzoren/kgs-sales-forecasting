@@ -4,9 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
-const API = import.meta.env.VITE_API_URL;
 
-const LOGIN_API = "http://localhost:5000/login";
+const API = import.meta.env.VITE_API_URL; // ✅ use environment variable
 
 const Login = () => {
   const navigate = useNavigate();
@@ -52,7 +51,7 @@ const Login = () => {
       return;
     }
 
-    // Show loading indicator
+    // Show loading alert
     Swal.fire({
       title: "Logging in...",
       html: "Preparing your dashboard",
@@ -61,7 +60,7 @@ const Login = () => {
     });
 
     try {
-      const res = await fetch(LOGIN_API, {
+      const res = await fetch(`${API}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -69,20 +68,15 @@ const Login = () => {
       });
 
       const data = await res.json();
+      Swal.close();
 
-      // ============================================
-      // SUCCESS - Initialize session with parallel requests
-      // ============================================
+      // ✅ SUCCESS
       if (res.ok) {
         console.log("🔓 Login successful, initializing session...");
-        
-        // ✅ Fetch user info + forecast status in PARALLEL
-        // This takes ~500ms instead of 2-3 seconds!
+
+        // Fetch user info + forecast status
         const { forecastStatus } = await SessionManager.initializeSession();
-        
-        Swal.close();
-        
-        // Show success message
+
         await Swal.fire({
           icon: "success",
           title: "Login Successful",
@@ -91,17 +85,12 @@ const Login = () => {
           showConfirmButton: false,
         });
 
-        // Navigate based on forecast status (instant decision - already cached!)
         const destination = forecastStatus.hasForecast ? "/home" : "/welcome";
-        console.log(`✅ Navigating to ${destination}`);
         navigate(destination, { replace: true });
-        
         return;
       }
 
-      // ============================================
-      // ACCOUNT LOCKED (423)
-      // ============================================
+      // ⚠ ACCOUNT LOCKED
       if (res.status === 423) {
         const lockSeconds = data.remainingTime || 60;
         setIsLocked(true);
@@ -128,13 +117,22 @@ const Login = () => {
         return;
       }
 
-      // ============================================
-      // WRONG CREDENTIALS
-      // ============================================
+      // ❌ WRONG CREDENTIALS
+      if (res.status === 401 || res.status === 409) {
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: data.message || "Invalid email or password",
+          confirmButtonColor: "#001D39",
+        });
+        return;
+      }
+
+      // ❌ OTHER ERRORS
       Swal.fire({
         icon: "error",
         title: "Login Failed",
-        text: data.message || "Invalid email or password",
+        text: data.message || "Something went wrong",
         confirmButtonColor: "#001D39",
       });
     } catch (err) {
@@ -152,7 +150,6 @@ const Login = () => {
     <div className="login-wrapper">
       <div className="login-container">
         <h2 className="Title">Log In</h2>
-
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>
           <input
