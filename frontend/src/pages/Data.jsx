@@ -53,10 +53,15 @@ export default function UploadBox() {
     }
 
     try {
-     const url = showLoading ? `${API}/data` : `${API}/data?polling=true`;
+     const url = showLoading
+  ? `${API}/data`
+  : `${API}/data?polling=true`;
+
 const res = await fetch(url, {
+  method: "GET",
   credentials: "include",
 });
+
       
       if (res.status === 401) {
         if (showLoading && isInitialLoad) {
