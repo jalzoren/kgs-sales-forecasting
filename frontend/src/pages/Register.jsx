@@ -142,12 +142,12 @@ const Register = () => {
     });
 
     try {
-      const response = await fetch("http://localhost:5000/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(formData),
-      });
+     const response = await fetch(`${API}/register`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify(formData),
+});
 
       const data = await response.json();
 
