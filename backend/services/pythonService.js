@@ -1,24 +1,40 @@
 // services/pythonService.js
+const axios = require("axios");
 const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
+const FormData = require("form-data");
 
 class PythonService {
   constructor() {
-    // ✅ Central Python path (venv)
-    this.pythonPath =
-      "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe";
-
-    // Note: Removed historyPath - we now read directly from Excel files per user, not JSON storage
-
+    this.isProduction = process.env.NODE_ENV === "production" || process.env.USE_ML_SERVICE === "true";
+    
+    // ✅ ML Service URL (for production/remote)
+    this.mlServiceUrl = process.env.ML_SERVICE_URL || "https://kgs-sales-forecasting-ml-service.onrender.com";
+    
+    // ✅ Local Python path (for local development)
+    this.pythonPath = process.env.PYTHON_PATH || "D:/kgs-sales-forecasting/ml-service/venv/Scripts/python.exe";
+    
     // Preprocess status tracking
     this.preprocessStatusByUserId = new Map();
+    
+    console.log("🔧 PythonService initialized:");
+    console.log(`   Environment: ${this.isProduction ? "PRODUCTION (ML Service)" : "LOCAL (Python Scripts)"}`);
+    if (this.isProduction) {
+      console.log(`   ML Service URL: ${this.mlServiceUrl}`);
+    } else {
+      console.log(`   Python Path: ${this.pythonPath}`);
+    }
   }
 
   // =====================================================
-  // ✅ Core runner for Python scripts
+  // ✅ HYBRID: Run Python script locally OR call ML service
   // =====================================================
-  runScript(scriptPath, args = [], options = {}) {
+  async runScript(scriptPath, args = [], options = {}) {
+    if (this.isProduction) {
+      throw new Error("runScript() is not available in production mode. Use ML Service endpoints.");
+    }
+    
     return new Promise((resolve, reject) => {
       console.log(`🐍 Using Python at: ${this.pythonPath}`);
       console.log(`➡️ Running: ${scriptPath} ${args.join(" ")}`);
@@ -46,16 +62,14 @@ class PythonService {
         if (code === 0 && !errorMsg.toLowerCase().includes("error")) {
           resolve(output.trim());
         } else {
-          reject(
-            new Error(`Python exited with code ${code}. Error:\n${errorMsg || "Unknown"}`)
-          );
+          reject(new Error(`Python exited with code ${code}. Error:\n${errorMsg || "Unknown"}`));
         }
       });
     });
   }
 
   // =====================================================
-  // ✅ Preprocess status getter
+  // ✅ Get Preprocess Status
   // =====================================================
   getPreprocessStatus(userId) {
     return (
@@ -68,214 +82,189 @@ class PythonService {
   }
 
   // =====================================================
-  // ✅ Generate Forecast (generates all horizons: 7d, 30d, 90d by default)
+  // ✅ HYBRID: Generate Forecast
   // =====================================================
   async generateForecast(userId, horizonDays = null) {
     console.log(`📈 Generating forecast for User ID: ${userId}...`);
-    if (horizonDays) {
-      console.log(`   Note: horizonDays parameter is ignored - forecastModel.py generates all horizons (7d, 30d, 90d) by default`);
+    
+    if (this.isProduction) {
+      // PRODUCTION: Call ML Service API
+      return this._generateForecastRemote(userId);
+    } else {
+      // LOCAL: Run Python script directly
+      return this._generateForecastLocal(userId);
     }
+  }
 
+  async _generateForecastRemote(userId) {
+    try {
+      const forecastUrl = `${this.mlServiceUrl}/api/forecast/${userId}`;
+      console.log(`   Calling ML Service: ${forecastUrl}`);
+      
+      const response = await axios.get(forecastUrl, { 
+        timeout: 300000 // 5 minutes
+      });
+
+      // ML service returns JSON with forecast data
+      const result = response.data;
+      
+      // Save the forecast data locally if needed
+      const filesDir = path.join(__dirname, "../files/forecastData", `user_${userId}`);
+      fs.mkdirSync(filesDir, { recursive: true });
+      
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, -5);
+      const jsonFileName = `forecast_${userId}_${timestamp}.json`;
+      const jsonPath = path.join(filesDir, jsonFileName);
+      
+      fs.writeFileSync(jsonPath, JSON.stringify(result, null, 2));
+      console.log("✅ Forecast JSON saved at:", jsonPath);
+      
+      // Generate Excel from JSON if needed
+      // (You might need to implement this or modify ML service to return Excel)
+      
+      return jsonPath;
+      
+    } catch (err) {
+      let errorMsg = err.message;
+      if (err.response) {
+        const rd = err.response.data;
+        errorMsg = rd?.detail || rd?.message || err.response.statusText || "Server error";
+      }
+      console.error(`❌ Remote forecast failed:`, errorMsg);
+      throw new Error(`Forecast failed: ${errorMsg}`);
+    }
+  }
+
+  async _generateForecastLocal(userId) {
     const script = path.join(__dirname, "../../ml-service/forecastModel.py");
-
-    // Python args: only userId (forecastModel.py generates all horizons by default)
     const args = [userId.toString()];
-
-    let status = "Completed";
-    let resultPath = null;
 
     try {
       const stdout = await this.runScript(script, args);
 
-      // Extract the saved file path from Python stdout
-      // Try multiple patterns to catch the output file path
-      let pathMatch = stdout.match(/Output file:\s*(.+\.xlsx)/i);
-      if (!pathMatch) {
-        // Try alternative pattern
-        pathMatch = stdout.match(/Output file:\s*(.+)/i);
-      }
-      if (!pathMatch) {
-        // Try pattern without colon
-        pathMatch = stdout.match(/Output file\s+(.+\.xlsx)/i);
-      }
-      if (!pathMatch) {
-        // Try to find any .xlsx file path in the output
-        pathMatch = stdout.match(/([^\s]+\.xlsx)/i);
-      }
+      // Extract file path from output
+      let pathMatch = stdout.match(/Output file:\s*(.+\.xlsx)/i) || 
+                      stdout.match(/([^\s]+\.xlsx)/i);
       
       if (pathMatch) {
-        resultPath = pathMatch[1].trim();
+        const resultPath = pathMatch[1].trim();
         console.log("✅ Forecast saved at:", resultPath);
-        console.log("📋 Full stdout (last 500 chars):", stdout.slice(-500));
         
-        // Auto-generate PDF after Excel is created
+        // Auto-generate PDF
         try {
           const PDFService = require("./pdfService");
-          const path = require("path");
-          const fs = require("fs");
           
-          // Normalize the resultPath (it might be absolute or relative)
-          let absoluteExcelPath;
-          if (path.isAbsolute(resultPath)) {
-            absoluteExcelPath = resultPath;
-          } else {
-            // Try to resolve relative to backend directory
-            const backendDir = path.join(__dirname, "..");
-            absoluteExcelPath = path.resolve(backendDir, resultPath);
-            
-            // If still doesn't exist, try resolving from current working directory
-            if (!fs.existsSync(absoluteExcelPath)) {
-              absoluteExcelPath = path.resolve(resultPath);
-            }
-          }
+          let absoluteExcelPath = path.isAbsolute(resultPath) 
+            ? resultPath 
+            : path.resolve(path.join(__dirname, ".."), resultPath);
           
-          console.log(`🔍 Checking Excel file at: ${absoluteExcelPath}`);
-          
-          // Ensure the Excel file exists
           if (!fs.existsSync(absoluteExcelPath)) {
-            console.warn(`⚠️ Excel file not found at: ${absoluteExcelPath}`);
-            console.warn(`   Trying to find file in forecastData directory...`);
-            
-            // Try to find it in the forecastData directory
             const forecastDir = path.join(__dirname, "../files/forecastData", `user_${userId}`);
             const fileName = path.basename(resultPath);
             const altPath = path.join(forecastDir, fileName);
             
             if (fs.existsSync(altPath)) {
               absoluteExcelPath = altPath;
-              console.log(`✅ Found Excel file at: ${absoluteExcelPath}`);
-            } else {
-              console.error(`❌ Excel file not found at any location`);
-              console.error(`   Tried: ${absoluteExcelPath}`);
-              console.error(`   Tried: ${altPath}`);
-              return;
             }
           }
           
-          const pdfFileName = path.basename(absoluteExcelPath).replace(".xlsx", ".pdf");
-          // PDF directory should be: backend/files/forecastPdf/user_{userId}/
-          const filesDir = path.join(__dirname, "../files");
-          const pdfDir = path.join(filesDir, "forecastPdf", `user_${userId}`);
-          const pdfPath = path.join(pdfDir, pdfFileName);
-          
-          // Ensure PDF directory exists
-          if (!fs.existsSync(pdfDir)) {
+          if (fs.existsSync(absoluteExcelPath)) {
+            const pdfFileName = path.basename(absoluteExcelPath).replace(".xlsx", ".pdf");
+            const pdfDir = path.join(__dirname, "../files/forecastPdf", `user_${userId}`);
+            const pdfPath = path.join(pdfDir, pdfFileName);
+            
             fs.mkdirSync(pdfDir, { recursive: true });
-            console.log(`📁 Created PDF directory: ${pdfDir}`);
-          }
-          
-          console.log(`📄 Auto-generating PDF report...`);
-          console.log(`   Excel: ${absoluteExcelPath}`);
-          console.log(`   PDF: ${pdfPath}`);
-          
-          await PDFService.generateForecastReport(absoluteExcelPath, pdfPath);
-          
-          // Verify PDF was created
-          if (fs.existsSync(pdfPath)) {
-            const pdfStats = fs.statSync(pdfPath);
-            console.log(`✅ PDF report generated successfully!`);
-            console.log(`   Path: ${pdfPath}`);
-            console.log(`   Size: ${(pdfStats.size / 1024).toFixed(2)} KB`);
-          } else {
-            console.error(`❌ PDF file was not created at: ${pdfPath}`);
+            
+            await PDFService.generateForecastReport(absoluteExcelPath, pdfPath);
+            console.log(`✅ PDF generated: ${pdfPath}`);
           }
         } catch (pdfErr) {
-          console.error("❌ Failed to auto-generate PDF (forecast still successful):", pdfErr.message);
-          console.error("   Stack:", pdfErr.stack);
-          // Don't fail the forecast if PDF generation fails
+          console.error("⚠️ PDF generation failed:", pdfErr.message);
         }
-      } else {
-        console.warn("⚠️ Could not parse output file path from Python stdout");
-        console.warn("   Full stdout:", stdout);
+        
+        return resultPath;
       }
+      
+      throw new Error("Could not extract forecast file path from output");
     } catch (err) {
-      console.error("❌ Forecast generation failed:", err.message || err);
-      status = "Failed";
-      throw err; // Re-throw so caller knows it failed
+      console.error("❌ Local forecast failed:", err.message);
+      throw err;
     }
-
-    // Note: No longer saving to JSON - forecast history is read directly from Excel files per user
-    // The /api/forecast/history endpoint reads from backend/files/forecastData/user_{userId}/
-
-    return resultPath;
   }
 
   // =====================================================
-  // ✅ Evaluate Forecast against weekly actuals
+  // ✅ HYBRID: Evaluate Forecast
   // =====================================================
   async evaluateForecast(userId) {
     console.log(`📊 Evaluating forecast for User ID: ${userId}...`);
     
-    // Make HTTP POST request to ML service /api/evaluate endpoint
+    const evaluateUrl = `${this.mlServiceUrl}/api/evaluate`;
+    
     try {
-      const axios = require("axios");
-      
-      const mlServiceUrl = process.env.ML_SERVICE_URL || "http://localhost:8000";
-      const evaluateUrl = `${mlServiceUrl}/api/evaluate`;
-      
       console.log(`   Calling: ${evaluateUrl}`);
       
-      // Build payload without sending explicit nulls
-      const payload = { user_id: userId.toString() };
-
-      const response = await axios.post(evaluateUrl, payload, {
-        timeout: 60000  // 60 second timeout for evaluation
-      });
+      const response = await axios.post(evaluateUrl, 
+        { user_id: userId.toString() },
+        { timeout: 60000 }
+      );
 
       console.log(`✅ Evaluation completed for user ${userId}`);
-      console.log(`   Result: ${JSON.stringify(response.data, null, 2)}`);
-
       return response.data;
     } catch (err) {
-      // Better error logging
       let errorMsg = "Unknown error";
       
       if (err.response) {
-        // Server responded with error
         const rd = err.response.data;
-        errorMsg = rd?.detail || rd || err.response.statusText || "Server error";
-        // Ensure we stringify objects for readable logs
-        const printable = typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg);
-        console.error(`⚠️ Evaluation API returned ${err.response.status}: ${printable}`);
+        errorMsg = rd?.detail || rd?.message || err.response.statusText;
+        console.error(`⚠️ Evaluation API returned ${err.response.status}: ${errorMsg}`);
       } else if (err.request) {
-        // Request made but no response
-        errorMsg = "No response from ML service - is it running on port 8000?";
+        errorMsg = "No response from ML service";
         console.error(`⚠️ ${errorMsg}`);
       } else {
-        // Error in request setup
         errorMsg = err.message;
         console.error(`⚠️ Request error: ${err.message}`);
       }
       
-      console.error(`⚠️ Evaluation failed: ${errorMsg}`);
-      throw new Error(`Evaluation failed: ${typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg)}`);
+      throw new Error(`Evaluation failed: ${errorMsg}`);
     }
   }
 
   // =====================================================
-  // ❌ Removed: Save forecast history to JSON
-  // Forecast history is now read directly from Excel files per user
-  // See: /api/forecast/history endpoint in backend/routes/forecast.js
+  // ✅ HYBRID: Check if Model Exists
   // =====================================================
-
-  // =====================================================
-  // ✅ Check if model exists
-  // ====================================================No forecast directory found=
-  checkIfModelExists(userId) {
-    const modelDir = path.join(__dirname, "../../ml-service/models", `user_${userId}`);
-    const lstmPath = path.join(modelDir, "lstm_model.keras");
-    const xgbPath = path.join(modelDir, "xgb_model.json");
-    return fs.existsSync(lstmPath) && fs.existsSync(xgbPath);
+  async checkIfModelExists(userId) {
+    if (this.isProduction) {
+      // PRODUCTION: Call ML Service API
+      try {
+        const statusUrl = `${this.mlServiceUrl}/api/model-status/${userId}`;
+        const response = await axios.get(statusUrl, { timeout: 10000 });
+        return response.data.model_exists || false;
+      } catch (err) {
+        console.error(`⚠️ Could not check model status (remote):`, err.message);
+        return false;
+      }
+    } else {
+      // LOCAL: Check file system directly
+      const modelDir = path.join(__dirname, "../../ml-service/models", `user_${userId}`);
+      
+      if (!fs.existsSync(modelDir)) return false;
+      
+      const productDirs = fs.readdirSync(modelDir).filter(d => {
+        const fullPath = path.join(modelDir, d);
+        return fs.statSync(fullPath).isDirectory();
+      });
+      
+      return productDirs.some(prodDir => {
+        const lstmPath = path.join(modelDir, prodDir, "lstm_model.keras");
+        const xgbPath = path.join(modelDir, prodDir, "xgb_model.json");
+        return fs.existsSync(lstmPath) && fs.existsSync(xgbPath);
+      });
+    }
   }
 
   // =====================================================
-  // ✅ Preprocess Data
+  // ✅ HYBRID: Preprocess Data
   // =====================================================
-  // Preprocess Data
-  // @param {string} userId - User ID
-  // @param {boolean} isWeekly - True if weekly upload, false if training data
-  // 
-
   async preprocessData(userId, isWeekly = false) {
     console.log(`🔄 Starting preprocessing for User ID: ${userId}...`);
     console.log(`   Type: ${isWeekly ? 'WEEKLY' : 'TRAINING'}`);
@@ -286,8 +275,75 @@ class PythonService {
       message: "Starting data preprocessing...",
     });
 
+    if (this.isProduction) {
+      // PRODUCTION: Upload file to ML Service
+      return this._preprocessDataRemote(userId, isWeekly);
+    } else {
+      // LOCAL: Run Python script
+      return this._preprocessDataLocal(userId, isWeekly);
+    }
+  }
+
+  async _preprocessDataRemote(userId, isWeekly) {
+    try {
+      const salesDataDir = path.join(__dirname, "../files/salesData", `user_${userId}`);
+      
+      if (!fs.existsSync(salesDataDir)) {
+        throw new Error(`No sales data found for user ${userId}`);
+      }
+      
+      const files = fs.readdirSync(salesDataDir)
+        .filter(f => f.endsWith('.csv') || f.endsWith('.xlsx'))
+        .sort((a, b) => {
+          const statA = fs.statSync(path.join(salesDataDir, a));
+          const statB = fs.statSync(path.join(salesDataDir, b));
+          return statB.mtimeMs - statA.mtimeMs;
+        });
+      
+      if (files.length === 0) {
+        throw new Error(`No CSV/Excel files found for user ${userId}`);
+      }
+      
+      const latestFile = files[0];
+      const filePath = path.join(salesDataDir, latestFile);
+      
+      console.log(`📤 Uploading file to ML service: ${latestFile}`);
+      
+      const formData = new FormData();
+      formData.append('file', fs.createReadStream(filePath));
+      formData.append('user_id', userId.toString());
+      formData.append('is_weekly', isWeekly.toString());
+      
+      const preprocessUrl = `${this.mlServiceUrl}/api/preprocess`;
+      const response = await axios.post(preprocessUrl, formData, {
+        headers: formData.getHeaders(),
+        timeout: 120000,
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      });
+      
+      this.preprocessStatusByUserId.set(String(userId), {
+        state: "done",
+        progress: 100,
+        message: "Preprocessing completed successfully!",
+      });
+      
+      console.log(`✅ Remote preprocessing completed`);
+      return response.data;
+    } catch (err) {
+      this.preprocessStatusByUserId.set(String(userId), {
+        state: "error",
+        progress: 0,
+        message: `Preprocessing failed: ${err.message}`,
+      });
+      
+      throw new Error(`Remote preprocessing failed: ${err.message}`);
+    }
+  }
+
+  async _preprocessDataLocal(userId, isWeekly) {
     const script = path.join(__dirname, "../../ml-service/processData.py");
-    const args = [userId.toString(), isWeekly.toString()];  // ✅ Pass is_weekly flag
+    const args = [userId.toString(), isWeekly.toString()];
 
     try {
       const output = await this.runScript(script, args);
@@ -298,7 +354,7 @@ class PythonService {
         message: "Preprocessing completed successfully!",
       });
       
-      console.log(`✅ Preprocessing completed for user ${userId}`);
+      console.log(`✅ Local preprocessing completed`);
       return output;
     } catch (err) {
       this.preprocessStatusByUserId.set(String(userId), {
@@ -306,56 +362,66 @@ class PythonService {
         progress: 0,
         message: `Preprocessing failed: ${err.message}`,
       });
-      console.error(`❌ Preprocessing failed for user ${userId}:`, err.message);
+      
       throw err;
     }
   }
 
   // =====================================================
-  // ✅ Train Model
+  // ✅ HYBRID: Train Model
   // =====================================================
   async trainModel(userId) {
     console.log(`🎯 Starting model training for User ID: ${userId}...`);
 
-    const script = path.join(__dirname, "../../ml-service/trainModel.py");
-    const args = [userId.toString()];
+    if (this.isProduction) {
+      // PRODUCTION: Call ML Service
+      try {
+        const trainUrl = `${this.mlServiceUrl}/api/train`;
+        const response = await axios.post(trainUrl, 
+          { user_id: userId.toString() },
+          { timeout: 600000 } // 10 minutes
+        );
+        
+        console.log(`✅ Remote training started`);
+        return response.data;
+      } catch (err) {
+        throw new Error(`Remote training failed: ${err.message}`);
+      }
+    } else {
+      // LOCAL: Run Python script
+      const script = path.join(__dirname, "../../ml-service/trainModel.py");
+      const args = [userId.toString()];
 
-    try {
-      const output = await this.runScript(script, args);
-      console.log(`✅ Model training completed for user ${userId}`);
-      return output;
-    } catch (err) {
-      console.error(`❌ Model training failed for user ${userId}:`, err.message);
-      throw err;
+      try {
+        const output = await this.runScript(script, args);
+        console.log(`✅ Local training completed`);
+        return output;
+      } catch (err) {
+        throw err;
+      }
     }
   }
 
   // =====================================================
-  // ✅ Convert Excel to CSV
+  // ✅ LOCAL ONLY: Convert Excel to CSV (using xlsx library)
   // =====================================================
   async convertToCsv(excelPath) {
     console.log(`🔄 Converting Excel to CSV: ${excelPath}`);
     
-    const script = path.join(__dirname, "../../ml-service/convertToCsv.py");
-    const args = [excelPath];
-
     try {
-      const output = await this.runScript(script, args);
-      // The Python script should output the CSV file path
-      // Extract it from output or construct it
-      const csvPath = excelPath.replace(/\.xlsx?$/, ".csv");
+      const XLSX = require('xlsx');
       
-      if (fs.existsSync(csvPath)) {
-        console.log(`✅ Excel converted to CSV: ${csvPath}`);
-        return csvPath;
-      } else {
-        // Try to extract path from output
-        const pathMatch = output.match(/([^\s]+\.csv)/);
-        if (pathMatch && fs.existsSync(pathMatch[1])) {
-          return pathMatch[1];
-        }
-        throw new Error("CSV file not found after conversion");
-      }
+      const workbook = XLSX.readFile(excelPath);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      
+      const csvPath = excelPath.replace(/\.xlsx?$/i, ".csv");
+      const csv = XLSX.utils.sheet_to_csv(worksheet);
+      
+      fs.writeFileSync(csvPath, csv, 'utf8');
+      
+      console.log(`✅ Excel converted to CSV: ${csvPath}`);
+      return csvPath;
     } catch (err) {
       console.error(`❌ Excel to CSV conversion failed:`, err.message);
       throw err;
@@ -363,56 +429,23 @@ class PythonService {
   }
 
   // =====================================================
-  // ✅ Count rows in CSV or Excel file
+  // ✅ LOCAL ONLY: Count rows (using xlsx library)
   // =====================================================
   async countRows(filePath) {
     try {
-      // Create a simple Python script to count rows
-      const countScript = `
-import sys
-import pandas as pd
-
-file_path = sys.argv[1]
-
-try:
-    if file_path.endswith('.csv'):
-        df = pd.read_csv(file_path, encoding='utf-8', on_bad_lines='skip', engine='python')
-    elif file_path.endswith('.xlsx') or file_path.endswith('.xls'):
-        df = pd.read_excel(file_path)
-    else:
-        print(0)
-        sys.exit(0)
-    
-    # Count non-empty rows (excluding header)
-    row_count = len(df.dropna(how='all'))
-    print(row_count)
-except Exception as e:
-    print(0)
-    sys.exit(1)
-`;
-
-      // Write temporary script
-      const tempScriptPath = path.join(__dirname, "../../ml-service/temp_count_rows.py");
-      fs.writeFileSync(tempScriptPath, countScript, "utf8");
-
-      try {
-        const output = await this.runScript(tempScriptPath, [filePath]);
-        const count = parseInt(output.trim(), 10);
-        
-        // Clean up temp script
-        if (fs.existsSync(tempScriptPath)) {
-          fs.unlinkSync(tempScriptPath);
-        }
-        
-        return isNaN(count) ? 0 : count;
-      } catch (err) {
-        // Clean up temp script on error
-        if (fs.existsSync(tempScriptPath)) {
-          fs.unlinkSync(tempScriptPath);
-        }
-        console.error("❌ Error counting rows:", err.message);
-        return 0;
+      if (filePath.endsWith('.csv')) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const lines = content.split('\n').filter(line => line.trim());
+        return Math.max(0, lines.length - 1); // Exclude header
+      } else if (filePath.endsWith('.xlsx') || filePath.endsWith('.xls')) {
+        const XLSX = require('xlsx');
+        const workbook = XLSX.readFile(filePath);
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const data = XLSX.utils.sheet_to_json(worksheet);
+        return data.length;
       }
+      return 0;
     } catch (err) {
       console.error("❌ Failed to count rows:", err.message);
       return 0;
