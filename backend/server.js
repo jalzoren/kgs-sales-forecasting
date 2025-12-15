@@ -23,7 +23,7 @@ const PORT = process.env.PORT || 5000;
 app.set("trust proxy", 1); // Required behind proxy (Render)
 
 app.use(cors({
-  origin: "https://kgs-sales-forecasting-frontend.onrender.com" || "https://kgs-sales-forecasting-frontend1.onrender.com",// your frontend URL
+  origin: "https://kgs-sales-forecasting-frontend1.onrender.com", // your frontend URL
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 }));
