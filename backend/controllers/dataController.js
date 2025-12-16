@@ -197,69 +197,6 @@ class DataController {
   }
 
   /* ----------------------------------------------------
-   * USER DATA STATUS
-   * -------------------------------------------------- */
-  async getUserDataStatus(req, res) {
-    try {
-      const userId = req.session.user?.id;
-      if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
-      const result = await db.query(
-        `SELECT COUNT(*) as count FROM salesdata WHERE userid = $1`,
-        [userId]
-      );
-
-      const count = parseInt(result.rows[0].count) || 0;
-      res.json({ hasData: count > 0, dataCount: count });
-    } catch (err) {
-      console.error("❌ getUserDataStatus error:", err.message);
-      res.status(500).json({ message: "Failed to check data status" });
-    }
-  }
-
-  /* ----------------------------------------------------
-   * PREPROCESSING STATUS
-   * -------------------------------------------------- */
-  async getPreprocessStatus(req, res) {
-    try {
-      const userId = req.session.user?.id;
-      if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
-      const result = await db.query(
-        `SELECT COUNT(*) as count FROM salesdata WHERE userid = $1 AND status = $2`,
-        [userId, "Preprocessing"]
-      );
-
-      const count = parseInt(result.rows[0].count) || 0;
-      res.json({ isProcessing: count > 0, processingCount: count });
-    } catch (err) {
-      console.error("❌ getPreprocessStatus error:", err.message);
-      res.status(500).json({ message: "Failed to check preprocessing status" });
-    }
-  }
-
-  /* ----------------------------------------------------
-   * TRAINING STATUS
-   * -------------------------------------------------- */
-  async getTrainingStatus(req, res) {
-    try {
-      const userId = req.session.user?.id;
-      if (!userId) return res.status(401).json({ message: "Unauthorized" });
-
-      const result = await db.query(
-        `SELECT COUNT(*) as count FROM salesdata WHERE userid = $1 AND status = $2`,
-        [userId, "Training"]
-      );
-
-      const count = parseInt(result.rows[0].count) || 0;
-      res.json({ isTraining: count > 0, trainingCount: count });
-    } catch (err) {
-      console.error("❌ getTrainingStatus error:", err.message);
-      res.status(500).json({ message: "Failed to check training status" });
-    }
-  }
-
-  /* ----------------------------------------------------
    * DELETE UPLOAD
    * -------------------------------------------------- */
   async deleteUpload(req, res) {
