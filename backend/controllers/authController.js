@@ -110,7 +110,11 @@ class AuthController {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const user = resultsObj.rows[0];
+      const user = results[0];
+
+          if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
       // Initialize session attempts if not exists
       if (!req.session.loginAttempts) {

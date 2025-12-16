@@ -5,7 +5,6 @@ const cors = require("cors");
 const path = require("path");
 
 const sessionConfig = require("./config/sessionConfig");
-const db = require("./config/db");
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
@@ -24,24 +23,10 @@ const PORT = process.env.PORT || 5000;
 
 app.set("trust proxy", 1); // Required behind proxy (Render)
 
-// Allow configured frontend URL(s) for CORS. Use environment variable `FRONTEND_URL`
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  "https://kgs-sales-forecasting-frontend1.onrender.com",
-  "https://kgs-sales-forecasting-yerg.onrender.com",
-].filter(Boolean);
-
 app.use(cors({
-  origin: (origin, callback) => {
-    // allow requests with no origin (e.g., mobile apps or curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      return callback(null, true);
-    }
-    return callback(new Error('CORS policy: Origin not allowed'));
-  },
+  origin: "https://kgs-sales-forecasting-frontend1.onrender.com", // your frontend URL
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true,
+  credentials: true
 }));
 
 
@@ -94,26 +79,6 @@ app.get("/api/check-session", (req, res) => {
 // =======================
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
-});
-
-// =======================
-// Health check
-// =======================
-app.get("/health", async (req, res) => {
-  try {
-    const result = await db.query("SELECT 1");
-    return res.json({ ok: true, db: !!result });
-  } catch (err) {
-    console.error("Health check DB error:", err);
-    return res.status(500).json({ ok: false, error: err.message });
-  }
-});
-
-// Global error handler to return JSON for uncaught errors
-app.use((err, req, res, next) => {
-  console.error("Unhandled error:", err && err.stack ? err.stack : err);
-  if (res.headersSent) return next(err);
-  res.status(500).json({ message: "Server error", error: err && err.message ? err.message : String(err) });
 });
 
 // =======================
