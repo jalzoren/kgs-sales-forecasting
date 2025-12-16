@@ -73,8 +73,15 @@ const res = await fetch(url, {
         window.location.href = "/";
         return;
       }
-      
+      // 404 => no uploads yet (treat as empty list)
+      if (res.status === 404) {
+        if (showLoading && isInitialLoad) Swal.close();
+        setUploads([]);
+        return;
+      }
+
       if (!res.ok) {
+        // Try to parse JSON safely, otherwise fallback to status text
         const errorData = await res.json().catch(() => ({ message: res.statusText }));
         if (showLoading && isInitialLoad) {
           Swal.close();
@@ -88,8 +95,8 @@ const res = await fetch(url, {
         setUploads([]);
         return;
       }
-      
-      const data = await res.json();
+
+      const data = await res.json().catch(() => []);
       if (Array.isArray(data)) {
         setUploads(data);
         if (showLoading && isInitialLoad) {
