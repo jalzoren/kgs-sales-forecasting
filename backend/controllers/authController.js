@@ -101,17 +101,23 @@ class AuthController {
       return res.status(400).json({ message: "Missing email or password" });
 
     try {
+      console.log("🔐 Login attempt for email:", email);
+      
       // Get user by email
       const resultsObj = await db.query(
         `SELECT userid, email, password, firstname, lastname FROM "user" WHERE email = $1`,
         [email]
       );
 
+      console.log("📊 Query result rowCount:", resultsObj.rowCount);
+      
       if (resultsObj.rowCount === 0) {
+        console.log("⚠️ User not found");
         return res.status(404).json({ message: "User not found" });
       }
 
       const user = resultsObj.rows[0];
+      console.log("✅ User found:", user.email);
 
       // Initialize session attempts if not exists
       if (!req.session.loginAttempts) {
@@ -185,8 +191,9 @@ class AuthController {
 
       res.json({ message: "Login successful", user: req.session.user });
     } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Server error" });
+      console.error("❌ Login error:", error.message);
+      console.error("   Stack:", error.stack);
+      res.status(500).json({ message: "Server error during login", error: error.message });
     }
   }
 

@@ -14,9 +14,9 @@ class NotificationController {
       console.log("Fetching notifications for userId:", userId); // Debug log
 
       db.query(
-        `SELECT notificationId as id, type, title, message, timestamp, isRead as \`read\` 
+        `SELECT notificationid as id, type, title, message, timestamp, isread as \`read\` 
          FROM notifications 
-         WHERE userId = ? 
+         WHERE userid = ? 
          ORDER BY timestamp DESC`,
         [userId],
         (err, notifications) => {
@@ -51,7 +51,7 @@ class NotificationController {
       console.log("Creating notification for userId:", userId); // Debug log
 
       db.query(
-        `INSERT INTO notifications (userId, type, title, message) VALUES (?, ?, ?, ?)`,
+        `INSERT INTO notifications (userid, type, title, message) VALUES (?, ?, ?, ?)`,
         [userId, type, title, message],
         (err, result) => {
           if (err) {
@@ -61,8 +61,8 @@ class NotificationController {
 
           // Fetch the newly created notification
           db.query(
-            `SELECT notificationId as id, type, title, message, timestamp, isRead as \`read\` 
-             FROM notifications WHERE notificationId = ?`,
+            `SELECT notificationid as id, type, title, message, timestamp, isread as \`read\` 
+             FROM notifications WHERE notificationid = ?`,
             [result.insertId],
             (err, newNotif) => {
               if (err) {
@@ -90,7 +90,7 @@ class NotificationController {
       const userId = req.session.user.id;
 
       db.query(
-        `UPDATE notifications SET isRead = 1 WHERE notificationId = ? AND userId = ?`,
+        `UPDATE notifications SET isread = 1 WHERE notificationid = ? AND userid = ?`,
         [req.params.id, userId],
         (err, result) => {
           if (err) {
@@ -121,7 +121,7 @@ class NotificationController {
       const userId = req.session.user.id;
 
       db.query(
-        `UPDATE notifications SET isRead = 1 WHERE userId = ?`,
+        `UPDATE notifications SET isread = 1 WHERE userid = ?`,
         [userId],
         (err, result) => {
           if (err) {
@@ -147,7 +147,7 @@ class NotificationController {
       const userId = req.session.user.id;
 
       db.query(
-        `DELETE FROM notifications WHERE notificationId = ? AND userId = ?`,
+        `DELETE FROM notifications WHERE notificationid = ? AND userid = ?`,
         [req.params.id, userId],
         (err, result) => {
           if (err) {
@@ -178,7 +178,7 @@ class NotificationController {
       const userId = req.session.user.id;
 
       db.query(
-        `DELETE FROM notifications WHERE userId = ?`,
+        `DELETE FROM notifications WHERE userid = ?`,
         [userId],
         (err, result) => {
           if (err) {
