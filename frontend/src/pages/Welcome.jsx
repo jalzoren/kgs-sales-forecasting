@@ -5,10 +5,9 @@ import "../css/Welcome.css";
 import Welcomed from "/Welcomed.svg";
 import { FaRegQuestionCircle } from "react-icons/fa";
 import Swal from "sweetalert2";
-// Normalize VITE_API_URL so we always build requests against the backend '/api' prefix.
-const _RAW_API = import.meta.env.VITE_API_URL || "";
-const _API_BASE = _RAW_API.replace(/\/api\/?$/, "").replace(/\/$/, "");
-const API = `${_API_BASE}/api`;
+
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // includes /api
+const API = `${API_BASE}/api`;
 
 // ganto lang? yung pathing lalagyaan ng API na ganto tapos import?, oo kasi diba ang usual na ginagawa natin is nakalocalhost, papaltan lang yon, sa chatgpt ako nagaano kung saan error
 // tapos? check m lang logs, if may error, papagawa ko na rin dapat ung sa connection ng ml-service sa render

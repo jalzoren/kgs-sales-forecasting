@@ -19,10 +19,9 @@ import {
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
-// Normalize VITE_API_URL so we always build requests against the backend '/api' prefix.
-const _RAW_API = import.meta.env.VITE_API_URL || "";
-const _API_BASE = _RAW_API.replace(/\/api\/?$/, "").replace(/\/$/, "");
-const API = `${_API_BASE}/api`;
+
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // includes /api
+const API = `${API_BASE}/api`;
 
 export default function UploadBox() {
   const {
