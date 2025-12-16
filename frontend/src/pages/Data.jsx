@@ -20,9 +20,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Manila");
 
-const RAW_API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
-const API_BASE = RAW_API.endsWith("/api") ? RAW_API : `${RAW_API}/api`;
-const API = `${API_BASE}/api`;
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, "");const API = `${API_BASE}/api`;
 
 export default function UploadBox() {
   const {
@@ -58,7 +56,7 @@ export default function UploadBox() {
     try {
      const url = showLoading
   ? `${API}/data`
-  : `${API}/data?polling=true`;
+  : `$${API}/api/data?polling=true`;
 
 const res = await fetch(url, {
   method: "GET",
