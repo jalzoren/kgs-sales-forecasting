@@ -40,12 +40,13 @@ class AuthController {
     try {
       // Check if email already exists
       console.log("🔍 Checking if email exists:", email);
-      const existingUsers = await db.query("user", {
-        params: { email: `eq.${email}` },
-      });
-      console.log("📊 Existing users found:", existingUsers);
+      const existingUsersResult = await db.query(
+        `SELECT userid FROM "user" WHERE email = $1`,
+        [email]
+      );
+      console.log("📊 Existing users found:", existingUsersResult.rowCount);
 
-      if (existingUsers && existingUsers.length > 0) {
+      if (existingUsersResult.rowCount > 0) {
         console.log("⚠️ Email already registered");
         return res.status(409).json({ message: "Email already registered" });
       }
@@ -54,30 +55,29 @@ class AuthController {
       console.log("🔐 Hashing password...");
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Insert new user
+      // Insert new user and return the created row
       console.log("💾 Inserting new user into database...");
-      const newUser = await db.query("user", {
-        method: "POST",
-        data: {
-          firstname: firstName,
-          lastname: lastName,
-          email: email,
-          password: hashedPassword,
-        },
-      });
-      console.log("✅ User created:", newUser);
+      const newUserResult = await db.query(
+        `INSERT INTO "user" (firstname, lastname, email, password) 
+         VALUES ($1, $2, $3, $4)
+         RETURNING userid, email, firstname, lastname`,
+        [firstName, lastName, email, hashedPassword]
+      );
+      console.log("✅ User created:", newUserResult.rows[0]);
 
-      if (!newUser || newUser.length === 0) {
+      if (!newUserResult.rows || newUserResult.rows.length === 0) {
         console.error("❌ Registration error: No user returned");
         return res.status(500).json({ message: "Failed to create account" });
       }
 
+      const newUser = newUserResult.rows[0];
+
       // Auto-login after registration
       req.session.user = {
-        id: newUser[0].userid,
-        email: newUser[0].email,
-        firstName: newUser[0].firstname,
-        lastName: newUser[0].lastname,
+        id: newUser.userid,
+        email: newUser.email,
+        firstName: newUser.firstname,
+        lastName: newUser.lastname,
       };
 
       res.json({
@@ -86,10 +86,10 @@ class AuthController {
       });
     } catch (error) {
       console.error("❌ Registration error:", error);
-      console.error("Error details:", error.response?.data || error.message);
+      console.error("Error details:", error.message);
       res.status(500).json({ 
         message: "Server error during registration",
-        error: error.response?.data || error.message 
+        error: error.message
       });
     }
   }
@@ -102,15 +102,16 @@ class AuthController {
 
     try {
       // Get user by email
-      const results = await db.query("user", {
-        params: { email: `eq.${email}` },
-      });
+      const resultsObj = await db.query(
+        `SELECT userid, email, password, firstname, lastname FROM "user" WHERE email = $1`,
+        [email]
+      );
 
-      if (!results || results.length === 0) {
+      if (resultsObj.rowCount === 0) {
         return res.status(404).json({ message: "User not found" });
       }
 
-      const user = results[0];
+      const user = resultsObj.rows[0];
 
       // Initialize session attempts if not exists
       if (!req.session.loginAttempts) {
@@ -221,16 +222,13 @@ class AuthController {
     const expiry = new Date(Date.now() + 3 * 60000);
 
     try {
-      const result = await db.query("user", {
-        method: "PATCH",
-        params: { email: `eq.${email}` },
-        data: {
-          resetcode: code,
-          codeexpiry: expiry.toISOString(),
-        },
-      });
+      const resultObj = await db.query(
+        `UPDATE "user" SET resetcode = $1, codeexpiry = $2 WHERE email = $3
+         RETURNING userid`,
+        [code, expiry.toISOString(), email]
+      );
 
-      if (!result || result.length === 0) {
+      if (resultObj.rowCount === 0) {
         return res.status(404).json({ message: "Email not found" });
       }
 
@@ -253,18 +251,16 @@ class AuthController {
       return res.status(400).json({ message: "Missing email or code" });
 
     try {
-      const results = await db.query("user", {
-        params: {
-          email: `eq.${email}`,
-          select: "resetcode,codeexpiry",
-        },
-      });
+      const resultsObj = await db.query(
+        `SELECT resetcode, codeexpiry FROM "user" WHERE email = $1`,
+        [email]
+      );
 
-      if (!results || results.length === 0) {
+      if (resultsObj.rowCount === 0) {
         return res.status(404).json({ message: "Email not found" });
       }
 
-      const user = results[0];
+      const user = resultsObj.rows[0];
       const now = new Date();
 
       if (user.resetcode !== code) {
@@ -301,17 +297,13 @@ class AuthController {
     try {
       const hashed = await bcrypt.hash(newPassword, 10);
 
-      const result = await db.query("user", {
-        method: "PATCH",
-        params: { email: `eq.${email}` },
-        data: {
-          password: hashed,
-          resetcode: null,
-          codeexpiry: null,
-        },
-      });
+      const resultObj = await db.query(
+        `UPDATE "user" SET password = $1, resetcode = NULL, codeexpiry = NULL WHERE email = $2
+         RETURNING userid`,
+        [hashed, email]
+      );
 
-      if (!result || result.length === 0) {
+      if (resultObj.rowCount === 0) {
         return res.status(404).json({ message: "Email not found" });
       }
 
