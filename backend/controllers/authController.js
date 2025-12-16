@@ -106,11 +106,7 @@ class AuthController {
         params: { email: `eq.${email}` },
       });
 
-<<<<<<< HEAD
       if (!results || results.length === 0) {
-=======
-      if (resultsObj.rowCount === 0) {
->>>>>>> parent of 4a24b326 (Fixing the login kasi nagkaerror, kung nagka error parin balik sa data tab fixing)
         return res.status(404).json({ message: "User not found" });
       }
 
