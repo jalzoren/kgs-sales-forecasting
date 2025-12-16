@@ -6,7 +6,7 @@ from datetime import datetime
 
 UPLOAD_DIR = "../backend/files/salesData"
 CLEAN_DIR = "../backend/files/cleanData"
-WEEKLY_DIR = "../backend/files/weeklyData"  # NEW: Separate folder for weekly uploads
+WEEKLY_DIR = "../backend/files/weeklyData" 
 
 
 def ensure_user_folder(base_dir: str, user_id: str) -> str:

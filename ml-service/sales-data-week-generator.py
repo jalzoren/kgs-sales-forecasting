@@ -1,4 +1,4 @@
-# sales data week generator — REALISTIC VERSION (2025-11-20 tested)
+# sales data week generator 
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
@@ -7,7 +7,7 @@ import os
 
 # ============================= CONFIGURATION =============================
 CONFIG = {
-    "start_date": "2025-11-24",          # Monday
+    "start_date": "2025-12-1",          # Monday
     "min_quantity": 1,
     "max_quantity": 5,
 

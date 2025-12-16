@@ -7,7 +7,7 @@ import os
 
 # ============================= CONFIGURATION =============================
 CONFIG = {
-    "year": 2024,                        # Updated to 2025
+    "year": 2021,                        # Updated to 2025
     "base_tx_per_day": 75,               # ↓ Further reduced (~60–90 tx/day)
     "tx_variation": 0.18,                # Slightly lower variation
 
