@@ -101,14 +101,16 @@ class AuthController {
       return res.status(400).json({ message: "Missing email or password" });
 
     try {
-      console.log("🔐 Login attempt for email:", email);
-      
       // Get user by email
       const results = await db.query("user", {
         params: { email: `eq.${email}` },
       });
 
+<<<<<<< HEAD
       if (!results || results.length === 0) {
+=======
+      if (resultsObj.rowCount === 0) {
+>>>>>>> parent of 4a24b326 (Fixing the login kasi nagkaerror, kung nagka error parin balik sa data tab fixing)
         return res.status(404).json({ message: "User not found" });
       }
 
@@ -186,9 +188,8 @@ class AuthController {
 
       res.json({ message: "Login successful", user: req.session.user });
     } catch (error) {
-      console.error("❌ Login error:", error.message);
-      console.error("   Stack:", error.stack);
-      res.status(500).json({ message: "Server error during login", error: error.message });
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Server error" });
     }
   }
 
