@@ -13,6 +13,7 @@ const forecastRoutes = require("./routes/forecast");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const homeRoutes = require("./routes/homeRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const forecastRoutes = require("./routes/forecast");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
