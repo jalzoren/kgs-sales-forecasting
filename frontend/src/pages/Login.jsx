@@ -5,10 +5,9 @@ import Swal from "sweetalert2";
 import SessionManager from "../services/sessionManager";
 import "../css/Login.css";
 
-// Remove trailing slash if any
-
-
-const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, ""); // includes /api
+// Normalize API base so it always includes a single /api
+const RAW_API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+const API_BASE = RAW_API.endsWith("/api") ? RAW_API : `${RAW_API}/api`;
 const LOGIN_API = `${API_BASE}/login`;
 
 

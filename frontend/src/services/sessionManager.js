@@ -20,7 +20,9 @@
  *   - Navbar.jsx: invalidateForecastCache() after data changes
  * ═══════════════════════════════════════════════════════════════
  */
-const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+// Normalize API base so it always includes a single /api
+const RAW_API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
+const API_BASE = RAW_API.endsWith("/api") ? RAW_API : `${RAW_API}/api`;
 const LOGIN_API = `${API_BASE}/login`;
 const SESSION_API = `${API_BASE}/check-session`;
 
