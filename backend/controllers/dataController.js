@@ -185,16 +185,35 @@ class DataController {
    * -------------------------------------------------- */
   async getUploads(req, res) {
     const userId = req.session.user?.id;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-    const result = await db.query(
-      `SELECT * FROM salesdata
-       WHERE userid = $1
-       ORDER BY uploaddate DESC`,
-      [userId]
-    );
+    try {
+      const result = await db.query(
+        `SELECT * FROM salesdata
+        WHERE userid = $1
+        ORDER BY uploaddate DESC`,
+        [userId]
+      );
 
-    res.json(result.rows);
+      // ✅ ALWAYS return an array (even if empty)
+      // 404 is NOT appropriate here - empty data is a valid state
+      if (result.rows.length === 0) {
+        console.log(`ℹ️ No uploads found for user ${userId} (new user)`);
+        return res.json([]); // ✅ Return empty array, not 404
+      }
+
+      console.log(`✅ Found ${result.rows.length} upload(s) for user ${userId}`);
+      res.json(result.rows);
+    } catch (err) {
+      console.error("❌ Error fetching uploads:", err);
+      res.status(500).json({ 
+        message: "Failed to fetch uploads",
+        error: err.message 
+      });
+    }
   }
 
   /* ----------------------------------------------------
@@ -210,6 +229,134 @@ class DataController {
 
     res.json({ message: "Upload deleted successfully" });
   }
+
+  /* ----------------------------------------------------
+  * GET USER DATA STATUS (for Welcome page)
+  * -------------------------------------------------- */
+  async getUserDataStatus(req, res) {
+    const userId = req.session.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      // Check if user has any uploads
+      const uploadsResult = await db.query(
+        `SELECT COUNT(*) as count, 
+                MAX(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as has_completed
+        FROM salesdata 
+        WHERE userid = $1`,
+        [userId]
+      );
+
+      const dataCount = parseInt(uploadsResult.rows[0]?.count || 0);
+      const hasModels = uploadsResult.rows[0]?.has_completed === 1;
+
+      res.json({
+        hasData: dataCount > 0,
+        dataCount: dataCount,
+        hasModels: hasModels
+      });
+    } catch (err) {
+      console.error("❌ Error checking user data status:", err);
+      res.status(500).json({ 
+        message: "Failed to check data status",
+        error: err.message 
+      });
+    }
+  }
+
+  /* ----------------------------------------------------
+  * GET PREPROCESSING STATUS
+  * -------------------------------------------------- */
+  async getPreprocessStatus(req, res) {
+    const userId = req.session.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const PythonService = require("../services/pythonService");
+      const status = PythonService.getPreprocessStatus(userId);
+      res.json(status);
+    } catch (err) {
+      console.error("❌ Error getting preprocess status:", err);
+      res.json({ 
+        state: "idle", 
+        progress: 0, 
+        message: "No preprocessing in progress" 
+      });
+    }
+  }
+
+  /* ----------------------------------------------------
+  * GET TRAINING STATUS
+  * -------------------------------------------------- */
+  async getTrainingStatus(req, res) {
+    const userId = req.session.user?.id;
+    
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      // Check if there's an ongoing training by checking latest upload status
+      const result = await db.query(
+        `SELECT status FROM salesdata 
+        WHERE userid = $1 
+        ORDER BY uploaddate DESC 
+        LIMIT 1`,
+        [userId]
+      );
+
+      if (result.rows.length === 0) {
+        return res.json({ 
+          state: "idle", 
+          progress: 0, 
+          message: "No training in progress" 
+        });
+      }
+
+      const status = result.rows[0].status;
+
+      if (status === "Training") {
+        return res.json({
+          state: "running",
+          progress: 50, // Generic progress since we don't track exact progress
+          message: "Training models..."
+        });
+      } else if (status === "Completed") {
+        return res.json({
+          state: "done",
+          progress: 100,
+          message: "Training completed"
+        });
+      } else if (status === "Failed") {
+        return res.json({
+          state: "error",
+          progress: 0,
+          message: "Training failed"
+        });
+      } else {
+        return res.json({
+          state: "idle",
+          progress: 0,
+          message: "No training in progress"
+        });
+      }
+    } catch (err) {
+      console.error("❌ Error getting training status:", err);
+      res.json({ 
+        state: "idle", 
+        progress: 0, 
+        message: "No training in progress" 
+      });
+    }
+  }
 }
+
+
 
 module.exports = new DataController();
