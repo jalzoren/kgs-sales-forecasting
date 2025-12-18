@@ -8,7 +8,6 @@ import Swal from "sweetalert2";
 
 const RAW_API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
 const API_BASE = RAW_API.endsWith("/api") ? RAW_API : `${RAW_API}/api`;
-const API = `${API_BASE}/api`;
 
 // ganto lang? yung pathing lalagyaan ng API na ganto tapos import?, oo kasi diba ang usual na ginagawa natin is nakalocalhost, papaltan lang yon, sa chatgpt ako nagaano kung saan error
 // tapos? check m lang logs, if may error, papagawa ko na rin dapat ung sa connection ng ml-service sa render
@@ -46,7 +45,7 @@ export default function Welcome() {
 
   const checkUserStatus = async (isInitial = false) => {
     try {
-      const res = await fetch(`${API}/data?polling=true`, {
+      const res = await fetch(`${API_BASE}/data?polling=true`, {
         credentials: "include",
       });
       
@@ -74,7 +73,7 @@ export default function Welcome() {
       // ✅ Check forecast with proper validation
       let hasForecast = false;
       try {
-        const forecastRes = await fetch(`${API}/forecast/history`, {
+        const forecastRes = await fetch(`${API_BASE}/forecast/history`, {
           credentials: "include",
         });
         
