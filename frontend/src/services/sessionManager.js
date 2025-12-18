@@ -21,10 +21,8 @@
  * ═══════════════════════════════════════════════════════════════
  */
 // Normalize API base so it always includes a single /api
-const RAW_API = import.meta.env.VITE_API_URL.replace(/\/$/, "");
-const API_BASE = RAW_API.endsWith("/api") ? RAW_API : `${RAW_API}/api`;
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, "");
 const LOGIN_API = `${API_BASE}/login`;
-const SESSION_API = `${API_BASE}/check-session`;
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const DASHBOARD_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dashboard
@@ -260,7 +258,7 @@ class SessionManager {
    */
 async fetchUserInfo() {
   try {
-const res = await fetch(SESSION_API, { credentials: "include" });
+const res = await fetch(API_BASE, { credentials: "include" });
     if (!res.ok) throw new Error("Not authenticated");
     const data = await res.json();
     if (!data.loggedIn || !data.user) throw new Error("No user session");
@@ -278,7 +276,7 @@ const res = await fetch(SESSION_API, { credentials: "include" });
    */
 async fetchForecastStatus() {
   try {
- const res = await fetch(`${API_BASE}/forecast/status`, { credentials: "include" });
+ const res = await fetch(`${API_BASE}/status`, { credentials: "include" });
 
  // ✅ adjust path
     if (res.status === 404) return { hasForecast: false, forecastCount: 0, latestForecast: null };

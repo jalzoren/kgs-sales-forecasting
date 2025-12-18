@@ -142,7 +142,7 @@ const Register = () => {
     });
 
     try {
-     const response = await fetch(`${API}/register`, {
+     const response = await fetch(`${API}/api/register`, {
   method: "POST",
   headers: { "Content-Type": "application/json" },
   credentials: "include",
