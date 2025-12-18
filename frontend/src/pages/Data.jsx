@@ -54,29 +54,34 @@ export default function UploadBox() {
     }
 
     try {
-     const url = showLoading
-  ? `${API}/data`
-  : `$${API}/api/data?polling=true`;
+    const url = `${API_BASE}/api/data${showLoading ? "" : "?polling=true"}`;
+    
+    console.log(`📡 Fetching uploads: ${url}`);
 
-const res = await fetch(url, {
-  method: "GET",
-  credentials: "include",
-});
+    const res = await fetch(url, {
+      method: "GET",
+      credentials: "include",
+    });
 
       
-      if (res.status === 401) {
-        if (showLoading && isInitialLoad) {
-          Swal.close();
-        }
-        window.location.href = "/";
-        return;
+    if (res.status === 401) {
+      if (showLoading && isInitialLoad) {
+        Swal.close();
       }
-      // 404 => no uploads yet (treat as empty list)
-      if (res.status === 404) {
-        if (showLoading && isInitialLoad) Swal.close();
-        setUploads([]);
-        return;
+      window.location.href = "/";
+      return;
+    }
+
+    // ✅ Handle 404 as "no uploads yet" (not an error)
+    if (res.status === 404) {
+      if (showLoading && isInitialLoad) {
+        Swal.close();
+        setIsInitialLoad(false);
       }
+      setUploads([]);
+      console.log("ℹ️ No uploads found (404 is expected for new users)");
+      return;
+    }
 
       if (!res.ok) {
         // Try to parse JSON safely, otherwise fallback to status text
@@ -97,6 +102,7 @@ const res = await fetch(url, {
       const data = await res.json().catch(() => []);
       if (Array.isArray(data)) {
         setUploads(data);
+        console.log(`✅ Loaded ${data.length} uploads`);
         if (showLoading && isInitialLoad) {
           Swal.close();
           setIsInitialLoad(false);

@@ -39,17 +39,19 @@ export default function Welcome() {
         credentials: "include",
       });
       
-      if (!res.ok) {
-        setUserStatus({
-          hasData: false,
-          hasModels: false,
-          hasForecast: false,
-          dataCount: 0,
-          isProcessing: false
-        });
-        if (isInitial) setIsInitialLoad(false);
-        return;
-      }
+    // ✅ Handle 404 as "no data yet" (expected for new users)
+    if (res.status === 404 || !res.ok) {
+      console.log("ℹ️ No data found - new user or no uploads yet");
+      setUserStatus({
+        hasData: false,
+        hasModels: false,
+        hasForecast: false,
+        dataCount: 0,
+        isProcessing: false
+      });
+      if (isInitial) setIsInitialLoad(false);
+      return;
+    }
       
       const uploads = await res.json();
       
