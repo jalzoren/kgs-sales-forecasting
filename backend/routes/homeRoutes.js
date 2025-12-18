@@ -8,7 +8,7 @@ const homeController = require("../controllers/homeController");
  * GET /api/home/dashboard
  * Get dashboard data combining sales, forecasts, and future predictions
  */
-router.get("/api/home/dashboard", requireAuth, (req, res) => {
+router.get("/home/dashboard", requireAuth, (req, res) => {
   homeController.getDashboard(req, res);
 });
 

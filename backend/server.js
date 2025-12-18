@@ -47,22 +47,26 @@ app.use(sessionConfig);
 // =======================
 app.use("/files", express.static(path.join(__dirname, "files")));
 
-// =======================
-// Routes
-// =======================
-// Auth routes
+// ═══════════════════════════════════════════════════════════
+// ROUTES - ALL UNDER /api PREFIX FOR CONSISTENCY
+// ═══════════════════════════════════════════════════════════
+// Auth routes → /api/login, /api/register, /api/check-session, etc.
 app.use("/api", authRoutes);
 
-// Forecast routes
+// Data routes → /api/data
+app.use("/api", dataRoutes);
+
+// Forecast routes → /api/forecast
 app.use("/api/forecast", forecastRoutes);
 
-// Notifications routes
-app.use("/api/notifications", notificationRoutes);
+// Home routes → /api/home
+app.use("/api", homeRoutes);
 
-// Other data/analytics/home routes
-app.use("/api/data", dataRoutes);
-app.use("/", analyticsRoutes);
-app.use("/", homeRoutes);
+// Analytics routes → /api/analytics
+app.use("/api", analyticsRoutes);
+
+// Notification routes → /api/notifications
+app.use("/api/notifications", notificationRoutes);
 
 // =======================
 // SESSION CHECK
@@ -78,7 +82,11 @@ app.get("/api/check-session", (req, res) => {
 // Root
 // =======================
 app.get("/", (req, res) => {
-  res.send("Backend running 🚀");
+  res.json({ 
+    status: "running", 
+    message: "KGS Sales Forecasting API. Backend running 🚀",
+    timestamp: new Date().toISOString()
+  });
 });
 
 // =======================
@@ -86,4 +94,6 @@ app.get("/", (req, res) => {
 // =======================
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
+  console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`   Database: ${process.env.SUPABASE_DB_URL ? 'Supabase (PostgreSQL)' : 'MySQL'}`);
 });
