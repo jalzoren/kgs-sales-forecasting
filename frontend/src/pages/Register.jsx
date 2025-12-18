@@ -3,7 +3,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "../css/Register.css";
-const API = import.meta.env.VITE_API_URL;
+
+const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, "");
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -142,12 +143,12 @@ const Register = () => {
     });
 
     try {
-     const response = await fetch(`${API}/api/register`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  credentials: "include",
-  body: JSON.stringify(formData),
-});
+      const response = await fetch(`${API_BASE}/api/register`, { // ✅ Now: /api/register
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(formData),
+  });
 
       const data = await response.json();
 

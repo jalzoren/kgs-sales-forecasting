@@ -22,12 +22,9 @@
  */
 // Normalize API base so it always includes a single /api
 const API_BASE = import.meta.env.VITE_API_URL.replace(/\/$/, "");
-const LOGIN_API = `${API_BASE}/login`;
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const DASHBOARD_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes for dashboard
-// sessionManager.js
-
 
 class SessionManager {
   constructor() {
@@ -256,37 +253,64 @@ class SessionManager {
    * Fetch user info from API
    * Private helper method
    */
-async fetchUserInfo() {
-  try {
-const res = await fetch(API_BASE, { credentials: "include" });
-    if (!res.ok) throw new Error("Not authenticated");
-    const data = await res.json();
-    if (!data.loggedIn || !data.user) throw new Error("No user session");
-    return data.user;
-  } catch (err) {
-    console.error("❌ Failed to fetch user info:", err);
-    throw err;
+
+  async fetchUserInfo() {
+    try {
+      const res = await fetch(`${API_BASE}/api/check-session`, { 
+        credentials: "include" 
+      });
+      
+      if (!res.ok) throw new Error("Not authenticated");
+      
+      const data = await res.json();
+      
+      if (!data.loggedIn || !data.user) {
+        throw new Error("No user session");
+      }
+      
+      return data.user;
+    } catch (err) {
+      console.error("❌ Failed to fetch user info:", err);
+      throw err;
+    }
   }
-}
+
 
 
   /**
    * Fetch forecast status from API
    * Private helper method
    */
-async fetchForecastStatus() {
-  try {
- const res = await fetch(`${API_BASE}/status`, { credentials: "include" });
 
- // ✅ adjust path
-    if (res.status === 404) return { hasForecast: false, forecastCount: 0, latestForecast: null };
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch (err) {
-    console.error("❌ Failed to fetch forecast status:", err);
-    return { hasForecast: false, forecastCount: 0, latestForecast: null };
+  async fetchForecastStatus() {
+    try {
+      const res = await fetch(`${API_BASE}/api/forecast/status`, { 
+        credentials: "include" 
+      });
+
+      // 404 means no forecasts yet (new user)
+      if (res.status === 404) {
+        return { 
+          hasForecast: false, 
+          forecastCount: 0, 
+          latestForecast: null 
+        };
+      }
+      
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      
+      return await res.json();
+    } catch (err) {
+      console.error("❌ Failed to fetch forecast status:", err);
+      return { 
+        hasForecast: false, 
+        forecastCount: 0, 
+        latestForecast: null 
+      };
+    }
   }
-}
 
   /**
    * Fetch dashboard data from API
@@ -294,7 +318,8 @@ async fetchForecastStatus() {
    */
   async fetchDashboardData(days) {
     try {
-      const response = await fetch(`${API_BASE}/home/dashboard?days=${days}`,
+      const response = await fetch(
+        `${API_BASE}/api/home/dashboard?days=${days}`,
         { credentials: "include" }
       );
 
