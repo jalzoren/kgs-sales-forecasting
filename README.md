@@ -35,3 +35,10 @@ The system will include:
 
 The system’s purpose is to **provide insights and alerts**, not to make automated decisions.  
 The final restocking decision remains the **responsibility of the store manager**, based on experience and contextual understanding.
+
+
+## Contributors
+
+- [Miah](https://github.com/jerimiahbitancor)
+- [Bianca](https://github.com/ka1zen3)
+- [Jal](https://github.com/jalzoren)
